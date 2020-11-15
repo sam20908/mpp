@@ -1,13 +1,13 @@
-project("Sandobx")
+cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+project("matrixpp")
 
-add_executable(Sandbox "matrix.hpp")
+add_library(${PROJECT_NAME} INTERFACE)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_sources(matrixpp INTERFACE "${CMAKE_SOURCE_DIR}/include/matrixpp/matrixpp.hpp")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(Sandbox PUBLIC -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+    target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
 else()
-    target_compile_options(Sandbox PUBLIC /W4 /WX)
+    target_compile_options(${PROJECT_NAME} INTERFACE /W4 /WX)
 endif()
