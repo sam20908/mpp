@@ -88,5 +88,10 @@
     - [ ] :bar_chart: Report test statistics to Azure Pipelines.
     - [ ] :bar_chart: Report performance statistics to Azure Pipelines.
 
+## :page_with_curl: Licensing:
+- [x] :pencil2: Mark all sources with **Apache License 2.0** header
+- [x] :pencil2: `LICENSE` file
+- [x] :pencil2: `NOTICE` file
+
 ## :thinking: Considering:
 - :bulb: Saturated arithmetic operations in matrix operations (a good example candidate is `determinant`, where the values can unpredictably exceed the matrix element type. Currently, having the user choose the precision type only solves half of the problem, since it's still pretty difficult to judge the precision needed).
