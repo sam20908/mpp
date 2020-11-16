@@ -2,6 +2,8 @@
 - [ ] :heavy_exclamation_mark: `singular` should respect user provided precision type (it correctly only checks against `long double`).
 - [ ] :heavy_exclamation_mark: `identity_matrix` can't have rank `0`.
 - [ ] :heavy_exclamation_mark: `zero_matrix` can't have rank `0`.
+- [ ] :heavy_exclamation_mark: `determinant` should **always** return floating point.
+- [ ] :heavy_exclamation_mark: `inverse` should **always** return floating point matrix.
 
 ## :tada: Improvements:
 - [ ] :heavy_exclamation_mark: Use a faster algorithm (with exchange for more space complexity) for determinant calculation.
