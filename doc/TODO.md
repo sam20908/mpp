@@ -14,6 +14,7 @@
 - [ ] :100: Allow passing user specified format to `print`.
 - [ ] :100: Implement an iterator class so that `matrix` can be iterated as a 2D range.
 - [ ] :100: `identity_matrix`'s constructor parameter should be renamed from `side_length` to `rank`.
+- [ ] :100: Doxygen documentation for the `matrix` API.
 
 ## :mountain_railway: Tests:
 - [ ] :100: **Performance benchmark**.
