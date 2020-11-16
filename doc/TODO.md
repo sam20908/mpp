@@ -1,9 +1,9 @@
-## Bugfixes:
+## :gear: Bugfixes:
 - [ ] :heavy_exclamation_mark: `singular` should respect user provided precision type (it correctly only checks against `long double`).
 - [ ] :heavy_exclamation_mark: `identity_matrix` can't have rank `0`.
 - [ ] :heavy_exclamation_mark: `zero_matrix` can't have rank `0`.
 
-## Improvements:
+## :tada: Improvements:
 - [ ] :heavy_exclamation_mark: Use a faster algorithm (with exchange for more space complexity) for determinant calculation.
 - [ ] :heavy_exclamation_mark: Use a faster algorithm (with exchange for more space complexity) for inverse calculation.
 - [ ] :small_red_triangle: Assertion for a fully static matrix that one side can't be zero and other being a non-zero should be a `static_assert`.
@@ -13,7 +13,7 @@
 - [ ] :100: Implement an iterator class so that `matrix` can be iterated as a 2D range.
 - [ ] :100: `identity_matrix`'s constructor parameter should be renamed from `side_length` to `rank`.
 
-## Tests:
+## :mountain_railway: Tests:
 - [ ] :100: **Performance benchmark**.
 - [ ] :small_red_triangle_down: Add tests for `matrix`:
     ### Instantiation:
@@ -79,7 +79,7 @@
     - [ ] :heavy_check_mark: Default copy constructor should perform a deep copy.
     - [ ] :heavy_check_mark: Default move constructor should move the data into the other object and leave the original one in a zombie state.
 
-## CI:
+## :beginner: CI:
 - [ ] :rocket: Use **Azure Pipelines**:
     - [ ] :small_orange_diamond: Test build on Windows.
     - [ ] :small_orange_diamond: Test build on Linux.
@@ -88,5 +88,5 @@
     - [ ] :bar_chart: Report test statistics to Azure Pipelines.
     - [ ] :bar_chart: Report performance statistics to Azure Pipelines.
 
-## Considering:
+## :thinking: Considering:
 - :bulb: Saturated arithmetic operations in matrix operations (a good example candidate is `determinant`, where the values can unpredictably exceed the matrix element type. Currently, having the user choose the precision type only solves half of the problem, since it's still pretty difficult to judge the precision needed).
