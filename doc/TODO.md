@@ -80,13 +80,13 @@
     - [ ] :heavy_check_mark: Default move constructor should move the data into the other object and leave the original one in a zombie state.
 
 ## CI:
-- [ ] Use **Azure Pipelines**:
-    - [ ] Test build on Windows.
-    - [ ] Test build on Linux.
-    - [ ] Test build on MacOS.
-    - [ ] Check that the code is formatted properly with **Clang Format**.
-    - [ ] Report test statistics to Azure Pipelines.
-    - [ ] Report performance statistics to Azure Pipelines.
+- [ ] :rocket: Use **Azure Pipelines**:
+    - [ ] :small_orange_diamond: Test build on Windows.
+    - [ ] :small_orange_diamond: Test build on Linux.
+    - [ ] :small_orange_diamond: Test build on MacOS.
+    - [ ] :mag_right: Check that the code is formatted properly with **Clang Format**.
+    - [ ] :bar_chart: Report test statistics to Azure Pipelines.
+    - [ ] :bar_chart: Report performance statistics to Azure Pipelines.
 
 ## Considering:
-- Saturated arithmetic operations in matrix operations (a good example candidate is `determinant`, where the values can unpredictably exceed the matrix element type. Currently, having the user choose the precision type only solves half of the problem, since it's still pretty difficult to judge the precision needed).
+- :bulb: Saturated arithmetic operations in matrix operations (a good example candidate is `determinant`, where the values can unpredictably exceed the matrix element type. Currently, having the user choose the precision type only solves half of the problem, since it's still pretty difficult to judge the precision needed).
