@@ -37,3 +37,6 @@ compile_commands.json
 
 # Visual Studio Code local configuration
 .vscode/
+
+# Clang cache
+.cache/
