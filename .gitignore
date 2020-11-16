@@ -31,5 +31,9 @@
 *.out
 *.app
 
-# CMake build folders
+# CMake build files and folders
 build/
+compile_commands.json
+
+# Visual Studio Code local configuration
+.vscode/
