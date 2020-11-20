@@ -22,6 +22,7 @@
     ### Instantiation:
     - [x] :x: Instantiation of a non-arithmetic type.
     - [ ] :x: Pass a 1D or 3D+ range to the range constructor overload.
+    - [ ] :x: Pass a 0 for one side and non-zero for another in compile time.
     ### Constructor:
     - [ ] :heavy_check_mark: `matrix_reserve_only_tag` constructor should only reserve (does not increase the size of the buffer).
     - [ ] :heavy_check_mark: Default copy constructor should perform a deep copy.
