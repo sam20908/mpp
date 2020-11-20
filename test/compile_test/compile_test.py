@@ -31,6 +31,7 @@ class CompileTest(lit.formats.TestFormat):
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
         self.expected_results = {}
+        self.test_directory = local_config.test_directory
 
         expected_results_txt_path = os.path.join(
             self.test_dir, 'expected_results.txt')
@@ -61,7 +62,7 @@ class CompileTest(lit.formats.TestFormat):
             yield test
 
     def execute(self, test, lit_config):
-        build_dir = os.getcwd()
+        build_dir = self.test_directory
 
         test_source_path_separated = test.file_path.split(os.path.sep)
 
