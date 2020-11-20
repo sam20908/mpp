@@ -40,3 +40,6 @@ compile_commands.json
 
 # Clang cache
 .cache/
+
+# Compiled Python code (because LLVM Lit generates them)
+*.pyc
