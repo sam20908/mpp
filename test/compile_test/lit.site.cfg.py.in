@@ -22,14 +22,9 @@
 sys.path.append('@TEST_PATH@')
 
 
-import pathlib
 from compile_test import CompileTest
 
 
 config.name = 'compile-test'
-config.test_format = CompileTest('@TEST_PATH@')
-
-# This helps the compile test suite to always point to the correct
-# directory because running lit in different locations can mess up
-# the execution of the test (because it uses os.getcwd())
-config.test_directory = pathlib.Path(__file__).parent.absolute()
+config.test_format = CompileTest('@COMPILE_TEST_OUTPUT_DIR@')
+config.test_dir = '@TEST_PATH@'

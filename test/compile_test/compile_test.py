@@ -21,74 +21,66 @@ import lit.Test
 import lit.formats
 import lit.util
 import os
+import pathlib
 import tempfile
 
 
 class CompileTest(lit.formats.TestFormat):
-    def __init__(self, test_dir):
-        self.test_dir = test_dir
+    def __init__(self, build_dir):
+        self.build_dir = build_dir
 
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
         self.expected_results = {}
-        self.test_directory = local_config.test_directory
+        self.test_dir = local_config.test_dir
 
         expected_results_txt_path = os.path.join(
             self.test_dir, 'expected_results.txt')
 
         # Parse the file as a map of file name and their expected result
         with open(expected_results_txt_path, 'r') as expected_results_reader:
-            current_line = expected_results_reader.readline()
+            lines = expected_results_reader.readlines()
+            for line in lines:
+                test_source_relpath, expected_result = line.strip().split(' ')
+                self.expected_results[test_source_relpath] = expected_result
 
-            filename, expected_result = current_line.split(' ')
-            self.expected_results[filename] = expected_result
+        print(self.expected_results)
 
-        for entry in os.scandir(self.test_dir):
-            if not entry.is_dir():
-                continue
-
-            test_source_path = os.path.join(entry.path, 'test.cpp')
-
-            if not os.path.isfile(test_source_path):
-                continue
+        for test_source in pathlib.Path(self.test_dir).rglob('test.cpp'):
+            test_source_relpath = os.path.relpath(test_source, self.test_dir)
 
             # lit.Test.Test expects the path for the suite to be a tuple
             # because it joins it later with a separator for all path getters
-            test_source_path_tuple = path_in_suite + (entry.path, 'test.cpp')
-
+            test_source_path_tuple = path_in_suite + (str(test_source),)
             test = lit.Test.Test(
-                test_suite, test_source_path_tuple, local_config, test_source_path)
+                test_suite, test_source_path_tuple, local_config, test_source_relpath)
 
             yield test
 
     def execute(self, test, lit_config):
-        build_dir = self.test_directory
+        test_source_relpath = test.file_path
+        test_source_dirname = os.path.dirname(test_source_relpath)
 
-        test_source_path_separated = test.file_path.split(os.path.sep)
-
-        # We only need the last two elements, which is the test directory name
-        # and the test source name
-        test_directory_name, test_source_name = test_source_path_separated[-2:]
-        test_source_relative_path = test_directory_name + '/' + test_source_name
-
-        if not test_source_relative_path in self.expected_results.keys():
+        if not test_source_relpath in self.expected_results.keys():
             return lit.Test.UNSUPPORTED, "Test isn't specified in expected_results.txt"
 
-        # We need a temporary location to store the CMake configuration for
-        # the test sources
+        # Use a temporary directory to avoid leaving garbage CMake configuration
+        # for test sources behind
         with tempfile.TemporaryDirectory() as temp_dir:
             # Switch the current working directory because we want the CMake
-            # configuration files to be cleaned up after the test (the output
-            # and error messages are returned by lit.util.executeCommand)
+            # configuration files to be in the temporary directory to be cleaned
             os.chdir(temp_dir)
 
             # Use the configured CMakeLists in the test directory in the build folder
             # to configure for specific test source (we do this by the command line)
-            cmake_test_name_arg = f'-DTEST_NAME={test_directory_name}'
-            cmake_test_source_arg = f'-DTEST_SOURCE={test.file_path}'
+            # CMake doesn't allow / in target names, so we convert it to underscore
+            test_source_dirname_cmake_friendly = test_source_dirname.replace(
+                '/', '_')
+            cmake_test_name_arg = f'-DTEST_NAME={test_source_dirname_cmake_friendly}'
+            cmake_test_source_arg = f'-DTEST_SOURCE={test.getSourcePath()}'
             cmake_config_cmd = [
-                'cmake', cmake_test_name_arg, cmake_test_source_arg, '-DMATRIXPP_BUILD_TEST=FALSE',
-                build_dir, '-B', 'build']
+                'cmake', cmake_test_name_arg, cmake_test_source_arg, self.build_dir,
+                '-B', 'build']
             config_out, config_err, config_exit_code = lit.util.executeCommand(
                 cmake_config_cmd)
 
@@ -106,13 +98,13 @@ class CompileTest(lit.formats.TestFormat):
                 build_diagnostic = build_out + build_err
 
                 # Check if the file was intended to FAIL. Return XFAIL if thats the case
-                if self.expected_results[test_source_relative_path] == 'FAIL':
+                if self.expected_results[test_source_relpath] == 'FAIL':
                     return lit.Test.XFAIL, build_diagnostic
 
                 return lit.Test.FAIL, build_diagnostic
             else:
                 # Check if the file was intended to PASS
-                if self.expected_results[test_source_relative_path] == 'PASS':
+                if self.expected_results[test_source_relpath] == 'PASS':
                     return lit.Test.PASS, ''
 
                 return lit.Test.XPASS, ''
