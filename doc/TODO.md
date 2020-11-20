@@ -20,7 +20,7 @@
 - [ ] :100: **Performance benchmark**.
 - [ ] :small_red_triangle_down: Add tests for `matrix`:
     ### Instantiation:
-    - [ ] :x: Instantiation of a non-arithmetic type.
+    - [x] :x: Instantiation of a non-arithmetic type.
     ### Constructor:
     - [ ] :x: Pass a 1D or 3D+ range to the range constructor overload.
     - [ ] :heavy_check_mark: `matrix_reserve_only_tag` constructor should only reserve (does not increase the size of the buffer).
