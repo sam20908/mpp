@@ -15,5 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
+set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test")
+
 add_subdirectory("compile_test")
 add_subdirectory("unit_test")
+
+include(Dart)
+
+add_test(NAME "test" 
+    COMMAND lit unit_test compile_test
+    WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")

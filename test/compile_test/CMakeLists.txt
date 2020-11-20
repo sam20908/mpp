@@ -17,7 +17,7 @@
 
 set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
 set(TEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test/compile_test")
+set(COMPILE_TEST_OUTPUT_DIR "${TEST_OUTPUT_DIR}/compile_test")
 
-configure_file("lit.site.cfg.py.in" "${TEST_OUTPUT_DIR}/lit.site.cfg.py")
-configure_file("CMakeLists.txt.in" "${TEST_OUTPUT_DIR}/CMakeLists.txt" @ONLY)
+configure_file("lit.site.cfg.py.in" "${COMPILE_TEST_OUTPUT_DIR}/lit.site.cfg.py")
+configure_file("CMakeLists.txt.in" "${COMPILE_TEST_OUTPUT_DIR}/CMakeLists.txt" @ONLY)

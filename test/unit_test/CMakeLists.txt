@@ -17,7 +17,7 @@
 
 find_package(GTest CONFIG REQUIRED)
 
-set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test/unittest")
+set(UNIT_TEST_OUTPUT_DIR "${TEST_OUTPUT_DIR}/unit_test")
 set(TEST_SUFFIX "_test")
 
 function(_create_unit_test TEST_DIR)
@@ -31,14 +31,14 @@ function(_create_unit_test TEST_DIR)
         GTest::gmock GTest::gtest)
 
     set_target_properties(${TEST_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${UNIT_TEST_OUTPUT_DIR}"
         
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF)
 endfunction()
 
-configure_file("lit.site.cfg.py.in" "${TEST_OUTPUT_DIR}/lit.site.cfg.py")
+configure_file("lit.site.cfg.py.in" "${UNIT_TEST_OUTPUT_DIR}/lit.site.cfg.py")
 
 _create_unit_test("inverse")
 _create_unit_test("determinant")
