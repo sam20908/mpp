@@ -21,8 +21,8 @@
 - [ ] :small_red_triangle_down: Add tests for `matrix`:
     ### Instantiation:
     - [x] :x: Instantiation of a non-arithmetic type.
-    ### Constructor:
     - [ ] :x: Pass a 1D or 3D+ range to the range constructor overload.
+    ### Constructor:
     - [ ] :heavy_check_mark: `matrix_reserve_only_tag` constructor should only reserve (does not increase the size of the buffer).
     - [ ] :heavy_check_mark: Default copy constructor should perform a deep copy.
     - [ ] :heavy_check_mark: Default move constructor should move the data into the other object and leave the original one in a zombie state.
