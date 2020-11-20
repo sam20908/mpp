@@ -16,20 +16,20 @@
 # under the License.
 
 cmake_minimum_required(VERSION 3.15)
+project("temp_test")
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
+add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
-project("matrixpp")
+set_target_properties(${TEST_NAME} PROPERTIES
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF)
 
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_subdirectory("@PROJECT_ROOT@" "build")
+target_link_libraries(${TEST_NAME} PRIVATE matrixpp::matrixpp)
 
-target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
-target_include_directories(${PROJECT_NAME} INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-
-if(MATRIXPP_BUILD_TEST)
-    enable_testing()
-    add_subdirectory("test")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+else()
+    target_compile_options(${TEST_NAME} PRIVATE /W4 /WX)
 endif()

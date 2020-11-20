@@ -15,21 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cmake_minimum_required(VERSION 3.15)
+set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
+set(TEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test/compile_test")
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
-
-project("matrixpp")
-
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-
-target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
-target_include_directories(${PROJECT_NAME} INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-
-if(MATRIXPP_BUILD_TEST)
-    enable_testing()
-    add_subdirectory("test")
-endif()
+configure_file("lit.site.cfg.py.in" "${TEST_OUTPUT_DIR}/lit.site.cfg.py")
+configure_file("CMakeLists.txt.in" "${TEST_OUTPUT_DIR}/CMakeLists.txt" @ONLY)

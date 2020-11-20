@@ -15,21 +15,30 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cmake_minimum_required(VERSION 3.15)
+find_package(GTest CONFIG REQUIRED)
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
+set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test/unittest")
+set(TEST_SUFFIX "_test")
 
-project("matrixpp")
+function(_create_unit_test TEST_DIR)
+    set(TEST_NAME "${TEST_DIR}${TEST_SUFFIX}")
+    add_executable(${TEST_NAME} 
+        "${TEST_DIR}/test.cpp" 
+        "../gtest_main.cpp")
 
-add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+    target_link_libraries(${TEST_NAME} PRIVATE
+        matrixpp::matrixpp
+        GTest::gmock GTest::gtest)
 
-target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
-target_include_directories(${PROJECT_NAME} INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    set_target_properties(${TEST_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${TEST_OUTPUT_DIR}"
+        
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF)
+endfunction()
 
-if(MATRIXPP_BUILD_TEST)
-    enable_testing()
-    add_subdirectory("test")
-endif()
+configure_file("lit.site.cfg.py.in" "${TEST_OUTPUT_DIR}/lit.site.cfg.py")
+
+_create_unit_test("inverse")
+_create_unit_test("determinant")
