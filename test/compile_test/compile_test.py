@@ -44,8 +44,6 @@ class CompileTest(lit.formats.TestFormat):
                 test_source_relpath, expected_result = line.strip().split(' ')
                 self.expected_results[test_source_relpath] = expected_result
 
-        print(self.expected_results)
-
         for test_source in pathlib.Path(self.test_dir).rglob('test.cpp'):
             test_source_relpath = os.path.relpath(test_source, self.test_dir)
 
