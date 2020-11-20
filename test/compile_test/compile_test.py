@@ -57,7 +57,7 @@ class CompileTest(lit.formats.TestFormat):
 
     def execute(self, test, lit_config):
         test_source_relpath = test.file_path
-        test_source_dirname = os.path.dirname(test_source_relpath)
+        test_source_dirname = os.path.dirname(test_source_relpath).replace(os.path.sep, '/')
 
         if not test_source_relpath in self.expected_results.keys():
             return lit.Test.UNSUPPORTED, "Test isn't specified in expected_results.txt"
