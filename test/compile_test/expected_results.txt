@@ -1,1 +1,1 @@
-instantiate_non_arithmetic_type/test.cpp FAIL
+instantiate/non_arithmetic_type/test.cpp FAIL

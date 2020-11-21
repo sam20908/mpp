@@ -26,13 +26,11 @@ import tempfile
 
 
 class CompileTest(lit.formats.TestFormat):
-    def __init__(self, build_dir):
-        self.build_dir = build_dir
-
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
         self.expected_results = {}
         self.test_dir = local_config.test_dir
+        self.build_dir = local_config.build_dir
 
         expected_results_txt_path = os.path.join(
             self.test_dir, 'expected_results.txt')
