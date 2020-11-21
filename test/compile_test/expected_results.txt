@@ -1,1 +1,4 @@
+instantiate/1d_range_constructor/test.cpp FAIL
+instantiate/3d_range_constructor/test.cpp FAIL
+instantiate/4d_range_constructor/test.cpp FAIL
 instantiate/non_arithmetic_type/test.cpp FAIL
