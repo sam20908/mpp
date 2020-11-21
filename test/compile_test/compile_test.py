@@ -111,10 +111,9 @@ class CompileTest(lit.formats.TestFormat):
                 cmake_config_cmd)
 
             if config_exit_code:
-                # We don't check for expected results here because this has nothing
-                # to do with the test source
+                # Test couldn't start because didn't get past configuration stage
                 config_diagnostic = config_out + config_err
-                return lit.Test.FAIL, config_diagnostic
+                return lit.Test.UNRESOLVED, config_diagnostic
 
             cmake_build_cmd = ['cmake', '--build', 'build']
             build_out, build_err, build_exit_code = lit.util.executeCommand(
