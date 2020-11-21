@@ -42,20 +42,50 @@ class CompileTest(lit.formats.TestFormat):
                 test_source_relpath, expected_result = line.strip().split(' ')
                 self.expected_results[test_source_relpath] = expected_result
 
-        for test_source in pathlib.Path(self.test_dir).rglob('test.cpp'):
-            test_source_relpath = os.path.relpath(test_source, self.test_dir)
+        # Only run the specified tests and avoid recursive search of tests
+        if 'COMPILE_TESTS_TO_RUN' in lit_config.params.keys():
+            tests = lit_config.params['COMPILE_TESTS_TO_RUN'].split(',')
 
-            # lit.Test.Test expects the path for the suite to be a tuple
-            # because it joins it later with a separator for all path getters
-            test_source_path_tuple = path_in_suite + (str(test_source),)
-            test = lit.Test.Test(
-                test_suite, test_source_path_tuple, local_config, test_source_relpath)
+            for test in tests:
+                # Check if the specified test really exists
+                test_dir_path = os.path.join(self.test_dir, test)
+                test_dir_exists = os.path.isdir(test_dir_path)
 
-            yield test
+                if not test_dir_exists:
+                    continue
+
+                test_source_abspath = os.path.join(test_dir_path, 'test.cpp')
+                test_source_exists = os.path.isfile(test_source_abspath)
+
+                if not test_source_exists:
+                    continue
+
+                # lit.Test.Test expects the path for the suite to be a tuple
+                # because it joins it later with a separator for all path getters
+                test_source_path_tuple = path_in_suite + (test_source_abspath,)
+                test_source_relpath = os.path.join(test, 'test.cpp')
+                test = lit.Test.Test(
+                    test_suite, test_source_path_tuple, local_config, test_source_relpath)
+
+                yield test
+        else:
+            for test_source in pathlib.Path(self.test_dir).rglob('test.cpp'):
+                test_source_relpath = os.path.relpath(
+                    test_source, self.test_dir)
+
+                # lit.Test.Test expects the path for the suite to be a tuple
+                # because it joins it later with a separator for all path getters
+                test_source_path_tuple = path_in_suite + (str(test_source),)
+                test = lit.Test.Test(
+                    test_suite, test_source_path_tuple, local_config, test_source_relpath)
+
+                yield test
 
     def execute(self, test, lit_config):
+        # @TODO: Convert type to unix style
         test_source_relpath = test.file_path
-        test_source_dirname = os.path.dirname(test_source_relpath).replace(os.path.sep, '/')
+        test_source_dirname = os.path.dirname(
+            test_source_relpath).replace(os.path.sep, '/')
 
         if not test_source_relpath in self.expected_results.keys():
             return lit.Test.UNSUPPORTED, "Test isn't specified in expected_results.txt"
