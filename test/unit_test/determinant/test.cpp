@@ -21,12 +21,16 @@
 
 #include <matrixpp/matrixpp.hpp>
 
-TEST(DeterminantTest, IdentityMatrix)
-{
-    EXPECT_EQ(1, 1);
-}
-
 TEST(DeterminantTest, Calculation)
 {
-    EXPECT_EQ(1, 1);
+    auto matrix = matrixpp::matrix<int, 3, 3>{
+        {7, 3, 1},
+        {8, 8, 2},
+        {5, 8, 2}
+    };
+    auto det = matrix.determinant();
+
+    EXPECT_EQ(det,6);
+
+    // @TODO: Add more test cases for various precision types
 }
