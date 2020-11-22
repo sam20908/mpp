@@ -334,43 +334,43 @@ namespace matrixpp
 				// 3x3 and higher. Use recursion
 
 				/*
-     * Instead of manually recreating the entire inner matrix for calculation,
-     * we can just rotate and swap the elements of the untrimmed inner matrix
-     * (the matrix which we haven't "cut off" a column). With this method, we
-     * can just ignore the last column of this untrimmed matrix. Here is an
-     * example of this in action:
-     *
-     * Suppose we start with this 4x4 matrix:
-     * [1 2 3 4]
-     * [5 6 7 8]
-     * [9 8 7 6]
-     * [5 4 3 2]
-     *
-     * We can already cut off the top row in trivial fashion by using row_begin,
-     * so we can start off by cutting the first column. We're just going to work
-     * with this matrix where the top row got cut off: [5 6 7 8] [9 8 7 6] [5 4
-     * 3 2]
-     *
-     * Cutting off the first column would *always* start by rotating the row
-     * left. This can be achieved by using `std::rotate`: [6 7 8 5] [8 7 6 9] [4
-     * 3 2 5]
-     *
-     * Then ignoring the second column would be swapping the first element and
-     * the last element. [5 7 8 6] [9 7 6 8] [5 3 2 4]
-     *
-     * Ignoring the third column would be swapping the second element and the
-     * last element. [5 6 8 7] [9 8 6 7] [5 4 2 3]
-     *
-     * Igoring the fourth column would be swapping the third element and the
-     * last element. This would also go back to where we started! [5 6 7 8] [9 8
-     * 7 6] [5 4 3 2]
-     *
-     * This is important because we guarantee that all minor determinants are
-     * based on their "base" matrix, and the base matrix's values are back to
-     * where it should be. Suprisingly, this also guarantees that all minor
-     * determinant calculations are going to restore the base matrix back to
-     * where it should be
-     */
+				* Instead of manually recreating the entire inner matrix for calculation,
+				* we can just rotate and swap the elements of the untrimmed inner matrix
+				* (the matrix which we haven't "cut off" a column). With this method, we
+				* can just ignore the last column of this untrimmed matrix. Here is an
+				* example of this in action:
+				*
+				* Suppose we start with this 4x4 matrix:
+				* [1 2 3 4]
+				* [5 6 7 8]
+				* [9 8 7 6]
+				* [5 4 3 2]
+				*
+				* We can already cut off the top row in trivial fashion by using row_begin,
+				* so we can start off by cutting the first column. We're just going to work
+				* with this matrix where the top row got cut off: [5 6 7 8] [9 8 7 6] [5 4
+				* 3 2]
+				*
+				* Cutting off the first column would *always* start by rotating the row
+				* left. This can be achieved by using `std::rotate`: [6 7 8 5] [8 7 6 9] [4
+				* 3 2 5]
+				*
+				* Then ignoring the second column would be swapping the first element and
+				* the last element. [5 7 8 6] [9 7 6 8] [5 3 2 4]
+				*
+				* Ignoring the third column would be swapping the second element and the
+				* last element. [5 6 8 7] [9 8 6 7] [5 4 2 3]
+				*
+				* Igoring the fourth column would be swapping the third element and the
+				* last element. This would also go back to where we started! [5 6 7 8] [9 8
+				* 7 6] [5 4 3 2]
+				*
+				* This is important because we guarantee that all minor determinants are
+				* based on their "base" matrix, and the base matrix's values are back to
+				* where it should be. Suprisingly, this also guarantees that all minor
+				* determinant calculations are going to restore the base matrix back to
+				* where it should be
+				*/
 
 				for (auto column_index = std::size_t{ 0 }; column_index <= column_end; ++column_index)
 				{
