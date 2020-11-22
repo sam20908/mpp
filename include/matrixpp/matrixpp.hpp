@@ -460,14 +460,14 @@ namespace matrixpp
 			else
 			{
 				/**
-     * The swapping and rotating logic works a lot like `determinant_impl`'s
-     * logic, except that we put the minor matrix at the top left corner and
-     * call `determinant_impl` to calucate the determinant of that minor matrix.
-     * We do this because We ignore the values on the current row and column
-     *
-     * We use the same way to rotate and swap the columns, except that we do it
-     * to the rows as well
-     */
+				* The swapping and rotating logic works a lot like `determinant_impl`'s
+				* logic, except that we put the minor matrix at the top left corner and
+				* call `determinant_impl` to calucate the determinant of that minor matrix.
+				* We do this because We ignore the values on the current row and column
+				*
+				* We use the same way to rotate and swap the columns, except that we do it
+				* to the rows as well
+				*/
 
 				// First step: Compute matrix of minors
 
