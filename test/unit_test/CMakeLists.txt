@@ -40,5 +40,4 @@ endfunction()
 
 configure_file("lit.site.cfg.py.in" "${UNIT_TEST_OUTPUT_DIR}/lit.site.cfg.py")
 
-_create_unit_test("inverse")
 _create_unit_test("determinant")
