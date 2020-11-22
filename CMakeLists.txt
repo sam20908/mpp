@@ -21,6 +21,7 @@ set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems
     CACHE STRING "Vcpkg toolchain file")
 
 project("matrixpp")
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -29,7 +30,7 @@ target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-if(${PROJECT_NAME}_BUILD_TEST)
+if(${PROJECT_NAME_UPPER}_BUILD_TEST)
     enable_testing()
     add_subdirectory("test")
 endif()
