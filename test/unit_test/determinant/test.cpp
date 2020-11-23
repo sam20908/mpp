@@ -18,19 +18,17 @@
  */
 
 #include <gtest/gtest.h>
-
 #include <matrixpp/matrixpp.hpp>
 
-TEST(DeterminantTest, Calculation)
+namespace
 {
-    auto matrix = matrixpp::matrix<int, 3, 3>{
-        {7, 3, 1},
-        {8, 8, 2},
-        {5, 8, 2}
-    };
-    auto det = matrix.determinant();
+	TEST(DeterminantTest, Calculation)
+	{
+		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto det    = matrix.determinant();
 
-    EXPECT_EQ(det,6);
+		EXPECT_EQ(det, 6);
 
-    // @TODO: Add more test cases for various precision types
-}
+		// @TODO: Add more test cases for various precision types
+	}
+} // namespace
