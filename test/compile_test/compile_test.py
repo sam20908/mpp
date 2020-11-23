@@ -25,24 +25,33 @@ import pathlib
 import tempfile
 
 
+def _parse_expected_results(file_path):
+    expected_results = {}
+
+    # Parse the file as a map of file name and their expected result
+    with open(file_path, 'r') as reader:
+        lines = reader.readlines()
+        for line in lines:
+            test_source_relpath, expected_result = line.strip().split(' ')
+            expected_results[test_source_relpath] = expected_result
+
+    return expected_results
+
+
 class CompileTest(lit.formats.TestFormat):
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
+        expected_results_filepath = os.path.join(
+            local_config.test_dir, 'expected_results.txt')
+
         self.expected_results = {}
         self.test_dir = local_config.test_dir
         self.build_dir = local_config.build_dir
-
-        expected_results_txt_path = os.path.join(
-            self.test_dir, 'expected_results.txt')
-
-        # Parse the file as a map of file name and their expected result
-        with open(expected_results_txt_path, 'r') as expected_results_reader:
-            lines = expected_results_reader.readlines()
-            for line in lines:
-                test_source_relpath, expected_result = line.strip().split(' ')
-                self.expected_results[test_source_relpath] = expected_result
+        self.expected_results = _parse_expected_results(
+            expected_results_filepath)
 
         # Only run the specified tests and avoid recursive search of tests
+        # @TODO: Move this logic into a separate function
         if 'COMPILE_TESTS_TO_RUN' in lit_config.params.keys():
             tests = lit_config.params['COMPILE_TESTS_TO_RUN'].split(',')
 
