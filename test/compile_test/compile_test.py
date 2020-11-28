@@ -38,57 +38,62 @@ def _parse_expected_results(file_path):
     return expected_results
 
 
+def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_config):
+    tests = []
+
+    if 'COMPILE_TESTS_TO_RUN' in lit_params.keys():
+        specified_tests = lit_params['COMPILE_TESTS_TO_RUN'].split(',')
+
+        for test in specified_tests:
+            test_dir_path = os.path.join(test_dir, test)
+            test_dir_exists = os.path.isdir(test_dir_path)
+
+            if not test_dir_exists:
+                continue
+
+            # @TODO: allow specify directory of directory of tests
+            test_source_abspath = os.path.join(test_dir_path, 'test.cpp')
+            test_source_exists = os.path.isfile(test_source_abspath)
+
+            if not test_source_exists:
+                continue
+
+            test_source_path_tuple = path_in_suite + (test_source_abspath,)
+            test_source_relpath = os.path.join(test, 'test.cpp')
+            test = lit.Test.Test(
+                test_suite, test_source_path_tuple, local_config, test_source_relpath)
+
+            tests.append(test)
+    else:
+        for test_source in pathlib.Path(test_dir).rglob('test.cpp'):
+            test_source_relpath = os.path.relpath(
+                test_source, test_dir)
+
+            test_source_path_tuple = path_in_suite + (str(test_source),)
+            test = lit.Test.Test(
+                test_suite, test_source_path_tuple, local_config, test_source_relpath)
+
+            tests.append(test)
+
+    return tests
+
+
 class CompileTest(lit.formats.TestFormat):
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
         expected_results_filepath = os.path.join(
             local_config.test_dir, 'expected_results.txt')
 
-        self.expected_results = {}
         self.test_dir = local_config.test_dir
         self.build_dir = local_config.build_dir
         self.expected_results = _parse_expected_results(
             expected_results_filepath)
 
-        # Only run the specified tests and avoid recursive search of tests
-        # @TODO: Move this logic into a separate function
-        if 'COMPILE_TESTS_TO_RUN' in lit_config.params.keys():
-            tests = lit_config.params['COMPILE_TESTS_TO_RUN'].split(',')
+        tests = _parse_tests_to_run(
+            lit_config.params, self.test_dir, test_suite, path_in_suite, local_config)
 
-            for test in tests:
-                # Check if the specified test really exists
-                test_dir_path = os.path.join(self.test_dir, test)
-                test_dir_exists = os.path.isdir(test_dir_path)
-
-                if not test_dir_exists:
-                    continue
-
-                test_source_abspath = os.path.join(test_dir_path, 'test.cpp')
-                test_source_exists = os.path.isfile(test_source_abspath)
-
-                if not test_source_exists:
-                    continue
-
-                # lit.Test.Test expects the path for the suite to be a tuple
-                # because it joins it later with a separator for all path getters
-                test_source_path_tuple = path_in_suite + (test_source_abspath,)
-                test_source_relpath = os.path.join(test, 'test.cpp')
-                test = lit.Test.Test(
-                    test_suite, test_source_path_tuple, local_config, test_source_relpath)
-
-                yield test
-        else:
-            for test_source in pathlib.Path(self.test_dir).rglob('test.cpp'):
-                test_source_relpath = os.path.relpath(
-                    test_source, self.test_dir)
-
-                # lit.Test.Test expects the path for the suite to be a tuple
-                # because it joins it later with a separator for all path getters
-                test_source_path_tuple = path_in_suite + (str(test_source),)
-                test = lit.Test.Test(
-                    test_suite, test_source_path_tuple, local_config, test_source_relpath)
-
-                yield test
+        for test in tests:
+            yield test
 
     def execute(self, test, lit_config):
         # @TODO: Convert type to unix style
