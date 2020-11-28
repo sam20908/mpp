@@ -29,6 +29,3 @@ config.name = 'compile-test'
 config.test_format = CompileTest()
 config.test_dir = '@COMPILE_TEST_DIR@'
 config.build_dir = '@COMPILE_TEST_OUTPUT_DIR@'
-
-# @TODO: Support passing subset of tests directly to Lit without
-# relying on COMPILE_TESTS_TO_RUN
