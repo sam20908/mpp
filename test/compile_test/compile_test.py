@@ -48,7 +48,10 @@ def _parse_tests_to_run(lit_config, test_dir, test_suite, path_in_suite, local_c
         for test_source in pathlib.Path(test_glob_path).rglob(test_suffix):
             test_source_path_tuple = path_in_suite + \
                 (str(test_source.resolve()),)
-            test_source_relpath = os.path.relpath(test_source, test_dir)
+
+            # Convert path to unix style in all cases
+            test_source_relpath = os.path.relpath(
+                test_source, test_dir).replace(os.path.sep, '/')
 
             test = lit.Test.Test(
                 test_suite, test_source_path_tuple, local_config, test_source_relpath)
@@ -91,7 +94,6 @@ class CompileTest(lit.formats.TestFormat):
             yield test
 
     def execute(self, test, lit_config):
-        # @TODO: Convert type to unix style
         test_source_relpath = test.file_path
         test_source_dirname = os.path.dirname(
             test_source_relpath).replace(os.path.sep, '/')
