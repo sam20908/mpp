@@ -41,6 +41,18 @@ def _parse_expected_results(file_path):
 def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_config):
     tests = []
 
+    def _add_test_sources_to_tests(test_glob_path):
+        # @TODO: Support exclusion of tests
+        for test_source in pathlib.Path(test_glob_path).rglob('test.cpp'):
+            test_source_path_tuple = path_in_suite + \
+                (str(test_source.resolve()),)
+            test_source_relpath = os.path.relpath(test_source, test_dir)
+
+            test = lit.Test.Test(
+                test_suite, test_source_path_tuple, local_config, test_source_relpath)
+
+            tests.append(test)
+
     if 'COMPILE_TESTS_TO_RUN' in lit_params.keys():
         specified_tests = lit_params['COMPILE_TESTS_TO_RUN'].split(',')
 
@@ -51,27 +63,10 @@ def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_c
             if not specified_test_exists:
                 continue
 
-            # @TODO: Support exclusion of tests
-            for test_source in pathlib.Path(specified_test_path).rglob('test.cpp'):
-                test_source_path_tuple = path_in_suite + \
-                    (str(test_source.resolve()),)
-                test_source_relpath = os.path.relpath(test_source, test_dir)
+            _add_test_sources_to_tests(specified_test_path)
 
-                test = lit.Test.Test(
-                    test_suite, test_source_path_tuple, local_config, test_source_relpath)
-
-                tests.append(test)
     else:
-        for test_source in pathlib.Path(test_dir).rglob('test.cpp'):
-            test_source_path_tuple = path_in_suite + \
-                (str(test_source.resolve()),)
-            test_source_relpath = os.path.relpath(
-                test_source, test_dir)
-
-            test = lit.Test.Test(
-                test_suite, test_source_path_tuple, local_config, test_source_relpath)
-
-            tests.append(test)
+        _add_test_sources_to_tests(test_dir)
 
     return tests
 
