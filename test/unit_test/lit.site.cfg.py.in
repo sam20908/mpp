@@ -22,4 +22,5 @@
 import lit.formats
 
 config.name = 'unit-test'
-config.test_format = lit.formats.GoogleTest('@UNIT_TEST_OUTPUT_DIR@', '@TEST_SUFFIX@')
+config.test_format = lit.formats.GoogleTest('@UNIT_TEST_OUTPUT_DIR@', 
+    '@UNIT_TEST_SUFFIX@')

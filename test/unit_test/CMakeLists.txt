@@ -18,10 +18,10 @@
 find_package(GTest CONFIG REQUIRED)
 
 set(UNIT_TEST_OUTPUT_DIR "${TEST_OUTPUT_DIR}/unit_test")
-set(TEST_SUFFIX "_test")
+set(UNIT_TEST_SUFFIX "_test")
 
 function(_create_unit_test TEST_DIR)
-    set(TEST_NAME "${TEST_DIR}${TEST_SUFFIX}")
+    set(TEST_NAME "${TEST_DIR}${UNIT_TEST_SUFFIX}")
     add_executable(${TEST_NAME} 
         "${TEST_DIR}/test.cpp" 
         "../gtest_main.cpp")

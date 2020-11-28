@@ -38,12 +38,14 @@ def _parse_expected_results(file_path):
     return expected_results
 
 
-def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_config):
+def _parse_tests_to_run(lit_config, test_dir, test_suite, path_in_suite, local_config):
     tests = []
 
     def _add_test_sources_to_tests(test_glob_path):
+        test_suffix = local_config.test_suffix
+
         # @TODO: Support exclusion of tests
-        for test_source in pathlib.Path(test_glob_path).rglob('test.cpp'):
+        for test_source in pathlib.Path(test_glob_path).rglob(test_suffix):
             test_source_path_tuple = path_in_suite + \
                 (str(test_source.resolve()),)
             test_source_relpath = os.path.relpath(test_source, test_dir)
@@ -53,8 +55,8 @@ def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_c
 
             tests.append(test)
 
-    if 'COMPILE_TESTS_TO_RUN' in lit_params.keys():
-        specified_tests = lit_params['COMPILE_TESTS_TO_RUN'].split(',')
+    if 'COMPILE_TESTS_TO_RUN' in lit_config.params.keys():
+        specified_tests = lit_config.params['COMPILE_TESTS_TO_RUN'].split(',')
 
         for specified_test in specified_tests:
             specified_test_dir = os.path.join(test_dir, specified_test)
@@ -83,7 +85,7 @@ class CompileTest(lit.formats.TestFormat):
             expected_results_filepath)
 
         tests = _parse_tests_to_run(
-            lit_config.params, self.test_dir, test_suite, path_in_suite, local_config)
+            lit_config, self.test_dir, test_suite, path_in_suite, local_config)
 
         for test in tests:
             yield test

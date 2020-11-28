@@ -27,5 +27,6 @@ from compile_test import CompileTest
 
 config.name = 'compile-test'
 config.test_format = CompileTest()
+config.test_suffix = '@COMPILE_TEST_SUFFIX@'
 config.test_dir = '@COMPILE_TEST_DIR@'
 config.build_dir = '@COMPILE_TEST_OUTPUT_DIR@'
