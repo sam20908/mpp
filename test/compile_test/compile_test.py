@@ -57,13 +57,13 @@ def _parse_tests_to_run(lit_params, test_dir, test_suite, path_in_suite, local_c
         specified_tests = lit_params['COMPILE_TESTS_TO_RUN'].split(',')
 
         for specified_test in specified_tests:
-            specified_test_path = os.path.join(test_dir, specified_test)
-            specified_test_exists = os.path.isdir(specified_test_path)
+            specified_test_dir = os.path.join(test_dir, specified_test)
+            specified_test_exists = os.path.isdir(specified_test_dir)
 
             if not specified_test_exists:
                 continue
 
-            _add_test_sources_to_tests(specified_test_path)
+            _add_test_sources_to_tests(specified_test_dir)
 
     else:
         _add_test_sources_to_tests(test_dir)
