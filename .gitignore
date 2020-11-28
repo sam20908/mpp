@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# CMake build files and folders
+build/
+compile_commands.json
+
+# Visual Studio Code local configuration
+.vscode/
+
+# Clang cache
+.cache/
+
+# Compiled Python code (because LLVM Lit generates them)
+*.pyc
