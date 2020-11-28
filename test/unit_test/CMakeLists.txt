@@ -24,7 +24,7 @@ function(_create_unit_test TEST_DIR)
     set(TEST_NAME "${TEST_DIR}${UNIT_TEST_SUFFIX}")
     add_executable(${TEST_NAME} 
         "${TEST_DIR}/test.cpp" 
-        "../gtest_main.cpp")
+        "gtest_main.cpp")
 
     target_link_libraries(${TEST_NAME} PRIVATE
         matrixpp::matrixpp
