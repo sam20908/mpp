@@ -18,3 +18,6 @@ A C++20 and later matrix library
     - *Note: This assumes you're in `build/bin/test/compile_test` directory!*
     1. `lit . -D COMPILE_TESTS_TO_RUN=instantiate/1d_range_constructor,instantiate/3d_range_constructor`
     2. The above command runs only the two specified tests.
+    - You can also specify the parent directory of subdirectories of tests, for example:
+    1. `lit . -D COMPILE_TESTS_TO_RUN=instantiate`
+    2. The above command runs all the tests inside `instantiate`.
