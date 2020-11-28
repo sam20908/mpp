@@ -1,11 +1,3 @@
-trigger:
-  branches:
-    include:
-    - master
-    - /*
-
-name: Formatting
-displayName: 'Formatting'
 jobs:
   - job: ClangFormatValidation
     displayName: 'Clang Format Validation'
