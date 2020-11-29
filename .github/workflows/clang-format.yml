@@ -11,9 +11,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Checkout run-clang-format
-        uses: actions/checkout@v2
-        with:
-          repository: 'Sarcasm/run-clang-format'
+        run: git clone https://github.com/Sarcasm/run-clang-format
 
       - name: Validate
         run: python ./run-clang-format/run-clang-format.py -r include test --style file
