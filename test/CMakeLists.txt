@@ -19,6 +19,7 @@ set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test")
 
 add_subdirectory("compile_test")
 add_subdirectory("unit_test")
+add_subdirectory("performance_test")
 
 include(Dart)
 
