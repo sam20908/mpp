@@ -3,7 +3,7 @@ name: Clang Format Validation
 on: [push, pull_request]
 
 jobs:
-  validate:
+  Validate:
     runs-on: ubuntu-20.04
 
     steps:
