@@ -17,10 +17,10 @@
  * under the License.
  */
 
- /**
-  * Since linking GTest::gtest_main somehow creates another test
-  * for lit, we define the main function manually
-  */
+/**
+ * Since linking GTest::gtest_main somehow creates another test
+ * for lit, we define the main function manually
+ */
 
 #include <gtest/gtest.h>
 
