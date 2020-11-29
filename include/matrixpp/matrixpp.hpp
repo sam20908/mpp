@@ -1227,8 +1227,11 @@ namespace matrixpp
 		return object;
 	}
 
+	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
+	// clang-format off
 	template<range_2d Range2D>
 	matrix(Range2D&&) -> matrix<std::ranges::range_value_t<std::ranges::range_value_t<Range2D>>>;
+	// clang-format on
 
 	template<arithmetic Element = int, std::size_t N = std::dynamic_extent>
 	class identity_matrix : public matrix<Element, N, N>
