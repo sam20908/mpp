@@ -1,6 +1,0 @@
-jobs:
-  - job: ClangFormatValidation
-    displayName: 'Clang Format Validation'
-    steps:
-    - checkout: self
-    - bash: echo Hello
