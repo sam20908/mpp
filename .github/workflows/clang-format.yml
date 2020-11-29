@@ -16,4 +16,4 @@ jobs:
           repository: 'Sarcasm/run-clang-format'
 
       - name: Validate
-        run: python ./run-clang-format/run-clang-format.py -r include test
+        run: python ./run-clang-format/run-clang-format.py -r include test --style file
