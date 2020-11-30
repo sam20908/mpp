@@ -56,9 +56,8 @@ jobs:
           CXX: /usr/bin/g++-10
 
       - name: Publish Unit and Compile Test Results
-        uses: mikepenz/action-junit-report@v1
+        uses: EnricoMi/publish-unit-test-result-action@v1.5
         with:
-          report_paths: '**/results.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/results.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         if: steps.build_status.outputs.exit_status == 'success'
