@@ -36,12 +36,16 @@ jobs:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
 
+      - name: Set Build Status
+        id: build_status
+        run: echo ::set-output name=status::success
+
       - name: Install Python Lit
         run: |
           pip install lit
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Unit and Compile Test
+      - name: Run Unit and Compile Test
         run: |
           cd '${{ github.workspace }}/build/bin/test/unit_test'
           lit . --xunit-xml-output results.xml
@@ -56,4 +60,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/results.xml'
-        if: ${{ always() }}
+        if: steps.build_status.outputs.exit_status == success
