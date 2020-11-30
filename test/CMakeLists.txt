@@ -24,5 +24,5 @@ add_subdirectory("performance_test")
 include(Dart)
 
 add_test(NAME "test" 
-    COMMAND lit unit_test compile_test --xunit-xml-output results.xml
+    COMMAND lit unit_test compile_test
     WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")
