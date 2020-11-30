@@ -43,8 +43,10 @@ jobs:
 
       - name: Unit and Compile Test
         run: |
-          cd '${{ github.workspace }}/build/bin/test'
-          lit unit_test compile_test --xunit-xml-output results.xml
+          cd '${{ github.workspace }}/build/bin/test/unit_test'
+          lit . --xunit-xml-output results.xml
+          cd '${{ github.workspace }}/build/bin/test/compile_test'
+          lit . --xunit-xml-output results.xml
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
