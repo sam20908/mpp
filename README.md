@@ -5,7 +5,6 @@ A C++20 and later matrix library
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
 - YOu can also just include the header into your project manually if that's your decision.
 - Specify `MATRIXPP_BUILD_TEST` to a boolean value to enable or disable building the test.
-- Specify `MATRIXPP_BUILD_PERFORMANCE_TEST` to a boolean value to enable or disable building the performance test.
 
 ## Test Dependencies:
 - `gtest` in `vcpkg` for test.
