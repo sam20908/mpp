@@ -31,7 +31,7 @@ jobs:
           cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
           cmakeBuildType: 'Release'
           buildDirectory: '${{ github.workspace }}/build'
-          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE'
+          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE -DCMAKE_C_COMPILER=/usr/bin/gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/g++-10'
 
       - name: Install Python Lit
         run: |
