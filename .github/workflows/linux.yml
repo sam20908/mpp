@@ -1,0 +1,50 @@
+name: Linux Build and Test
+
+on: [push, pull_request]
+
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgArguments: '@${{ github.workspace }}/vcpkg-dependencies.txt'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          appendedCacheKey: ${{ hashFiles( '${{ github.workspace}}/vcpkg-dependencies.txt' ) }}
+
+      - name: Install GCC 10
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt install gcc-10 g++-10
+          
+      - name: Build
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeBuildType: 'Release'
+          buildDirectory: '${{ github.workspace }}/build'
+          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE'
+
+      - name: Install Python Lit
+        run: |
+          pip install lit
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Unit and Compile Test
+        run: |
+          cd '${{ github.workspace }}/build/bin/test'
+          lit unit_test compile_test --xunit-xml-output results.xml
+
+      - name: Publish Unit and Compile Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: '${{ github.workspace }}/build/bin/test/results.xml'
+        if: ${{ always() }}
