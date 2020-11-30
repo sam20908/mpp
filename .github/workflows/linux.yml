@@ -60,4 +60,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/results.xml'
-        if: steps.build_status.outputs.exit_status == success
+        if: steps.build_status.outputs.exit_status == 'success'
