@@ -38,7 +38,7 @@ jobs:
 
       - name: Set Build Status
         id: build_status
-        run: echo ::set-output name=status::success
+        run: echo ::set-output name=exit_status::success
 
       - name: Install Python Lit
         run: |
@@ -56,8 +56,9 @@ jobs:
           CXX: /usr/bin/g++-10
 
       - name: Publish Unit and Compile Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.5
+        uses: mikepenz/action-junit-report@v1
         with:
+          report_paths: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/results.xml'
         if: steps.build_status.outputs.exit_status == 'success'
