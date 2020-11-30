@@ -41,7 +41,7 @@ jobs:
       - name: Unit and Compile Test
         run: |
           cd '${{ github.workspace }}/build/bin/test'
-          lit unit_test compile_test --xunit-xml-output results.xml
+          lit unit_test compile_test --xunit-xml-output results.xml -a
 
       - name: Publish Unit and Compile Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1.5
