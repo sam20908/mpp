@@ -61,3 +61,8 @@ jobs:
           files: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
         if: steps.build_status.outputs.exit_status == 'success'
+
+      - name: Run Performance Test
+        run: |
+          cd '${{ github.workspace }}/build/bin/test/performance_test'
+          for file in *; do ./$file; done
