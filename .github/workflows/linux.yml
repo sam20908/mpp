@@ -34,6 +34,9 @@ jobs:
           cmakeBuildType: 'Release'
           buildDirectory: '${{ github.workspace }}/build'
           cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE'
+        env:
+          CC: gcc
+          CXX: g++
 
       - name: Install Python Lit
         run: |
