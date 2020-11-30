@@ -38,7 +38,7 @@ jobs:
 
       - name: Set Build Status
         id: build_status
-        run: echo ::set-output name=status::success
+        run: echo ::set-output name=exit_status::success
 
       - name: Install Python Lit
         run: |
