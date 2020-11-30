@@ -37,14 +37,12 @@ jobs:
           CXX: /usr/bin/g++-10
 
       - name: Install Python Lit
-        run: |
-          pip install lit
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: pip install lit
 
       - name: Unit and Compile Test
         run: |
           cd '${{ github.workspace }}/build/bin/test'
-          lit unit_test compile_test --xunit-xml-output results.xml -a
+          $HOME/.local/bin/lit unit_test compile_test --xunit-xml-output results.xml -a
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
