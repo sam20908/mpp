@@ -60,4 +60,4 @@ jobs:
         with:
           report_paths: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.build_status.outputs.exit_status == success
+        if: steps.build_status.outputs.exit_status == 'success'
