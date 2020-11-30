@@ -15,15 +15,16 @@ static void determinant_5x5(benchmark::State& state)
 	}
 }
 
-// static void determinant_100x100(benchmark::State& state)
-// {
-// 	for (auto _ : state)
-// 	{
-// 		matrixpp::matrix a(100, 100, 12345);
+static void determinant_100x100(benchmark::State& state)
+{
+	for (auto _ : state)
+	{
+		matrixpp::matrix a(100, 100, 12345);
 
-// 		(void)a.determinant<long double>();
-// 	}
-// }
+		// @TODO: Fix this when determinant API changes
+		(void)a.determinant<long double>();
+	}
+}
 
 BENCHMARK(determinant_5x5);
-// BENCHMARK(determinant_100x100);
+BENCHMARK(determinant_100x100);
