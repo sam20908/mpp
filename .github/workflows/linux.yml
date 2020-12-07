@@ -29,9 +29,8 @@ jobs:
         uses: lukka/run-cmake@v3
         with:
           cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
-          cmakeBuildType: 'Release'
           buildDirectory: '${{ github.workspace }}/build'
-          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE'
+          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE -DCMAKE_BUILD_TYPE=Release'
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
