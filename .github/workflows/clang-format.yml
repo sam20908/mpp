@@ -1,4 +1,4 @@
-name: Clang Format Validation
+name: Format
 
 on: [push, pull_request]
 
