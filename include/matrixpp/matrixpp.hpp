@@ -273,7 +273,7 @@ namespace matrixpp
 			}
 		}
 
-		inline constexpr std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
+		constexpr std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
 		{
 			// This is mainly for avoiding bug-prone code, because this calculation occurs
 			// in a lot of places, and a typo can cause a lot of things to fail. It's
