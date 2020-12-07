@@ -15,6 +15,16 @@ static void determinant_5x5(benchmark::State& state)
 	}
 }
 
+static void determinant_10x10(benchmark::State& state)
+{
+	matrixpp::matrix a(10, 10, 125);
+
+	for (auto _ : state)
+	{
+		(void)a.determinant();
+	}
+}
+
 static void determinant_100x100(benchmark::State& state)
 {
 	matrixpp::matrix a(100, 100, 1);
@@ -27,4 +37,5 @@ static void determinant_100x100(benchmark::State& state)
 }
 
 BENCHMARK(determinant_5x5);
+BENCHMARK(determinant_10x10);
 // BENCHMARK(determinant_100x100);
