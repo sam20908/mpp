@@ -90,7 +90,7 @@
     - [ ] :small_orange_diamond: Test build on MacOS (XCode not up to date yet).
     - [ ] :mag_right: Check that the code is formatted properly with **Clang Format**.
     - [x] :bar_chart: Report test statistics to GitHub Actions.
-    - [ ] :bar_chart: Report performance statistics to GitHub Actions.
+    - [x] :bar_chart: Report performance statistics to GitHub Pages.
 
 ## :page_with_curl: Licensing:
 - [x] :pencil2: Mark all sources with **Apache License 2.0** header
