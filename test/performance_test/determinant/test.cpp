@@ -3,11 +3,7 @@
 
 static void determinant_5x5(benchmark::State& state)
 {
-	matrixpp::matrix a{ { 1000, 1000, 100, 10, 1 },
-		{ 1000, 1000, 100, 10, 1 },
-		{ 1000, 1000, 100, 10, 1 },
-		{ 1000, 1000, 100, 10, 1 },
-		{ 1000, 1000, 100, 10, 1 } };
+	matrixpp::matrix a(5, 5, 125);
 
 	for (auto _ : state)
 	{
