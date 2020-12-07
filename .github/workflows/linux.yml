@@ -69,3 +69,5 @@ jobs:
         with:
           tool: 'googlecpp'
           output-file-path: '${{ github.workspace }}/build/bin/test/performance_test/results.json'
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          auto-push: true
