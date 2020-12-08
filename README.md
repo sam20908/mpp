@@ -1,14 +1,17 @@
 # matrixpp
 A C++20 and later matrix library
 
+![](https://github.com/sam20908/matrixpp/workflows/Linux/badge.svg)
+
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
 - YOu can also just include the header into your project manually if that's your decision.
-- **Note: specify `MATRIXPP_BUILD_TEST` to a boolean value to enable or disable building the test!**
+- Specify `MATRIXPP_BUILD_TEST` to a boolean value to enable or disable building the test.
 
 ## Test Dependencies:
-- `gtest` in `vcpkg`.
-- Python package `lit`.
+- `gtest` in `vcpkg` for test.
+- Python package `lit` for test.
+- `benchmark` in `vcpkg` for performance test.
 
 ## Using the Lit Test Suite:
 - Running `ctest` in `build` directory invokes all tests (use `ctest -V` for verbose output).

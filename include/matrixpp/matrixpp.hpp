@@ -273,7 +273,7 @@ namespace matrixpp
 			}
 		}
 
-		inline std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
+		constexpr std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
 		{
 			// This is mainly for avoiding bug-prone code, because this calculation occurs
 			// in a lot of places, and a typo can cause a lot of things to fail. It's
@@ -1227,8 +1227,11 @@ namespace matrixpp
 		return object;
 	}
 
+	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
+	// clang-format off
 	template<range_2d Range2D>
 	matrix(Range2D&&) -> matrix<std::ranges::range_value_t<std::ranges::range_value_t<Range2D>>>;
+	// clang-format on
 
 	template<arithmetic Element = int, std::size_t N = std::dynamic_extent>
 	class identity_matrix : public matrix<Element, N, N>

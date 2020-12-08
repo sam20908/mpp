@@ -104,10 +104,6 @@ class CompileTest(lit.formats.TestFormat):
         # Use a temporary directory to avoid leaving garbage CMake configuration
         # for test sources behind
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Switch the current working directory because we want the CMake
-            # configuration files to be in the temporary directory to be cleaned
-            os.chdir(temp_dir)
-
             # Use the configured CMakeLists in the test directory in the build folder
             # to configure for specific test source (we do this by the command line)
             # CMake doesn't allow / in target names, so we convert it to underscore
@@ -117,7 +113,7 @@ class CompileTest(lit.formats.TestFormat):
             cmake_test_source_arg = f'-DTEST_SOURCE={test.getSourcePath()}'
             cmake_config_cmd = [
                 'cmake', cmake_test_name_arg, cmake_test_source_arg, self.build_dir,
-                '-B', 'build']
+                '-B', temp_dir]
             config_out, config_err, config_exit_code = lit.util.executeCommand(
                 cmake_config_cmd)
 
@@ -126,7 +122,7 @@ class CompileTest(lit.formats.TestFormat):
                 config_diagnostic = config_out + config_err
                 return lit.Test.UNRESOLVED, config_diagnostic
 
-            cmake_build_cmd = ['cmake', '--build', 'build']
+            cmake_build_cmd = ['cmake', '--build', temp_dir]
             build_out, build_err, build_exit_code = lit.util.executeCommand(
                 cmake_build_cmd)
 

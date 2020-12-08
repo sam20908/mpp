@@ -84,13 +84,13 @@
     - [ ] :heavy_check_mark: Default move constructor should move the data into the other object and leave the original one in a zombie state.
 
 ## :beginner: CI:
-- [ ] :rocket: Use **Azure Pipelines**:
-    - [ ] :small_orange_diamond: Test build on Windows.
-    - [ ] :small_orange_diamond: Test build on Linux.
-    - [ ] :small_orange_diamond: Test build on MacOS.
-    - [ ] :mag_right: Check that the code is formatted properly with **Clang Format**.
-    - [ ] :bar_chart: Report test statistics to Azure Pipelines.
-    - [ ] :bar_chart: Report performance statistics to Azure Pipelines.
+- [ ] :rocket: Use **GitHub Actions**:
+    - [ ] :small_orange_diamond: Test build on Windows (Visual Studio not up to date yet).
+    - [x] :small_orange_diamond: Test build on Linux.
+    - [ ] :small_orange_diamond: Test build on MacOS (XCode not up to date yet).
+    - [x] :mag_right: Check that the code is formatted properly with **Clang Format**.
+    - [x] :bar_chart: Report test statistics to GitHub Actions.
+    - [x] :bar_chart: Report performance statistics to GitHub Pages.
 
 ## :page_with_curl: Licensing:
 - [x] :pencil2: Mark all sources with **Apache License 2.0** header
