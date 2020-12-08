@@ -1,6 +1,8 @@
 # matrixpp
 A C++20 and later matrix library
 
+![](https://github.com/sam20908/matrixpp/workflows/Linux/badge.svg)
+
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
 - YOu can also just include the header into your project manually if that's your decision.
