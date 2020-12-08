@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1607311394099,
+  "lastUpdate": 1607394180407,
   "repoUrl": "https://github.com/sam20908/matrixpp",
   "entries": {
     "Benchmark": [
@@ -102,6 +102,42 @@ window.BENCHMARK_DATA = {
             "value": 26761989.407407116,
             "unit": "ns/iter",
             "extra": "iterations: 27\ncpu: 26761141.44444444 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "samestimable2016@gmail.com",
+            "name": "sam20908",
+            "username": "sam20908"
+          },
+          "committer": {
+            "email": "samestimable2016@gmail.com",
+            "name": "sam20908",
+            "username": "sam20908"
+          },
+          "distinct": true,
+          "id": "0f54d5577320367ff04a865ef9afedd97649ebf0",
+          "message": "Add Linux status badge",
+          "timestamp": "2020-12-07T18:21:19-08:00",
+          "tree_id": "1200b2fb1e23932eca07315ae4dddd59596c44f1",
+          "url": "https://github.com/sam20908/matrixpp/commit/0f54d5577320367ff04a865ef9afedd97649ebf0"
+        },
+        "date": 1607394179709,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "determinant_5x5",
+            "value": 1054.3351245374001,
+            "unit": "ns/iter",
+            "extra": "iterations: 667149\ncpu: 1054.0271108852744 ns\nthreads: 1"
+          },
+          {
+            "name": "determinant_10x10",
+            "value": 31410341.782608215,
+            "unit": "ns/iter",
+            "extra": "iterations: 23\ncpu: 31409649.086956523 ns\nthreads: 1"
           }
         ]
       }
