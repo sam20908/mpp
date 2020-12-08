@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1607394180407,
+  "lastUpdate": 1607394226482,
   "repoUrl": "https://github.com/sam20908/matrixpp",
   "entries": {
     "Benchmark": [
@@ -138,6 +138,42 @@ window.BENCHMARK_DATA = {
             "value": 31410341.782608215,
             "unit": "ns/iter",
             "extra": "iterations: 23\ncpu: 31409649.086956523 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "samestimable2016@gmail.com",
+            "name": "sam20908",
+            "username": "sam20908"
+          },
+          "committer": {
+            "email": "samestimable2016@gmail.com",
+            "name": "sam20908",
+            "username": "sam20908"
+          },
+          "distinct": true,
+          "id": "a8dac8502b3fd7b91e85bac2f084537a15880ec9",
+          "message": "Update TODO",
+          "timestamp": "2020-12-07T18:22:05-08:00",
+          "tree_id": "b0ac9fca66b13af5dfaa9326e6e14362be11927c",
+          "url": "https://github.com/sam20908/matrixpp/commit/a8dac8502b3fd7b91e85bac2f084537a15880ec9"
+        },
+        "date": 1607394225819,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "determinant_5x5",
+            "value": 1076.0470470940509,
+            "unit": "ns/iter",
+            "extra": "iterations: 659977\ncpu: 1075.7949004283482 ns\nthreads: 1"
+          },
+          {
+            "name": "determinant_10x10",
+            "value": 29519405.347826313,
+            "unit": "ns/iter",
+            "extra": "iterations: 23\ncpu: 29516525.869565226 ns\nthreads: 1"
           }
         ]
       }
