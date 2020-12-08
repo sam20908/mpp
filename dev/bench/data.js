@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1607394510167,
+  "lastUpdate": 1607394613150,
   "repoUrl": "https://github.com/sam20908/matrixpp",
   "entries": {
     "Benchmark": [
@@ -206,6 +206,42 @@ window.BENCHMARK_DATA = {
             "value": 31772933.76190467,
             "unit": "ns/iter",
             "extra": "iterations: 21\ncpu: 31770403.619047623 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "samestimable2016@gmail.com",
+            "name": "Sam Huang",
+            "username": "sam20908"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e046c13673f10c3c0da125286709dfeac2478986",
+          "message": "Use GitHub Actions",
+          "timestamp": "2020-12-07T18:25:20-08:00",
+          "tree_id": "b0ac9fca66b13af5dfaa9326e6e14362be11927c",
+          "url": "https://github.com/sam20908/matrixpp/commit/e046c13673f10c3c0da125286709dfeac2478986"
+        },
+        "date": 1607394612668,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "determinant_5x5",
+            "value": 930.5607262717771,
+            "unit": "ns/iter",
+            "extra": "iterations: 757127\ncpu: 930.0495029235519 ns\nthreads: 1"
+          },
+          {
+            "name": "determinant_10x10",
+            "value": 25972857.32000046,
+            "unit": "ns/iter",
+            "extra": "iterations: 25\ncpu: 25972149.279999994 ns\nthreads: 1"
           }
         ]
       }
