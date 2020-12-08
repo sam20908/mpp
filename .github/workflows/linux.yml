@@ -7,6 +7,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: mstachniuk/ci-skip@v1
+        with:
+          fail-fast: true
+          exit-code: 0
+      
       - name: Checkout
         uses: actions/checkout@v2
         with:
