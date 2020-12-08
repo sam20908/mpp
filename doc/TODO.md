@@ -88,7 +88,7 @@
     - [ ] :small_orange_diamond: Test build on Windows (Visual Studio not up to date yet).
     - [x] :small_orange_diamond: Test build on Linux.
     - [ ] :small_orange_diamond: Test build on MacOS (XCode not up to date yet).
-    - [ ] :mag_right: Check that the code is formatted properly with **Clang Format**.
+    - [x] :mag_right: Check that the code is formatted properly with **Clang Format**.
     - [x] :bar_chart: Report test statistics to GitHub Actions.
     - [x] :bar_chart: Report performance statistics to GitHub Pages.
 
