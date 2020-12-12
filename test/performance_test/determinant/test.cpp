@@ -46,7 +46,6 @@ static void determinant_100x100(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		// @TODO: Fix this when determinant API changes
 		(void)a.determinant<long double>();
 	}
 }
