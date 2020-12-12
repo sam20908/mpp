@@ -13,6 +13,8 @@
 - [ ] :small_red_triangle: `row` should return a row vector.
 - [ ] :small_red_triangle: `column` should return a column vector.
 - [ ] :100: Allow passing user specified format to `print`.
+- [ ] :100: `zero` utility method.
+- [ ] :100: `random` utility method.
 - [ ] :100: Implement an iterator class so that `matrix` can be iterated as a 2D range.
 - [ ] :100: `identity_matrix`'s constructor parameter should be renamed from `side_length` to `rank`.
 - [ ] :100: Doxygen documentation for the `matrix` API.
