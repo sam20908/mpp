@@ -55,3 +55,4 @@ function(_create_performance_test TEST_DIR)
 endfunction()
 
 _create_performance_test("determinant")
+_create_performance_test("inverse")
