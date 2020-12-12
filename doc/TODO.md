@@ -8,6 +8,7 @@
 ## :tada: Improvements:
 - [ ] :heavy_exclamation_mark: Use a faster algorithm (with exchange for more space complexity) for determinant calculation.
 - [ ] :heavy_exclamation_mark: Use a faster algorithm (with exchange for more space complexity) for inverse calculation.
+- [ ] :heavy_exclamation_mark: Remove duplicate determinant calculation for inverse.
 - [ ] :small_red_triangle: Assertion for a fully static matrix that one side can't be zero and other being a non-zero should be a `static_assert`.
 - [ ] :small_red_triangle: `row` should return a row vector.
 - [ ] :small_red_triangle: `column` should return a column vector.
