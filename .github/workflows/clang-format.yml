@@ -6,14 +6,16 @@ jobs:
   Validate:
     runs-on: ubuntu-20.04
 
-    steps:
+    steps:  
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+
       - uses: mstachniuk/ci-skip@v1
         with:
           fail-fast: true
           exit-code: 0
-        
-      - name: Checkout
-        uses: actions/checkout@v2
 
       - name: Checkout run-clang-format
         run: git clone https://github.com/Sarcasm/run-clang-format

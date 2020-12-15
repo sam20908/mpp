@@ -7,16 +7,17 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: '0'
+
       - uses: mstachniuk/ci-skip@v1
         with:
           fail-fast: true
           exit-code: 0
       
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v6
         with:
