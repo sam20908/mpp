@@ -15,7 +15,6 @@ jobs:
       - uses: mstachniuk/ci-skip@v1
         with:
           fail-fast: true
-          exit-code: 0
 
       - name: Checkout run-clang-format
         run: git clone https://github.com/Sarcasm/run-clang-format
