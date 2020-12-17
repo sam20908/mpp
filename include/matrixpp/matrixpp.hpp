@@ -418,7 +418,8 @@ namespace matrixpp
 		}
 
 		template<typename Precision, bool Vector>
-		/* constexpr */ void inverse_impl(auto& result, auto& data, std::size_t rows, std::size_t columns)
+		/* constexpr */ void
+		inverse_impl(auto& result, auto& data, std::size_t rows, std::size_t columns, Precision determinant)
 		{
 			auto& result_data = result.data();
 
@@ -452,8 +453,7 @@ namespace matrixpp
 					result_data[3] = std::move(element_4);
 				}
 
-				auto determinant = determinant_impl<Precision>(data, rows, columns, 0, columns - 1);
-				auto multiplier  = static_cast<Precision>(1) / determinant;
+				auto multiplier = static_cast<Precision>(1) / determinant;
 
 				result *= multiplier;
 			}
@@ -969,14 +969,15 @@ namespace matrixpp
 				throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
 			}
 
-			if (singular())
+			auto result      = matrix<Precision, Rows, Columns>{ _rows, _columns, matrix_reserve_only };
+			auto determinant = detail::determinant_impl<Precision>(_buffer, _rows, _columns, 0, _columns - 1);
+
+			if (determinant == 0)
 			{
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
 
-			auto result = matrix<Precision, Rows, Columns>{ _rows, _columns, matrix_reserve_only };
-
-			detail::inverse_impl<Precision, _buffer_is_vector>(result, _buffer, _rows, _columns);
+			detail::inverse_impl<Precision, _buffer_is_vector>(result, _buffer, _rows, _columns, determinant);
 
 			return result;
 		}
