@@ -972,7 +972,7 @@ namespace matrixpp
 			auto result      = matrix<Precision, Rows, Columns>{ _rows, _columns, matrix_reserve_only };
 			auto determinant = detail::determinant_impl<Precision>(_buffer, _rows, _columns, 0, _columns - 1);
 
-			if (determinant == 0)
+			if (determinant == static_cast<Precision>(0))
 			{
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
