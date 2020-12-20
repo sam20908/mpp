@@ -1,10 +1,13 @@
-name: Build
+name: CI
 
 on: push
 
 jobs:
-  Setup:
-    runs-on: ubuntu-20.04
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -24,15 +27,6 @@ jobs:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           appendedCacheKey: ${{ hashFiles( '${{ github.workspace}}/vcpkg-dependencies.txt' ) }}
 
-  Build:
-    needs: Setup
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-
-    steps:
       - name: Install GCC 10
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -56,29 +50,6 @@ jobs:
           buildDirectory: '${{ github.workspace }}/build'
           cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE -DCMAKE_BUILD_TYPE=Release'
 
-  PerfTest:
-    needs: Build
-    name: Performance Test
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Benchmark
-        run: |
-          cd '${{ github.workspace }}/build/bin/test/performance_test'
-          ./all_tests --benchmark_format=json | tee results.json
-
-      - name: Publish Benchmark Results
-        uses: rhysd/github-action-benchmark@v1
-        with:
-          tool: 'googlecpp'
-          output-file-path: '${{ github.workspace }}/build/bin/test/performance_test/results.json'
-          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          auto-push: true
-
-  LitTest:
-    needs: Build
-    name: Lit Test
-    runs-on: ubuntu-20.04
-    steps:
       - name: Install Python Lit
         run: |
           pip install lit
@@ -97,3 +68,16 @@ jobs:
         with:
           files: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Benchmark
+        run: |
+          cd '${{ github.workspace }}/build/bin/test/performance_test'
+          ./all_tests --benchmark_format=json | tee results.json
+
+      - name: Publish Benchmark Results
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          tool: 'googlecpp'
+          output-file-path: '${{ github.workspace }}/build/bin/test/performance_test/results.json'
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          auto-push: true
