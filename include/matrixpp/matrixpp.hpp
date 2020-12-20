@@ -25,25 +25,20 @@
 #include <vector>
 // clang-format on
 
-#include <algorithm>  // std::ranges::transform, std::rotate
-#include <functional> // std::bind_front
-#include <iostream>   // std::cout
-#include <iterator>   // std::iter_swap
-#include <limits>     // std::numeric_limits
-#include <ranges>     // std::ranges::range_value_t
-#include <span>       // std::dynamic_extent
-#include <stdexcept>  // std::runtime_error
+#include <algorithm>   // std::ranges::transform, std::rotate
+#include <functional>  // std::bind_front
+#include <iostream>    // std::cout
+#include <iterator>    // std::iter_swap
+#include <limits>      // std::numeric_limits
+#include <ranges>      // std::ranges::range_value_t
+#include <span>        // std::dynamic_extent
+#include <stdexcept>   // std::runtime_error
+#include <type_traits> // std::is_arithmetic
 
 namespace matrixpp
 {
 	template<typename Element>
-	concept arithmetic = requires(Element&& element)
-	{
-		{ element + element };
-		{ element - element };
-		{ element * element };
-		{ element / element };
-	};
+	concept arithmetic = std::is_arithmetic_v<Element>;
 
 	template<typename Range>
 	concept range_2d = std::ranges::range<std::ranges::range_value_t<Range>> &&
