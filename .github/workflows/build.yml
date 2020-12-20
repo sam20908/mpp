@@ -1,0 +1,97 @@
+name: Linux
+
+on: push
+
+jobs:
+  Setup:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: '0'
+
+      - name: Check if CI needs to be skipped
+        uses: mstachniuk/ci-skip@v1
+        with:
+          fail-fast: true
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgArguments: '@${{ github.workspace }}/vcpkg-dependencies.txt'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          appendedCacheKey: ${{ hashFiles( '${{ github.workspace}}/vcpkg-dependencies.txt' ) }}
+
+  Build:
+    needs: Setup
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+
+    steps:
+      - name: Install GCC 10
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt install gcc-10 g++-10
+
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 110
+          sudo update-alternatives --set cc /usr/bin/gcc
+
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 110
+          sudo update-alternatives --set c++ /usr/bin/g++
+        if: matrix.os == 'ubuntu-20.04'
+
+      - name: Build
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
+          buildDirectory: '${{ github.workspace }}/build'
+          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE -DCMAKE_BUILD_TYPE=Release'
+
+  PerfTest:
+    needs: Build
+    name: Performance Test
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Benchmark
+        run: |
+          cd '${{ github.workspace }}/build/bin/test/performance_test'
+          ./all_tests --benchmark_format=json | tee results.json
+
+      - name: Publish Benchmark Results
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          tool: 'googlecpp'
+          output-file-path: '${{ github.workspace }}/build/bin/test/performance_test/results.json'
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          auto-push: true
+
+  LitTest:
+    needs: Build
+    name: Lit Test
+    steps:
+      - name: Install Python Lit
+        run: |
+          pip install lit
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Test
+        run: |
+          cd '${{ github.workspace }}/build/bin/test'
+          lit compile_test unit_test --xunit-xml-output results.xml
+        env:
+          CC: /usr/bin/gcc-10
+          CXX: /usr/bin/g++-10
+
+      - name: Publish Unit and Compile Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.5
+        with:
+          files: '**/results.xml'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
