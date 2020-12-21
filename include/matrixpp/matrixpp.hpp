@@ -234,7 +234,7 @@ namespace matrixpp
 			}
 		};
 
-		constexpr void validate_dimension(std::size_t rows, std::size_t columns)
+		[[nodiscard]] constexpr void validate_dimension(std::size_t rows, std::size_t columns)
 		{
 			if ((rows == 0 && columns != 0) || (rows != 0 && columns == 0))
 			{
@@ -243,7 +243,7 @@ namespace matrixpp
 			}
 		}
 
-		constexpr auto range_2d_columns(auto&& rng)
+		[[nodiscard]] constexpr auto range_2d_columns(auto&& rng)
 		{
 			auto rng_size = std::ranges::size(rng);
 
@@ -252,7 +252,7 @@ namespace matrixpp
 
 		// @TODO: Uncomment out constexpr specifier when constexpr std::vector ships
 
-		inline /* constexpr */ void validate_matrices_same_size(const auto& lhs, const auto& rhs)
+		[[nodiscard]] inline /* constexpr */ void validate_matrices_same_size(const auto& lhs, const auto& rhs)
 		{
 			if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns())
 			{
@@ -260,7 +260,7 @@ namespace matrixpp
 			}
 		}
 
-		inline /* constexpr */ void validate_matrices_multipliable(const auto& lhs, const auto& rhs)
+		[[nodiscard]] inline /* constexpr */ void validate_matrices_multipliable(const auto& lhs, const auto& rhs)
 		{
 			if (lhs.columns() != rhs.rows())
 			{
@@ -268,7 +268,8 @@ namespace matrixpp
 			}
 		}
 
-		constexpr std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
+		[[nodiscard]] constexpr std::size_t
+		index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
 		{
 			// This is mainly for avoiding bug-prone code, because this calculation occurs
 			// in a lot of places, and a typo can cause a lot of things to fail. It's
@@ -278,7 +279,7 @@ namespace matrixpp
 		}
 
 		template<typename Precision>
-		constexpr Precision determinant_impl(auto& data,
+		[[nodiscard]] constexpr Precision determinant_impl(auto& data,
 			std::size_t rows,
 			std::size_t columns,
 			std::size_t row_begin,
@@ -413,7 +414,7 @@ namespace matrixpp
 		}
 
 		template<typename Precision, bool Vector>
-		/* constexpr */ void
+		[[nodiscard]] inline /* constexpr */ void
 		inverse_impl(auto& result, auto& data, std::size_t rows, std::size_t columns, Precision determinant)
 		{
 			auto& result_data = result.data();
@@ -583,7 +584,7 @@ namespace matrixpp
 		}
 
 		template<std::size_t Rows, std::size_t Columns>
-		constexpr matrix_type get_matrix_type()
+		[[nodiscard]] constexpr matrix_type get_matrix_type()
 		{
 			constexpr auto row_is_dynamic    = Rows == std::dynamic_extent;
 			constexpr auto column_is_dynamic = Columns == std::dynamic_extent;
