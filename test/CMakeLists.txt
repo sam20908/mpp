@@ -15,32 +15,29 @@
 # specific language governing permissions and limitations
 # under the License.
 
+include(CMakeDependentOption)
+include(Dart)
+
 set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test")
 
-function(_map_option_to_subdir OPT SUBDIR HELPER_TEXT)
-    # Helper variable to determine whether the test suite should be added:
-    # 1. If the current test suite is not explicitly specified by the user, add it
-    # 2. If it is explicitly specified, then set it to their specified value (
-    #    to handle user setting it to TRUE, which should still add the test suite)
-    set(OPT_VAL)
-    if(DEFINED ${OPT})
-        set(OPT_VAL ${${OPT}})
-    else()
-        set(OPT_VAL TRUE)
-    endif()
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TEST "Builds compile test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_UNIT_TEST "Builds unit test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_PERFORMANCE_TEST "Builds performance test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
 
-    option(${OPT} "${HELPER_TEXT}" ${OPT_VAL})
+if(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TEST)
+    add_subdirectory("compile_test")
+endif()
 
-    if(${${OPT}})
-        add_subdirectory(${SUBDIR})
-    endif()
-endfunction()
+if(${PROJECT_NAME_UPPER}_BUILD_UNIT_TEST)
+    add_subdirectory("unit_test")
+endif()
 
-_map_option_to_subdir(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TEST "compile_test" "Builds compile test suite")
-_map_option_to_subdir(${PROJECT_NAME_UPPER}_BUILD_UNIT_TEST "unit_test" "Builds unit test suite")
-_map_option_to_subdir(${PROJECT_NAME_UPPER}_BUILD_PERFORMANCE_TEST "performance_test" "Builds performance test suite")
-
-include(Dart)
+if(${PROJECT_NAME_UPPER}_BUILD_PERFORMANCE_TEST)
+    add_subdirectory("performance_test")
+endif()
 
 add_test(NAME "test" 
     COMMAND lit unit_test compile_test

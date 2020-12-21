@@ -30,7 +30,7 @@ target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-option(${PROJECT_NAME_UPPER}_BUILD_TEST "Builds all test suites")
+option(${PROJECT_NAME_UPPER}_BUILD_TEST "Builds the test suites")
 
 if(${PROJECT_NAME_UPPER}_BUILD_TEST)
     enable_testing()
