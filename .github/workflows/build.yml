@@ -72,7 +72,7 @@ jobs:
       - name: Benchmark
         run: |
           cd '${{ github.workspace }}/build/bin/test/performance_test'
-          ./all_tests --benchmark_format=json | tee results.json
+          ./all_tests --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
         uses: rhysd/github-action-benchmark@v1
