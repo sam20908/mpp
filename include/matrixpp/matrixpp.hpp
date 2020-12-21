@@ -243,7 +243,7 @@ namespace matrixpp
 			}
 		}
 
-		constexpr auto range_2d_columns(auto&& rng)
+		[[nodiscard]] constexpr auto range_2d_columns(auto&& rng)
 		{
 			auto rng_size = std::ranges::size(rng);
 
@@ -268,7 +268,8 @@ namespace matrixpp
 			}
 		}
 
-		constexpr std::size_t index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
+		[[nodiscard]] constexpr std::size_t
+		index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
 		{
 			// This is mainly for avoiding bug-prone code, because this calculation occurs
 			// in a lot of places, and a typo can cause a lot of things to fail. It's
@@ -278,7 +279,7 @@ namespace matrixpp
 		}
 
 		template<typename Precision>
-		constexpr Precision determinant_impl(auto& data,
+		[[nodiscard]] constexpr Precision determinant_impl(auto& data,
 			std::size_t rows,
 			std::size_t columns,
 			std::size_t row_begin,
@@ -413,7 +414,7 @@ namespace matrixpp
 		}
 
 		template<typename Precision, bool Vector>
-		/* constexpr */ void
+		inline /* constexpr */ void
 		inverse_impl(auto& result, auto& data, std::size_t rows, std::size_t columns, Precision determinant)
 		{
 			auto& result_data = result.data();
@@ -583,7 +584,7 @@ namespace matrixpp
 		}
 
 		template<std::size_t Rows, std::size_t Columns>
-		constexpr matrix_type get_matrix_type()
+		[[nodiscard]] constexpr matrix_type get_matrix_type()
 		{
 			constexpr auto row_is_dynamic    = Rows == std::dynamic_extent;
 			constexpr auto column_is_dynamic = Columns == std::dynamic_extent;
@@ -1127,7 +1128,7 @@ namespace matrixpp
 	// @TODO: Uncomment out constexpr specifier when constexpr std::vector ships
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator+(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator+(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_same_size(lhs, rhs);
@@ -1136,7 +1137,7 @@ namespace matrixpp
 	}
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator-(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator-(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_same_size(lhs, rhs);
@@ -1145,19 +1146,21 @@ namespace matrixpp
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator*(const detail::expr_base<Base, Element>& object, Element constant)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(const detail::expr_base<Base, Element>& object,
+		Element constant)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_multiply_op };
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator*(Element constant, const detail::expr_base<Base, Element>& object)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(Element constant,
+		const detail::expr_base<Base, Element>& object)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_multiply_op };
 	}
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator*(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_multipliable(lhs, rhs);
@@ -1166,13 +1169,15 @@ namespace matrixpp
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator/(const detail::expr_base<Base, Element>& object, Element constant)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator/(const detail::expr_base<Base, Element>& object,
+		Element constant)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_divide_op };
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator/(Element constant, const detail::expr_base<Base, Element>& object)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator/(Element constant,
+		const detail::expr_base<Base, Element>& object)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_divide_op };
 	}

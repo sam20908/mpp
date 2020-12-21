@@ -19,6 +19,7 @@
 - [ ] :100: `identity_matrix`'s constructor parameter should be renamed from `side_length` to `rank`.
 - [ ] :100: Doxygen documentation for the `matrix` API.
 - [x] :100: Make matrix element type an arithmetic type.
+- [x] :100: Add missing `[[ndiscard]]`.
 
 ## :mountain_railway: Tests:
 - [ ] :100: **Performance benchmark**.
