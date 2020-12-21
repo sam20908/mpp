@@ -64,7 +64,7 @@ jobs:
           CXX: /usr/bin/g++-10
 
       - name: Publish Unit and Compile Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.5
+        uses: EnricoMi/publish-unit-test-result-action@v1.6
         with:
           files: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
