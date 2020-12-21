@@ -1128,7 +1128,7 @@ namespace matrixpp
 	// @TODO: Uncomment out constexpr specifier when constexpr std::vector ships
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator+(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator+(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_same_size(lhs, rhs);
@@ -1137,7 +1137,7 @@ namespace matrixpp
 	}
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator-(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator-(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_same_size(lhs, rhs);
@@ -1146,19 +1146,21 @@ namespace matrixpp
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator*(const detail::expr_base<Base, Element>& object, Element constant)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(const detail::expr_base<Base, Element>& object,
+		Element constant)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_multiply_op };
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator*(Element constant, const detail::expr_base<Base, Element>& object)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(Element constant,
+		const detail::expr_base<Base, Element>& object)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_multiply_op };
 	}
 
 	template<typename LeftBase, typename RightBase, typename Element>
-	/* constexpr */ decltype(auto) operator*(const detail::expr_base<LeftBase, Element>& lhs,
+	[[nodiscard]] /* constexpr */ decltype(auto) operator*(const detail::expr_base<LeftBase, Element>& lhs,
 		const detail::expr_base<RightBase, Element>& rhs)
 	{
 		detail::validate_matrices_multipliable(lhs, rhs);
@@ -1167,13 +1169,15 @@ namespace matrixpp
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator/(const detail::expr_base<Base, Element>& object, Element constant)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator/(const detail::expr_base<Base, Element>& object,
+		Element constant)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_divide_op };
 	}
 
 	template<typename Base, typename Element>
-	/* constexpr */ decltype(auto) operator/(Element constant, const detail::expr_base<Base, Element>& object)
+	[[nodiscard]] /* constexpr */ decltype(auto) operator/(Element constant,
+		const detail::expr_base<Base, Element>& object)
 	{
 		return detail::expr_constant_op{ object, std::move(constant), detail::scalar_divide_op };
 	}
