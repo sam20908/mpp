@@ -234,7 +234,7 @@ namespace matrixpp
 			}
 		};
 
-		[[nodiscard]] constexpr void validate_dimension(std::size_t rows, std::size_t columns)
+		constexpr void validate_dimension(std::size_t rows, std::size_t columns)
 		{
 			if ((rows == 0 && columns != 0) || (rows != 0 && columns == 0))
 			{
@@ -252,7 +252,7 @@ namespace matrixpp
 
 		// @TODO: Uncomment out constexpr specifier when constexpr std::vector ships
 
-		[[nodiscard]] inline /* constexpr */ void validate_matrices_same_size(const auto& lhs, const auto& rhs)
+		inline /* constexpr */ void validate_matrices_same_size(const auto& lhs, const auto& rhs)
 		{
 			if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns())
 			{
@@ -260,7 +260,7 @@ namespace matrixpp
 			}
 		}
 
-		[[nodiscard]] inline /* constexpr */ void validate_matrices_multipliable(const auto& lhs, const auto& rhs)
+		inline /* constexpr */ void validate_matrices_multipliable(const auto& lhs, const auto& rhs)
 		{
 			if (lhs.columns() != rhs.rows())
 			{
@@ -414,7 +414,7 @@ namespace matrixpp
 		}
 
 		template<typename Precision, bool Vector>
-		[[nodiscard]] inline /* constexpr */ void
+		inline /* constexpr */ void
 		inverse_impl(auto& result, auto& data, std::size_t rows, std::size_t columns, Precision determinant)
 		{
 			auto& result_data = result.data();
