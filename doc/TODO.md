@@ -20,6 +20,7 @@
 - [ ] :100: Doxygen documentation for the `matrix` API.
 - [x] :100: Make matrix element type an arithmetic type.
 - [x] :100: Add missing `[[ndiscard]]`.
+- [ ] :100: Add documentation about performance benchmarks in README.
 
 ## :mountain_railway: Tests:
 - [ ] :100: **Performance benchmark**.

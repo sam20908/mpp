@@ -15,13 +15,29 @@
 # specific language governing permissions and limitations
 # under the License.
 
+include(CMakeDependentOption)
+include(Dart)
+
 set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/test")
 
-add_subdirectory("compile_test")
-add_subdirectory("unit_test")
-add_subdirectory("performance_test")
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TEST "Builds compile test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_UNIT_TEST "Builds unit test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
+cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_PERFORMANCE_TEST "Builds performance test suite" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TEST" OFF)
 
-include(Dart)
+if(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TEST)
+    add_subdirectory("compile_test")
+endif()
+
+if(${PROJECT_NAME_UPPER}_BUILD_UNIT_TEST)
+    add_subdirectory("unit_test")
+endif()
+
+if(${PROJECT_NAME_UPPER}_BUILD_PERFORMANCE_TEST)
+    add_subdirectory("performance_test")
+endif()
 
 add_test(NAME "test" 
     COMMAND lit unit_test compile_test
