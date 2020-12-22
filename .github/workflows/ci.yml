@@ -125,7 +125,7 @@ jobs:
   Benchmarks:
     needs: Build
     runs-on: ubuntu-20.04
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
