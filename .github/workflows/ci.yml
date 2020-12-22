@@ -39,9 +39,6 @@ jobs:
           sudo update-alternatives --set c++ /usr/bin/g++
         if: matrix.os == 'ubuntu-20.04'
 
-      - name: Install valgrind
-        run: sudo apt-get install valgrind
-
       - name: Build
         uses: lukka/run-cmake@v3
         with:
@@ -49,10 +46,67 @@ jobs:
           buildDirectory: '${{ github.workspace }}/build'
           cmakeAppendedArgs: '-DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release'
 
+      - name: Tar test artifacts
+        run: |
+          cd '${{ github.workspace }}/build/bin/tests'
+          tar -cf '${{ github.workspace}}/tests.tar' .
+
+      - name: Tar benchmark artifacts
+        run: |
+          cd '${{ github.workspace }}/build/bin/benchmarks'
+          tar -cf '${{ github.workspace }}/benchmarks.tar' .
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: tests
+          path: '${{ github.workspace }}/tests.tar'
+
+      - name: Upload compile tests
+        uses: actions/upload-artifact@v2
+        with:
+          name: compile_tests
+          path: '${{ github.workspace }}/tests/compile_tests'
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: '${{ github.workspace }}/benchmarks.tar'
+  
+  LitTest:
+    name: Lit Test
+    needs: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install valgrind
+        run: sudo apt-get install valgrind
+
       - name: Install Python Lit
         run: |
           pip install lit
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Download test artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: tests
+          path: '${{ github.workspace }}/build/bin/tests'
+
+      - name: Download compile tests
+        uses: actions/download-artifact@v2
+        with:
+          name: compile_tests
+          path: '${{ github.workspace }}/tests/compile_tests'
+
+      - name: Extract test artifacts
+        run: |
+          cd '${{ github.workspace }}/build/bin/tests'
+          tar -xf tests.tar
 
       - name: Test
         run: |
@@ -68,6 +122,25 @@ jobs:
           files: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+  Benchmarks:
+    needs: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download benchmark artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: benchmarks
+          path: '${{ github.workspace }}/build/bin/benchmarks'
+
+      - name: Extract benchmark artifacts
+        run: |
+          cd '${{ github.workspace }}/build/bin/benchmarks'
+          tar -xf benchmarks.tar
+
       - name: Benchmark
         run: |
           cd '${{ github.workspace }}/build/bin/benchmarks'
@@ -80,3 +153,4 @@ jobs:
           output-file-path: '${{ github.workspace }}/build/bin/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true
+        if: github.ref == 'refs/heads/main'
