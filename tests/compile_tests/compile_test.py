@@ -25,71 +25,49 @@ import pathlib
 import tempfile
 
 
-def _parse_expected_results(file_path):
-    expected_results = {}
+class CompileTest(lit.formats.TestFormat):
+    def __init__(self, test_source_dir, test_binary_dir, test_source_filename, expected_results_file):
+        self.test_source_dir = test_source_dir
+        self.test_binary_dir = test_binary_dir
+        self.test_source_filename = test_source_filename
+        self.expected_results_file = expected_results_file
 
-    # Parse the file as a map of file name and their expected result
-    with open(file_path, 'r') as reader:
-        lines = reader.readlines()
-        for line in lines:
-            test_source_relpath, expected_result = line.strip().split(' ')
-            expected_results[test_source_relpath] = expected_result
+    def _parse_tests_to_run(self, test_suite, path_in_suite, lit_config, local_config):
+        tests = []
 
-    return expected_results
-
-
-def _parse_tests_to_run(lit_config, test_dir, test_suite, path_in_suite, local_config):
-    tests = []
-
-    def _add_test_sources_to_tests(test_glob_path):
-        test_suffix = local_config.test_suffix
-
-        # @TODO: Support exclusion of tests
-        for test_source in pathlib.Path(test_glob_path).rglob(test_suffix):
+        for test_source in pathlib.Path(self.test_source_dir).rglob(self.test_source_filename):
             test_source_path_tuple = path_in_suite + \
                 (str(test_source.resolve()),)
 
             # Convert path to unix style in all cases
             test_source_relpath = os.path.relpath(
-                test_source, test_dir).replace(os.path.sep, '/')
+                test_source, self.test_source_dir).replace(os.path.sep, '/')
 
             test = lit.Test.Test(
                 test_suite, test_source_path_tuple, local_config, test_source_relpath)
 
             tests.append(test)
 
-    if 'COMPILE_TESTS_TO_RUN' in lit_config.params.keys():
-        specified_tests = lit_config.params['COMPILE_TESTS_TO_RUN'].split(',')
+        return tests
 
-        for specified_test in specified_tests:
-            specified_test_dir = os.path.join(test_dir, specified_test)
-            specified_test_exists = os.path.isdir(specified_test_dir)
+    def _parse_expected_results(self):
+        expected_results = {}
 
-            if not specified_test_exists:
-                continue
+        # Parse the file as a map of file name and their expected result
+        with open(self.expected_results_file, 'r') as reader:
+            lines = reader.readlines()
+            for line in lines:
+                test_source_relpath, expected_result = line.strip().split(' ')
+                expected_results[test_source_relpath] = expected_result
 
-            _add_test_sources_to_tests(specified_test_dir)
+        return expected_results
 
-    else:
-        _add_test_sources_to_tests(test_dir)
-
-    return tests
-
-
-class CompileTest(lit.formats.TestFormat):
     def getTestsInDirectory(self, test_suite, path_in_suite,
                             lit_config, local_config):
-        expected_results_filepath = os.path.join(
-            local_config.test_dir, 'expected_results.txt')
+        self.expected_results = self._parse_expected_results()
 
-        self.test_dir = local_config.test_dir
-        self.build_dir = local_config.build_dir
-        self.expected_results = _parse_expected_results(
-            expected_results_filepath)
-
-        tests = _parse_tests_to_run(
-            lit_config, self.test_dir, test_suite, path_in_suite, local_config)
-
+        tests = self._parse_tests_to_run(
+            test_suite, path_in_suite, lit_config, local_config)
         for test in tests:
             yield test
 
@@ -112,7 +90,7 @@ class CompileTest(lit.formats.TestFormat):
             cmake_test_name_arg = f'-DTEST_NAME={test_source_dirname_cmake_friendly}'
             cmake_test_source_arg = f'-DTEST_SOURCE={test.getSourcePath()}'
             cmake_config_cmd = [
-                'cmake', cmake_test_name_arg, cmake_test_source_arg, self.build_dir,
+                'cmake', cmake_test_name_arg, cmake_test_source_arg, self.test_binary_dir,
                 '-B', temp_dir]
             config_out, config_err, config_exit_code = lit.util.executeCommand(
                 cmake_config_cmd)

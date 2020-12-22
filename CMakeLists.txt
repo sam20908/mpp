@@ -30,9 +30,14 @@ target_sources(${PROJECT_NAME} INTERFACE "include/matrixpp/matrixpp.hpp")
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-option(${PROJECT_NAME_UPPER}_BUILD_TEST "Builds the test suites")
+option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the test suites")
+option(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS "Builds the benchmarks")
 
-if(${PROJECT_NAME_UPPER}_BUILD_TEST)
+if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
     enable_testing()
-    add_subdirectory("test")
+    add_subdirectory("tests")
+endif()
+
+if(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS)
+    add_subdirectory("benchmarks")
 endif()

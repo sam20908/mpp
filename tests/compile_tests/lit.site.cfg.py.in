@@ -19,8 +19,13 @@ under the License.
 
 # pylint: skip-file
 
-import lit.formats
+# Make sure to be able to import CompileTest class
+sys.path.append('@COMPILE_TESTS_SOURCE_DIR@')
 
-config.name = 'unit-test'
-config.test_format = lit.formats.GoogleTest('@UNIT_TEST_OUTPUT_DIR@', 
-    '@UNIT_TEST_SUFFIX@')
+
+from compile_test import CompileTest
+
+
+config.name = 'compile-tests'
+config.test_format = CompileTest('@COMPILE_TESTS_SOURCE_DIR@', '@COMPILE_TESTS_BINARY_DIR@',
+  '@COMPILE_TESTS_SOURCE_FILENAME@', '@COMPILE_TESTS_EXPECTED_RESULTS_FILE@')

@@ -17,13 +17,16 @@
 
 find_package(GTest CONFIG REQUIRED)
 
-set(UNIT_TEST_OUTPUT_DIR "${TEST_OUTPUT_DIR}/unit_test")
-set(UNIT_TEST_SUFFIX "_test")
+set(UNIT_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/unit_tests")
+set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
+set(UNIT_TESTS_EXECUTABLE_SUFFIX "_test")
+
+configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 
 function(_create_unit_test TEST_DIR)
-    set(TEST_NAME "${TEST_DIR}${UNIT_TEST_SUFFIX}")
+    set(TEST_NAME "${TEST_DIR}${UNIT_TESTS_EXECUTABLE_SUFFIX}")
     add_executable(${TEST_NAME} 
-        "${TEST_DIR}/test.cpp" 
+        "${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}" 
         "gtest_main.cpp")
 
     target_link_libraries(${TEST_NAME} PRIVATE
@@ -31,13 +34,11 @@ function(_create_unit_test TEST_DIR)
         GTest::gmock GTest::gtest)
 
     set_target_properties(${TEST_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${UNIT_TEST_OUTPUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${UNIT_TESTS_BINARY_DIR}"
         
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF)
 endfunction()
-
-configure_file("lit.site.cfg.py.in" "${UNIT_TEST_OUTPUT_DIR}/lit.site.cfg.py")
 
 _create_unit_test("determinant")
