@@ -46,11 +46,17 @@ jobs:
           buildDirectory: '${{ github.workspace }}/build'
           cmakeAppendedArgs: '-DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release'
 
+      - name: Tar test artifacts
+        run: tar -cvf '${{ github.workspace }}/tars/tests.tar' '${{ github.workspace }}/build/bin/tests'
+
+      - name: Tar benchmark artifacts
+        run: tar -cvf '${{ github.workspace }}/tars/benchmarks.tar' '${{ github.workspace }}/build/bin/benchmarks'
+
       - name: Upload test artifacts
         uses: actions/upload-artifact@v2
         with:
           name: tests
-          path: '${{ github.workspace }}/build/bin/tests'
+          path: '${{ github.workspace }}/tars/tests.tar'
 
       - name: Upload compile tests
         uses: actions/upload-artifact@v2
@@ -62,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: benchmarks
-          path: '${{ github.workspace }}/build/bin/benchmarks'
+          path: '${{ github.workspace }}/tars/benchmarks.tar'
   
   LitTest:
     name: Lit Test
@@ -90,6 +96,11 @@ jobs:
           name: compile_tests
           path: '${{ github.workspace }}/tests/compile_tests'
 
+      - name: Extract test artifacts
+        run: |
+          cd '${{ github.workspace }}/bin/tests'
+          tar –xvzf tests.tar
+
       - name: Test
         run: |
           cd '${{ github.workspace }}/bin/tests'
@@ -114,6 +125,11 @@ jobs:
         with:
           name: benchmarks
           path: '${{ github.workspace }}/bin/benchmarks'
+
+      - name: Extract benchmark artifacts
+        run: |
+          cd '${{ github.workspace }}/bin/benchmarks'
+          tar –xvzf benchmarks.tar
 
       - name: Benchmark
         run: |
