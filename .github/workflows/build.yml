@@ -39,9 +39,6 @@ jobs:
           sudo update-alternatives --set c++ /usr/bin/g++
         if: matrix.os == 'ubuntu-20.04'
 
-      - name: Install valgrind
-        run: sudo apt-get install valgrind
-
       - name: Build
         uses: lukka/run-cmake@v3
         with:
@@ -49,14 +46,41 @@ jobs:
           buildDirectory: '${{ github.workspace }}/build'
           cmakeAppendedArgs: '-DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release'
 
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: tests
+          path: '${{ github.workspace }}/build/tests'
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmarks
+          path: '${{ github.workspace }}/build/benchmarks'
+  
+  LitTest:
+    name: Lit Test
+    needs: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Install valgrind
+        run: sudo apt-get install valgrind
+
       - name: Install Python Lit
         run: |
           pip install lit
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Download test artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: tests
+          working-directory: '${{ github.workspace }}/tests'
+
       - name: Test
         run: |
-          cd '${{ github.workspace }}/build/bin/tests'
+          cd '${{ github.workspace }}/tests'
           lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak
         env:
           CC: /usr/bin/gcc-10
@@ -68,15 +92,26 @@ jobs:
           files: '**/results.xml'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+  Benchmarks:
+    needs: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Download benchmark artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: benchmarks
+          working-directory: '${{ github.workspace }}/benchmarks'
+
       - name: Benchmark
         run: |
-          cd '${{ github.workspace }}/build/bin/benchmarks'
+          cd '${{ github.workspace }}//benchmarks'
           ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
         uses: rhysd/github-action-benchmark@v1
         with:
           tool: 'googlecpp'
-          output-file-path: '${{ github.workspace }}/build/bin/benchmarks/results.json'
+          output-file-path: '${{ github.workspace }}/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true
