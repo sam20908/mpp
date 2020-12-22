@@ -19,21 +19,17 @@
 
 #pragma once
 
-// Buffer types
-// clang-format off
+#include <algorithm>
 #include <array>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <ranges>
+#include <span>
+#include <stdexcept>
+#include <type_traits>
 #include <vector>
-// clang-format on
-
-#include <algorithm>   // std::ranges::transform, std::rotate
-#include <functional>  // std::bind_front
-#include <iostream>    // std::cout
-#include <iterator>    // std::iter_swap
-#include <limits>      // std::numeric_limits
-#include <ranges>      // std::ranges::range_value_t
-#include <span>        // std::dynamic_extent
-#include <stdexcept>   // std::runtime_error
-#include <type_traits> // std::is_arithmetic
 
 namespace matrixpp
 {
