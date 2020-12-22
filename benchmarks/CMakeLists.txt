@@ -28,7 +28,7 @@ set(BENCHMARKS_TEST_SUFFIX "test.cpp")
 # This executable will contain all the benchmarks. It is achieved by adding
 # all the sources into this target (each time _create_performance_test is
 # called, it also adds the source into this target)
-add_executable(all_tests)
+add_executable("all_benchmarks")
 
 function(_setup_target target)
     target_link_libraries(${target} PRIVATE 
