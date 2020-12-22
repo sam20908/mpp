@@ -49,12 +49,12 @@ jobs:
       - name: Tar test artifacts
         run: |
           cd '${{ github.workspace }}/build/bin/tests'
-          tar -cvf '${{ github.workspace}}/tests.tar' .
+          tar -cf '${{ github.workspace}}/tests.tar' .
 
       - name: Tar benchmark artifacts
         run: |
           cd '${{ github.workspace }}/build/bin/benchmarks'
-          tar -cvf '${{ github.workspace }}/benchmarks.tar' .
+          tar -cf '${{ github.workspace }}/benchmarks.tar' .
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v2
