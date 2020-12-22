@@ -99,7 +99,7 @@ jobs:
       - name: Extract test artifacts
         run: |
           cd '${{ github.workspace }}/build/bin/tests'
-          tar -xvf tests.tar
+          tar -xf tests.tar
 
       - name: Test
         run: |
@@ -129,7 +129,7 @@ jobs:
       - name: Extract benchmark artifacts
         run: |
           cd '${{ github.workspace }}/build/bin/benchmarks'
-          tar -xvf benchmarks.tar
+          tar -xf benchmarks.tar
           ls
 
       - name: Benchmark
