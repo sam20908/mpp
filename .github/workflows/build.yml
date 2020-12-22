@@ -129,7 +129,7 @@ jobs:
       - name: Extract benchmark artifacts
         run: |
           cd '${{ github.workspace }}/build/bin/benchmarks'
-          tar -xf benchmarks.tar
+          tar -C . -xf benchmarks.tar
           ls
 
       - name: Benchmark
