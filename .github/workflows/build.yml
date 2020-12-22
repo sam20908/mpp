@@ -88,7 +88,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: tests
-          path: '${{ github.workspace }}/bin/tests'
+          path: '${{ github.workspace }}/build/bin/tests'
 
       - name: Download compile tests
         uses: actions/download-artifact@v2
@@ -98,12 +98,12 @@ jobs:
 
       - name: Extract test artifacts
         run: |
-          cd '${{ github.workspace }}/bin/tests'
+          cd '${{ github.workspace }}/build/bin/tests'
           tar -xvf tests.tar
 
       - name: Test
         run: |
-          cd '${{ github.workspace }}/bin/tests'
+          cd '${{ github.workspace }}/build/bin/tests'
           lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak
         env:
           CC: /usr/bin/gcc-10
@@ -124,22 +124,22 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: benchmarks
-          path: '${{ github.workspace }}/bin/benchmarks'
+          path: '${{ github.workspace }}/build/bin/benchmarks'
 
       - name: Extract benchmark artifacts
         run: |
-          cd '${{ github.workspace }}/bin/benchmarks'
+          cd '${{ github.workspace }}/build/bin/benchmarks'
           tar -xvf benchmarks.tar
 
       - name: Benchmark
         run: |
-          cd '${{ github.workspace }}/bin/benchmarks'
+          cd '${{ github.workspace }}/build/bin/benchmarks'
           ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
         uses: rhysd/github-action-benchmark@v1
         with:
           tool: 'googlecpp'
-          output-file-path: '${{ github.workspace }}/bin/benchmarks/results.json'
+          output-file-path: '${{ github.workspace }}/build/bin/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true
