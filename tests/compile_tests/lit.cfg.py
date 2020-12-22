@@ -20,4 +20,4 @@
 # pylint: skip-file
 
 lit_config.fatal(
-    'Please run lit in <build-directory>/bin/test/compile_test folder')
+    'Please run lit in <build directory>/bin/tests/compile_tests folder')

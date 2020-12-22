@@ -20,4 +20,4 @@ jobs:
         run: git clone https://github.com/Sarcasm/run-clang-format
 
       - name: Validate
-        run: python ./run-clang-format/run-clang-format.py -r include test --style file
+        run: python ./run-clang-format/run-clang-format.py -r include tests benchmarks --style file

@@ -44,7 +44,7 @@ jobs:
         with:
           cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
           buildDirectory: '${{ github.workspace }}/build'
-          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TEST=TRUE -DCMAKE_BUILD_TYPE=Release'
+          cmakeAppendedArgs: '-DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release'
 
       - name: Install Python Lit
         run: |
@@ -53,8 +53,8 @@ jobs:
 
       - name: Test
         run: |
-          cd '${{ github.workspace }}/build/bin/test'
-          lit compile_test unit_test --xunit-xml-output results.xml
+          cd '${{ github.workspace }}/build/bin/tests'
+          lit compile_tests unit_tests --xunit-xml-output results.xml
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
@@ -67,13 +67,13 @@ jobs:
 
       - name: Benchmark
         run: |
-          cd '${{ github.workspace }}/build/bin/test/performance_test'
-          ./all_tests --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+          cd '${{ github.workspace }}/build/bin/benchmarks'
+          ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
         uses: rhysd/github-action-benchmark@v1
         with:
           tool: 'googlecpp'
-          output-file-path: '${{ github.workspace }}/build/bin/test/performance_test/results.json'
+          output-file-path: '${{ github.workspace }}/build/bin/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true

@@ -19,14 +19,8 @@ under the License.
 
 # pylint: skip-file
 
-sys.path.append('@COMPILE_TEST_DIR@')
+import lit.formats
 
-
-from compile_test import CompileTest
-
-
-config.name = 'compile-test'
-config.test_format = CompileTest()
-config.test_suffix = '@COMPILE_TEST_SUFFIX@'
-config.test_dir = '@COMPILE_TEST_DIR@'
-config.build_dir = '@COMPILE_TEST_OUTPUT_DIR@'
+config.name = 'unit-tests'
+config.test_format = lit.formats.GoogleTest('@UNIT_TESTS_OUTPUT_DIR@', 
+    '@UNIT_TESTS_EXECUTABLE_SUFFIX@')
