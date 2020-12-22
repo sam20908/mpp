@@ -106,6 +106,7 @@ jobs:
       - name: Benchmark
         run: |
           cd '${{ github.workspace }}/benchmarks'
+          ls
           ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
