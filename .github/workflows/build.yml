@@ -130,6 +130,7 @@ jobs:
         run: |
           cd '${{ github.workspace }}/build/bin/benchmarks'
           tar -xvf benchmarks.tar
+          ls
 
       - name: Benchmark
         run: |
