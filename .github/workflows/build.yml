@@ -50,13 +50,19 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tests
-          path: '${{ github.workspace }}/build/tests'
+          path: '${{ github.workspace }}/build/bin/tests'
+
+      - name: Upload compile tests
+        uses: actions/upload-artifact@v2
+        with:
+          name: compile_tests
+          path: '${{ github.workspace }}/tests/compile_tests'
 
       - name: Upload benchmark artifacts
         uses: actions/upload-artifact@v2
         with:
           name: benchmarks
-          path: '${{ github.workspace }}/build/benchmarks'
+          path: '${{ github.workspace }}/build/bin/benchmarks'
   
   LitTest:
     name: Lit Test
@@ -76,11 +82,17 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: tests
-          path: '${{ github.workspace }}/tests'
+          path: '${{ github.workspace }}/bin/tests'
+
+      - name: Download compile tests
+        uses: actions/download-artifact@v2
+        with:
+          name: compile_tests
+          path: '${{ github.workspace }}/tests/compile_tests'
 
       - name: Test
         run: |
-          cd '${{ github.workspace }}/tests'
+          cd '${{ github.workspace }}/bin/tests'
           lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak
         env:
           CC: /usr/bin/gcc-10
@@ -101,18 +113,17 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: benchmarks
-          path: '${{ github.workspace }}/benchmarks'
+          path: '${{ github.workspace }}/bin/benchmarks'
 
       - name: Benchmark
         run: |
-          cd '${{ github.workspace }}/benchmarks'
-          ls
+          cd '${{ github.workspace }}/bin/benchmarks'
           ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
         uses: rhysd/github-action-benchmark@v1
         with:
           tool: 'googlecpp'
-          output-file-path: '${{ github.workspace }}/benchmarks/results.json'
+          output-file-path: '${{ github.workspace }}/bin/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true
