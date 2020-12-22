@@ -125,7 +125,6 @@ jobs:
   Benchmarks:
     needs: Build
     runs-on: ubuntu-20.04
-    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
@@ -154,3 +153,4 @@ jobs:
           output-file-path: '${{ github.workspace }}/build/bin/benchmarks/results.json'
           github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           auto-push: true
+        if: github.ref == 'refs/heads/main'
