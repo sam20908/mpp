@@ -52,7 +52,7 @@ function(_create_performance_test TEST_DIR)
 
     _setup_target(${TEST_NAME})
 
-    target_sources(all_tests PRIVATE "${TEST_SOURCE}")
+    target_sources("all_benchmarks" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
 _create_performance_test("determinant")
