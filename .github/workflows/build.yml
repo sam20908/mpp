@@ -108,7 +108,7 @@ jobs:
       - name: Test
         run: |
           cd '${{ github.workspace }}/build/bin/tests'
-          lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak
+          lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak -a
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
