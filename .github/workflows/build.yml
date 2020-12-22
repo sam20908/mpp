@@ -39,6 +39,9 @@ jobs:
           sudo update-alternatives --set c++ /usr/bin/g++
         if: matrix.os == 'ubuntu-20.04'
 
+      - name: Install valgrind
+        run: sudo apt-get install valgrind
+
       - name: Build
         uses: lukka/run-cmake@v3
         with:
@@ -54,7 +57,7 @@ jobs:
       - name: Test
         run: |
           cd '${{ github.workspace }}/build/bin/tests'
-          lit compile_tests unit_tests --xunit-xml-output results.xml
+          lit compile_tests unit_tests --xunit-xml-output results.xml --vg --vg-leak
         env:
           CC: /usr/bin/gcc-10
           CXX: /usr/bin/g++-10
