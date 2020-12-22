@@ -76,7 +76,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: tests
-          working-directory: '${{ github.workspace }}/tests'
+          path: '${{ github.workspace }}/tests'
 
       - name: Test
         run: |
@@ -101,11 +101,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: benchmarks
-          working-directory: '${{ github.workspace }}/benchmarks'
+          path: '${{ github.workspace }}/benchmarks'
 
       - name: Benchmark
         run: |
-          cd '${{ github.workspace }}//benchmarks'
+          cd '${{ github.workspace }}/benchmarks'
           ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
 
       - name: Publish Benchmark Results
