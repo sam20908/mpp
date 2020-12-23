@@ -66,3 +66,8 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '**/results.xml' 
       failTaskOnFailedTests: true
+
+  - script: |
+      cd build/bin/benchmarks
+      ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+    displayName: Run All Benchmarks
