@@ -53,9 +53,9 @@ jobs:
     displayName: Use GCC 10
     condition: eq('os', 'ubuntu-20.04')
 
-   - task: run-cmake@0
-     displayName: Configure and Build
-     inputs:
-       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-       useVcpkgToolchainFile: true
-       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
+  - task: run-cmake@0
+    displayName: Configure and Build
+    inputs:
+      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+      useVcpkgToolchainFile: true
+      cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
