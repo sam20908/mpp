@@ -6,12 +6,19 @@ A C++20 and later matrix library
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
 - You can also just include the header into your project manually if that's your decision.
+
+## Using Built-in Tests:
 - Specify `MATRIXPP_BUILD_TESTS` to a boolean value to enable or disable building the test.
     - This enables all of the following implicitly:
         - `MATRIXPP_BUILD_COMPILE_TESTS` to `TRUE`.
         - `MATRIXPP_BUILD_UNIT_TESTS` to `TRUE`.
     - You can manually specify one of those above options to `FALSE` should you disable that specific test.
 - Specify `MATRIXPP_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
+
+## Using Code Coverage:
+- Specify `MATRIXPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
+- **NOTE**: Requirements are listed in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
+    - Very brief: **GCC** or **Clang** for the compiler and **gcov** has to be found in **PATH**. 
 
 ## Test Dependencies:
 - Python package `lit` (because the test infrastructure uses Lit testing infrastructure).
