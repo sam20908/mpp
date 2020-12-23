@@ -19,11 +19,14 @@ jobs:
     matrix:
       'Ubuntu 20.04':
         os: ubuntu-20.04
+        CC: 'gcc-10'
+        CXX: 'g++-10'
   pool:
     vmImage: $(os)
+
   variables:
-    CC: gcc-7
-    CXX: g++-7
+    CC: $(CC)
+    CXX: $(CXX)
   
   steps:
   - checkout: self
@@ -38,20 +41,8 @@ jobs:
   - task: run-vcpkg@0
     displayName: Run vcpkg
     inputs:
-      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg_x64-linux.txt'
+      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
-
-  - script: |
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
-
-      sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 110
-      sudo update-alternatives --set cc /usr/bin/gcc
-
-      sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 110
-      sudo update-alternatives --set c++ /usr/bin/g++
-    displayName: Use GCC 10
-    condition: eq('os', 'ubuntu-20.04')
 
   - task: run-cmake@0
     displayName: Configure and Build
