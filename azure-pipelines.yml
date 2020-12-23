@@ -13,7 +13,7 @@ jobs:
 
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
     displayName: Validate
-    
+
 - job: Build
   strategy:
     matrix:
@@ -38,7 +38,7 @@ jobs:
   - task: run-vcpkg@0
     displayName: Run vcpkg
     inputs:
-      vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg_x64-linux.txt
+      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg_x64-linux.txt'
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - script: |
