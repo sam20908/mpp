@@ -49,6 +49,7 @@ jobs:
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
+      buildDirectory: build
 
   - script: |
       pip3 install lit
@@ -56,7 +57,7 @@ jobs:
     displayName: Install Python LLVM Lit
 
   - script: |
-      cd ../bin/tests
+      cd build/bin/tests
       lit compile_tests unit_tests --xunit-xml-output results.xml
     displayName: Run Lit Test
 
