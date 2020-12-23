@@ -1,6 +1,8 @@
 jobs:
 - job: FormatValidation
   displayName: Format Validation
+  pool:
+    vmImage: 'ubuntu-latest'
 
   steps:
   - checkout: self
