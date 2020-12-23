@@ -14,7 +14,9 @@ jobs:
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
     displayName: Validate
 
-- job: Build
+- job: BuildAndTestAndBenchmark
+  displayName: Build / Test / Benchmark
+
   strategy:
     matrix:
       'Ubuntu 20.04':
