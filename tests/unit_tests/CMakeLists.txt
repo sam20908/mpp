@@ -19,14 +19,15 @@ find_package(GTest CONFIG REQUIRED)
 
 set(UNIT_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/unit_tests")
 set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
-set(UNIT_TESTS_EXECUTABLE_SUFFIX "_test")
+set(UNIT_TESTS_EXECUTABLE_SUFFIX "_unit_test")
 
 configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 
 function(_create_unit_test TEST_DIR)
     set(TEST_NAME "${TEST_DIR}${UNIT_TESTS_EXECUTABLE_SUFFIX}")
+    set(TEST_SOURCE "${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}")
     add_executable(${TEST_NAME} 
-        "${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}" 
+        "${TEST_SOURCE}" 
         "gtest_main.cpp")
 
     target_link_libraries(${TEST_NAME} PRIVATE
