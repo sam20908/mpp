@@ -52,20 +52,6 @@ jobs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release
       buildDirectory: build
-      buildWithCMakeArgs: --coverage
-    condition: ne(variables['os'], 'ubuntu-20.04')
-
-  - task: run-cmake@0
-    displayName: Configure and Build With Code Coverage
-    inputs:
-      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release
-      buildDirectory: build
-    condition: eq(variables['os'], 'ubuntu-20.04')
-
-  - script: sudo <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-    displayName: Upload Code Coverage
-    condition: eq(variables['os'], 'ubuntu-20.04')
 
   - script: |
       pip3 install lit
