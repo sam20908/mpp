@@ -70,6 +70,7 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '**/results.xml' 
       failTaskOnFailedTests: true
+    displayName: Publish Lit Test Results
 
   - script: |
       cd build/bin/benchmarks
