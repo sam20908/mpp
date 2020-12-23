@@ -6,7 +6,7 @@ jobs:
   - checkout: self
     submodules: true
 
-  - script: wget https://raw.githubusercontent.com/Sarcasm/run-clang-format/master/run-clang-format.py --output run-clang-format.py
+  - script: curl https://raw.githubusercontent.com/Sarcasm/run-clang-format/master/run-clang-format.py --output run-clang-format.py
     displayName: Download run-clang-format.py
 
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
