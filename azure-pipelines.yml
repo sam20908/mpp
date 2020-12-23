@@ -49,3 +49,19 @@ jobs:
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
+
+  - script: |
+      pip3 install lit
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Python LLVM Lit
+
+  - script: |
+      cd tests
+      lit compile_tests unit_tests --xunit-xml-output results.xml
+    displayName: Run Lit Test
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '**/results.xml' 
+      failTaskOnFailedTests: true
