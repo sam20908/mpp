@@ -13,6 +13,7 @@ jobs:
 
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
     displayName: Validate
+    
 - job: Build
   strategy:
     matrix:
@@ -35,12 +36,10 @@ jobs:
       path: '$(Build.SourcesDirectory)/vcpkg'
 
   - task: run-vcpkg@0
-     displayName: Run vcpkg
-     inputs:
-       # Response file stored in source control, it provides the list of ports and triplet(s).
-       vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg_x64-linux.txt
-       # Location of the vcpkg as submodule of the repository.
-       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+    displayName: Run vcpkg
+    inputs:
+      vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg_x64-linux.txt
+      vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - script: |
       sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
