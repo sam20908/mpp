@@ -1,7 +1,7 @@
 # matrixpp
 A C++20 and later matrix library
 
-![](https://github.com/sam20908/matrixpp/workflows/CI/badge.svg)
+[![Build Status](https://dev.azure.com/samestimable2016/matrixpp/_apis/build/status/sam20908.matrixpp?branchName=main)](https://dev.azure.com/samestimable2016/matrixpp/_build/latest?definitionId=2&branchName=main)
 
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
