@@ -48,5 +48,4 @@ jobs:
     displayName: Configure and Build
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      useVcpkgToolchainFile: true
       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
