@@ -56,7 +56,8 @@ jobs:
     displayName: Install Python LLVM Lit
 
   - script: |
-      cd build/bin/tests
+      cd bin/tests
+      ls
       lit compile_tests unit_tests --xunit-xml-output results.xml
     displayName: Run Lit Test
 
