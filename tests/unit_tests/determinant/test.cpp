@@ -22,7 +22,7 @@
 
 namespace
 {
-	TEST(DeterminantTest, Calculation)
+	TEST(Determinant3x3, Calculation)
 	{
 		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto det    = matrix.determinant();
