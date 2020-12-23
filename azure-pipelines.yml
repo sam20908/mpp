@@ -13,3 +13,50 @@ jobs:
 
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
     displayName: Validate
+- job: Build
+  strategy:
+    matrix:
+      'Ubuntu 20.04':
+        os: ubuntu-20.04
+  pool:
+    vmImage: $(os)
+  variables:
+    CC: gcc-7
+    CXX: g++-7
+  
+  steps:
+  - checkout: self
+    submodules: true
+
+  - task: Cache@2
+    displayName: Cache vcpkg
+    inputs:
+      key: $(Build.SourcesDirectory)/vcpkg_dependencies.txt | "$(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD" | "$(Agent.OS)"
+      path: '$(Build.SourcesDirectory)/vcpkg'
+
+  - task: run-vcpkg@0
+     displayName: Run vcpkg
+     inputs:
+       # Response file stored in source control, it provides the list of ports and triplet(s).
+       vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg_x64-linux.txt
+       # Location of the vcpkg as submodule of the repository.
+       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+
+  - script: |
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+
+      sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 110
+      sudo update-alternatives --set cc /usr/bin/gcc
+
+      sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 110
+      sudo update-alternatives --set c++ /usr/bin/g++
+    displayName: Use GCC 10
+    condition: eq('os', 'ubuntu-20.04')
+
+   - task: run-cmake@0
+     displayName: Configure and Build
+     inputs:
+       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+       useVcpkgToolchainFile: true
+       cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE
