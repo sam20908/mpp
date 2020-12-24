@@ -53,8 +53,22 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - script: cmake -G "Ninja Multi-Config" -DCMAKE_MAKE_PROGRAM=make -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build .
-    displayName: CMake Configure
+  - task: run-cmake@0
+    displayName: Configure and Build
+    inputs:
+      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
+      buildDirectory: build
+
+  - script: cmake --build build --config Debug --target matrixpp_code_coverage
+    displayName: Generate Code Coverage in Debug Configuration
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: JaCoCo
+      summaryFileLocation: build/matrixpp_code_coverage/index.html
+      pathToSources: $(Build.SourcesDirectory)
+    displayName: Publish Code Coverage
 
   - script: cmake --build build --target all --config Release
     displayName: Build in Release Configuration
@@ -80,13 +94,3 @@ jobs:
       cd build/bin/benchmarks/Release
       ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
     displayName: Run All Benchmarks
-
-  - script: cmake --build build --config Debug --target matrixpp_code_coverage
-    displayName: Generate Code Coverage in Debug Configuration
-
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: JaCoCo
-      summaryFileLocation: build/matrixpp_code_coverage/index.html
-      pathToSources: $(Build.SourcesDirectory)
-    displayName: Publish Code Coverage
