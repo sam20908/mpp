@@ -35,6 +35,7 @@ A C++20 and later matrix library
 - There will be an executable called `all_benchmarks`, which invokes all the benchmarks.
 
 ## Using Code Coverage:
+- ***Requires unit tests to be enabled!***
 - Specify `MATRIXPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
 - **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
     - Recommended to build in **Debug** configuration.

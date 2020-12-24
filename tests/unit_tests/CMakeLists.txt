@@ -20,8 +20,14 @@ find_package(GTest CONFIG REQUIRED)
 set(UNIT_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/unit_tests")
 set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "_unit_test")
+set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
 configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
+
+# This executable will contain all the unit tests
+add_executable("all_unit_tests")
+target_sources("all_unit_tests" PRIVATE "gtest_main.cpp")
+_setup_target("all_unit_tests" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
 
 function(_create_unit_test TEST_DIR)
     set(TEST_NAME "${TEST_DIR}${UNIT_TESTS_EXECUTABLE_SUFFIX}")
@@ -30,16 +36,21 @@ function(_create_unit_test TEST_DIR)
         "${TEST_SOURCE}" 
         "gtest_main.cpp")
 
-    target_link_libraries(${TEST_NAME} PRIVATE
-        matrixpp::matrixpp
-        GTest::gmock GTest::gtest)
+    _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
 
-    set_target_properties(${TEST_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${UNIT_TESTS_BINARY_DIR}"
-        
-        CXX_STANDARD 20
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS OFF)
+    target_sources("all_unit_tests" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
 _create_unit_test("determinant")
+
+cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
+    ON "${PROJECT_NAME_UPPER}_BUILD_TESTS" OFF)
+
+if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
+    include("CodeCoverage.cmake")
+    append_coverage_compiler_flags()
+    setup_target_for_coverage_gcovr_xml(
+        NAME ${PROJECT_NAME}_code_coverage
+        EXECUTABLE "bin/tests/unit_tests/$<CONFIG>/all_unit_tests"
+        DEPENDENCIES "all_unit_tests")
+endif()

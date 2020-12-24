@@ -70,9 +70,6 @@ jobs:
       pathToSources: $(Build.SourcesDirectory)
     displayName: Publish Code Coverage
 
-  - script: cmake --build build --target all --config Release
-    displayName: Build in Release Configuration
-
   - script: |
       pip3 install lit
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
@@ -80,7 +77,6 @@ jobs:
 
   - script: |
       cd build/bin/tests
-      rm -rf unit_tests/Debug
       lit compile_tests unit_tests --xunit-xml-output results.xml
     displayName: Run Lit Test
 
@@ -90,6 +86,9 @@ jobs:
       testResultsFiles: '**/results.xml' 
       failTaskOnFailedTests: true
     displayName: Publish Lit Test Results
+
+  - script: cmake --build build --target all --config Release
+    displayName: Build in Release Configuration
 
   - script: |
       cd build/bin/benchmarks/Release
