@@ -12,13 +12,13 @@ A C++20 and later matrix library
 - `gtest` in `vcpkg` for unit tests.
 - `benchmark` in `vcpkg` for benchmarks.
 - `gcov` and `gcovr` for code coverage (has to be found in **PATH**).
-- NOTE: **Ninja** won't work for code coverage due to a bug, so a workaround is to use **Ninja Multi-Config**.
 
 ## Using Built-in Tests:
 - Specify `MATRIXPP_BUILD_TESTS` to a boolean value to enable or disable building the test.
     - This enables all of the following implicitly:
         - `MATRIXPP_BUILD_COMPILE_TESTS` to `TRUE`.
         - `MATRIXPP_BUILD_UNIT_TESTS` to `TRUE`.
+            - **Note: Multi configuration generators will put same executables of different configurations in unit tests binary directory!**
     - You can manually specify one of those above options to `FALSE` should you disable that specific test.
 - Specify `MATRIXPP_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
     - Recommended to build in **Release** configuration.
@@ -36,6 +36,7 @@ A C++20 and later matrix library
 
 ## Using Code Coverage:
 - ***Requires unit tests to be enabled!***
+- NOTE: **Ninja** won't work for code coverage due to a bug, so a workaround is to use **Ninja Multi-Config**.
 - Specify `MATRIXPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
 - **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
     - Recommended to build in **Debug** configuration.
