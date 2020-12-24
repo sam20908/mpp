@@ -48,7 +48,9 @@ jobs:
       vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
-  - script: sudo apt-get install gcovr
+  - script: |
+      sudo apt-get update
+      sudo apt-get install gcovr
     displayName: Install Gcovr
 
   - task: run-cmake@0
