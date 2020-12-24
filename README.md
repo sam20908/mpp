@@ -38,3 +38,4 @@ A C++20 and later matrix library
 - Specify `MATRIXPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
 - **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
     - Recommended to build in **Debug** configuration.
+    - Coverage file will be in `<build directory>` named `matrixpp_code_coverage.xml`.
