@@ -17,7 +17,7 @@ jobs:
     displayName: Validate
 
 - job: BuildAndTestAndBenchmark
-  displayName: Build / Test / Benchmark
+  displayName: Build / Test / Benchmark / Code Coverage
 
   strategy:
     matrix:
@@ -48,12 +48,30 @@ jobs:
       vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
+  - script: |
+      sudo apt-get update
+      sudo apt-get install gcovr
+    displayName: Install Gcovr
+
   - task: run-cmake@0
     displayName: Configure and Build
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release
+      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
       buildDirectory: build
+
+  - script: cmake --build build --config Debug --target matrixpp_code_coverage
+    displayName: Generate Code Coverage in Debug Configuration
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: cobertura
+      summaryFileLocation: build/matrixpp_code_coverage.xml
+      pathToSources: $(Build.SourcesDirectory)
+    displayName: Publish Code Coverage
+
+  - script: cmake --build build --target all --config Release
+    displayName: Build in Release Configuration
 
   - script: |
       pip3 install lit
@@ -62,6 +80,7 @@ jobs:
 
   - script: |
       cd build/bin/tests
+      rm -rf unit_tests/Debug
       lit compile_tests unit_tests --xunit-xml-output results.xml
     displayName: Run Lit Test
 
@@ -73,6 +92,6 @@ jobs:
     displayName: Publish Lit Test Results
 
   - script: |
-      cd build/bin/benchmarks
+      cd build/bin/benchmarks/Release
       ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
     displayName: Run All Benchmarks
