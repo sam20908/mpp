@@ -53,12 +53,11 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - task: run-cmake@0
-    displayName: Configure and Build
-    inputs:
-      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
-      buildDirectory: build
+  - script: cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build .
+    displayName: CMake Configure
+
+  - script: cmake --build build --target all --config Release
+    displayName: Build in Release Configuration
 
   - script: |
       pip3 install lit
@@ -78,12 +77,12 @@ jobs:
     displayName: Publish Lit Test Results
 
   - script: |
-      cd build/bin/benchmarks
+      cd build/bin/benchmarks/Release
       ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
     displayName: Run All Benchmarks
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
-    displayName: Generate Code Coverage
+    displayName: Generate Code Coverage in Debug Configuration
 
   - task: PublishCodeCoverageResults@1
     inputs:
