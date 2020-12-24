@@ -19,7 +19,7 @@ find_package(benchmark CONFIG REQUIRED)
 
 set(BENCHMARKS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
 set(BENCHMARKS_SOURCE_FILENAME "test.cpp")
-set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main)
+set(BENCHMARKS_LIBRARIES "${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main")
 
 # This executable will contain all the benchmarks
 add_executable("all_benchmarks")

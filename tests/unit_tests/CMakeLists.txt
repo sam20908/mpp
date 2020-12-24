@@ -20,7 +20,7 @@ find_package(GTest CONFIG REQUIRED)
 set(UNIT_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/unit_tests")
 set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "_unit_test")
-set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
+set(UNIT_TESTS_LIBRARIES "${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest")
 
 configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 
