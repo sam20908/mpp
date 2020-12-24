@@ -28,7 +28,7 @@ set_target_properties("${PROJECT_NAME}_dummy" PROPERTIES
 
 include("CodeCoverage.cmake")
 append_coverage_compiler_flags()
-setup_target_for_coverage_gcovr_html(
+setup_target_for_coverage_gcovr_xml(
     NAME ${PROJECT_NAME}_code_coverage
     EXECUTABLE "bin/code_coverage/Debug/${PROJECT_NAME}_dummy"
     EXCLUDE "code_coverage/*" # Don't include dummy main file
