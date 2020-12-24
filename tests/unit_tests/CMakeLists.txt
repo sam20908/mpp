@@ -52,6 +52,5 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
         EXECUTABLE "bin/tests/unit_tests/$<CONFIG>/all_unit_tests"
-        EXCLUDES "vcpkg/*"
         DEPENDENCIES "all_unit_tests")
 endif()
