@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file")
@@ -32,6 +32,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the test suites")
 option(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS "Builds the benchmarks")
+option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage")
 
 if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
     enable_testing()
@@ -40,4 +41,8 @@ endif()
 
 if(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS)
     add_subdirectory("benchmarks")
+endif()
+
+if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
+    add_subdirectory("code_coverage")
 endif()

@@ -39,20 +39,20 @@ jobs:
   - task: Cache@2
     displayName: Cache vcpkg
     inputs:
-      key: $(Build.SourcesDirectory)/vcpkg-dependencies.txt | "$(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD" | "$(Agent.OS)"
-      path: '$(Build.SourcesDirectory)/vcpkg'
+      key: vcpkg-dependencies.txt | ".git/modules/vcpkg/HEAD" | "$(Agent.OS)"
+      path: 'vcpkg'
 
   - task: run-vcpkg@0
     displayName: Run vcpkg
     inputs:
-      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
-      vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+      vcpkgArguments: '@vcpkg-dependencies.txt'
+      vcpkgDirectory: vcpkg
 
   - task: run-cmake@0
     displayName: Configure and Build
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G Ninja -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DCMAKE_BUILD_TYPE=Release
+      cmakeAppendedArgs: -G 'Ninja Multi-Config' -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
       buildDirectory: build
 
   - script: |
@@ -76,3 +76,13 @@ jobs:
       cd build/bin/benchmarks
       ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
     displayName: Run All Benchmarks
+
+  - script: cmake --build build --config Debug --target matrixpp_code_coverage
+    displayName: Generate Code Coverage
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: JaCoCo
+      summaryFileLocation: build/matrixpp_code_coverage/index.html
+      pathToSources: $(Build.SourcesDirectory)
+    displayName: Publish Code Coverage
