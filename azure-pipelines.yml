@@ -17,7 +17,7 @@ jobs:
     displayName: Validate
 
 - job: BuildAndTestAndBenchmark
-  displayName: Build / Test / Benchmark
+  displayName: Build / Test / Benchmark / Code Coverage
 
   strategy:
     matrix:
@@ -39,14 +39,14 @@ jobs:
   - task: Cache@2
     displayName: Cache vcpkg
     inputs:
-      key: vcpkg-dependencies.txt | ".git/modules/vcpkg/HEAD" | "$(Agent.OS)"
-      path: 'vcpkg'
+      key: $(Build.SourcesDirectory)/vcpkg-dependencies.txt | "$(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD" | "$(Agent.OS)"
+      path: '$(Build.SourcesDirectory)/vcpkg'
 
   - task: run-vcpkg@0
     displayName: Run vcpkg
     inputs:
-      vcpkgArguments: '@vcpkg-dependencies.txt'
-      vcpkgDirectory: vcpkg
+      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
+      vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - task: run-cmake@0
     displayName: Configure and Build
