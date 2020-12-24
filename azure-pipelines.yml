@@ -65,7 +65,7 @@ jobs:
 
   - task: PublishCodeCoverageResults@1
     inputs:
-      codeCoverageTool: JaCoCo
+      codeCoverageTool: cobertura
       summaryFileLocation: build/matrixpp_code_coverage/index.html
       pathToSources: $(Build.SourcesDirectory)
     displayName: Publish Code Coverage
@@ -80,6 +80,7 @@ jobs:
 
   - script: |
       cd build/bin/tests
+      rm -rf unit_tests/Debug
       lit compile_tests unit_tests --xunit-xml-output results.xml
     displayName: Run Lit Test
 
