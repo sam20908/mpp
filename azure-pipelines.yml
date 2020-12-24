@@ -52,7 +52,7 @@ jobs:
     displayName: Configure and Build
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G 'Ninja Multi-Config' -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
+      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE
       buildDirectory: build
 
   - script: |
