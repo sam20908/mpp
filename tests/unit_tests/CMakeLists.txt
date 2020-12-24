@@ -51,6 +51,7 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
+        BASE_DIRECTORY "${PROJECT_SOURCE_DIR}/include"
         EXECUTABLE "bin/tests/unit_tests/$<CONFIG>/all_unit_tests"
         DEPENDENCIES "all_unit_tests")
 endif()
