@@ -6,6 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +20,11 @@ jobs:
       
       - name: Build
         run: npm run build
+
+      - name: Set Git Credentials
+        run: |
+          git config user.email "samestimable2016@gmail.com"
+          git config user.name "Sam Huang"
 
       - name: Deploy
         run: npm run deploy
