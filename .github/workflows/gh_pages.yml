@@ -15,11 +15,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install
-        run: npm install
+        run: yarn install
       
       - name: Build
-        run: npm run build
+        run: yarn run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
