@@ -16,7 +16,7 @@ export class NavigationBar extends Component {
                     </Nav>
                     <Navbar.Text>
                         A header-only C++20 matrix library
-                        </Navbar.Text>
+                    </Navbar.Text>
                 </Navbar.Collapse>
             </Navbar>
         );
