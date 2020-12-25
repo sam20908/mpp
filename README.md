@@ -1,7 +1,7 @@
 # matrixpp
 A C++20 and later matrix library
 
-[![Build Status](https://dev.azure.com/samestimable2016/matrixpp/_apis/build/status/sam20908.matrixpp?branchName=main)](https://dev.azure.com/samestimable2016/matrixpp/_build/latest?definitionId=2&branchName=main)
+![Build Status](https://img.shields.io/azure-devops/build/samestimable2016/matrixpp/2?label=%F0%9F%94%A8%20Build%20Status) ![Test Results](https://img.shields.io/azure-devops/tests/samestimable2016/matrixpp/2?label=%F0%9F%A7%AA%20Test%20Results) ![Code Coverage](https://img.shields.io/azure-devops/coverage/samestimable2016/matrixpp/2?label=%F0%9F%93%B6%20Code%20Coverage) ![GitHub Pages](https://img.shields.io/github/deployments/sam20908/matrixpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages)
 
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
