@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
       - name: Install
         run: npm install
@@ -19,10 +21,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Set Git Credentials
-        run: |
-          git config user.email "samestimable2016@gmail.com"
-          git config user.name "sam20908"
-
-      - name: Deploy
-        run: npm run deploy
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages-prod
+          FOLDER: build
+          CLEAN: true
