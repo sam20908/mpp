@@ -8,12 +8,15 @@ export class NavigationBar extends Component {
         return (
             <Navbar bg="dark" variant="dark" sticky="top" expand="lg">
                 <Navbar.Brand href="#home">matrixpp</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="mr-auto">
-                        <Nav.Link href="#home" active="true">Home</Nav.Link>
-                        <Nav.Link href="#link">Documentation</Nav.Link>
+                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                <Navbar.Collapse id="responsive-navbar-nav">
+                    <Nav className="mr-auto" activeKey="/">
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="/docs">Documentation</Nav.Link>
                     </Nav>
+                    <Navbar.Text>
+                        A header-only C++20 matrix library
+                        </Navbar.Text>
                 </Navbar.Collapse>
             </Navbar>
         );
