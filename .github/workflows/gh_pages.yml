@@ -21,8 +21,8 @@ jobs:
 
       - name: Set Git Credentials
         run: |
-          git config --global user.email "samestimable2016@gmail.com"
-          git config --global user.name "Sam Huang"
+          git config user.email "samestimable2016@gmail.com"
+          git config user.name "sam20908"
 
       - name: Deploy
         run: npm run deploy
