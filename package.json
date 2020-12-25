@@ -1,4 +1,6 @@
 {
+  "homepage": "http://sam20908.github.io/matrixpp",
+  
   "name": "matrixpp",
   "version": "0.1.0",
   "private": true,
