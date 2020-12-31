@@ -197,19 +197,22 @@ namespace matrixpp
 		auto cols     = obj.columns();
 		auto buf_copy = obj.buffer();
 
-		auto result = matrix<Value, RowsExtent, ColumnsExtent>{};
-		auto det    = detail::determinant_impl<Value>(buf_copy, rows, cols, 0, cols - 1);
+		using inverse_matrix_t = matrix<Value, RowsExtent, ColumnsExtent>;
+		auto inverse           = inverse_matrix_t{};
+		auto det               = detail::determinant_impl<Value>(buf_copy, rows, cols, 0, cols - 1);
 
 		if (det == static_cast<Value>(0))
 		{
 			throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 		}
 
-		auto inverse_buf = obj.buffer();
+		auto inverse_buf = typename inverse_matrix_t::buffer_type{};
+		detail::allocate_1d_buf_if_vector(inverse_buf, rows, cols);
 
 		detail::inverse_impl<Value>(inverse_buf, buf_copy, rows, cols, det);
+		detail::init_matrix_base_with_1d_rng(inverse, inverse_buf, rows, cols);
 
-		return result;
+		return inverse;
 	}
 
 	template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
