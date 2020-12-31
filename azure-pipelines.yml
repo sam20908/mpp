@@ -20,7 +20,7 @@ jobs:
   displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
   pool:
-    vmImage: ubuntu-latest
+    vmImage: ubuntu-20.04
 
   steps:
   - checkout: self
@@ -39,11 +39,6 @@ jobs:
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - script: |
-      sudo apt-get update
-      sudo apt-get install gcovr
-    displayName: Install Gcovr
-
-  - script: |
       pip3 install lit
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
@@ -59,12 +54,13 @@ jobs:
       sudo update-alternatives --set c++ /usr/bin/g++
     displayName: Use GCC 10 by default
 
-  - task: run-cmake@0
-    inputs:
-      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE
-      buildDirectory: build
-    displayName: Configure and Build
+  - script: |
+      sudo apt-get update
+      sudo apt-get install gcovr
+    displayName: Install Gcovr
+
+  - script: cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
+    displayName: Configure
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
