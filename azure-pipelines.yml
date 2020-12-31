@@ -61,11 +61,11 @@ jobs:
     displayName: Use GCC 10 by default
 
   - task: run-cmake@0
-    displayName: Configure and Build
     inputs:
       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE
       buildDirectory: build
+    displayName: Configure and Build
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
@@ -127,12 +127,12 @@ jobs:
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
 
-  - task: run-cmake@0
-    displayName: Configure and Build
-    inputs:
-      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE
-      buildDirectory: build
+  - script: |
+      call "%PROGRAMFILES(X86)%\Microsoft Visual Studio\2019\Preview\Common7\Tools\VsDevCmd.bat" ^
+        -host_arch=amd64 -arch=amd64 -no_logo
+      cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
+      cmake --build build --target all
+      displayName: Configure and Build
 
   - script: |
       cd build/bin/tests
