@@ -38,5 +38,5 @@ if(${PROJECT_NAME_UPPER}_BUILD_UNIT_TESTS)
 endif()
 
 add_test(NAME "test" 
-    COMMAND lit unit_tests compile_tests
+    COMMAND ${LLVM_LIT_EXEC} unit_tests compile_tests
     WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")
