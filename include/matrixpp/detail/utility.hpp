@@ -84,11 +84,11 @@ namespace matrixpp::detail
 		}
 	}
 
-	inline void allocate_1d_buf_if_vector(const auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	inline void allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = requires
 		{
-			buf.push_back();
+			buf.push_back(0);
 		};
 
 		if constexpr (is_vec)
