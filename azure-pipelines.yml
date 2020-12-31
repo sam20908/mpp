@@ -24,7 +24,6 @@ jobs:
 
   steps:
   - checkout: self
-    displayName: Checkout
     submodules: true
 
   - task: Cache@2
@@ -106,7 +105,6 @@ jobs:
 
 #   steps:
 #   - checkout: self
-#     displayName: Checkout
 #     submodules: true
 
 #   - task: Cache@2
