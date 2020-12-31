@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include "../detail/matrix_base.hpp"
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
 #include "determinant.hpp"
-#include "matrixpp/detail/matrix_base.hpp"
 
 #include <algorithm>
 #include <bits/ranges_algo.h>
