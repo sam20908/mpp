@@ -21,6 +21,6 @@ under the License.
 
 import lit.formats
 
-config.name = 'unit-tests'
+config.name = 'Unit Test'
 config.test_format = lit.formats.GoogleTest('@UNIT_TESTS_OUTPUT_DIR@', 
     '@UNIT_TESTS_EXECUTABLE_SUFFIX@')

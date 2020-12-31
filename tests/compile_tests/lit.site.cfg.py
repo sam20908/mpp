@@ -19,10 +19,25 @@ under the License.
 
 # pylint: skip-file
 
-from os.path import join
+
+from lit.formats import ShTest
+from os.path import dirname
 
 
-config.source_dir = '@COMPILE_TESTS_SOURCE_DIR@'
-config.binary_dir = '@COMPILE_TESTS_BINARY_DIR@'
+has_binary_dir = hasattr(config, 'binary_dir')
+has_source_dir = hasattr(config, 'source_dir')
+if not has_binary_dir or not has_source_dir:
+    # The user probably tried to run lit in this directory, which means we can't
+    # access some of the properties defined by the lit.site.cfg.py file in the
+    # binary dir
+    lit_config.fatal(
+        'Lit must be ran in <build directory>/bin/tests/compile_tests!')
 
-lit_config.load_config(config, join(config.source_dir, 'lit.site.cfg.py'))
+config.name = 'Compile Test'
+config.suffixes = ['.cpp']
+config.test_format = ShTest()
+config.test_source_root = dirname(__file__)
+config.test_exec_root = config.binary_dir
+
+config.excludes = ['__pycache__', 'build']
+config.substitutions.append(('%binary_dir', config.binary_dir))

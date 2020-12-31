@@ -22,7 +22,11 @@ set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "_unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
-configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
+if(LLVM_LIT_EXEC)
+    configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
+else()
+    message(STATUS "LLVM Lit not found! LLVM test suite for unit tests won't be set up")
+endif()
 
 # This executable will contain all the unit tests
 add_executable("all_unit_tests")
@@ -31,7 +35,7 @@ _setup_target("all_unit_tests" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIE
 
 function(_create_unit_test TEST_DIR)
     set(TEST_NAME "${TEST_DIR}${UNIT_TESTS_EXECUTABLE_SUFFIX}")
-    set(TEST_SOURCE "${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}")
+    set(TEST_SOURCE "src/${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}")
     add_executable(${TEST_NAME} 
         "${TEST_SOURCE}" 
         "gtest_main.cpp")
@@ -41,10 +45,8 @@ function(_create_unit_test TEST_DIR)
     target_sources("all_unit_tests" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
-_create_unit_test("determinant")
-
 cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
-    ON "${PROJECT_NAME_UPPER}_BUILD_TESTS" OFF)
+    OFF "${PROJECT_NAME_UPPER}_BUILD_TESTS" OFF)
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     include("CodeCoverage.cmake")
@@ -55,3 +57,18 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/unit_tests/*"
         DEPENDENCIES "all_unit_tests")
 endif()
+
+# Algorithm tests
+_create_unit_test("block")
+_create_unit_test("determinant")
+_create_unit_test("inverse")
+_create_unit_test("transpose")
+
+# Utility tests
+_create_unit_test("equality")
+_create_unit_test("type_casting")
+_create_unit_test("matrix_type")
+
+# Basic tests
+_create_unit_test("initialization")
+_create_unit_test("math_operations")

@@ -15,11 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
+if(NOT LLVM_LIT_EXEC)
+    message(FATAL_ERROR "Compile tests requires LLVM Lit to be found in PATH!")
+endif()
+
 set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
 set(COMPILE_TESTS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(COMPILE_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/compile_tests")
-set(COMPILE_TESTS_SOURCE_FILENAME "test.cpp")
-set(COMPILE_TESTS_EXPECTED_RESULTS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/expected_results.txt")
 
 configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
