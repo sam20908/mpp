@@ -20,7 +20,7 @@ jobs:
   displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
   pool:
-    vmImage: ubuntu-latest
+    vmImage: ubuntu-20.04
 
   steps:
   - checkout: self
@@ -59,12 +59,8 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - task: run-cmake@0
-    inputs:
-      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE
-      buildDirectory: build
-    displayName: Configure and Build
+  - script: cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
+    displayName: Configure
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
