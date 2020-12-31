@@ -79,8 +79,8 @@ jobs:
 
   - script: |
       cd build/bin/tests
-      export CC=$(CC)
-      export CXX=$(CXX)
+      echo "##[debug] C compiler: $(CC)"
+      echo "##[debug] C++ compiler: $(CXX)"
       lit compile_tests unit_tests --xunit-xml-output results.xml
     continueOnError: true
     displayName: Run Lit Test
