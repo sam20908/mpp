@@ -130,7 +130,7 @@ jobs:
   - script: |
       call "%PROGRAMFILES(X86)%\Microsoft Visual Studio\2019\Preview\Common7\Tools\VsDevCmd.bat" ^
         -host_arch=amd64 -arch=amd64 -no_logo
-      cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
+      cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
       cmake --build build --target all
     displayName: Configure and Build
 
