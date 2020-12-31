@@ -27,7 +27,7 @@ _setup_target("all_benchmarks" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIE
 
 function(_create_performance_test TEST_DIR)
     set(TEST_NAME "${TEST_DIR}_benchmarks")
-    set(TEST_SOURCE "${TEST_DIR}/${BENCHMARKS_SOURCE_FILENAME}")
+    set(TEST_SOURCE "src/${TEST_DIR}/${BENCHMARKS_SOURCE_FILENAME}")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
     _setup_target(${TEST_NAME} "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")

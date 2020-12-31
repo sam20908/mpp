@@ -43,3 +43,6 @@ compile_commands.json
 
 # Compiled Python code (because LLVM Lit generates them)
 *.pyc
+
+# JetBrain IDE cache
+.idea/

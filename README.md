@@ -5,10 +5,10 @@ A C++20 and later matrix library
 
 ## Including the Project:
 - A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
-- You can also just include the header into your project manually if that's your decision.
+- You can also just include the headers into your project manually if that's your decision.
 
-## Test Dependencies:
-- Python package `lit` (because the test infrastructure uses Lit testing infrastructure).
+## Test Suite Dependencies:
+- Python package `lit` for compile tests (has to be found in **PATH**).
 - `gtest` in `vcpkg` for unit tests.
 - `benchmark` in `vcpkg` for benchmarks.
 - `gcov` and `gcovr` for code coverage (has to be found in **PATH**).
@@ -25,7 +25,7 @@ A C++20 and later matrix library
 
 ## Using the Lit Test Suite:
 - Running `ctest` in `<build directory>` directory invokes all tests (use `ctest -V` for verbose output).
-- Running `lit` either in `<build directory>/bin/tests/unit_tests` or `<build directory>/bin/tests/compile_tests` runs all the test in that directory.
+- Running `lit` either in `<build directory>/bin/tests/unit_tests` or `<build directory>/bin/tests/compile_tests` runs all the test in that directory (CMake will detect if `lit` is found in PATH before setting up the test suite).
 - You can manually run specific unit tests by invoking the executable (don't double click on them, instead run them from command line).
 - You can manually run specific compile tests by using Lit's parameter `--filter` and pass a regex string to match the tests.
 
