@@ -53,6 +53,11 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
+  - script: |
+      pip3 install lit
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Python LLVM Lit
+
   - task: run-cmake@0
     displayName: Configure and Build
     inputs:
@@ -69,11 +74,6 @@ jobs:
       summaryFileLocation: build/matrixpp_code_coverage.xml
       pathToSources: $(Build.SourcesDirectory)
     displayName: Publish Code Coverage
-
-  - script: |
-      pip3 install lit
-      echo '##vso[task.prependpath]$(HOME)/.local/bin'
-    displayName: Install Python LLVM Lit
 
   - script: |
       cd build/bin/tests
