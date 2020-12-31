@@ -127,7 +127,9 @@ jobs:
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
 
-  - script: choco install ninja
+  - script: |
+      choco install ninja
+      echo '##vso[task.prependpath]C:\\ProgramData\\chocolatey\\bin'
     displayName: Install Ninja Generator
 
   - script: |
