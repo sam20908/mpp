@@ -122,29 +122,30 @@ jobs:
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
       vcpkgTriplet: x64-windows
 
-  # - script: |
-  #     pip3 install lit
-  #     echo '##vso[task.prependpath]$(HOME)/.local/bin'
-  #   displayName: Install Python LLVM Lit
+  - script: |
+      pip3 install lit
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Python LLVM Lit
 
-  # - script: |
-  #     call "%PROGRAMFILES(X86)%\Microsoft Visual Studio\2019\Preview\Common7\Tools\VsDevCmd.bat" ^
-  #       -host_arch=amd64 -arch=amd64 -no_logo
-  #     cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
-  #     cmake --build build --target all
-  #   displayName: Configure and Build
+  - script: |
+      call "%PROGRAMFILES(X86)%\Microsoft Visual Studio\2019\Preview\Common7\Tools\VsDevCmd.bat" ^
+        -host_arch=amd64 -arch=amd64 -no_logo
+      cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
+      dir build
+      cmake --build build --target all
+    displayName: Configure and Build
 
-  # - script: |
-  #     cd build/bin/tests
-  #     lit compile_tests unit_tests --xunit-xml-output results.xml
-  #   continueOnError: true
-  #   displayName: Run Lit Test
+  - script: |
+      cd build/bin/tests
+      lit compile_tests unit_tests --xunit-xml-output results.xml
+    continueOnError: true
+    displayName: Run Lit Test
 
-  # - task: PublishTestResults@2
-  #   inputs:
-  #     testResultsFormat: JUnit
-  #     testResultsFiles: '**/results.xml' 
-  #   displayName: Publish Lit Test Results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '**/results.xml' 
+    displayName: Publish Lit Test Results
 
   # - script: cmake --build build --target all --config Release
   #   displayName: Build in Release Configuration
