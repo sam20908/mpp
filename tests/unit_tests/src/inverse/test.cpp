@@ -23,7 +23,7 @@
 
 namespace
 {
-	TEST(Inverse, 3x3_SameType)
+	TEST(Inverse, DISABLED_3x3_SameType)
 	{
 		auto matrix  = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto inverse = matrixpp::inverse(matrix);
