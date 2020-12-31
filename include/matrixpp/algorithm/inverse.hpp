@@ -22,6 +22,7 @@
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
 #include "determinant.hpp"
+#include "matrixpp/detail/matrix_base.hpp"
 
 #include <algorithm>
 #include <bits/ranges_algo.h>
@@ -53,10 +54,10 @@ namespace matrixpp
 				auto element_3 = static_cast<Precision>(data[2]) * -1;
 				auto element_4 = static_cast<Precision>(data[0]);
 
-				result[0] = std::move(element_1);
-				result[1] = std::move(element_2);
-				result[2] = std::move(element_3);
-				result[3] = std::move(element_4);
+				result[0] = element_1;
+				result[1] = element_2;
+				result[2] = element_3;
+				result[3] = element_4;
 
 				auto multiplier = static_cast<Precision>(1) / determinant;
 
@@ -223,18 +224,21 @@ namespace matrixpp
 		auto cols     = obj.columns();
 		auto buf_copy = obj.buffer();
 
-		auto result = matrix<Value, RowsExtent, ColumnsExtent>{};
-		auto det    = detail::determinant_impl<Value>(buf_copy, rows, cols, 0, cols - 1);
+		using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
+		auto inverse           = inverse_matrix_t{};
+		auto det               = detail::determinant_impl<To>(buf_copy, rows, cols, 0, cols - 1);
 
-		if (det == static_cast<Value>(0))
+		if (det == static_cast<To>(0))
 		{
 			throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 		}
 
-		auto inverse_buf = obj.buffer();
+		auto inverse_buf = typename inverse_matrix_t::buffer_type{};
+		detail::allocate_1d_buf_if_vector(inverse_buf, rows, cols);
 
-		detail::inverse_impl<Value>(inverse_buf, buf_copy, rows, cols, det);
+		detail::inverse_impl<To>(inverse_buf, buf_copy, rows, cols, det);
+		detail::init_matrix_base_with_1d_rng(inverse, inverse_buf, rows, cols);
 
-		return result;
+		return inverse;
 	}
 } // namespace matrixpp

@@ -68,7 +68,7 @@ namespace matrixpp::detail
 		return std::pair{ rows, cols };
 	}
 
-	inline void validate_matrices_same_size(auto&& left, auto&& right) // @TODO: ISSUE #20
+	inline void validate_matrices_same_size(const auto& left, const auto& right) // @TODO: ISSUE #20
 	{
 		if (left.rows() != right.rows() || left.columns() != right.columns())
 		{
@@ -76,11 +76,24 @@ namespace matrixpp::detail
 		}
 	}
 
-	inline void validate_matrices_multipliable(auto&& left, auto&& right) // @TODO: ISSUE #20
+	inline void validate_matrices_multipliable(const auto& left, const auto& right) // @TODO: ISSUE #20
 	{
 		if (left.columns() != right.rows())
 		{
 			throw std::runtime_error("Left matrix's columns is not equal to right matrix's rows!");
+		}
+	}
+
+	inline void allocate_1d_buf_if_vector(const auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	{
+		constexpr auto is_vec = requires
+		{
+			buf.push_back();
+		};
+
+		if constexpr (is_vec)
+		{
+			buf.resize(rows * cols);
 		}
 	}
 } // namespace matrixpp::detail

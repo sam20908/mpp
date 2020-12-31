@@ -192,20 +192,10 @@ namespace matrixpp::detail
 		std::size_t rows,
 		std::size_t cols) // @TODO: ISSUE #20
 	{
-		constexpr auto is_dynamic = BaseRowsExtent == std::dynamic_extent || BaseColumnsExtent == std::dynamic_extent;
-
 		base._rows = rows;
 		base._cols = cols;
+		allocate_1d_buf_if_vector(base._buf, rows, cols);
 
-		if constexpr (is_dynamic)
-		{
-			base._buf.reserve(rows * cols);
-
-			std::ranges::copy(rng, std::back_inserter(base._buf));
-		}
-		else
-		{
-			std::ranges::copy(rng, base._buf.begin());
-		}
+		std::ranges::copy(rng, base._buf.begin());
 	}
 } // namespace matrixpp::detail
