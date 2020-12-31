@@ -120,6 +120,7 @@ jobs:
     inputs:
       vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+      vcpkgTriplet: x64-windows
 
   - script: |
       pip3 install lit
