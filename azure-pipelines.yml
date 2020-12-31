@@ -16,11 +16,11 @@ jobs:
   - script: python ./run-clang-format.py -r include tests benchmarks --style file
     displayName: Validate
 
-- job: BuildAndTestAndBenchmark
+- job: BuildAndTestAndBenchmarkUbuntu
   displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
 
   steps:
   - checkout: self
@@ -77,6 +77,61 @@ jobs:
       summaryFileLocation: build/matrixpp_code_coverage.xml
       pathToSources: $(Build.SourcesDirectory)
     displayName: Publish Code Coverage
+
+  - script: |
+      cd build/bin/tests
+      lit compile_tests unit_tests --xunit-xml-output results.xml
+    continueOnError: true
+    displayName: Run Lit Test
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: '**/results.xml' 
+    displayName: Publish Lit Test Results
+
+  # - script: cmake --build build --target all --config Release
+  #   displayName: Build in Release Configuration
+
+  # - script: |
+  #     cd build/bin/benchmarks/Release
+  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+  #   displayName: Run All Benchmarks
+
+- job: BuildAndTestWindows
+  displayName: Build / Test / Benchmark (Windows)
+
+  pool:
+    vmImage: windows-latest
+
+  steps:
+  - checkout: self
+    displayName: Checkout
+    submodules: true
+
+  - task: Cache@2
+    displayName: Cache vcpkg
+    inputs:
+      key: $(Build.SourcesDirectory)/vcpkg-dependencies.txt | "$(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD" | "$(Agent.OS)"
+      path: '$(Build.SourcesDirectory)/vcpkg'
+
+  - task: run-vcpkg@0
+    displayName: Run vcpkg
+    inputs:
+      vcpkgArguments: '@$(Build.SourcesDirectory)/vcpkg-dependencies.txt'
+      vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+
+  - script: |
+      pip3 install lit
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Python LLVM Lit
+
+  - task: run-cmake@0
+    displayName: Configure and Build
+    inputs:
+      cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+      cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE
+      buildDirectory: build
 
   - script: |
       cd build/bin/tests
