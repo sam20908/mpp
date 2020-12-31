@@ -17,21 +17,11 @@ jobs:
     displayName: Validate
 
 - job: BuildAndTestAndBenchmark
-  displayName: Build / Test / Benchmark / Code Coverage
+  displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
-  strategy:
-    matrix:
-      'Ubuntu GCC 10':
-        os: ubuntu-20.04
-        CC: 'gcc-10'
-        CXX: 'g++-10'
   pool:
-    vmImage: $(os)
+    vmImage: ubuntu-20.04
 
-  variables:
-    CC: $(CC)
-    CXX: $(CXX)
-  
   steps:
   - checkout: self
     displayName: Checkout
@@ -59,6 +49,17 @@ jobs:
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
 
+  - script: |
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+
+      sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
+      sudo update-alternatives --set cc /usr/bin/gcc
+
+      sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
+      sudo update-alternatives --set c++ /usr/bin/g++
+    displayName: Use GCC 10 by default
+
   - task: run-cmake@0
     displayName: Configure and Build
     inputs:
@@ -79,8 +80,6 @@ jobs:
 
   - script: |
       cd build/bin/tests
-      echo "##[debug] C compiler: $(CC)"
-      echo "##[debug] C++ compiler: $(CXX)"
       lit compile_tests unit_tests --xunit-xml-output results.xml
     continueOnError: true
     displayName: Run Lit Test
