@@ -68,6 +68,7 @@ jobs:
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
+    continueOnError: true
 
   - task: PublishCodeCoverageResults@1
     inputs:
@@ -88,10 +89,10 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Lit Test Results
 
-  - script: cmake --build build --target all --config Release
-    displayName: Build in Release Configuration
+  # - script: cmake --build build --target all --config Release
+  #   displayName: Build in Release Configuration
 
-  - script: |
-      cd build/bin/benchmarks/Release
-      ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
-    displayName: Run All Benchmarks
+  # - script: |
+  #     cd build/bin/benchmarks/Release
+  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+  #   displayName: Run All Benchmarks
