@@ -33,9 +33,9 @@ add_executable("unit_test")
 target_sources("unit_test" PRIVATE "gtest_main.cpp")
 _setup_target("unit_test" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
 
-function(_create_unit_test TEST_DIR)
-    set(TEST_NAME "${TEST_DIR}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
-    set(TEST_SOURCE "src/${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}")
+function(_create_unit_test TEST_FILENAME)
+    set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
+    set(TEST_SOURCE "src/${TEST_FILENAME}.cpp")
     add_executable(${TEST_NAME} 
         "${TEST_SOURCE}" 
         "gtest_main.cpp")
@@ -65,9 +65,9 @@ _create_unit_test("inverse")
 _create_unit_test("transpose")
 
 # Utility tests
+_create_unit_test("cast")
 _create_unit_test("equality")
-_create_unit_test("type_casting")
-_create_unit_test("matrix_type")
+_create_unit_test("type")
 
 # Basic tests
 _create_unit_test("initialization")

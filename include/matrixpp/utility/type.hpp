@@ -22,6 +22,7 @@
 #include "../matrix.hpp"
 
 #include <cstddef>
+#include <span>
 
 namespace matrixpp
 {
