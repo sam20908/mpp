@@ -129,7 +129,7 @@ jobs:
 
   - script: |
       choco install ninja
-      echo '##vso[task.prependpath]C:\\ProgramData\\chocolatey\\bin'
+      echo '##vso[task.prependpath]C:\\ProgramData\\chocolatey\\lib\\ninja\\tools'
     displayName: Install Ninja Generator
 
   - script: |
