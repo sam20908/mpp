@@ -36,6 +36,6 @@ namespace
 		auto left  = matrixpp::matrix<int, 3, 3>{ { { 7, 4, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto right = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 1, 2 }, { 5, 8, 1 } } };
 
-		EXPECT_EQ(left, right);
+		EXPECT_NE(left, right);
 	}
 } // namespace
