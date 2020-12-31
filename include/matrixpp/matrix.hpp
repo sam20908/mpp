@@ -50,8 +50,11 @@ namespace matrixpp
 	template<typename Value>
 	matrix(std::initializer_list<std::initializer_list<Value>>) -> matrix<Value>;
 
+	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
+	// clang-format off
 	template<detail::range_2d_arithmetic Range2D>
 	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
+	// clang-format on
 
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)

@@ -35,7 +35,7 @@ namespace
 		EXPECT_EQ(inverse(1, 1), 1);
 		EXPECT_EQ(inverse(1, 2), -1);
 		EXPECT_EQ(inverse(2, 0), 4);
-		EXPECT_EQ(inverse(2, 1), -41/6);
-		EXPECT_EQ(inverse(2, 2), 16/3);
+		EXPECT_EQ(inverse(2, 1), -41 / 6);
+		EXPECT_EQ(inverse(2, 2), 16 / 3);
 	}
 } // namespace

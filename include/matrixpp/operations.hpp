@@ -20,6 +20,6 @@
 #pragma once
 
 #include "operation/add.hpp"
-#include "operation/subtract.hpp"
-#include "operation/multiply.hpp"
 #include "operation/divide.hpp"
+#include "operation/multiply.hpp"
+#include "operation/subtract.hpp"
