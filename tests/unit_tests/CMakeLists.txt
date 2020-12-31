@@ -19,7 +19,7 @@ find_package(GTest CONFIG REQUIRED)
 
 set(UNIT_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/unit_tests")
 set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
-set(UNIT_TESTS_EXECUTABLE_SUFFIX "_unit_test")
+set(UNIT_TESTS_EXECUTABLE_SUFFIX "unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
 if(LLVM_LIT_EXEC)
@@ -29,12 +29,12 @@ else()
 endif()
 
 # This executable will contain all the unit tests
-add_executable("all_unit_tests")
-target_sources("all_unit_tests" PRIVATE "gtest_main.cpp")
-_setup_target("all_unit_tests" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
+add_executable("unit_test")
+target_sources("unit_test" PRIVATE "gtest_main.cpp")
+_setup_target("unit_test" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
 
 function(_create_unit_test TEST_DIR)
-    set(TEST_NAME "${TEST_DIR}${UNIT_TESTS_EXECUTABLE_SUFFIX}")
+    set(TEST_NAME "${TEST_DIR}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
     set(TEST_SOURCE "src/${TEST_DIR}/${UNIT_TESTS_SOURCE_FILENAME}")
     add_executable(${TEST_NAME} 
         "${TEST_SOURCE}" 
@@ -42,7 +42,7 @@ function(_create_unit_test TEST_DIR)
 
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
 
-    target_sources("all_unit_tests" PRIVATE "${TEST_SOURCE}")
+    target_sources("unit_test" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
 cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
@@ -53,9 +53,9 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE "$<TARGET_FILE:all_unit_tests>"
+        EXECUTABLE "$<TARGET_FILE:unit_test>"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/unit_tests/*"
-        DEPENDENCIES "all_unit_tests")
+        DEPENDENCIES "unit_test")
 endif()
 
 # Algorithm tests

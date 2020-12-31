@@ -22,17 +22,17 @@ set(BENCHMARKS_SOURCE_FILENAME "test.cpp")
 set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main)
 
 # This executable will contain all the benchmarks
-add_executable("all_benchmarks")
-_setup_target("all_benchmarks" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
+add_executable("benchmark")
+_setup_target("benchmark" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
 
 function(_create_performance_test TEST_DIR)
-    set(TEST_NAME "${TEST_DIR}_benchmarks")
+    set(TEST_NAME "${TEST_DIR}_benchmark")
     set(TEST_SOURCE "src/${TEST_DIR}/${BENCHMARKS_SOURCE_FILENAME}")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
     _setup_target(${TEST_NAME} "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
 
-    target_sources("all_benchmarks" PRIVATE "${TEST_SOURCE}")
+    target_sources("benchmark" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
 _create_performance_test("determinant")
