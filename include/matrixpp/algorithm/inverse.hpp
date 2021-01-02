@@ -33,7 +33,7 @@ namespace matrixpp
 	namespace detail
 	{
 		template<typename Precision>
-		inline void inverse_impl(auto& result,
+		inline void inv_impl(auto& result,
 			auto& data,
 			std::size_t rows,
 			std::size_t columns,
@@ -128,7 +128,7 @@ namespace matrixpp
 							}
 						}
 
-						auto minor_determinant = determinant_impl<Precision>(data, rows, columns, 0, columns - 2);
+						auto minor_determinant = det_impl<Precision>(data, rows, columns, 0, columns - 2);
 						auto result_index      = idx_2d_to_1d(columns, row_index, column_index);
 
 						result[result_index] = minor_determinant;
@@ -183,65 +183,48 @@ namespace matrixpp
 				std::ranges::transform(result, result.begin(), std::bind_front(std::multiplies<>{}, multiplier));
 			}
 		}
+
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] inline decltype(auto) inv_func(
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+		{
+			if (!square(obj))
+			{
+				throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
+			}
+
+			auto rows     = obj.rows();
+			auto cols     = obj.columns();
+			auto buf_copy = obj.buffer();
+
+			using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
+			auto inv               = inverse_matrix_t{};
+			auto det               = detail::det_impl<To>(buf_copy, rows, cols, 0, cols - 1);
+
+			if (det == static_cast<To>(0))
+			{
+				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+			}
+
+			auto inv_buf = typename inverse_matrix_t::buffer_type{};
+			detail::allocate_1d_buf_if_vector(inv_buf, rows, cols);
+
+			detail::inv_impl<To>(inv_buf, buf_copy, rows, cols, det);
+			detail::init_matrix_base_with_1d_rng(inv, inv_buf, rows, cols);
+
+			return inv;
+		}
 	} // namespace detail
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	[[nodiscard]] inline decltype(auto) inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
 	{
-		if (!square(obj))
-		{
-			throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
-		}
-
-		auto rows     = obj.rows();
-		auto cols     = obj.columns();
-		auto buf_copy = obj.buffer();
-
-		using inverse_matrix_t = matrix<Value, RowsExtent, ColumnsExtent>;
-		auto inverse           = inverse_matrix_t{};
-		auto det               = detail::determinant_impl<Value>(buf_copy, rows, cols, 0, cols - 1);
-
-		if (det == static_cast<Value>(0))
-		{
-			throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
-		}
-
-		auto inverse_buf = typename inverse_matrix_t::buffer_type{};
-		detail::allocate_1d_buf_if_vector(inverse_buf, rows, cols);
-
-		detail::inverse_impl<Value>(inverse_buf, buf_copy, rows, cols, det);
-		detail::init_matrix_base_with_1d_rng(inverse, inverse_buf, rows, cols);
-
-		return inverse;
+		return detail::inv_func<Value>(obj);
 	}
 
 	template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	[[nodiscard]] inline decltype(auto) inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
 	{
-		if (!square(obj))
-		{
-			throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
-		}
-
-		auto rows     = obj.rows();
-		auto cols     = obj.columns();
-		auto buf_copy = obj.buffer();
-
-		using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
-		auto inverse           = inverse_matrix_t{};
-		auto det               = detail::determinant_impl<To>(buf_copy, rows, cols, 0, cols - 1);
-
-		if (det == static_cast<To>(0))
-		{
-			throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
-		}
-
-		auto inverse_buf = typename inverse_matrix_t::buffer_type{};
-		detail::allocate_1d_buf_if_vector(inverse_buf, rows, cols);
-
-		detail::inverse_impl<To>(inverse_buf, buf_copy, rows, cols, det);
-		detail::init_matrix_base_with_1d_rng(inverse, inverse_buf, rows, cols);
-
-		return inverse;
+		return detail::inv_func<To>(obj);
 	}
 } // namespace matrixpp

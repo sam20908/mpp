@@ -31,11 +31,8 @@ namespace matrixpp
 	namespace detail
 	{
 		template<typename Precision>
-		[[nodiscard]] Precision determinant_impl(auto& data,
-			std::size_t rows,
-			std::size_t columns,
-			std::size_t row_begin,
-			std::size_t column_end)
+		[[nodiscard]] Precision
+		det_impl(auto& data, std::size_t rows, std::size_t columns, std::size_t row_begin, std::size_t column_end)
 		{
 			// The size of the data stays the same, so we have to determine the actual
 			// size of the data we're allowed to work with by using column_end
@@ -152,8 +149,7 @@ namespace matrixpp
 					// We effectively "shrink" the working range in the recursion call by
 					// making the minor start at the row below the current row_begin and
 					// "removing" the last column
-					auto minor_determinant =
-						determinant_impl<Precision>(data, rows, columns, row_begin + 1, column_end - 1);
+					auto minor_determinant = det_impl<Precision>(data, rows, columns, row_begin + 1, column_end - 1);
 
 					auto coefficient_index = idx_2d_to_1d(columns, row_begin, column_index);
 
@@ -164,35 +160,32 @@ namespace matrixpp
 				return result;
 			}
 		}
+
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] inline auto det_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+		{
+			if (!square(obj))
+			{
+				throw std::runtime_error("Cannot find determinant of a non-square matrix!");
+			}
+
+			auto buf_copy = obj.buffer();
+			auto rows     = obj.rows();
+			auto cols     = obj.columns();
+
+			return detail::det_impl<To>(buf_copy, rows, cols, 0, cols - 1);
+		}
 	} // namespace detail
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	[[nodiscard]] inline auto determinant(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
 	{
-		if (!square(obj))
-		{
-			throw std::runtime_error("Cannot find determinant of a non-square matrix!");
-		}
-
-		auto buf_copy = obj.buffer();
-		auto rows     = obj.rows();
-		auto cols     = obj.columns();
-
-		return detail::determinant_impl<Value>(buf_copy, rows, cols, 0, cols - 1);
+		return detail::det_func<Value>(obj);
 	}
 
 	template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	[[nodiscard]] inline auto determinant(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
 	{
-		if (!square(obj))
-		{
-			throw std::runtime_error("Cannot find determinant of a non-square matrix!");
-		}
-
-		auto buf_copy = obj.buffer();
-		auto rows     = obj.rows();
-		auto cols     = obj.columns();
-
-		return detail::determinant_impl<To>(buf_copy, rows, cols, 0, cols - 1);
+		return detail::det_func<To>(obj);
 	}
 } // namespace matrixpp

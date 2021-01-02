@@ -30,10 +30,10 @@ namespace matrixpp
 	[[nodiscard]] inline decltype(auto) cast(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
 	{
 		using casted_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
-		auto casted_matrix    = casted_matrix_t{};
+		auto casted           = casted_matrix_t{};
 
-		detail::init_matrix_base_with_1d_rng(casted_matrix, obj.buffer(), obj.rows(), obj.columns());
+		detail::init_matrix_base_with_1d_rng(casted, obj.buffer(), obj.rows(), obj.columns());
 
-		return casted_matrix;
+		return casted;
 	}
 } // namespace matrixpp
