@@ -36,15 +36,7 @@ namespace matrixpp
 		std::size_t RowsExtent    = std::dynamic_extent,
 		std::size_t ColumnsExtent = std::dynamic_extent>
 	class matrix;
-} // namespace matrixpp
 
-#include "detail/matrix_dynamic_rows_static_columns.tpp"
-#include "detail/matrix_fully_dynamic.tpp"
-#include "detail/matrix_fully_static.tpp"
-#include "detail/matrix_static_rows_dynamic_columns.tpp"
-
-namespace matrixpp
-{
 	// Deduction guides
 
 	template<typename Value>
@@ -60,3 +52,8 @@ namespace matrixpp
 	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)
 		-> matrix<Value, RowsExtent, ColumnsExtent>;
 } // namespace matrixpp
+
+#include "detail/matrix_dynamic_rows_static_columns.tpp"
+#include "detail/matrix_fully_dynamic.tpp"
+#include "detail/matrix_fully_static.tpp"
+#include "detail/matrix_static_rows_dynamic_columns.tpp"
