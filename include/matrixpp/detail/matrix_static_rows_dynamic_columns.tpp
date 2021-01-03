@@ -64,5 +64,14 @@ namespace matrixpp
 			using decayed_rng_2d_t = std::decay_t<decltype(rng_2d)>;
 			base::init_buf_2d_dynamic(std::forward<decayed_rng_2d_t>(rng_2d), RowsExtent, cols);
 		}
+
+		matrix(std::size_t columns, Value value) // @TODO: ISSUE #20
+		{
+			base::_rows = RowsExtent;
+			base::_cols = columns;
+
+			detail::allocate_1d_buf_if_vector(base::_buf, RowsExtent, columns);
+			std::ranges::fill(base::_buf, value);
+		}
 	};
 } // namespace matrixpp

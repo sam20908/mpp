@@ -70,5 +70,14 @@ namespace matrixpp
 				}
 			}
 		}
+
+		matrix(std::size_t rows, std::size_t columns, Value value) // @TODO: ISSUE #20
+		{
+			base::_rows = rows;
+			base::_cols = columns;
+
+			detail::allocate_1d_buf_if_vector(base::_buf, rows, columns);
+			std::ranges::fill(base::_buf, value);
+		}
 	};
 } // namespace matrixpp

@@ -210,7 +210,7 @@ namespace matrixpp
 			detail::allocate_1d_buf_if_vector(inv_buf, rows, cols);
 
 			detail::inv_impl<To>(inv_buf, buf_copy, rows, cols, det);
-			detail::init_matrix_base_with_1d_rng(inv, inv_buf, rows, cols);
+			detail::init_matrix_base_with_1d_rng(inv, std::move(inv_buf), rows, cols);
 
 			return inv;
 		}

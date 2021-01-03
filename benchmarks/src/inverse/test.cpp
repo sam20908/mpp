@@ -18,11 +18,12 @@
  */
 
 #include <benchmark/benchmark.h>
+#include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix.hpp>
 
 static void inverse_5x5(benchmark::State& state)
 {
-	matrixpp::matrix a{ { 6, 3, 5, 7, 2 },
+	auto a = matrixpp::matrix{ { 6, 3, 5, 7, 2 },
 		{ 8, 4, 0, 1, 2 },
 		{ 6, 4, 8, 3, 4 },
 		{ -2, 3, 5, 2, 1 },
@@ -30,13 +31,13 @@ static void inverse_5x5(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)a.inverse();
+		(void)matrixpp::inverse<long double>(a);
 	}
 }
 
 static void inverse_10x10(benchmark::State& state)
 {
-	matrixpp::matrix a{ { 6, 3, 5, 7, 2, 1, 5, 2, 3, 6 },
+	auto a = matrixpp::matrix{ { 6, 3, 5, 7, 2, 1, 5, 2, 3, 6 },
 		{ 8, 4, 0, 1, 2, 8, 5, 6, 1, 1 },
 		{ 6, 4, 8, 3, 4, -9, 7, 8, 3, -1 },
 		{ -2, 3, 5, 2, 1, 2, 3, 4, 5, 6 },
@@ -49,18 +50,18 @@ static void inverse_10x10(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)a.inverse();
+		(void)matrixpp::inverse<long double>(a);
 	}
 }
 
 static void inverse_100x100(benchmark::State& state)
 {
 	// @TODO: Use random utility method
-	matrixpp::matrix a(100, 100, 1);
+	auto a = matrixpp::matrix<int>(1, 1, 200); // @TODO: Use actual data
 
 	for (auto _ : state)
 	{
-		(void)a.inverse<long double>();
+		(void)matrixpp::inverse<long double>(a);
 	}
 }
 

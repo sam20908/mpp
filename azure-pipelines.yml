@@ -59,8 +59,8 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - script: cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
-    displayName: Configure
+  - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
+    displayName: Configure For Tests in Debug Configuration
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
@@ -85,13 +85,16 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Lit Test Results
 
-  # - script: cmake --build build --config Release
-  #   displayName: Build in Release Configuration
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMATRIXPP_BUILD_BENCHMARKS=TRUE -B build
+    displayName: Configure For Benchmarks in Release Configuration
 
-  # - script: |
-  #     cd build/bin/benchmarks/Release
-  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
-  #   displayName: Run All Benchmarks
+  - script: cmake --build build --config Release --target benchmark
+    displayName: Build Benchmarks in Release Configuration
+
+  - script: |
+      cd build/bin/benchmarks
+      ./benchmark --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+    displayName: Run All Benchmarks
 
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
