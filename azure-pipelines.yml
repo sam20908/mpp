@@ -85,13 +85,13 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Lit Test Results
 
-  # - script: cmake --build build --config Release
-  #   displayName: Build in Release Configuration
+  - script: cmake --build build --config Release --target benchmarks
+    displayName: Build Benchmarks in Release Configuration
 
-  # - script: |
-  #     cd build/bin/benchmarks/Release
-  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
-  #   displayName: Run All Benchmarks
+  - script: |
+      cd build/bin/benchmarks/Release
+      ./benchmark --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+    displayName: Run All Benchmarks
 
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
