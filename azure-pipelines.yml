@@ -85,7 +85,7 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Lit Test Results
 
-  - script: cmake --build build --config Release --target benchmarks
+  - script: cmake --build build --config Release --target benchmark
     displayName: Build Benchmarks in Release Configuration
 
   - script: |
