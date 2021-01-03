@@ -82,5 +82,10 @@ namespace matrixpp
 				}
 			}
 		}
+
+		constexpr explicit matrix(Value value)
+		{
+			std::ranges::fill(base::_buf, value);
+		}
 	};
 } // namespace matrixpp

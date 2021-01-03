@@ -81,6 +81,24 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
+	TEST(Initialization, FullyStaticValueConstructor)
+	{
+		auto matrix = matrixpp::matrix<int, 3, 3>{ 1 };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 1);
+		EXPECT_EQ(matrix(0, 1), 1);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 1);
+		EXPECT_EQ(matrix(1, 1), 1);
+		EXPECT_EQ(matrix(1, 2), 1);
+		EXPECT_EQ(matrix(2, 0), 1);
+		EXPECT_EQ(matrix(2, 1), 1);
+		EXPECT_EQ(matrix(2, 2), 1);
+	}
+
 	TEST(Initialization, FullyDynamic2DInitializerList)
 	{
 		auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
@@ -116,6 +134,24 @@ namespace
 		EXPECT_EQ(matrix(2, 0), 5);
 		EXPECT_EQ(matrix(2, 1), 8);
 		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, FullyDynamicValueConstructor)
+	{
+		auto matrix = matrixpp::matrix<int>{ 3, 3, 1 };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 1);
+		EXPECT_EQ(matrix(0, 1), 1);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 1);
+		EXPECT_EQ(matrix(1, 1), 1);
+		EXPECT_EQ(matrix(1, 2), 1);
+		EXPECT_EQ(matrix(2, 0), 1);
+		EXPECT_EQ(matrix(2, 1), 1);
+		EXPECT_EQ(matrix(2, 2), 1);
 	}
 
 	TEST(Initialization, StaticRowsDynamicColumns2DInitializerList)
@@ -155,6 +191,24 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
+	TEST(Initialization, StaticRowsDynamicColumnsValueConstructor)
+	{
+		auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ 3, 1 };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 1);
+		EXPECT_EQ(matrix(0, 1), 1);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 1);
+		EXPECT_EQ(matrix(1, 1), 1);
+		EXPECT_EQ(matrix(1, 2), 1);
+		EXPECT_EQ(matrix(2, 0), 1);
+		EXPECT_EQ(matrix(2, 1), 1);
+		EXPECT_EQ(matrix(2, 2), 1);
+	}
+
 	TEST(Initialization, DymamicRowsStaticColumns2DInitializerList)
 	{
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
@@ -190,5 +244,23 @@ namespace
 		EXPECT_EQ(matrix(2, 0), 5);
 		EXPECT_EQ(matrix(2, 1), 8);
 		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, DymamicRowsStaticColumnsValueConstructor)
+	{
+		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 3, 1 };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 1);
+		EXPECT_EQ(matrix(0, 1), 1);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 1);
+		EXPECT_EQ(matrix(1, 1), 1);
+		EXPECT_EQ(matrix(1, 2), 1);
+		EXPECT_EQ(matrix(2, 0), 1);
+		EXPECT_EQ(matrix(2, 1), 1);
+		EXPECT_EQ(matrix(2, 2), 1);
 	}
 } // namespace
