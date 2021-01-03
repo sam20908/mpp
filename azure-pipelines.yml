@@ -59,7 +59,7 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - script: cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
+  - script: cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
     displayName: Configure
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
@@ -89,7 +89,7 @@ jobs:
     displayName: Build Benchmarks in Release Configuration
 
   - script: |
-      cd build/bin/benchmarks
+      cd build/bin/benchmarks/Release
       ./benchmark --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
     displayName: Run All Benchmarks
 
