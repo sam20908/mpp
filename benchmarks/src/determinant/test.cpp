@@ -18,35 +18,36 @@
  */
 
 #include <benchmark/benchmark.h>
+#include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/matrix.hpp>
 
 static void determinant_5x5(benchmark::State& state)
 {
-	matrixpp::matrix a(5, 5, 125);
+	auto a = matrixpp::matrix<int, 5, 5>{ 125 };
 
 	for (auto _ : state)
 	{
-		(void)a.determinant();
+		(void)matrixpp::determinant<long double>(a);
 	}
 }
 
 static void determinant_10x10(benchmark::State& state)
 {
-	matrixpp::matrix a(10, 10, 125);
+	auto a = matrixpp::matrix<int, 10, 10>{ 125 };
 
 	for (auto _ : state)
 	{
-		(void)a.determinant();
+		(void)matrixpp::determinant<long double>(a);
 	}
 }
 
 static void determinant_100x100(benchmark::State& state)
 {
-	matrixpp::matrix a(100, 100, 1);
+	auto a = matrixpp::matrix<int, 100, 100>{ 125 };
 
 	for (auto _ : state)
 	{
-		(void)a.determinant<long double>();
+		(void)matrixpp::determinant<long double>(a);
 	}
 }
 
