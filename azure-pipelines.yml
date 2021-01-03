@@ -59,7 +59,7 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install Gcovr
 
-  - script: cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_MAKE_PROGRAM=ninja -DCMAKE_CXX_COMPILER=g++-10 -B build
+  - script: cmake -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja -B build
     displayName: Configure
 
   - script: cmake --build build --config Debug --target matrixpp_code_coverage
