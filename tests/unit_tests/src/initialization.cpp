@@ -154,7 +154,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 1);
 	}
 
-	TEST(Initialization, StaticRowsDynamicColumns2DInitializerList)
+	TEST(Initialization, DynamicColumns2DInitializerList)
 	{
 		auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
@@ -172,7 +172,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, StaticRowsDynamicColumns2DRange)
+	TEST(Initialization, DynamicColumns2DRange)
 	{
 		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ rng_2d };
@@ -191,7 +191,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, StaticRowsDynamicColumnsValueConstructor)
+	TEST(Initialization, DynamicColumnsValueConstructor)
 	{
 		auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ 3, 1 };
 
@@ -209,7 +209,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 1);
 	}
 
-	TEST(Initialization, DymamicRowsStaticColumns2DInitializerList)
+	TEST(Initialization, DymamicRowsSDInitializerList)
 	{
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
@@ -227,7 +227,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DymamicRowsStaticColumns2DRange)
+	TEST(Initialization, DynamicRows2DRange)
 	{
 		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ rng_2d };
@@ -246,7 +246,7 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DymamicRowsStaticColumnsValueConstructor)
+	TEST(Initialization, DymamicRowsValueConstructor)
 	{
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 3, 1 };
 

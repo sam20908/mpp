@@ -56,7 +56,7 @@ namespace
 		EXPECT_EQ(to(2, 2), 2.F);
 	}
 
-	TEST(TypeCasting, StaticRowsDynamicColumns)
+	TEST(TypeCasting, DynamicColumns)
 	{
 		auto from = matrixpp::matrix<int, 3, std::dynamic_extent>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::cast<float>(from);
@@ -72,7 +72,7 @@ namespace
 		EXPECT_EQ(to(2, 2), 2.F);
 	}
 
-	TEST(TypeCasting, DynamicRowsStaticColumns)
+	TEST(TypeCasting, DynamicRows)
 	{
 		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::cast<float>(from);
