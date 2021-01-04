@@ -39,10 +39,16 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} INTERFACE
     # Main headers
-    "include/matrixpp/algorithms.hpp"
-    "include/matrixpp/operations.hpp"
+    "include/matrixpp/algorithm.hpp"
+    "include/matrixpp/operation.hpp"
     "include/matrixpp/matrix.hpp"
-    "include/matrixpp/utilities.hpp"
+    "include/matrixpp/utility.hpp"
+
+    # Matrix headers
+    "include/matrixpp/matrix/dynamic_rows.hpp"
+    "include/matrixpp/matrix/dynamic_columns.hpp"
+    "include/matrixpp/matrix/fully_dynamic.hpp"
+    "include/matrixpp/matrix/fully_static.hpp"
 
     # Algorithm headers
     "include/matrixpp/algorithm/block.hpp"
@@ -68,11 +74,7 @@ target_sources(${PROJECT_NAME} INTERFACE
     "include/matrixpp/detail/expr_binary_constant_op.hpp"
     "include/matrixpp/detail/expr_binary_op.hpp"
     "include/matrixpp/detail/matrix_base.hpp"
-    "include/matrixpp/detail/utility.hpp"
-    "include/matrixpp/detail/matrix_fully_static.tpp"
-    "include/matrixpp/detail/matrix_fully_dynamic.tpp"
-    "include/matrixpp/detail/matrix_dynamic_rows_static_columns.tpp"
-    "include/matrixpp/detail/matrix_static_rows_dynamic_columns.tpp")
+    "include/matrixpp/detail/utility.hpp")
 
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

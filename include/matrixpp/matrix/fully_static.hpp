@@ -17,14 +17,15 @@
  * under the License.
  */
 
+#include "../detail/matrix_base.hpp"
+#include "../detail/matrix_def.hpp"
+
 namespace matrixpp
 {
 	template<detail::arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class matrix :
 		public detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>
 	{
-		// Fully static 2D matrix
-
 		static_assert(!detail::dimension_not_zero_and_non_zero(RowsExtent, ColumnsExtent),
 			"Cannot have one side being zero and other side being non-zero!");
 

@@ -17,14 +17,15 @@
  * under the License.
  */
 
+#include "../detail/matrix_base.hpp"
+#include "../detail/matrix_def.hpp"
+
 namespace matrixpp
 {
 	template<detail::arithmetic Value>
 	class matrix<Value, std::dynamic_extent, std::dynamic_extent> :
 		public detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, std::dynamic_extent>
 	{
-		// Fully dynamic 2D matrix
-
 		using base = detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, std::dynamic_extent>;
 
 	public:

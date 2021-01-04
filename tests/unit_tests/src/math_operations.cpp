@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 #include <matrixpp/matrix.hpp>
-#include <matrixpp/operations.hpp>
+#include <matrixpp/operation.hpp>
 
 namespace
 {
