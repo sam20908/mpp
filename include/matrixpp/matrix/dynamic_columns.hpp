@@ -17,14 +17,17 @@
  * under the License.
  */
 
+#pragma once
+
+#include "../detail/matrix_base.hpp"
+#include "../detail/matrix_def.hpp"
+
 namespace matrixpp
 {
 	template<detail::arithmetic Value, std::size_t RowsExtent>
 	class matrix<Value, RowsExtent, std::dynamic_extent> :
 		public detail::matrix_base<std::vector<Value>, Value, RowsExtent, std::dynamic_extent>
 	{
-		// Static rows dynamic columns matrix
-
 		using base = detail::matrix_base<std::vector<Value>, Value, RowsExtent, std::dynamic_extent>;
 
 	public:

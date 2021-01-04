@@ -19,41 +19,7 @@
 
 #pragma once
 
-#include "detail/constraints.hpp"
-#include "detail/expr_base.hpp"
-#include "detail/matrix_base.hpp"
-#include "detail/utility.hpp"
-
-#include <array>
-#include <cstddef>
-#include <initializer_list>
-#include <span>
-#include <vector>
-
-namespace matrixpp
-{
-	template<detail::arithmetic Value,
-		std::size_t RowsExtent    = std::dynamic_extent,
-		std::size_t ColumnsExtent = std::dynamic_extent>
-	class matrix;
-
-	// Deduction guides
-
-	template<typename Value>
-	matrix(std::initializer_list<std::initializer_list<Value>>) -> matrix<Value>;
-
-	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
-	// clang-format off
-	template<detail::range_2d_arithmetic Range2D>
-	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
-	// clang-format on
-
-	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)
-		-> matrix<Value, RowsExtent, ColumnsExtent>;
-} // namespace matrixpp
-
-#include "detail/matrix_dynamic_rows_static_columns.tpp"
-#include "detail/matrix_fully_dynamic.tpp"
-#include "detail/matrix_fully_static.tpp"
-#include "detail/matrix_static_rows_dynamic_columns.tpp"
+#include "matrix/dynamic_columns.hpp"
+#include "matrix/dynamic_rows.hpp"
+#include "matrix/fully_dynamic.hpp"
+#include "matrix/fully_static.hpp"
