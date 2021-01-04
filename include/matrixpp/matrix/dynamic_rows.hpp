@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#pragma once
+
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
 
