@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/Button'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 
 import { Octokit } from '@octokit/rest'
-import { throttling } from '@octokit/plugin-throttling'
 
 export class App extends Component {
     constructor(props) {
@@ -18,23 +17,7 @@ export class App extends Component {
         this.goToRepo = this.goToRepo.bind(this);
         this.goToReleaseURL = this.goToReleaseURL.bind(this);
 
-        const throttledKit = Octokit.plugin(throttling);
-        this.octokit = new throttledKit({
-            throttle: {
-                onRateLimit: (retryAfter, options, octokit) => {
-                    octokit.log.error("GitHub API request for latest release is exhausted! Retrying");
-
-                    if (options.request.retryCount === 0) {
-                        octokit.log.info(`Retrying after ${retryAfter} seconds!`);
-                        return true;
-                    }
-                },
-                onAbuseLimit: (retryAfter, options, octokit) => {
-                    octokit.log.warn("GitHub API request abused!");
-                }
-            },
-            auth: "f4b3cbf37e9937a69e7e8bfa2f47f7e5869317a3"
-        });
+        this.octokit = new Octokit();
     }
 
     getLatestRelease() {
