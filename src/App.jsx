@@ -88,9 +88,9 @@ export class App extends Component {
             <div>
                 <Jumbotron className="text-center">
                     <Image src={Logo128} />
-                    <p>
-                        A header-only C++20 matrix library available for public use under Apache-2.0 License
-                    </p>
+                    <br />
+                    <br />
+                    <p>A header-only C++20 matrix library available for public use under Apache-2.0 License</p>
                     <Container>
                         <Row className="justify-content-md-center">
                             <Col md="auto">
@@ -106,7 +106,8 @@ export class App extends Component {
                                 <img src="https://img.shields.io/github/deployments/sam20908/matrixpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages" />
                             </Col>
                         </Row>
-                    </Container><br />
+                    </Container>
+                    <br />
                     <Button variant="primary" onClick={() => this.goToRepo()}>GitHub Repository</Button>{' '}
                     {download_button}
                 </Jumbotron>
