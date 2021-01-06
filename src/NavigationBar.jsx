@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
+import Image from 'react-bootstrap/Image'
 import Container from 'react-bootstrap/Container'
 
 import NavbarBrandLogo from './img/logo-navbar-brand.png'
@@ -12,7 +13,7 @@ export class NavigationBar extends Component {
             <Navbar bg="dark" variant="dark" sticky="top" expand="lg">
                 <Container fluid>
                     <Navbar.Brand>
-                        <img src={NavbarBrandLogo} />
+                        <Image src={NavbarBrandLogo} />
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
