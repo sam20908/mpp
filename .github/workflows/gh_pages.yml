@@ -21,13 +21,16 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install
+      - name: Install All Dependencies
         run: yarn install
+
+      - name: Lint Source Files
+        run: yarn run lint
       
-      - name: Build
+      - name: Build Website For Production
         run: yarn build
 
-      - name: Deploy 🚀
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
