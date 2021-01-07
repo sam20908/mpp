@@ -5,13 +5,13 @@ import 'mdbreact/dist/css/mdb.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { App } from './App'
-import { NavigationBar } from './NavigationBar'
+import NavigationBar from './NavigationBar'
+import Home from './Home'
 
 ReactDOM.render(
   <React.StrictMode>
     <NavigationBar />
-    <App />
+    <Home />
   </React.StrictMode>,
   document.getElementById('root')
 );

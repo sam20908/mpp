@@ -1,32 +1,51 @@
 import React, { Component } from 'react'
+import { BrowserRouter as Router } from 'react-router-dom'
 
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
-import Image from 'react-bootstrap/Image'
-import Container from 'react-bootstrap/Container'
+import {
+    MDBNavbar, MDBNavbarBrand, MDBNavbarToggler,
+    MDBCollapse,
+    MDBNavbarNav, MDBNavItem, MDBNavLink
+} from "mdbreact";
 
 import NavbarBrandLogo from './img/logo-navbar-brand.png'
 
-export class NavigationBar extends Component {
+export default class NavigationBar extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = { navbar_open: true };
+        this.toggleNavbarCollapse = this.toggleNavbarCollapse.bind(this);
+    }
+
+    toggleNavbarCollapse() {
+        this.setState({ navbar_open: !this.state.navbar_open });
+    }
+
     render() {
         return (
-            <Navbar bg="dark" variant="dark" sticky="top" expand="lg">
-                <Container fluid>
-                    <Navbar.Brand>
-                        <Image src={NavbarBrandLogo} />
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-                    <Navbar.Collapse id="responsive-navbar-nav">
-                        <Nav className="mr-auto" activeKey="/">
-                            <Nav.Link href="/">Home</Nav.Link>
-                            <Nav.Link href="/docs">Documentation</Nav.Link>
-                        </Nav>
-                        <Navbar.Text>
-                            A header-only C++20 matrix library
-                    </Navbar.Text>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
+            <Router>
+                <MDBNavbar color="black" dark expand="md">
+                    <MDBNavbarBrand>
+                        <img src={NavbarBrandLogo} alt="" />
+                    </MDBNavbarBrand>
+                    <MDBNavbarToggler onClick={this.toggleNavbarCollapse} />
+                    <MDBCollapse isOpen={this.state.navbar_open} navbar>
+                        <MDBNavbarNav left>
+                            <MDBNavItem>
+                                <MDBNavLink to="#!">Home</MDBNavLink>
+                            </MDBNavItem>
+                            <MDBNavItem>
+                                <MDBNavLink to="#!">Documentation</MDBNavLink>
+                            </MDBNavItem>
+                        </MDBNavbarNav>
+                        <MDBNavbarNav right>
+                            <MDBNavItem>
+                                <MDBNavLink to="#!" disabled>A header-only C++20 matrix library</MDBNavLink>
+                            </MDBNavItem>
+                        </MDBNavbarNav>
+                    </MDBCollapse>
+                </MDBNavbar>
+            </Router>
         );
     }
 }
