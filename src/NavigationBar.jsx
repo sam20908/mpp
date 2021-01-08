@@ -5,7 +5,7 @@ import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarToggler,
     MDBCollapse,
     MDBNavbarNav, MDBNavItem, MDBNavLink
-} from "mdbreact";
+} from 'mdbreact';
 
 import NavbarBrandLogo from './img/logo-navbar-brand.png'
 
@@ -24,23 +24,23 @@ export default class NavigationBar extends Component {
     render() {
         return (
             <Router>
-                <MDBNavbar color="black" dark expand="md">
+                <MDBNavbar color='black' dark expand='md'>
                     <MDBNavbarBrand>
-                        <img src={NavbarBrandLogo} alt="" />
+                        <img src={NavbarBrandLogo} />
                     </MDBNavbarBrand>
                     <MDBNavbarToggler onClick={this.toggleNavbarCollapse} />
                     <MDBCollapse isOpen={this.state.navbar_open} navbar>
                         <MDBNavbarNav left>
                             <MDBNavItem>
-                                <MDBNavLink to="#!">Home</MDBNavLink>
+                                <MDBNavLink to='#!'>Home</MDBNavLink>
                             </MDBNavItem>
                             <MDBNavItem>
-                                <MDBNavLink to="#!">Documentation</MDBNavLink>
+                                <MDBNavLink to='#!'>Documentation</MDBNavLink>
                             </MDBNavItem>
                         </MDBNavbarNav>
                         <MDBNavbarNav right>
                             <MDBNavItem>
-                                <MDBNavLink to="#!" disabled>A header-only C++20 matrix library</MDBNavLink>
+                                <MDBNavLink to='#!' disabled>A header-only C++20 matrix library</MDBNavLink>
                             </MDBNavItem>
                         </MDBNavbarNav>
                     </MDBCollapse>
