@@ -64,7 +64,7 @@ int main()
     auto result = expr(0, 0); // This only evaluates the result at (1, 1)
     auto result_m = mpp::matrix{ expr }; // Evaluates the whole expression and constructs a matrix
 
-    auto m_det = mpp::det(m); // You can specify larger types for safety to avoid type overflow from calculation
+    auto m_det = mpp::determinant(m); // You can specify larger types for safety to avoid type overflow from calculation
     auto m_inv = mpp::inverse<float>(m); // Optional template parameter to allow custom precision types,
                                          // since inverse usually outputs floatings, it's a good candidate
     auto m_transposed = mpp::transpose(m);
