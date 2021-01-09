@@ -1,19 +1,51 @@
 import React from 'react'
+import styled from 'styled-components'
 import Highlight, { defaultProps } from 'prism-react-renderer';
+
+const Pre = styled.pre`
+  text-align: left;
+  margin: 1em 0;
+  padding: 0.5em;
+  overflow: scroll;
+
+  & .token-line {
+    line-height: 1.3em;
+    height: 1.3em;
+  }
+`;
+
+const Line = styled.div`
+  display: table-row;
+`;
+
+const LineNo = styled.span`
+  display: table-cell;
+  text-align: right;
+  padding-right: 1em;
+  user-select: none;
+  opacity: 0.5;
+`;
+
+const LineContent = styled.span`
+  display: table-cell;
+`;
 
 function CodeBlock(props) {
     return (
-        <Highlight {...defaultProps} code={props.code} language="cpp" theme={props.theme}>
+        <Highlight {...defaultProps} theme={props.theme} code={props.code} language="cpp">
             {({ className, style, tokens, getLineProps, getTokenProps }) => (
-                <pre className={className} style={style}>
+                <Pre className={className} style={style}>
                     {tokens.map((line, i) => (
-                        <div key={i} {...getLineProps({ line, key: i })}>
-                            {line.map((token, key) => (
-                                <span key={i} {...getTokenProps({ token, key })} />
-                            ))}
-                        </div>
+                        <Line key={i} {...getLineProps({ line, key: i })}>
+                            <LineNo>{i + 1}</LineNo>
+                            <LineContent>
+                                {line.map((token, key) => (
+                                    <span key={key} {...getTokenProps({ token, key })} />
+                                ))}
+                            </LineContent>
+                        </Line>
                     ))}
-                </pre>
+                </Pre>
             )}
         </Highlight>
     );

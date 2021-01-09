@@ -20,31 +20,58 @@ export default class Home extends Component {
         super(props);
 
         this.state = {
-            code_init: `
-            #include <matrixpp/matrix.h>
+            code_init: `#include <matrixpp/matrix.h>
 
-            namespace mpp = matrixpp; // More convenient namespace alias
+namespace mpp = matrixpp; // More convenient namespace alias
 
-            int main()
-            {
-                auto m = mpp::matrix<int>{};
-            }
-            `,
-            code_showcase_matrix_kinds: `
-            #include <matrixpp/matrix.h>
+int main()
+{
+    auto m = mpp::matrix<int>{};
 
-            namespace mpp = matrixpp;
+    return 0;
+}`,
+            code_showcase_kinds: `#include <matrixpp/matrix.h>
 
-            int main()
-            {
-                auto m_fully_static = mpp::matrix<int, 3, 3>{};
-                auto m_fully_dynamic = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{};
-                // ^ or just mpp::matrix<int>{} since the size parameters are defaulted to dynamic extent
-                auto m_dynamic_rows = mpp::matrix<int, std::dynamic_Extent, 3>{};
-                auto m_dynamic_columns = mpp::matrix<int, 3, std::dynamic_extent>{};
-                // ^ or just mpp::matrix<int, 3>{} since the column parameter is defaulted to dynamic extent
-            }
-            `,
+namespace mpp = matrixpp;
+
+int main()
+{
+    auto m_fully_static = mpp::matrix<int, 3, 3>{};
+    auto m_fully_dynamic = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{};
+    // ^ or just mpp::matrix<int>{} since the size parameters are defaulted to dynamic extent
+    auto m_dynamic_rows = mpp::matrix<int, std::dynamic_Extent, 3>{};
+    auto m_dynamic_columns = mpp::matrix<int, 3, std::dynamic_extent>{};
+    // ^ or just mpp::matrix<int, 3>{} since the column parameter is defaulted to dynamic extent
+
+    return 0;
+}`,
+            code_showcase_operations: `#include <matrixpp/matrix.h>
+#include <matrixpp/operations.hpp> // Required for +, -, *, and /
+#include <matrixpp/algorithms.hpp> // Required for determinant, inverse, transpose, block, and etc...
+
+int main()
+{
+    auto m = mpp::matrix{{
+        { 1, 2, 3 },
+        { 1, 2, 3 },
+        { 1, 2, 3 }
+    }}; // Uses 2D initializer list initializer. Defaults to dynamic matrix
+
+    // Remember that math operations are expression templates, so the results are not evaluated immediately
+    auto expr = m + m - m * 2 + m / 3;
+
+    auto result = expr(0, 0); // This only evaluates the result at (1, 1)
+    auto result_m = mpp::matrix{ expr }; // Evaluates the whole expression and constructs a matrix
+
+    auto m_det = mpp::det(m); // You can specify larger types for safety to avoid type overflow from calculation
+    auto m_inv = mpp::inverse<float>(m); // Optional template parameter to allow custom precision types,
+                                         // since inverse usually outputs floatings, it's a good candidate
+    auto m_transposed = mpp::transpose(m);
+    auto m_block = mpp::block(m, 0, 0, 1, 1); // Grabs top corner 2 x 2 (the indexes are inclusive, so 1 x 1
+                                              // blocks are possible :) )
+
+    return 0;
+}`,
             active_tab: 'fully_dynamic_matrices'
         };
 
@@ -88,7 +115,7 @@ export default class Home extends Component {
                         </MDBCol>
                     </MDBRow>
                 </MDBContainer>
-                {/* Home content */}
+                {/* Overview */}
                 <MDBContainer className='mt-5'>
                     <MDBTypography tag='h1' variant='display-4' className='text-center'>Brief Overview</MDBTypography>
                     <hr />
@@ -98,6 +125,7 @@ export default class Home extends Component {
                         It is also compatible with Standard Template Library algorithms.
                     </MDBBox>
                 </MDBContainer>
+                {/* Examples */}
                 <MDBContainer className='mt-5'>
                     <MDBTypography tag='h1' variant='display-4' className='text-center'>Examples</MDBTypography>
                     <hr />
@@ -174,7 +202,9 @@ export default class Home extends Component {
                         </MDBTabPane>
                     </MDBTabContent>
                     <p className="lead mt-5">We can specify the kind of matrix we want by specifying the size extent template parameters:</p>
-                    <CodeBlock code={this.state.code_showcase_matrix_kinds} theme={theme} />
+                    <CodeBlock code={this.state.code_showcase_kinds} theme={theme} />
+                    <p className="lead mt-5">Here are some examples of matrix operations:</p>
+                    <CodeBlock code={this.state.code_showcase_operations} theme={theme} />
                 </MDBContainer>
             </div>
         );
