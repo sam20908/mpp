@@ -7,7 +7,8 @@ import {
     MDBRow, MDBCol,
     MDBTypography, MDBBox,
     MDBNav, MDBNavItem, MDBNavLink,
-    MDBTabContent, MDBTabPane
+    MDBTabContent, MDBTabPane,
+    MDBBtn
 } from 'mdbreact'
 
 import theme from 'prism-react-renderer/themes/dracula'
@@ -111,6 +112,7 @@ int main()
                                         <img src='https://img.shields.io/github/deployments/sam20908/matrixpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages' />
                                     </MDBCol>
                                 </MDBRow>
+                                <MDBBtn gradient='blue' className='mt-5' href='https://github.com/sam20908/matrixpp'>GitHub Repository</MDBBtn>
                             </MDBJumbotron>
                         </MDBCol>
                     </MDBRow>
@@ -139,7 +141,7 @@ int main()
                         <MDBNav className='justify-content-center font-weight-bold'>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to='#!'
+                                    to=''
                                     active={this.state.active_tab === 'fully_dynamic_matrices'}
                                     onClick={() => this.goToTab('fully_dynamic_matrices')}
                                     role='tab'>
@@ -148,7 +150,7 @@ int main()
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to='#!'
+                                    to=''
                                     active={this.state.active_tab === 'fully_static_matrices'}
                                     onClick={() => this.goToTab('fully_static_matrices')}
                                     role='tab'>
@@ -157,7 +159,7 @@ int main()
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to='#!'
+                                    to=''
                                     active={this.state.active_tab === 'dynamic_row_matrices'}
                                     onClick={() => this.goToTab('dynamic_row_matrices')}
                                     role='tab'>
@@ -166,7 +168,7 @@ int main()
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to='#!'
+                                    to=''
                                     active={this.state.active_tab === 'dynamic_column_matrices'}
                                     onClick={() => this.goToTab('dynamic_column_matrices')}
                                     role='tab'>
