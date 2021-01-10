@@ -21,6 +21,7 @@
 
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
+#include "matrixpp/detail/utility.hpp"
 
 namespace matrixpp
 {
@@ -73,9 +74,30 @@ namespace matrixpp
 		template<typename Expr>
 		constexpr explicit matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>& expr)
 		{
+			// Overload which avoids dimension checking because the expression object's extents
+			// are constrained to be the same extent
+
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
 			auto idx    = std::size_t{ 0 };
+
+			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
+			{
+				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
+				{
+					base::_buf[idx++] = expr(row, col);
+				}
+			}
+		}
+
+		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
+		constexpr explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr)
+		{
+			base::_rows = expr.rows();
+			base::_cols = expr.columns();
+			auto idx    = std::size_t{ 0 };
+
+			detail::validate_matrices_same_size(*this, expr);
 
 			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
 			{

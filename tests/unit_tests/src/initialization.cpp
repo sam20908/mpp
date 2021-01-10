@@ -20,6 +20,7 @@
 #include <array>
 #include <gtest/gtest.h>
 #include <matrixpp/matrix.hpp>
+#include <matrixpp/operation/multiply.hpp>
 #include <span>
 #include <vector>
 
@@ -69,6 +70,56 @@ namespace
 
 		EXPECT_EQ(matrix.rows(), 3);
 		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, FullyStatic_StaticExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, FullyStatic_DynamicExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix<int>{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_EQ(matrix(0, 0), 7);
 		EXPECT_EQ(matrix(0, 1), 3);
@@ -136,6 +187,56 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
+	TEST(Initialization, FullyDynamic_StaticExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, FullyDynamic_DynamicExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
 	TEST(Initialization, FullyDynamicValueConstructor)
 	{
 		auto matrix = matrixpp::matrix<int>{ 3, 3, 1 };
@@ -191,6 +292,56 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
+	TEST(Initialization, DynamicColumns_StaticExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, DynamicColumns_DynamicExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
 	TEST(Initialization, DynamicColumnsValueConstructor)
 	{
 		auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ 3, 1 };
@@ -234,6 +385,56 @@ namespace
 
 		EXPECT_EQ(matrix.rows(), 3);
 		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, DynamicRows_StaticExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix(0, 0), 7);
+		EXPECT_EQ(matrix(0, 1), 3);
+		EXPECT_EQ(matrix(0, 2), 1);
+		EXPECT_EQ(matrix(1, 0), 8);
+		EXPECT_EQ(matrix(1, 1), 8);
+		EXPECT_EQ(matrix(1, 2), 2);
+		EXPECT_EQ(matrix(2, 0), 5);
+		EXPECT_EQ(matrix(2, 1), 8);
+		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, DynamicRows_DynamicExprObject)
+	{
+		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
+		auto m      = matrixpp::matrix{ arr_2d };
+
+		auto expr   = m * 1;
+		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_EQ(matrix(0, 0), 7);
 		EXPECT_EQ(matrix(0, 1), 3);

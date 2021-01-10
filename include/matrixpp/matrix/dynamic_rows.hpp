@@ -68,6 +68,25 @@ namespace matrixpp
 			base::init_buf_2d_dynamic(std::forward<decayed_rng_2d_t>(rng_2d), rows, ColumnsExtent);
 		}
 
+		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
+		explicit matrix(
+			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
+		{
+			base::_rows = expr.rows();
+			base::_cols = expr.columns();
+			base::_buf.reserve(expr.rows() * expr.columns());
+
+			detail::validate_matrices_same_size(*this, expr);
+
+			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
+			{
+				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
+				{
+					base::_buf.push_back(expr(row, col));
+				}
+			}
+		}
+
 		matrix(std::size_t rows, Value value) // @TODO: ISSUE #20
 		{
 			base::_rows = rows;
