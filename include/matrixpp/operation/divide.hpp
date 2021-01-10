@@ -63,8 +63,8 @@ namespace matrixpp
 			obj.columns() };
 	}
 
-	template<typename Value, std::size_t LeftRowsExtent, std::size_t LeftColumnsExtent>
-	inline decltype(auto) operator/=(matrix<Value, LeftRowsExtent, LeftColumnsExtent>& obj,
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	inline decltype(auto) operator/=(matrix<Value, RowsExtent, ColumnsExtent>& obj,
 		Value constant) // @TODO: ISSUE #20
 	{
 		std::ranges::transform(obj, obj.begin(), std::bind_front(std::divides<>{}, constant));
