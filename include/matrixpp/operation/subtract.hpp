@@ -37,25 +37,6 @@ namespace matrixpp
 		using sub_op_type = decltype(sub_op);
 	} // namespace detail
 
-	template<typename LeftBase, typename RightBase, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) operator-(
-		const detail::expr_base<LeftBase, Value, RowsExtent, ColumnsExtent>& left,
-		const detail::expr_base<RightBase, Value, RowsExtent, ColumnsExtent>& right) // @TODO: ISSUE #20
-	{
-		// Subtraction of matrices with same dimension extents
-
-		using left_type  = detail::expr_base<LeftBase, Value, RowsExtent, ColumnsExtent>;
-		using right_type = detail::expr_base<RightBase, Value, RowsExtent, ColumnsExtent>;
-
-		detail::validate_matrices_same_size(left, right);
-
-		return detail::expr_binary_op<RowsExtent, ColumnsExtent, left_type, right_type, detail::sub_op_type>{ left,
-			right,
-			detail::sub_op,
-			left.rows(),
-			left.columns() };
-	}
-
 	template<typename LeftBase,
 		typename RightBase,
 		typename Value,
@@ -67,19 +48,19 @@ namespace matrixpp
 		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
 		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right) // @TODO: ISSUE #20
 	{
-		// Subtraction of matrices with different dimension extents
-
 		using left_type  = detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>;
 		using right_type = detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>;
 
 		detail::validate_matrices_same_size(left, right);
 
-		return detail::
-			expr_binary_op<std::dynamic_extent, std::dynamic_extent, left_type, right_type, detail::sub_op_type>{ left,
-				right,
-				detail::sub_op,
-				left.rows(),
-				left.columns() };
+		constexpr auto row_extent = detail::prefer_static_extent(LeftRowsExtent, RightRowsExtent);
+		constexpr auto col_extent = detail::prefer_static_extent(LeftColumnsExtent, RightColumnsExtent);
+
+		return detail::expr_binary_op<row_extent, col_extent, left_type, right_type, detail::sub_op_type>{ left,
+			right,
+			detail::sub_op,
+			left.rows(),
+			left.columns() };
 	}
 
 	template<typename Value,

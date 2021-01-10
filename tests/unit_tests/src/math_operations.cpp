@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <matrixpp/matrix.hpp>
 #include <matrixpp/operation.hpp>
+#include <span>
 
 namespace
 {
@@ -287,5 +288,25 @@ namespace
 		EXPECT_EQ(result(2, 0), 2.5F);
 		EXPECT_EQ(result(2, 1), 4.F);
 		EXPECT_EQ(result(2, 2), 1.F);
+	}
+
+	TEST(Operation, Addition_PreferStaticExtent)
+	{
+		auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto result  = matrixpp::matrix{ matrix1 + matrix2 };
+
+		EXPECT_EQ(result.rows_extent(), 3);
+		EXPECT_EQ(result.columns_extent(), 3);
+	}
+
+	TEST(Operation, Subtraction_PreferStaticExtent)
+	{
+		auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto result  = matrixpp::matrix{ matrix1 - matrix2 };
+
+		EXPECT_EQ(result.rows_extent(), 3);
+		EXPECT_EQ(result.columns_extent(), 3);
 	}
 } // namespace

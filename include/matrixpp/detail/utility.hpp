@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <iterator>
 #include <ranges>
+#include <span>
 #include <stdexcept>
 #include <utility>
 
@@ -66,6 +67,18 @@ namespace matrixpp::detail
 		}
 
 		return std::pair{ rows, cols };
+	}
+
+	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent)
+	{
+		if (left_extent != std::dynamic_extent || right_extent != std::dynamic_extent)
+		{
+			return left_extent != std::dynamic_extent ? left_extent : right_extent;
+		}
+		else
+		{
+			return std::dynamic_extent;
+		}
 	}
 
 	inline void validate_matrices_same_size(const auto& left, const auto& right) // @TODO: ISSUE #20
