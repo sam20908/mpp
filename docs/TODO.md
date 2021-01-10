@@ -22,6 +22,7 @@
 - [x] Make matrix element type an arithmetic type.
 - [x] Add missing `[[ndiscard]]`.
 - [x] Add documentation about performance benchmarks in README.
+- [ ] Test matrix extents in unit tests.
 - [ ] Add examples in README.
 
 ## :mountain_railway: Tests:
