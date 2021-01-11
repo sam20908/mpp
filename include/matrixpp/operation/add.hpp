@@ -48,6 +48,8 @@ namespace matrixpp
 		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
 		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right) // @TODO: ISSUE #20
 	{
+		detail::validate_matrices_same_size(left, right);
+
 		using left_type  = detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>;
 		using right_type = detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>;
 
