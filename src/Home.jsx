@@ -141,16 +141,16 @@ int main()
                         <MDBNav className='justify-content-center font-weight-bold'>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to=''
+                                    to='#'
                                     active={this.state.active_tab === 'fully_dynamic_matrices'}
                                     onClick={() => this.goToTab('fully_dynamic_matrices')}
                                     role='tab'>
                                     Fully Dynamic Matrices
-                                    </MDBNavLink>
+                                </MDBNavLink>
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to=''
+                                    to='#'
                                     active={this.state.active_tab === 'fully_static_matrices'}
                                     onClick={() => this.goToTab('fully_static_matrices')}
                                     role='tab'>
@@ -159,21 +159,21 @@ int main()
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to=''
+                                    to='#'
                                     active={this.state.active_tab === 'dynamic_row_matrices'}
                                     onClick={() => this.goToTab('dynamic_row_matrices')}
                                     role='tab'>
                                     Dynamic Row Matrices
-                                    </MDBNavLink>
+                                </MDBNavLink>
                             </MDBNavItem>
                             <MDBNavItem>
                                 <MDBNavLink
-                                    to=''
+                                    to='#'
                                     active={this.state.active_tab === 'dynamic_column_matrices'}
                                     onClick={() => this.goToTab('dynamic_column_matrices')}
                                     role='tab'>
                                     Dynamic Column Matrices
-                                    </MDBNavLink>
+                                </MDBNavLink>
                             </MDBNavItem>
                         </MDBNav>
                     </Router>
