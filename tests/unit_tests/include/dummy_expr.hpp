@@ -56,4 +56,4 @@ namespace matrixpp_test::detail
 			return _obj(row_idx, col_idx);
 		}
 	};
-} // namespace tests::detail
+} // namespace matrixpp_test::detail
