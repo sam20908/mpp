@@ -17,11 +17,13 @@
  * under the License.
  */
 
+#include "../include/dummy_expr.hpp"
+
 #include <array>
 #include <gtest/gtest.h>
 #include <matrixpp/matrix.hpp>
-#include <matrixpp/operation/multiply.hpp>
 #include <span>
+#include <stdexcept>
 #include <vector>
 
 namespace
@@ -84,10 +86,9 @@ namespace
 
 	TEST(Initialization, FullyStatic_StaticExprObject)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+		auto m = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 
-		auto expr   = m * 1;
+		auto expr   = matrixpp_test::detail::dummy_expr{ m };
 		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 3);
@@ -107,12 +108,11 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, FullyStatic_DynamicExprObject)
+	TEST(Initialization, FullyStatic_DynamicExprObject_SameSize)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix<int>{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
 		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 3);
@@ -130,6 +130,14 @@ namespace
 		EXPECT_EQ(matrix(2, 0), 5);
 		EXPECT_EQ(matrix(2, 1), 8);
 		EXPECT_EQ(matrix(2, 2), 2);
+	}
+
+	TEST(Initialization, FullyStatic_DynamicExprObject_DifferentSize_Throw)
+	{
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
+
+		EXPECT_THROW((matrixpp::matrix<int, 3, 3>{ expr }), std::runtime_error);
 	}
 
 	TEST(Initialization, FullyStaticValueConstructor)
@@ -187,37 +195,11 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, FullyDynamic_StaticExprObject)
+	TEST(Initialization, FullyDynamic_ExprObject)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
-		auto matrix = matrixpp::matrix<int>{ expr };
-
-		EXPECT_EQ(matrix.rows(), 3);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_EQ(matrix(0, 0), 7);
-		EXPECT_EQ(matrix(0, 1), 3);
-		EXPECT_EQ(matrix(0, 2), 1);
-		EXPECT_EQ(matrix(1, 0), 8);
-		EXPECT_EQ(matrix(1, 1), 8);
-		EXPECT_EQ(matrix(1, 2), 2);
-		EXPECT_EQ(matrix(2, 0), 5);
-		EXPECT_EQ(matrix(2, 1), 8);
-		EXPECT_EQ(matrix(2, 2), 2);
-	}
-
-	TEST(Initialization, FullyDynamic_DynamicExprObject)
-	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix{ arr_2d };
-
-		auto expr   = m * 1;
 		auto matrix = matrixpp::matrix<int>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 3);
@@ -292,12 +274,11 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DynamicColumns_StaticExprObject)
+	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
 		auto matrix = matrixpp::matrix<int, 3>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 3);
@@ -317,29 +298,12 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DynamicColumns_DynamicExprObject)
+	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
-		auto matrix = matrixpp::matrix<int, 3>{ expr };
-
-		EXPECT_EQ(matrix.rows(), 3);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 3);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_EQ(matrix(0, 0), 7);
-		EXPECT_EQ(matrix(0, 1), 3);
-		EXPECT_EQ(matrix(0, 2), 1);
-		EXPECT_EQ(matrix(1, 0), 8);
-		EXPECT_EQ(matrix(1, 1), 8);
-		EXPECT_EQ(matrix(1, 2), 2);
-		EXPECT_EQ(matrix(2, 0), 5);
-		EXPECT_EQ(matrix(2, 1), 8);
-		EXPECT_EQ(matrix(2, 2), 2);
+		EXPECT_THROW((matrixpp::matrix<int, 3>{ expr }), std::runtime_error);
 	}
 
 	TEST(Initialization, DynamicColumnsValueConstructor)
@@ -397,12 +361,11 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DynamicRows_StaticExprObject)
+	TEST(Initialization, DynamicRows_ExprObject_SameColumns)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix<int, 3, 3>{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 3);
@@ -422,29 +385,12 @@ namespace
 		EXPECT_EQ(matrix(2, 2), 2);
 	}
 
-	TEST(Initialization, DynamicRows_DynamicExprObject)
+	TEST(Initialization, DynamicRows_ExprObject_DifferentColumns_Throw)
 	{
-		auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 }, std::array{ 5, 8, 2 } };
-		auto m      = matrixpp::matrix{ arr_2d };
+		auto m    = matrixpp::matrix<int>{ { { 7, 3 }, { 8, 8 }, { 5, 8 } } };
+		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
-		auto expr   = m * 1;
-		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ expr };
-
-		EXPECT_EQ(matrix.rows(), 3);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
-		EXPECT_EQ(matrix.columns_extent(), 3);
-
-		EXPECT_EQ(matrix(0, 0), 7);
-		EXPECT_EQ(matrix(0, 1), 3);
-		EXPECT_EQ(matrix(0, 2), 1);
-		EXPECT_EQ(matrix(1, 0), 8);
-		EXPECT_EQ(matrix(1, 1), 8);
-		EXPECT_EQ(matrix(1, 2), 2);
-		EXPECT_EQ(matrix(2, 0), 5);
-		EXPECT_EQ(matrix(2, 1), 8);
-		EXPECT_EQ(matrix(2, 2), 2);
+		EXPECT_THROW((matrixpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::runtime_error);
 	}
 
 	TEST(Initialization, DymamicRowsValueConstructor)

@@ -167,12 +167,12 @@ namespace matrixpp::detail
 			return _cols;
 		}
 
-		[[nodiscard]] auto rows_extent() const // @TODO: ISSUE #20
+		[[nodiscard]] constexpr static auto rows_extent()
 		{
 			return RowsExtent;
 		}
 
-		[[nodiscard]] auto columns_extent() const // @TODO: ISSUE #20
+		[[nodiscard]] constexpr static auto columns_extent()
 		{
 			return ColumnsExtent;
 		}
