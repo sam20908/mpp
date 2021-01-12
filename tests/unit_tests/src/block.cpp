@@ -43,7 +43,7 @@ namespace
 		EXPECT_EQ(to(2, 2), 2);
 	}
 
-	TEST(Block, Cropped)
+	TEST(Block, Cropped_3x3To2x2)
 	{
 		auto from = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::block(from, 0, 0, 1, 1);
@@ -57,7 +57,7 @@ namespace
 		EXPECT_EQ(to(1, 0), 8);
 	}
 
-	TEST(Block, CroppedTo1x1_EdgeCase)
+	TEST(Block, Cropped_3x3To1x1)
 	{
 		auto from = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::block(from, 1, 1, 1, 1);
@@ -68,13 +68,13 @@ namespace
 		EXPECT_EQ(to(0, 0), 8);
 	}
 
-	TEST(Block, IndicesOverlap)
+	TEST(Block, IndicesOverlap_Throw)
 	{
 		auto from = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		EXPECT_THROW((void)matrixpp::block(from, 1, 1, 0, 0), std::invalid_argument);
 	}
 
-	TEST(Block, IndicesOutOfBounds)
+	TEST(Block, IndicesOutOfBounds_Throw)
 	{
 		auto from = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		EXPECT_THROW((void)matrixpp::block(from, 0, 0, 2, 3), std::invalid_argument);
