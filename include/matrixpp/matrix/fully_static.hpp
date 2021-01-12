@@ -93,11 +93,14 @@ namespace matrixpp
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		constexpr explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr)
 		{
+			if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
+			{
+				throw std::runtime_error("Dimensions of expression object doesn't match provided extents!");
+			}
+
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
 			auto idx    = std::size_t{ 0 };
-
-			detail::validate_matrices_same_size(*this, expr);
 
 			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
 			{
