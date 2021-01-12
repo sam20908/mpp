@@ -72,6 +72,11 @@ namespace matrixpp
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
+			if (ColumnsExtent != expr.columns())
+			{
+				throw std::runtime_error("Columns of expression object doesn't match provided columns extent!");
+			}
+
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
 			base::_buf.reserve(expr.rows() * expr.columns());

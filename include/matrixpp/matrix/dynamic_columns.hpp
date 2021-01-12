@@ -22,6 +22,8 @@
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
 
+#include <stdexcept>
+
 namespace matrixpp
 {
 	template<detail::arithmetic Value, std::size_t RowsExtent>
@@ -72,11 +74,14 @@ namespace matrixpp
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
+			if (RowsExtent != expr.rows())
+			{
+				throw std::runtime_error("Rows of expression object doesn't match provided rows extent!");
+			}
+
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
 			base::_buf.reserve(expr.rows() * expr.columns());
-
-			detail::validate_matrices_same_size(*this, expr);
 
 			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
 			{
