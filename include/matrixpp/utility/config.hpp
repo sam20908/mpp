@@ -19,8 +19,39 @@
 
 #pragma once
 
-#include "utility/cast.hpp"
-#include "utility/config.hpp"
-#include "utility/equal.hpp"
-#include "utility/square.hpp"
-#include "utility/type.hpp"
+#include <cstddef>
+#include <span>
+
+namespace matrixpp
+{
+	namespace customize
+	{
+		struct customize_tag
+		{
+		};
+
+		template<typename>
+		[[nodiscard]] constexpr std::size_t default_rows_extent()
+		{
+			return std::dynamic_extent;
+		}
+
+		template<typename>
+		[[nodiscard]] constexpr std::size_t default_columns_extent()
+		{
+			return std::dynamic_extent;
+		}
+	} // namespace customize
+
+	template<typename Tag = customize::customize_tag>
+	[[nodiscard]] constexpr std::size_t default_rows_extent()
+	{
+		return customize::default_rows_extent<Tag>();
+	}
+
+	template<typename Tag = customize::customize_tag>
+	[[nodiscard]] constexpr std::size_t default_columns_extent()
+	{
+		return customize::default_columns_extent<Tag>();
+	}
+} // namespace matrixpp

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "../utility/config.hpp"
 #include "constraints.hpp"
 #include "expr_base.hpp"
 
@@ -31,8 +32,8 @@
 namespace matrixpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent    = std::dynamic_extent,
-		std::size_t ColumnsExtent = std::dynamic_extent>
+		std::size_t RowsExtent    = default_rows_extent(),
+		std::size_t ColumnsExtent = default_columns_extent()>
 	class matrix;
 
 	// Deduction guides

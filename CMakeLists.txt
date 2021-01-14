@@ -64,6 +64,7 @@ target_sources(${PROJECT_NAME} INTERFACE
 
     # Utility headers
     "include/matrixpp/utility/cast.hpp"
+    "include/matrixpp/utility/config.hpp"
     "include/matrixpp/utility/equal.hpp"
     "include/matrixpp/utility/square.hpp"
     "include/matrixpp/utility/type.hpp"
