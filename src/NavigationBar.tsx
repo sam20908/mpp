@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import * as React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import {
@@ -13,19 +13,20 @@ import {
 
 import NavbarBrandLogo from "./img/logo-navbar-brand.png";
 
-export default class NavigationBar extends Component {
-  constructor(props) {
-    super(props);
+interface State {
+  navbar_open: boolean;
+}
 
-    this.state = { navbar_open: true };
-    this.toggleNavbarCollapse = this.toggleNavbarCollapse.bind(this);
-  }
+export default class NavigationBar extends React.Component<unknown, State> {
+  state: State = {
+    navbar_open: true,
+  };
 
-  toggleNavbarCollapse() {
+  toggleNavbarCollapse(): void {
     this.setState({ navbar_open: !this.state.navbar_open });
   }
 
-  render() {
+  render(): React.ReactNode {
     return (
       <Router>
         <MDBNavbar color="black" dark expand="md">

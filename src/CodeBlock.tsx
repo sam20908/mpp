@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 import styled from "styled-components";
-import Highlight, { defaultProps } from "prism-react-renderer";
+import Highlight, { defaultProps, PrismTheme } from "prism-react-renderer";
 
 const Pre = styled.pre`
   text-align: left;
@@ -30,14 +30,14 @@ const LineContent = styled.span`
   display: table-cell;
 `;
 
-function CodeBlock(props) {
+interface Props {
+  theme: PrismTheme;
+  code: string;
+}
+
+const CodeBlock: React.FunctionComponent<Props> = ({ theme, code }: Props) => {
   return (
-    <Highlight
-      {...defaultProps}
-      theme={props.theme}
-      code={props.code}
-      language="cpp"
-    >
+    <Highlight {...defaultProps} theme={theme} code={code} language="cpp">
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <Pre className={className} style={style}>
           {tokens.map((line, i) => (
@@ -54,6 +54,6 @@ function CodeBlock(props) {
       )}
     </Highlight>
   );
-}
+};
 
 export default CodeBlock;

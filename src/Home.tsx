@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import * as React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
 import {
@@ -21,12 +21,16 @@ import theme from "prism-react-renderer/themes/dracula";
 import CodeBlock from "./CodeBlock";
 import Logo128 from "./img/logo128.png";
 
-export default class Home extends Component {
-  constructor(props) {
-    super(props);
+interface State {
+  code_init: string;
+  code_showcase_kinds: string;
+  code_showcase_operations: string;
+  active_tab: string;
+}
 
-    this.state = {
-      code_init: `#include <matrixpp/matrix.h>
+export default class Home extends React.Component<unknown, State> {
+  state: State = {
+    code_init: `#include <matrixpp/matrix.h>
 
 namespace mpp = matrixpp; // More convenient namespace alias
 
@@ -36,7 +40,7 @@ int main()
 
     return 0;
 }`,
-      code_showcase_kinds: `#include <matrixpp/matrix.h>
+    code_showcase_kinds: `#include <matrixpp/matrix.h>
 
 namespace mpp = matrixpp;
 
@@ -51,7 +55,7 @@ int main()
 
     return 0;
 }`,
-      code_showcase_operations: `#include <matrixpp/matrix.h>
+    code_showcase_operations: `#include <matrixpp/matrix.h>
 #include <matrixpp/operations.hpp> // Required for +, -, *, and /
 #include <matrixpp/algorithms.hpp> // Required for determinant, inverse, transpose, block, and etc...
 
@@ -78,20 +82,17 @@ int main()
 
     return 0;
 }`,
-      active_tab: "fully_dynamic_matrices",
-    };
+    active_tab: "fully_dynamic_matrices",
+  };
 
-    this.goToTab = this.goToTab.bind(this);
-  }
-
-  goToTab(tabName) {
+  goToTab(tabName: string): void {
     if (this.state.active_tab != tabName) {
       // If the user is already on the current tab, then there's no need to do anything
       this.setState({ active_tab: tabName });
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     return (
       <div>
         {/* Home jumbotron */}
@@ -155,7 +156,7 @@ int main()
             To create a matrix, we can simply do this:
           </MDBTypography>
           <CodeBlock code={this.state.code_init} theme={theme} />
-          <MDBTypography variant="p" className="lead">
+          <MDBTypography tag="p" className="lead">
             We just created a default initialized <b>fully dynamic</b> matrix
             with dimensions <b>0 x 0</b>. Fully dynamic means it can resize in
             rows and columns at runtime. This leads into the 4 kinds of matrices

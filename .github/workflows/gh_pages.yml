@@ -25,7 +25,7 @@ jobs:
         run: yarn install
 
       - name: Lint Source Files
-        run: yarn run lint
+        run: yarn lint
       
       - name: Build Website For Production
         run: yarn build
