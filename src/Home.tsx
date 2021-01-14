@@ -59,6 +59,8 @@ int main()
 #include <matrixpp/operations.hpp> // Required for +, -, *, and /
 #include <matrixpp/algorithms.hpp> // Required for determinant, inverse, transpose, block, and etc...
 
+namespace mpp = matrixpp;
+
 int main()
 {
     auto m = mpp::matrix{{
