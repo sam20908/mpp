@@ -75,6 +75,7 @@ target_sources(${PROJECT_NAME} INTERFACE
     "include/matrixpp/detail/expr_binary_constant_op.hpp"
     "include/matrixpp/detail/expr_binary_op.hpp"
     "include/matrixpp/detail/matrix_base.hpp"
+    "include/matrixpp/detail/tag_invoke.hpp"
     "include/matrixpp/detail/utility.hpp")
 
 target_include_directories(${PROJECT_NAME} INTERFACE
