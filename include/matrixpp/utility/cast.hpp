@@ -31,7 +31,7 @@ namespace matrixpp
 	struct cast_t
 	{
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		friend constexpr auto tag_invoke(cast_t,
+		[[nodiscard]] friend constexpr auto tag_invoke(cast_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
 		{
