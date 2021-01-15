@@ -19,35 +19,27 @@
 
 #pragma once
 
-#include <cstddef>
-#include <span>
+#include <utility>
 
-namespace matrixpp
+namespace matrixpp::detail
 {
-	struct matrix_rows_extent_tag
+	namespace tag_invoke_impl
 	{
-	};
+		void tag_invoke();
 
-	struct matrix_columns_extent_tag
-	{
-	};
+		template<typename CPO, typename... Args>
+		using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
 
-	namespace customize
-	{
-		struct customize_tag
+		struct tag_invoke_fn
 		{
+			template<typename CPO, typename... Args>
+			[[nodiscard]] constexpr auto operator()(CPO&& cpo, Args&&... args) const
+				-> tag_invoke_result_t<CPO, Args...>
+			{
+				return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
+			}
 		};
-	} // namespace customize
+	} // namespace tag_invoke_impl
 
-	template<typename... Args>
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, Args&&...)
-	{
-		return std::dynamic_extent;
-	}
-
-	template<typename... Args>
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, Args&&...)
-	{
-		return std::dynamic_extent;
-	}
-} // namespace matrixpp
+	inline constexpr auto tag_invoke = detail::tag_invoke_impl::tag_invoke_fn{};
+} // namespace matrixpp::detail

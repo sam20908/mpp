@@ -6,14 +6,12 @@
 
 namespace matrixpp::customize
 {
-	template<>
-	[[nodiscard]] constexpr std::size_t default_rows_extent<customize_tag>()
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
 	{
 		return 10;
 	}
 
-	template<>
-	[[nodiscard]] constexpr std::size_t default_columns_extent<customize_tag>()
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
 	{
 		return 10;
 	}
@@ -24,9 +22,6 @@ namespace matrixpp::customize
 
 int main()
 {
-	static_assert(matrixpp::default_rows_extent() == 10, "Customized rows extent not detected!");
-	static_assert(matrixpp::default_columns_extent() == 10, "Customized columns extent not detected!");
-
 	auto m = matrixpp::matrix<int>{};
 	assert(m.rows_extent() == 10);
 	assert(m.columns_extent() == 10);
