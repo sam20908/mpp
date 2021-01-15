@@ -41,5 +41,5 @@ namespace matrixpp::detail
 		};
 	} // namespace tag_invoke_impl
 
-	inline constexpr auto tag_invoke = detail::tag_invoke_impl::tag_invoke_fn{};
+	inline constexpr auto tag_invoke_cpo = detail::tag_invoke_impl::tag_invoke_fn{};
 } // namespace matrixpp::detail
