@@ -28,30 +28,41 @@
 
 namespace matrixpp
 {
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) transpose(
-		const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	struct transpose_t
 	{
-		using transposed_matrix_t = matrix<Value, ColumnsExtent, RowsExtent>;
-		auto transposed           = transposed_matrix_t{};
-		auto buf_copy             = obj.buffer();
-		auto rows                 = obj.rows();
-		auto cols                 = obj.columns();
-		const auto& buf           = obj.buffer();
-
-		for (auto col = std::size_t{ 0 }; col < cols; ++col)
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix<Value, ColumnsExtent, RowsExtent>
 		{
-			for (auto row = std::size_t{ 0 }; row < rows; ++row)
-			{
-				auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
-				auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
+			auto transposed = matrix<Value, ColumnsExtent, RowsExtent>{};
+			auto buf_copy   = obj.buffer();
+			auto rows       = obj.rows();
+			auto cols       = obj.columns();
+			const auto& buf = obj.buffer();
 
-				buf_copy[transposed_idx] = buf[normal_idx];
+			for (auto col = std::size_t{ 0 }; col < cols; ++col)
+			{
+				for (auto row = std::size_t{ 0 }; row < rows; ++row)
+				{
+					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
+					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
+
+					buf_copy[transposed_idx] = buf[normal_idx];
+				}
 			}
+
+			detail::init_matrix_base_with_1d_rng(transposed, std::move(buf_copy), cols, rows);
+
+			return transposed;
 		}
 
-		detail::init_matrix_base_with_1d_rng(transposed, std::move(buf_copy), cols, rows);
+		template<typename... Args>
+		[[nodiscard]] constexpr auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<transpose_t, Args...>
+		{
+			return tag_invoke(*this, std::forward<Args>(args)...);
+		}
+	};
 
-		return transposed;
-	}
+	inline constexpr auto transpose = transpose_t{};
 } // namespace matrixpp
