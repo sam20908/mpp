@@ -1,13 +1,3 @@
-export const init = `#include <matrixpp/matrix.h>
-
-namespace mpp = matrixpp; // More convenient namespace alias
-
-int main()
-{
-    auto m = mpp::matrix<int>{};
-
-    return 0;
-}`;
 export const kinds = `#include <matrixpp/matrix.h>
 
 namespace mpp = matrixpp;
@@ -23,10 +13,11 @@ int main()
 
     return 0;
 }`;
+
 export const operations = `#include <matrixpp/matrix.h>
-#include <matrixpp/operations.hpp> // Required for +, -, *, and /
-#include <matrixpp/algorithms.hpp> // Required for determinant, inverse, transpose, block, and etc...
-#include <utility> // Get std::type_identity
+#include <matrixpp/operations.hpp> // +, -, *, and /
+#include <matrixpp/algorithms.hpp> // determinant, inverse, transpose, block, and etc...
+#include <utility> // std::type_identity
 
 namespace mpp = matrixpp;
 
@@ -48,10 +39,40 @@ int main()
 
     auto m_inv = mpp::inverse(std::type_identity<float>{}, m); // Usually want floating point for inverse
     auto m_inv_int = mpp::inverse(m); // Inverse has the same value type as "m" -> int (LOSING PRECISION!)
-    
+
     auto m_transposed = mpp::transpose(m);
     auto m_block = mpp::block(m, 0, 0, 1, 1); // Grabs top corner 2 x 2 (the indexes are inclusive, so 1 x 1
                                               // blocks are possible :) )
 
     return 0;
 }`;
+
+export const customize_default_extent = `#include <matrixpp/utility/config.hpp>
+// It's very important to do this before including matrix.hpp
+namespace matrixpp::customize
+{
+    // Customization for default extent for matrix class has to take place here because
+    // the library looks for customizations via ADL, and customize_tag is declared in this
+    // scope
+    [[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+    {
+        return 10;
+    }
+
+    [[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
+    {
+        return 10;
+    }
+} // namespace matrixpp::customize
+
+#include <matrixpp/matrix.hpp>
+
+int main()
+{
+    auto m = matrixpp::matrix<int>{}; // The library uses the new default extent by default
+    auto r = m.rows_extent(); // 10
+    auto c = m.rows_extent(); // 10
+
+    return 0;
+}
+`;

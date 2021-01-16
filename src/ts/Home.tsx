@@ -1,5 +1,4 @@
 import * as React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
 
 import {
   MDBJumbotron,
@@ -7,35 +6,21 @@ import {
   MDBRow,
   MDBCol,
   MDBTypography,
-  MDBNav,
-  MDBNavItem,
-  MDBNavLink,
-  MDBTabContent,
-  MDBTabPane,
   MDBBtn,
+  MDBCard,
+  MDBCardTitle,
+  MDBCardBody,
+  MDBCardText,
 } from "mdbreact";
 
 import theme from "prism-react-renderer/themes/dracula";
 
-import { init, kinds, operations } from "./ExampleCodes";
+import { kinds, operations, customize_default_extent } from "./ExampleCodes";
 
 import CodeBlock from "./CodeBlock";
 import Logo128 from "../img/logo128.png";
 
-interface State {
-  active_tab: string;
-}
-
-export default class Home extends React.Component<unknown, State> {
-  state: State = { active_tab: "fully_dynamic_matrices" };
-
-  goToTab(tabName: string): void {
-    if (this.state.active_tab != tabName) {
-      // If the user is already on the current tab, then there's no need to do anything
-      this.setState({ active_tab: tabName });
-    }
-  }
-
+export default class Home extends React.Component<unknown, unknown> {
   render(): React.ReactNode {
     return (
       <div>
@@ -100,19 +85,14 @@ export default class Home extends React.Component<unknown, State> {
             user-defined types.
           </MDBTypography>
           <br />
-          <MDBTypography blockquote bqColor="primary">
-            <MDBTypography tag="p" className="bq-title">
-              Notice!
-            </MDBTypography>
-            <p>
-              This project is developed as a hobby and a learning project. I do
-              not claim this library to be the &quot;next standard matrix
-              library&quot;, but I do try to improve it as time goes on.{" "}
-              <b>
-                If you want to help contribute, just send an issue or a pull
-                request on matrixpp GitHub!
-              </b>
-            </p>
+          <MDBTypography note noteColor="secondary" noteTitle="Note! ">
+            This project is developed as a hobby and a learning project. I do
+            not claim this library to be the &quot;next standard matrix
+            library&quot;, but I do try to improve it as time goes on.{" "}
+            <b>
+              If you want to help contribute, just send an issue or a pull
+              request on matrixpp GitHub!
+            </b>
           </MDBTypography>
         </MDBContainer>
         {/* Examples */}
@@ -122,107 +102,144 @@ export default class Home extends React.Component<unknown, State> {
           </MDBTypography>
           <hr />
           <MDBTypography tag="p" className="lead">
-            To create a matrix, we can simply do this:
-          </MDBTypography>
-          <CodeBlock code={init} theme={theme} />
-          <MDBTypography tag="p" className="lead">
-            We just created a default initialized <b>fully dynamic</b> matrix
-            with dimensions <b>0 x 0</b>. Fully dynamic means it can resize in
-            rows and columns at runtime. This leads into the 4 kinds of matrices
-            that can be created:
-          </MDBTypography>
-          <Router>
-            <MDBNav className="justify-content-center font-weight-bold">
-              <MDBNavItem>
-                <MDBNavLink
-                  to="#"
-                  active={this.state.active_tab === "fully_dynamic_matrices"}
-                  onClick={() => this.goToTab("fully_dynamic_matrices")}
-                  role="tab"
-                >
-                  Fully Dynamic Matrices
-                </MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink
-                  to="#"
-                  active={this.state.active_tab === "fully_static_matrices"}
-                  onClick={() => this.goToTab("fully_static_matrices")}
-                  role="tab"
-                >
-                  Fully Static Matrices
-                </MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink
-                  to="#"
-                  active={this.state.active_tab === "dynamic_row_matrices"}
-                  onClick={() => this.goToTab("dynamic_row_matrices")}
-                  role="tab"
-                >
-                  Dynamic Row Matrices
-                </MDBNavLink>
-              </MDBNavItem>
-              <MDBNavItem>
-                <MDBNavLink
-                  to="#"
-                  active={this.state.active_tab === "dynamic_column_matrices"}
-                  onClick={() => this.goToTab("dynamic_column_matrices")}
-                  role="tab"
-                >
-                  Dynamic Column Matrices
-                </MDBNavLink>
-              </MDBNavItem>
-            </MDBNav>
-          </Router>
-          <MDBTabContent
-            className="card px-3 pt-2"
-            activeItem={this.state.active_tab}
-          >
-            <MDBTabPane tabId="fully_static_matrices" role="tabpanel">
-              <MDBTypography tag="p" className="mt-2">
-                A matrix which has fixed dimensions and rows, therefore it
-                cannot be resized. It can be constructed and manipulated at
-                compile time and runtime.
-              </MDBTypography>
-            </MDBTabPane>
-            <MDBTabPane tabId="fully_dynamic_matrices" role="tabpanel">
-              <MDBTypography tag="p" className="mt-2">
-                A matrix which can be resized in rows and columns. It can be
-                constructed and manipulated at runtime{" "}
-                <b>(compile time support is pending).</b>
-              </MDBTypography>
-            </MDBTabPane>
-            <MDBTabPane tabId="dynamic_row_matrices" role="tabpanel">
-              <MDBTypography tag="p" className="mt-2">
-                A matrix which can be resized in rows but has fixed columns. It
-                can be constructed and manipulated at runtime{" "}
-                <b>(compile time support is pending).</b>
-              </MDBTypography>
-            </MDBTabPane>
-            <MDBTabPane tabId="dynamic_column_matrices" role="tabpanel">
-              <MDBTypography tag="p" className="mt-2">
-                A matrix which can be resized in columns but has fixed rows. It
-                can be constructed and manipulated at runtime{" "}
-                <b>(compile time support is pending).</b>
-              </MDBTypography>
-            </MDBTabPane>
-          </MDBTabContent>
-          <MDBTypography tag="p" className="lead mt-5">
-            We can specify the kind of matrix we want by specifying the size
-            extent template parameters:
+            Below is a sample of creating different kinds of matrices
           </MDBTypography>
           <CodeBlock code={kinds} theme={theme} />
+          <MDBTypography tag="p" className="lead">
+            Below describes the pros and cons of each matrix:
+          </MDBTypography>
+          <MDBRow className="mb-4">
+            <MDBCol sm="6">
+              <MDBCard>
+                <MDBCardBody>
+                  <MDBCardTitle>Fully Static Matrices</MDBCardTitle>
+                  <MDBCardText>
+                    A matrix that uses a static buffer <b>std::array</b>, which
+                    also means it will be allocated on the stack.
+                    <br />
+                    <br />
+                    <b>Pros</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Static buffer (no heap allocation)</li>
+                        <li>Dimensions known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                    <b>Cons</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Not resizable</li>
+                      </ul>
+                    </MDBTypography>
+                  </MDBCardText>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+            <MDBCol sm="6">
+              <MDBCard>
+                <MDBCardBody>
+                  <MDBCardTitle>Fully Dynamic Matrices</MDBCardTitle>
+                  <MDBCardText>
+                    A matrix that can have a runtime size and can be very
+                    flexible. It can be imagined as <b>std::vcector</b> of
+                    matrices because of how dynamic it can be.
+                    <br />
+                    <br />
+                    <b>Pros</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>
+                          Very flexible (can be resized in rows and columns)
+                        </li>
+                        <li>
+                          Default kind of matrix which works for almost every
+                          situation
+                        </li>
+                      </ul>
+                    </MDBTypography>
+                    <b>Cons</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Size is not known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                  </MDBCardText>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+          </MDBRow>
+          <MDBRow className="mb-4">
+            <MDBCol sm="6">
+              <MDBCard>
+                <MDBCardBody>
+                  <MDBCardTitle>Dynamic Rows Matrices</MDBCardTitle>
+                  <MDBCardText>
+                    A matrix that has known column size but can be flexible in
+                    rows
+                    <br />
+                    <br />
+                    <b>Pros</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Resizable in rows</li>
+                        <li>Columns are known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                    <b>Cons</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Rows is not known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                  </MDBCardText>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+            <MDBCol sm="6">
+              <MDBCard>
+                <MDBCardBody>
+                  <MDBCardTitle>Dynamic Columns Matrices</MDBCardTitle>
+                  <MDBCardText>
+                    A matrix that has known row size but can be flexible in
+                    columns
+                    <br />
+                    <br />
+                    <b>Pros</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Resizable in columns</li>
+                        <li>Rows are known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                    <b>Cons</b>
+                    <MDBTypography listUnStyled>
+                      <ul>
+                        <li>Columns is not known at compile time</li>
+                      </ul>
+                    </MDBTypography>
+                  </MDBCardText>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+          </MDBRow>
           <MDBTypography tag="p" className="lead mt-5">
             Here are some examples of matrix operations:
           </MDBTypography>
           <CodeBlock code={operations} theme={theme} />
           <MDBTypography tag="p" className="lead mt-5">
-            Some APIs have overloads that take a custom template type by{" "}
-            <b>std::type_identity</b>, which is required because the free
-            functions are <b>customization point objects</b>, therefore passing
-            a type directly is not possible.
+            Some algorithms and operations have overloads that take a custom
+            template type by <b>std::type_identity</b>, which is required
+            because the algorithms and operations are{" "}
+            <b>customization point objects</b>, therefore passing a type
+            directly to the invoke operator is not possible. Currently, the
+            algorithms and operations that support custom passing types can
+            deduce the type passed in from <b>std::type_identity</b>.
           </MDBTypography>
+          <MDBTypography tag="p" className="lead mt-5">
+            Here is how you can customize the default extents that the matrix
+            will default to:
+          </MDBTypography>
+          <CodeBlock code={customize_default_extent} theme={theme} />
         </MDBContainer>
       </div>
     );
