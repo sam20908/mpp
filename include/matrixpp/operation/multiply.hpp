@@ -33,26 +33,22 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		inline auto mul_constant_op = [](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
+		using mul_constant_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
 			return left(row_idx, col_idx) * right;
-		};
+		});
+		using mul_op_t          = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
+            using result_t = typename std::remove_cvref_t<decltype(left)>::value_type;
 
-		inline auto mul_op = [](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
-			using result_t = typename std::remove_cvref_t<decltype(left)>::value_type;
+            auto left_cols = left.columns();
+            auto result    = result_t{ 0 };
 
-			auto left_cols = left.columns();
-			auto result    = result_t{ 0 };
+            for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
+            {
+                result += left(row_idx, index) * right(index, col_idx);
+            }
 
-			for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
-			{
-				result += left(row_idx, index) * right(index, col_idx);
-			}
-
-			return result;
-		};
-
-		using mul_constant_op_type = decltype(mul_constant_op);
-		using mul_op_type          = decltype(mul_op);
+            return result;
+        });
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -61,12 +57,12 @@ namespace matrixpp
 	{
 		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
 
-		return detail::
-			expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_type>{ obj,
-				constant,
-				detail::mul_constant_op,
-				obj.rows(),
-				obj.columns() };
+		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_t>{
+			obj,
+			constant,
+			obj.rows(),
+			obj.columns()
+		};
 	}
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -75,12 +71,12 @@ namespace matrixpp
 	{
 		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
 
-		return detail::
-			expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_type>{ obj,
-				constant,
-				detail::mul_constant_op,
-				obj.rows(),
-				obj.columns() };
+		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_t>{
+			obj,
+			constant,
+			obj.rows(),
+			obj.columns()
+		};
 	}
 
 	template<typename LeftBase,
@@ -99,10 +95,9 @@ namespace matrixpp
 
 		detail::validate_matrices_multipliable(left, right);
 
-		return detail::expr_binary_op<LeftRowsExtent, RightColumnsExtent, left_type, right_type, detail::mul_op_type>{
+		return detail::expr_binary_op<LeftRowsExtent, RightColumnsExtent, left_type, right_type, detail::mul_op_t>{
 			left,
 			right,
-			detail::mul_op,
 			left.rows(),
 			right.columns()
 		};

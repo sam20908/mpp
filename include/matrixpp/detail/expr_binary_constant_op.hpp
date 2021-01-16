@@ -41,7 +41,7 @@ namespace matrixpp::detail
 		const Obj& _obj;
 		Value _constant; // Store the constant by copy to handle literals
 
-		const Op& _op;
+		Op _op{};
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
 		std::size_t _result_rows;
@@ -52,13 +52,11 @@ namespace matrixpp::detail
 
 		expr_binary_constant_op(const Obj& obj,
 			Value constant,
-			const Op& op,
 			std::size_t result_rows,
 			std::size_t result_cols) // @TODO: ISSUE #20
 			:
 			_obj(obj),
 			_constant(constant),
-			_op(op),
 			_result_rows(result_rows),
 			_result_cols(result_cols)
 		{

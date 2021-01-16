@@ -30,11 +30,9 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		inline auto sub_op = [](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
+		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
 			return left(row_idx, col_idx) - right(row_idx, col_idx);
-		};
-
-		using sub_op_type = decltype(sub_op);
+		});
 	} // namespace detail
 
 	template<typename LeftBase,
@@ -58,7 +56,6 @@ namespace matrixpp
 
 		return detail::expr_binary_op<row_extent, col_extent, left_type, right_type, detail::sub_op_type>{ left,
 			right,
-			detail::sub_op,
 			left.rows(),
 			left.columns() };
 	}
