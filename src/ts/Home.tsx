@@ -7,7 +7,6 @@ import {
   MDBRow,
   MDBCol,
   MDBTypography,
-  MDBBox,
   MDBNav,
   MDBNavItem,
   MDBNavLink,
@@ -83,13 +82,38 @@ export default class Home extends React.Component<unknown, State> {
             Brief Overview
           </MDBTypography>
           <hr />
-          <MDBBox tag="p" className="lead">
-            <b>matrixpp</b> uses free function style algorithms in combination
-            with templates to create an easy-to-understand API for the users. It
-            also currently uses various metaprogramming techniques such as
-            Expression Templates to allow delayed complex matrix computations.
-            It is also compatible with Standard Template Library algorithms.
-          </MDBBox>
+          <MDBTypography tag="p" className="lead mt-3">
+            <b>matrixpp</b> strives to mimic STL-style interface with algorithms
+            and operations declared outside of the matrix class to allow users
+            to &quot;Pay For What You Use&quot;. The API was also designed to be
+            compatible with standard STL algorithms, which means it strives to
+            meet the C++ Named Requirements for whatever operation it supports{" "}
+            <a href="https://en.cppreference.com/w/cpp/named_req">
+              (see all named requirements currently in the Standard)
+            </a>
+            . It internally uses template metaprogramming to allow techniques
+            like <b>expression template objects</b>, which for example delays
+            evaluation for a given expression until it needs to be evaluated.
+            Lastly, <b>matrixpp</b> is designed to be widely customizable, with
+            the help of &quot;Customization Point Objects&quot; to allow
+            customizing all algorithms and operations in the library for certain
+            user-defined types.
+          </MDBTypography>
+          <br />
+          <MDBTypography blockquote bqColor="primary">
+            <MDBTypography tag="p" className="bq-title">
+              Notice!
+            </MDBTypography>
+            <p>
+              This project is developed as a hobby and a learning project. I do
+              not claim this library to be the &quot;next standard matrix
+              library&quot;, but I do try to improve it as time goes on.{" "}
+              <b>
+                If you want to help contribute, just send an issue or a pull
+                request on matrixpp GitHub!
+              </b>
+            </p>
+          </MDBTypography>
         </MDBContainer>
         {/* Examples */}
         <MDBContainer className="mt-5">
