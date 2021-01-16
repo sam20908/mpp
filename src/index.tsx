@@ -5,8 +5,8 @@ import "mdbreact/dist/css/mdb.css";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import NavigationBar from "./NavigationBar";
-import Home from "./Home";
+import NavigationBar from "./ts/NavigationBar";
+import Home from "./ts/Home";
 
 ReactDOM.render(
   <React.StrictMode>
