@@ -21,7 +21,7 @@ import theme from "prism-react-renderer/themes/dracula";
 import { init, kinds, operations } from "./ExampleCodes";
 
 import CodeBlock from "./CodeBlock";
-import Logo128 from "./img/logo128.png";
+import Logo128 from "../img/logo128.png";
 
 interface State {
   active_tab: string;
@@ -193,6 +193,12 @@ export default class Home extends React.Component<unknown, State> {
             Here are some examples of matrix operations:
           </p>
           <CodeBlock code={operations} theme={theme} />
+          <MDBTypography tag="p" className="mt-2">
+            Some APIs have overloads that take a custom template type by{" "}
+            <b>std::type_identity</b>, which is required because the free
+            functions are <b>customization point objects</b>, therefore passing
+            a type directly is not possible.
+          </MDBTypography>
         </MDBContainer>
       </div>
     );

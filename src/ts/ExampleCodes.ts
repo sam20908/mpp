@@ -26,6 +26,7 @@ int main()
 export const operations = `#include <matrixpp/matrix.h>
 #include <matrixpp/operations.hpp> // Required for +, -, *, and /
 #include <matrixpp/algorithms.hpp> // Required for determinant, inverse, transpose, block, and etc...
+#include <utility> // Get std::type_identity
 
 namespace mpp = matrixpp;
 
@@ -44,8 +45,10 @@ int main()
     auto result_m = mpp::matrix{ expr }; // Evaluates the whole expression and constructs a matrix
 
     auto m_det = mpp::determinant(m); // You can specify larger types for safety to avoid type overflow from calculation
-    auto m_inv = mpp::inverse<float>(m); // Optional template parameter to allow custom precision types,
-                                         // since inverse usually outputs floatings, it's a good candidate
+
+    auto m_inv = mpp::inverse(std::type_identity<float>{}, m); // Usually want floating point for inverse
+    auto m_inv_int = mpp::inverse(m); // Inverse has the same value type as "m" -> int (LOSING PRECISION!)
+    
     auto m_transposed = mpp::transpose(m);
     auto m_block = mpp::block(m, 0, 0, 1, 1); // Grabs top corner 2 x 2 (the indexes are inclusive, so 1 x 1
                                               // blocks are possible :) )

@@ -11,7 +11,7 @@ import {
   MDBNavLink,
 } from "mdbreact";
 
-import NavbarBrandLogo from "./img/logo-navbar-brand.png";
+import NavbarBrandLogo from "../img/logo-navbar-brand.png";
 
 interface State {
   navbar_open: boolean;
