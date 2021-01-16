@@ -17,26 +17,37 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
-#include <matrixpp/algorithm/determinant.hpp>
-#include <matrixpp/matrix.hpp>
-#include <utility>
+#pragma once
 
-namespace
+#include <cstddef>
+#include <span>
+
+namespace matrixpp
 {
-	TEST(Determinant, 3x3_SameType)
+	struct matrix_rows_extent_tag
 	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(matrix);
+	};
 
-		EXPECT_EQ(det, 6);
+	struct matrix_columns_extent_tag
+	{
+	};
+
+	namespace customize
+	{
+		struct customize_tag
+		{
+		};
+	} // namespace customize
+
+	template<typename... Args>
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, Args&&...)
+	{
+		return std::dynamic_extent;
 	}
 
-	TEST(Determinant, 3x3_IntToFloat)
+	template<typename... Args>
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, Args&&...)
 	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
-
-		EXPECT_EQ(det, 6.F);
+		return std::dynamic_extent;
 	}
-} // namespace
+} // namespace matrixpp

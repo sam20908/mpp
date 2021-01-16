@@ -64,6 +64,7 @@ target_sources(${PROJECT_NAME} INTERFACE
 
     # Utility headers
     "include/matrixpp/utility/cast.hpp"
+    "include/matrixpp/utility/config.hpp"
     "include/matrixpp/utility/equal.hpp"
     "include/matrixpp/utility/square.hpp"
     "include/matrixpp/utility/type.hpp"
@@ -74,6 +75,7 @@ target_sources(${PROJECT_NAME} INTERFACE
     "include/matrixpp/detail/expr_binary_constant_op.hpp"
     "include/matrixpp/detail/expr_binary_op.hpp"
     "include/matrixpp/detail/matrix_base.hpp"
+    "include/matrixpp/detail/tag_invoke.hpp"
     "include/matrixpp/detail/utility.hpp")
 
 target_include_directories(${PROJECT_NAME} INTERFACE

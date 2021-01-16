@@ -20,6 +20,7 @@
 #pragma once
 
 #include "utility/cast.hpp"
+#include "utility/config.hpp"
 #include "utility/equal.hpp"
 #include "utility/square.hpp"
 #include "utility/type.hpp"

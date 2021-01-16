@@ -19,15 +19,29 @@
 
 #pragma once
 
+#include "../detail/tag_invoke.hpp"
 #include "../matrix.hpp"
 
 #include <cstddef>
 
 namespace matrixpp
 {
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto square(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	struct square_t
 	{
-		return obj.rows() == obj.columns();
-	}
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> bool
+		{
+			return obj.rows() == obj.columns();
+		}
+
+		template<typename... Args>
+		[[nodiscard]] constexpr auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<square_t, Args...>
+		{
+			return tag_invoke(*this, std::forward<Args>(args)...);
+		}
+	};
+
+	inline constexpr auto square = square_t{};
 } // namespace matrixpp

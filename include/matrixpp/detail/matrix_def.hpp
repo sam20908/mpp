@@ -19,8 +19,10 @@
 
 #pragma once
 
+#include "../utility/config.hpp"
 #include "constraints.hpp"
 #include "expr_base.hpp"
+#include "tag_invoke.hpp"
 
 #include <cstddef>
 #include <iterator>
@@ -31,8 +33,8 @@
 namespace matrixpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent    = std::dynamic_extent,
-		std::size_t ColumnsExtent = std::dynamic_extent>
+		std::size_t RowsExtent    = detail::tag_invoke_cpo(matrix_rows_extent_tag{}, customize::customize_tag{}),
+		std::size_t ColumnsExtent = detail::tag_invoke_cpo(matrix_columns_extent_tag{}, customize::customize_tag{})>
 	class matrix;
 
 	// Deduction guides

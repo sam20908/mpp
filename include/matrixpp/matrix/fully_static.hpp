@@ -21,7 +21,6 @@
 
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
-#include "matrixpp/detail/utility.hpp"
 
 namespace matrixpp
 {

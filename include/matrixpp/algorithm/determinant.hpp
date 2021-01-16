@@ -19,20 +19,23 @@
 
 #pragma once
 
+#include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
 #include "../matrix.hpp"
 #include "../utility/square.hpp"
 
 #include <algorithm>
 #include <ranges>
+#include <utility>
 
 namespace matrixpp
 {
 	namespace detail
 	{
 		template<typename Precision>
-		[[nodiscard]] Precision
+		[[nodiscard]] constexpr auto
 		det_impl(auto& data, std::size_t rows, std::size_t columns, std::size_t row_begin, std::size_t column_end)
+			-> Precision
 		{
 			// The size of the data stays the same, so we have to determine the actual
 			// size of the data we're allowed to work with by using column_end
@@ -177,15 +180,29 @@ namespace matrixpp
 		}
 	} // namespace detail
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto determinant(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	struct determinant_t
 	{
-		return detail::det_func<Value>(obj);
-	}
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(determinant_t,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> Value
+		{
+			return detail::det_func<Value>(obj);
+		}
 
-	template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto determinant(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
-	{
-		return detail::det_func<To>(obj);
-	}
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto
+		tag_invoke(determinant_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To
+		{
+			return detail::det_func<To>(obj);
+		}
+
+		template<typename... Args>
+		[[nodiscard]] constexpr auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<determinant_t, Args...>
+		{
+			return tag_invoke(*this, std::forward<Args>(args)...);
+		}
+	};
+
+	inline constexpr auto determinant = determinant_t{};
 } // namespace matrixpp

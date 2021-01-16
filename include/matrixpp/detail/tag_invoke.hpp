@@ -17,26 +17,29 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
-#include <matrixpp/algorithm/determinant.hpp>
-#include <matrixpp/matrix.hpp>
+#pragma once
+
 #include <utility>
 
-namespace
+namespace matrixpp::detail
 {
-	TEST(Determinant, 3x3_SameType)
+	namespace tag_invoke_impl
 	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(matrix);
+		void tag_invoke();
 
-		EXPECT_EQ(det, 6);
-	}
+		template<typename CPO, typename... Args>
+		using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
 
-	TEST(Determinant, 3x3_IntToFloat)
-	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
+		struct tag_invoke_fn
+		{
+			template<typename CPO, typename... Args>
+			[[nodiscard]] constexpr auto operator()(CPO&& cpo, Args&&... args) const
+				-> tag_invoke_result_t<CPO, Args...>
+			{
+				return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
+			}
+		};
+	} // namespace tag_invoke_impl
 
-		EXPECT_EQ(det, 6.F);
-	}
-} // namespace
+	inline constexpr auto tag_invoke_cpo = detail::tag_invoke_impl::tag_invoke_fn{};
+} // namespace matrixpp::detail

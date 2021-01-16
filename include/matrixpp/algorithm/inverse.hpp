@@ -216,15 +216,30 @@ namespace matrixpp
 		}
 	} // namespace detail
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+	struct inverse_t
 	{
-		return detail::inv_func<Value>(obj);
-	}
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix<Value, RowsExtent, ColumnsExtent>
+		{
+			return detail::inv_func<Value>(obj);
+		}
 
-	template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) inverse(const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
-	{
-		return detail::inv_func<To>(obj);
-	}
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t,
+			std::type_identity<To>,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
+		{
+			return detail::inv_func<To>(obj);
+		}
+
+		template<typename... Args>
+		[[nodiscard]] constexpr auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<inverse_t, Args...>
+		{
+			return tag_invoke(*this, std::forward<Args>(args)...);
+		}
+	};
+
+	inline constexpr auto inverse = inverse_t{};
 } // namespace matrixpp

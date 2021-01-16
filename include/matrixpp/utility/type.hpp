@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "../detail/tag_invoke.hpp"
 #include "../matrix.hpp"
 
 #include <cstddef>
@@ -34,27 +35,40 @@ namespace matrixpp
 		dynamic_columns
 	};
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] constexpr auto type(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+	struct type_t
 	{
-		auto row_is_dynamic    = obj.rows_extent() == std::dynamic_extent;
-		auto column_is_dynamic = obj.columns_extent() == std::dynamic_extent;
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend constexpr auto tag_invoke(type_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix_type
+		{
+			auto row_is_dynamic    = obj.rows_extent() == std::dynamic_extent;
+			auto column_is_dynamic = obj.columns_extent() == std::dynamic_extent;
 
-		if (!row_is_dynamic && !column_is_dynamic)
-		{
-			return matrix_type::fully_static;
+			if (!row_is_dynamic && !column_is_dynamic)
+			{
+				return matrix_type::fully_static;
+			}
+			else if (row_is_dynamic && column_is_dynamic)
+			{
+				return matrix_type::fully_dynamic;
+			}
+			else if (row_is_dynamic && !column_is_dynamic)
+			{
+				return matrix_type::dynamic_rows;
+			}
+			else
+			{
+				return matrix_type::dynamic_columns;
+			}
 		}
-		else if (row_is_dynamic && column_is_dynamic)
+
+		template<typename... Args>
+		[[nodiscard]] constexpr auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<type_t, Args...>
 		{
-			return matrix_type::fully_dynamic;
+			return tag_invoke(*this, std::forward<Args>(args)...);
 		}
-		else if (row_is_dynamic && !column_is_dynamic)
-		{
-			return matrix_type::dynamic_rows;
-		}
-		else
-		{
-			return matrix_type::dynamic_columns;
-		}
-	}
+	};
+
+	inline constexpr auto type = type_t{};
 } // namespace matrixpp

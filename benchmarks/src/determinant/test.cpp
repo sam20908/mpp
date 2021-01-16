@@ -20,6 +20,7 @@
 #include <benchmark/benchmark.h>
 #include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/matrix.hpp>
+#include <utility>
 
 static void determinant_5x5(benchmark::State& state)
 {
@@ -27,7 +28,7 @@ static void determinant_5x5(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::determinant<long double>(a);
+		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
 	}
 }
 
@@ -37,7 +38,7 @@ static void determinant_10x10(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::determinant<long double>(a);
+		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
 	}
 }
 
@@ -47,7 +48,7 @@ static void determinant_100x100(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::determinant<long double>(a);
+		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
 	}
 }
 
