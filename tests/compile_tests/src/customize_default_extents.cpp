@@ -1,6 +1,6 @@
 // RUN: cd %binary_dir
-// RUN: cmake -DTEST_NAME=customization -DTEST_SOURCE=%s -B build/customization
-// RUN: cmake --build build/customization --target customization
+// RUN: cmake -DTEST_NAME=customize_default_extents -DTEST_SOURCE=%s -B build/customize_default_extents
+// RUN: cmake --build build/customize_default_extents --target customize_default_extents
 
 #include <matrixpp/utility/config.hpp>
 
