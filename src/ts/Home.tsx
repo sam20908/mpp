@@ -184,16 +184,16 @@ export default class Home extends React.Component<unknown, State> {
               </MDBTypography>
             </MDBTabPane>
           </MDBTabContent>
-          <p className="lead mt-5">
+          <MDBTypography tag="p" className="lead mt-5">
             We can specify the kind of matrix we want by specifying the size
             extent template parameters:
-          </p>
+          </MDBTypography>
           <CodeBlock code={kinds} theme={theme} />
-          <p className="lead mt-5">
+          <MDBTypography tag="p" className="lead mt-5">
             Here are some examples of matrix operations:
-          </p>
+          </MDBTypography>
           <CodeBlock code={operations} theme={theme} />
-          <MDBTypography tag="p" className="mt-2">
+          <MDBTypography tag="p" className="lead mt-5">
             Some APIs have overloads that take a custom template type by{" "}
             <b>std::type_identity</b>, which is required because the free
             functions are <b>customization point objects</b>, therefore passing
