@@ -71,7 +71,7 @@ int main()
 {
     auto m = matrixpp::matrix<int>{}; // The library uses the new default extent by default
     auto r = m.rows_extent(); // 10
-    auto c = m.rows_extent(); // 10
+    auto c = m.columns_extent(); // 10
 
     return 0;
 }
