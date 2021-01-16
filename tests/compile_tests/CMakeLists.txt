@@ -23,5 +23,25 @@ set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
 set(COMPILE_TESTS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(COMPILE_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/compile_tests")
 
+function(_create_compile_test TEST_NAME)
+    add_custom_target("${TEST_NAME}_compile_test"
+        COMMAND ${LLVM_LIT_EXEC} --filter ${TEST_NAME} .
+        WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
+endfunction()
+
+add_custom_target("compile_test"
+    COMMAND ${LLVM_LIT_EXEC} .
+    WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
+
 configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
+
+_create_compile_test("1d_range_constructor")
+_create_compile_test("3d_range_constructor")
+_create_compile_test("customize_cpos")
+_create_compile_test("customize_default_extents")
+_create_compile_test("deduction_guides_expr_template")
+_create_compile_test("deduction_guides_initializer_list_2d")
+_create_compile_test("deduction_guides_rng_2d")
+_create_compile_test("non_arithmetic_type")
+_create_compile_test("one_side_zero_and_other_non_zero")
