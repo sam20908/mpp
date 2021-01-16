@@ -30,11 +30,9 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		inline auto div_op = [](const auto& lhs, const auto& rhs, std::size_t row_index, std::size_t column_index) {
+		using div_op_t = decltype([](auto&& lhs, auto&& rhs, std::size_t row_index, std::size_t column_index) {
 			return lhs(row_index, column_index) / rhs;
-		};
-
-		using div_op_type = decltype(div_op);
+		});
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -43,9 +41,8 @@ namespace matrixpp
 	{
 		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
 
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_type>{ obj,
+		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_t>{ obj,
 			constant,
-			detail::div_op,
 			obj.rows(),
 			obj.columns() };
 	}
@@ -56,9 +53,8 @@ namespace matrixpp
 	{
 		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
 
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_type>{ obj,
+		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_t>{ obj,
 			constant,
-			detail::div_op,
 			obj.rows(),
 			obj.columns() };
 	}

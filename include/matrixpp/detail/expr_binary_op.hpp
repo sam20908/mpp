@@ -41,7 +41,7 @@ namespace matrixpp::detail
 		const Left& _left;
 		const Right& _right;
 
-		const Op& _op;
+		Op _op{};
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
 		std::size_t _result_rows;
@@ -52,13 +52,11 @@ namespace matrixpp::detail
 
 		expr_binary_op(const Left& left,
 			const Right& right,
-			const Op& op,
 			std::size_t result_rows,
 			std::size_t result_cols) // @TODO: ISSUE #20
 			:
 			_left(left),
 			_right(right),
-			_op(op),
 			_result_rows(result_rows),
 			_result_cols(result_cols)
 		{
