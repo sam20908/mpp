@@ -20,6 +20,7 @@
 #pragma once
 
 #include "../detail/matrix_base.hpp"
+#include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
 #include "../matrix.hpp"
 

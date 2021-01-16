@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/matrix.hpp>
+#include <utility>
 
 namespace
 {
@@ -34,7 +35,7 @@ namespace
 	TEST(Determinant, 3x3_IntToFloat)
 	{
 		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant<float>(matrix);
+		auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(det, 6.F);
 	}
