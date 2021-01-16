@@ -20,13 +20,14 @@
 #include <gtest/gtest.h>
 #include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix.hpp>
+#include <utility>
 
 namespace
 {
 	TEST(Inverse, 3x3)
 	{
 		auto matrix  = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto inverse = matrixpp::inverse<float>(matrix);
+		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_FLOAT_EQ(inverse(0, 0), 0.F);
 		EXPECT_FLOAT_EQ(inverse(0, 1), 1.F / 3.F);

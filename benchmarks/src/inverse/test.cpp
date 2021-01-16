@@ -20,6 +20,7 @@
 #include <benchmark/benchmark.h>
 #include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix.hpp>
+#include <utility>
 
 static void inverse_5x5(benchmark::State& state)
 {
@@ -31,7 +32,7 @@ static void inverse_5x5(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::inverse<long double>(a);
+		(void)matrixpp::inverse(std::type_identity<long double>{}, a);
 	}
 }
 
@@ -50,7 +51,7 @@ static void inverse_10x10(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::inverse<long double>(a);
+		(void)matrixpp::inverse(std::type_identity<long double>{}, a);
 	}
 }
 
@@ -61,7 +62,7 @@ static void inverse_100x100(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)matrixpp::inverse<long double>(a);
+		(void)matrixpp::inverse(std::type_identity<long double>{}, a);
 	}
 }
 
