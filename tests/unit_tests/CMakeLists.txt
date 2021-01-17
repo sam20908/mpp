@@ -22,7 +22,7 @@ set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
-set(INCLUDE_HEADERS "include/dummy_expr.hpp")
+set(INCLUDE_HEADERS "../include/dummy_expr.hpp")
 
 if(LLVM_LIT_EXEC)
     configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
@@ -73,5 +73,6 @@ _create_unit_test("equality")
 _create_unit_test("type")
 
 # Basic tests
+_create_unit_test("customization")
 _create_unit_test("initialization")
 _create_unit_test("math_operations")

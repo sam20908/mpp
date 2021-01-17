@@ -17,18 +17,27 @@
  * under the License.
  */
 
-// RUN: cd %binary_dir
-// RUN: cmake -DTEST_NAME=customize_cpos -DTEST_SOURCE=%s -B build/customize_cpos
-// RUN: cmake --build build/customize_cpos --target customize_cpos
+#include <matrixpp/utility/config.hpp>
 
-#include <cassert>
-#include <cstddef>
+namespace matrixpp::customize
+{
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+	{
+		return 10;
+	}
+
+	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
+	{
+		return 10;
+	}
+} // namespace matrixpp::customize
+
+#include <gtest/gtest.h>
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix.hpp>
 #include <matrixpp/utility.hpp>
-// No need to test operations because they aren't CPOs
 
-namespace ns
+namespace
 {
 	enum class dumb_type
 	{
@@ -78,22 +87,53 @@ namespace ns
 	{
 		return dumb_class2{};
 	}
-} // namespace ns
 
-int main()
-{
-	auto d = ns::dumb_class{};
+	TEST(Customization, DefaultExtents)
+	{
+		auto m = matrixpp::matrix<int>{};
+		EXPECT_EQ(m.rows_extent(), 10);
+		EXPECT_EQ(m.columns_extent(), 10);
+	}
 
-	// Utility CPOs
-	assert(matrixpp::type(d) == ns::dumb_type::lol);
-	assert(matrixpp::cast(d) == ns::dumb_class2{});
-	assert(!matrixpp::square(d));
+	TEST(Customization, Type)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::type(d), dumb_type::lol);
+	}
 
-	// Algorithm CPOs
-	assert(matrixpp::block(d, 0, 0, 0, 0) == ns::dumb_class2{});
-	assert(matrixpp::determinant(d) == 2);
-	assert(matrixpp::inverse(d) == ns::dumb_class2{});
-	assert(matrixpp::transpose(d) == ns::dumb_class2{});
+	TEST(Customization, Cast)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::cast(d), dumb_class2{});
+	}
 
-	return 0;
-}
+	TEST(Customization, Square)
+	{
+		auto d = dumb_class{};
+		EXPECT_FALSE(matrixpp::square(d));
+	}
+
+	TEST(Customization, Block)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::block(d, 0, 0, 0, 0), dumb_class2{});
+	}
+
+	TEST(Customization, Determinant)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::determinant(d), 2);
+	}
+
+	TEST(Customization, Inverse)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::inverse(d), dumb_class2{});
+	}
+
+	TEST(Customization, Transpose)
+	{
+		auto d = dumb_class{};
+		EXPECT_EQ(matrixpp::transpose(d), dumb_class2{});
+	}
+} // namespace

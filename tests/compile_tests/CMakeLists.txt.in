@@ -18,7 +18,9 @@
 cmake_minimum_required(VERSION 3.15)
 project("temp_test")
 
-add_executable(${TEST_NAME} "${TEST_SOURCE}")
+set(INCLUDE_HEADERS "@COMPILE_TESTS_SOURCE_DIR@/../include/dummy_expr.hpp")
+
+add_executable(${TEST_NAME} "${TEST_SOURCE}" "${INCLUDE_HEADERS}")
 set_target_properties(${TEST_NAME} PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON

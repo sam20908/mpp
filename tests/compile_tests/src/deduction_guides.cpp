@@ -18,19 +18,26 @@
  */
 
 // RUN: cd %binary_dir
-// RUN: cmake -DTEST_NAME=non_arithmetic_type -DTEST_SOURCE=%s -B build/non_arithmetic_type
-// RUN: cmake --build build/non_arithmetic_type --target non_arithmetic_type
-// XFAIL: *
+// RUN: cmake -DTEST_NAME=deduction_guides -DTEST_SOURCE=%s -B build/deduction_guides
+// RUN: cmake --build build/deduction_guides --target deduction_guides
+
+#include "../../include/dummy_expr.hpp"
 
 #include <matrixpp/matrix.hpp>
-
-struct non_arithmetic_type
-{
-};
+#include <vector>
 
 int main()
 {
-	(void)matrixpp::matrix<non_arithmetic_type>{};
+	// 2D initializer list
+	(void)matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+
+	// Expression object
+	auto matrix = matrixpp::matrix<int>{};
+	(void)matrixpp::matrix{ matrixpp_test::detail::dummy_expr{ matrix } };
+
+	// 2D range
+	auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
+	(void)matrixpp::matrix{ rng_2d };
 
 	return 0;
 }

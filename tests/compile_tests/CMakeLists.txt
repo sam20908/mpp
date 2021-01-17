@@ -36,12 +36,4 @@ add_custom_target("compile_test"
 configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
 
-_create_compile_test("1d_range_constructor")
-_create_compile_test("3d_range_constructor")
-_create_compile_test("customize_cpos")
-_create_compile_test("customize_default_extents")
-_create_compile_test("deduction_guides_expr_template")
-_create_compile_test("deduction_guides_initializer_list_2d")
-_create_compile_test("deduction_guides_rng_2d")
-_create_compile_test("non_arithmetic_type")
-_create_compile_test("one_side_zero_and_other_non_zero")
+_create_compile_test("deduction_guides")

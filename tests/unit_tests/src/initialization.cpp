@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include "../include/dummy_expr.hpp"
+#include "../../include/dummy_expr.hpp"
 
 #include <array>
 #include <gtest/gtest.h>
