@@ -67,9 +67,11 @@ namespace matrixpp::customize
 
 #include <matrixpp/matrix.hpp>
 
+namespace mpp = matrixpp;
+
 int main()
 {
-    auto m = matrixpp::matrix<int>{}; // The library uses the new default extent by default
+    auto m = mpp::matrix<int>{}; // The library uses the new default extent by default
     auto r = m.rows_extent(); // 10
     auto c = m.columns_extent(); // 10
 
