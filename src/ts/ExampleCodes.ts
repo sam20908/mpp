@@ -48,7 +48,9 @@ int main()
 }`;
 
 export const customize_default_extent = `#include <matrixpp/utility/config.hpp>
-// It's very important to do this before including matrix.hpp
+
+// It's very important to do this before including matrix.hpp, otherwise the customization
+// is not going to be detected
 namespace matrixpp::customize
 {
     // Customization for default extent for matrix class has to take place here because

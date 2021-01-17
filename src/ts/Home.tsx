@@ -80,8 +80,8 @@ export default class Home extends React.Component<unknown, unknown> {
             like <b>expression template objects</b>, which for example delays
             evaluation for a given expression until it needs to be evaluated.
             Lastly, <b>matrixpp</b> is designed to be widely customizable, with
-            the help of &quot;Customization Point Objects&quot; to allow
-            customizing all algorithms and operations in the library for certain
+            the help of <b>Customization Point Objects</b> to allow customizing
+            all algorithms and operations in the library for certain
             user-defined types.
           </MDBTypography>
           <br />
