@@ -24,7 +24,7 @@
 static void Addition(benchmark::State& state)
 {
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
 	for (auto _ : state)
 	{
@@ -38,7 +38,7 @@ static void Addition(benchmark::State& state)
 static void Addition_CompoundAssign(benchmark::State& state)
 {
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
 	for (auto _ : state)
 	{
@@ -52,7 +52,7 @@ static void Addition_CompoundAssign(benchmark::State& state)
 static void Subtraction(benchmark::State& state)
 {
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
 	for (auto _ : state)
 	{
@@ -66,7 +66,7 @@ static void Subtraction(benchmark::State& state)
 static void Subtraction_CompoundAssign(benchmark::State& state)
 {
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
 	for (auto _ : state)
 	{
@@ -80,7 +80,7 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 static void Multiplication_Scalar(benchmark::State& state)
 {
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto scalar = 1;
+	auto scalar = 1;
 
 	for (auto _ : state)
 	{
@@ -94,7 +94,7 @@ static void Multiplication_Scalar(benchmark::State& state)
 static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 {
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto scalar = 1;
+	auto scalar = 1;
 
 	for (auto _ : state)
 	{
@@ -108,7 +108,7 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 static void Division_Scalar(benchmark::State& state)
 {
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto scalar = 1;
+	auto scalar = 1;
 
 	for (auto _ : state)
 	{
@@ -122,7 +122,7 @@ static void Division_Scalar(benchmark::State& state)
 static void Division_Scalar_CompoundAssign(benchmark::State& state)
 {
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto scalar = 1;
+	auto scalar = 1;
 
 	for (auto _ : state)
 	{
@@ -135,8 +135,8 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 
 static void Multiplication_Matrix(benchmark::State& state)
 {
-	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
 	for (auto _ : state)
 	{
