@@ -23,6 +23,13 @@
 #include <matrixpp/matrix/fully_dynamic.hpp>
 #include <utility>
 
+namespace
+{
+	// Benchmark limit without hanging (UB?)
+	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 13;
+	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 13;
+} // namespace
+
 static void Determinant(benchmark::State& state)
 {
 	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
@@ -80,7 +87,7 @@ static void Transpose(benchmark::State& state)
 	state.counters["Columns"] = state.range();
 }
 
-BENCHMARK(Determinant)->DenseRange(0, 15, 1);
-BENCHMARK(Inverse)->DenseRange(0, 15, 1);
+BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 1);
+BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 1);
 BENCHMARK(Block)->DenseRange(0, 1024, 128);
 BENCHMARK(Transpose)->DenseRange(0, 1024, 128);
