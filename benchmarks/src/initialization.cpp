@@ -34,4 +34,4 @@ static void Initialization_Fill(benchmark::State& state)
 	state.counters["Columns"] = state.range();
 }
 
-BENCHMARK(Initialization_Fill)->DenseRange(0, 1024, 128);
+BENCHMARK(Initialization_Fill)->RangeMultiplier(2)->Range(8, 8 << 10);

@@ -109,5 +109,5 @@ static void Transpose(benchmark::State& state)
 
 BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 1);
 BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 1);
-BENCHMARK(Block)->DenseRange(0, 1024, 128);
-BENCHMARK(Transpose)->DenseRange(0, 1024, 128);
+BENCHMARK(Block)->RangeMultiplier(2)->Range(8, 8 << 10);
+BENCHMARK(Transpose)->RangeMultiplier(2)->Range(8, 8 << 10);
