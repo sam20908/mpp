@@ -24,7 +24,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 
 namespace matrixpp
 {
