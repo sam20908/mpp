@@ -133,7 +133,19 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 	state.counters["Columns"] = state.range();
 }
 
-// @TODO: Add multiplication x scalar benchmark
+static void Multiplication_Matrix(benchmark::State& state)
+{
+	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+  auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+
+	for (auto _ : state)
+	{
+		(void)matrixpp::matrix{ a * b };
+	}
+
+	state.counters["Rows"]    = state.range();
+	state.counters["Columns"] = state.range();
+}
 
 BENCHMARK(Addition)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Addition_CompoundAssign)->RangeMultiplier(2)->Range(8, 8 << 10);
@@ -141,5 +153,6 @@ BENCHMARK(Subtraction)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Subtraction_CompoundAssign)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Multiplication_Scalar)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Multiplication_Scalar_CompoundAssign)->RangeMultiplier(2)->Range(8, 8 << 10);
+BENCHMARK(Multiplication_Matrix)->DenseRange(0, 1024, 128);
 BENCHMARK(Division_Scalar)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Division_Scalar_CompoundAssign)->RangeMultiplier(2)->Range(8, 8 << 10);
