@@ -29,6 +29,9 @@ static void Initialization_Fill(benchmark::State& state)
 	{
 		(void)matrixpp::matrix<int>{ state.range(), state.range(), 0 };
 	}
+
+	state.counters["Rows"]    = state.range();
+	state.counters["Columns"] = state.range();
 }
 
 BENCHMARK(Initialization_Fill)->DenseRange(0, 1024, 128);
