@@ -63,7 +63,10 @@ namespace matrixpp
 	inline decltype(auto) operator/=(matrix<Value, RowsExtent, ColumnsExtent>& obj,
 		Value constant) // @TODO: ISSUE #20
 	{
-		std::ranges::transform(obj, obj.begin(), std::bind_front(std::divides<>{}, constant));
+		// Can't use bind_front here because we want elem / constant, not constant / elem
+		std::ranges::transform(obj, obj.begin(), [constant](auto elem) {
+			return elem / constant
+		});
 
 		return obj;
 	}
