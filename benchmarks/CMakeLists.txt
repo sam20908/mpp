@@ -35,4 +35,5 @@ function(_create_benchmark TEST_FILE)
 endfunction()
 
 _create_benchmark("algorithms")
+_create_benchmark("operations")
 _create_benchmark("initialization")
