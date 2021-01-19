@@ -17,17 +17,31 @@
  * under the License.
  */
 
+#include <algorithm>
 #include <benchmark/benchmark.h>
 #include <cstddef>
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
+#include <matrixpp/utility/singular.hpp>
+#include <random>
 #include <utility>
 
 namespace
 {
 	// Benchmark limit without hanging (UB?)
 	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 13;
-	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 13;
+	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 11;
+
+	static inline auto random_device       = std::random_device{};
+	static inline auto random_engine       = std::mt19937{ random_device() };
+	static inline auto random_distribution = std::uniform_int_distribution{ 1, 50 };
+
+	void fill_matrix_with_random_values(auto& matrix)
+	{
+		std::ranges::transform(matrix, matrix.begin(), [](auto) {
+			return random_distribution(random_engine);
+		});
+	}
 } // namespace
 
 static void Determinant(benchmark::State& state)
@@ -46,7 +60,13 @@ static void Determinant(benchmark::State& state)
 
 static void Inverse(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
+	fill_matrix_with_random_values(matrix); // Initial fill, possibly non-singular first try
+
+	while (matrixpp::singular(matrix))
+	{
+		fill_matrix_with_random_values(matrix);
+	}
 
 	for (auto _ : state)
 	{
