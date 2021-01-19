@@ -80,7 +80,7 @@ static void Inverse(benchmark::State& state)
 
 static void Block(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ 1024, 1024, 0 };
+	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
 
 	for (auto _ : state)
 	{
