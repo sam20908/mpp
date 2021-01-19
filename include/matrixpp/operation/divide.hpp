@@ -65,7 +65,7 @@ namespace matrixpp
 	{
 		// Can't use bind_front here because we want elem / constant, not constant / elem
 		std::ranges::transform(obj, obj.begin(), [constant](auto elem) {
-			return elem / constant
+			return elem / constant;
 		});
 
 		return obj;
