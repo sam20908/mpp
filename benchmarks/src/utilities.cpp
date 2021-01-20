@@ -43,6 +43,8 @@ static void Equal(benchmark::State& state)
 
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
 		benchmark::DoNotOptimize(a == b);
 		benchmark::ClobberMemory();
 	}

@@ -42,6 +42,8 @@ static void Addition_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
 		benchmark::DoNotOptimize(a += b);
 		benchmark::ClobberMemory();
 	}
@@ -71,6 +73,8 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
 		benchmark::DoNotOptimize(a -= b);
 		benchmark::ClobberMemory();
 	}
@@ -100,6 +104,8 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(scalar);
 		benchmark::DoNotOptimize(a *= scalar);
 		benchmark::ClobberMemory();
 	}
@@ -129,6 +135,8 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(scalar);
 		benchmark::DoNotOptimize(a /= scalar);
 		benchmark::ClobberMemory();
 	}
