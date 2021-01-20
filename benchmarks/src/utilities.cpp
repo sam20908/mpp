@@ -25,24 +25,27 @@
 
 static void Cast(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		benchmark::DoNotOptimize(matrix);
-		benchmark::DoNotOptimize(matrixpp::cast(std::type_identity<long double>{}, matrix));
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(matrixpp::cast(std::type_identity<long double>{}, a));
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Equal(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -53,8 +56,8 @@ static void Equal(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 BENCHMARK(Cast)->RangeMultiplier(2)->Range(8, 8 << 10);

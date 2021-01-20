@@ -46,7 +46,8 @@ namespace
 
 static void Determinant(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto matrix =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -57,13 +58,14 @@ static void Determinant(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Inverse(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
+	auto matrix =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
 	fill_matrix_with_random_values(matrix); // Initial fill, possibly non-singular first try
 
 	while (matrixpp::singular(matrix))
@@ -80,31 +82,37 @@ static void Inverse(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Block(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
-	auto n      = state.range() == 0 ? 0 : state.range() - 1; // avoid out of range on reaching max size
+	auto matrix =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
+	auto n = state.range() == 0 ? 0 : state.range() - 1; // avoid out of range on reaching max size
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
 		benchmark::DoNotOptimize(n);
-		benchmark::DoNotOptimize(matrixpp::block(matrix, 0, 0, n, n));
+		benchmark::DoNotOptimize(matrixpp::block(matrix,
+			static_cast<std::size_t>(0),
+			static_cast<std::size_t>(0),
+			static_cast<std::size_t>(n),
+			static_cast<std::size_t>(n)));
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Transpose(benchmark::State& state)
 {
-	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
+	auto matrix =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -114,8 +122,8 @@ static void Transpose(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 1);

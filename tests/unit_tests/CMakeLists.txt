@@ -34,6 +34,7 @@ endif()
 add_executable("unit_test")
 target_sources("unit_test" PRIVATE "gtest_main.cpp")
 _setup_target("unit_test" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
+_turn_on_warnings("unit_test")
 
 function(_create_unit_test TEST_FILENAME)
     set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
@@ -44,6 +45,7 @@ function(_create_unit_test TEST_FILENAME)
         "gtest_main.cpp")
 
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
+    _turn_on_warnings(${TEST_NAME})
 
     target_sources("unit_test" PRIVATE "${TEST_SOURCE}")
 endfunction()

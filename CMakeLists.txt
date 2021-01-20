@@ -26,6 +26,15 @@ function(_setup_target target binary_dir libraries)
         CXX_EXTENSIONS OFF)
 endfunction()
 
+function(_turn_on_warnings target)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
+            -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+    else()
+        target_compile_options(${target} PRIVATE /W4 /WX)
+    endif()
+endfunction()
+
 cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"

@@ -23,6 +23,7 @@ set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark b
 # This executable will contain all the benchmarks
 add_executable("benchmark")
 _setup_target("benchmark" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
+_turn_on_warnings("benchmark")
 
 function(_create_benchmark TEST_FILE)
     set(TEST_NAME "${TEST_FILE}_benchmark")
@@ -30,6 +31,7 @@ function(_create_benchmark TEST_FILE)
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
     _setup_target(${TEST_NAME} "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
+    _turn_on_warnings(${TEST_NAME})
 
     target_sources("benchmark" PRIVATE "${TEST_SOURCE}")
 endfunction()
