@@ -44,6 +44,7 @@ static void Equal(benchmark::State& state)
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a == b);
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
