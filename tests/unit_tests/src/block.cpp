@@ -28,10 +28,10 @@ namespace
 	{
 		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::block(from,
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(2),
-			static_cast<std::size_t>(2));
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(2),
+            static_cast<std::size_t>(2));
 
 		EXPECT_EQ(to.rows(), 3);
 		EXPECT_EQ(to.columns(), 3);
@@ -51,10 +51,10 @@ namespace
 	{
 		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::block(from,
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(1),
-			static_cast<std::size_t>(1));
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(1));
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 2);
@@ -69,10 +69,10 @@ namespace
 	{
 		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto to   = matrixpp::block(from,
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0));
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0));
 
 		EXPECT_EQ(to.rows(), 1);
 		EXPECT_EQ(to.columns(), 1);
@@ -84,19 +84,21 @@ namespace
 	{
 		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		EXPECT_THROW((void)matrixpp::block(from,
-			static_cast<std::size_t>(1),
-			static_cast<std::size_t>(1),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0)), std::invalid_argument);
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0)),
+			std::invalid_argument);
 	}
 
 	TEST(Block, IndicesOutOfBounds_Throw)
 	{
 		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		EXPECT_THROW((void)matrixpp::block(from,
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(0),
-			static_cast<std::size_t>(2),
-			static_cast<std::size_t>(3)), std::invalid_argument);
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2),
+						 static_cast<std::size_t>(3)),
+			std::invalid_argument);
 	}
 } // namespace
