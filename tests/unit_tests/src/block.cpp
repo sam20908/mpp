@@ -77,7 +77,7 @@ namespace
 		EXPECT_EQ(to.rows(), 1);
 		EXPECT_EQ(to.columns(), 1);
 
-		EXPECT_EQ(to(0, 0), 8);
+		EXPECT_EQ(to(0, 0), 7);
 	}
 
 	TEST(Block, IndicesOverlap_Throw)
