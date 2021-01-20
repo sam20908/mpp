@@ -42,7 +42,7 @@ static void Addition_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		a += b;
+		benchmark::DoNotOptimize(a += b);
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -70,7 +70,7 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		a -= b;
+		benchmark::DoNotOptimize(a -= b);
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -98,7 +98,7 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		a *= scalar;
+		benchmark::DoNotOptimize(a *= scalar);
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -126,7 +126,7 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		a /= scalar;
+		benchmark::DoNotOptimize(a /= scalar);
 	}
 
 	state.counters["Rows"]    = state.range();
