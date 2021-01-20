@@ -144,7 +144,7 @@ namespace matrixpp
 						for (auto row_index = row_begin + 1; row_index < rows; ++row_index)
 						{
 							auto row_begin_index = static_cast<diff_t>(idx_2d_to_1d(columns, row_index, 0));
-							auto row_end_index   = static_cast<diff_t>(column_end - 1);
+							auto row_end_index   = static_cast<diff_t>(column_index - 1);
 
 							auto row_begin        = std::next(data.begin(), row_begin_index);
 							auto left_element_it  = std::next(row_begin, row_end_index);
