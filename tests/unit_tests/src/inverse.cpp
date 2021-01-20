@@ -39,4 +39,15 @@ namespace
 		EXPECT_FLOAT_EQ(inverse(2, 1), -41.F / 6.F);
 		EXPECT_FLOAT_EQ(inverse(2, 2), 16.F / 3.F);
 	}
+
+	TEST(Inverse, 0x0_FullyStatic_Edgecase)
+	{
+		auto matrix  = matrixpp::matrix<int, 0, 0>{};
+		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+
+		EXPECT_EQ(inverse.rows_extent(), 1);
+		EXPECT_EQ(inverse.columns_extent(), 1);
+
+		EXPECT_FLOAT_EQ(inverse(0, 0), 1.F);
+	}
 } // namespace
