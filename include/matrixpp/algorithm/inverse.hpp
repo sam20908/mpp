@@ -41,7 +41,7 @@ namespace matrixpp
 		{
 			if (rows == 0)
 			{
-				result[0] = static_cast<Precision>(data[0]);
+				result[0] = static_cast<Precision>(1);
 			}
 			else if (rows == 1)
 			{
@@ -201,16 +201,20 @@ namespace matrixpp
 			auto inv               = inverse_matrix_t{};
 			auto det               = detail::det_impl<To>(buf_copy, rows, cols, 0, cols - 1);
 
+			// Avoid using singular here because that'd cause another determinant calculation
 			if (det == static_cast<To>(0))
 			{
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
 
 			auto inv_buf = typename inverse_matrix_t::buffer_type{};
-			detail::allocate_1d_buf_if_vector(inv_buf, rows, cols);
+
+			// Allocate 1x1 for 0x0 matrix, because inverse of 0x0 matrix is 1
+			auto inv_buf_nxn = rows > 0 ? rows : std::size_t{ 1 };
+			detail::allocate_1d_buf_if_vector(inv_buf, inv_buf_nxn, inv_buf_nxn);
 
 			detail::inv_impl<To>(inv_buf, buf_copy, rows, cols, det);
-			detail::init_matrix_base_with_1d_rng(inv, std::move(inv_buf), rows, cols);
+			detail::init_matrix_base_with_1d_rng(inv, std::move(inv_buf), inv_buf_nxn, inv_buf_nxn);
 
 			return inv;
 		}

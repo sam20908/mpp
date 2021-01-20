@@ -18,40 +18,20 @@
  */
 
 #include <benchmark/benchmark.h>
-#include <matrixpp/algorithm/determinant.hpp>
-#include <matrixpp/matrix.hpp>
-#include <utility>
+#include <matrixpp/matrix/fully_dynamic.hpp>
 
-static void determinant_5x5(benchmark::State& state)
+// Benchmarking any other matrices (at least one side has compile time specified extent)
+// isn't viable because no functionality is provided to access the range at compile time
+
+static void Initialization_Fill(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int, 5, 5>{ 125 };
-
 	for (auto _ : state)
 	{
-		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
+		(void)matrixpp::matrix<int>{ state.range(), state.range(), 0 };
 	}
+
+	state.counters["Rows"]    = state.range();
+	state.counters["Columns"] = state.range();
 }
 
-static void determinant_10x10(benchmark::State& state)
-{
-	auto a = matrixpp::matrix<int, 10, 10>{ 125 };
-
-	for (auto _ : state)
-	{
-		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
-	}
-}
-
-static void determinant_100x100(benchmark::State& state)
-{
-	auto a = matrixpp::matrix<int, 100, 100>{ 125 };
-
-	for (auto _ : state)
-	{
-		(void)matrixpp::determinant(std::type_identity<long double>{}, a);
-	}
-}
-
-BENCHMARK(determinant_5x5);
-BENCHMARK(determinant_10x10);
-// BENCHMARK(determinant_100x100);
+BENCHMARK(Initialization_Fill)->RangeMultiplier(2)->Range(8, 8 << 10);

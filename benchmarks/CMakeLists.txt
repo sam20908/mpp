@@ -24,7 +24,7 @@ set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark b
 add_executable("benchmark")
 _setup_target("benchmark" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
 
-function(_create_performance_test TEST_FILE)
+function(_create_benchmark TEST_FILE)
     set(TEST_NAME "${TEST_FILE}_benchmark")
     set(TEST_SOURCE "src/${TEST_FILE}.cpp")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
@@ -34,5 +34,7 @@ function(_create_performance_test TEST_FILE)
     target_sources("benchmark" PRIVATE "${TEST_SOURCE}")
 endfunction()
 
-_create_performance_test("determinant")
-_create_performance_test("inverse")
+_create_benchmark("algorithms")
+_create_benchmark("operations")
+_create_benchmark("initialization")
+_create_benchmark("utilities")

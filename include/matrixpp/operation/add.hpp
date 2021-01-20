@@ -72,7 +72,7 @@ namespace matrixpp
 		detail::validate_matrices_same_size(left, right);
 
 		auto rows = left.rows();
-		auto cols = left.cols();
+		auto cols = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)
 		{

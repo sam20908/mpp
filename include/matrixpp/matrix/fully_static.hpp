@@ -70,31 +70,15 @@ namespace matrixpp
 			base::init_buf_2d_static(arr_2d, RowsExtent, ColumnsExtent);
 		}
 
-		template<typename Expr>
-		constexpr explicit matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>& expr)
-		{
-			// Overload which avoids dimension checking because the expression object's extents
-			// are constrained to be the same extent
-
-			base::_rows = expr.rows();
-			base::_cols = expr.columns();
-			auto idx    = std::size_t{ 0 };
-
-			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
-			{
-				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
-				{
-					base::_buf[idx++] = expr(row, col);
-				}
-			}
-		}
-
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		constexpr explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr)
 		{
-			if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
+			if constexpr (RowsExtent != ExprRowsExtent || ColumnsExtent != ExprColumnsExtent)
 			{
-				throw std::runtime_error("Dimensions of expression object doesn't match provided extents!");
+				if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
+				{
+					throw std::runtime_error("Dimensions of expression object doesn't match provided extents!");
+				}
 			}
 
 			base::_rows = expr.rows();
