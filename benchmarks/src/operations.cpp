@@ -26,9 +26,13 @@ static void Addition(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix{ a + b };
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
+		benchmark::DoNotOptimize(matrixpp::matrix{ a + b });
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -40,6 +44,7 @@ static void Addition_CompoundAssign(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
@@ -57,9 +62,13 @@ static void Subtraction(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix{ a - b };
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
+		benchmark::DoNotOptimize(matrixpp::matrix{ a - b });
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -71,6 +80,7 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
@@ -88,9 +98,13 @@ static void Multiplication_Scalar(benchmark::State& state)
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto scalar = 1;
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix{ a * scalar };
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(scalar);
+		benchmark::DoNotOptimize(matrixpp::matrix{ a * scalar });
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -102,6 +116,7 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto scalar = 1;
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
@@ -119,9 +134,13 @@ static void Division_Scalar(benchmark::State& state)
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto scalar = 1;
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix{ a / scalar };
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(scalar);
+		benchmark::DoNotOptimize(matrixpp::matrix{ a / scalar });
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -133,6 +152,7 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto scalar = 1;
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
@@ -150,9 +170,13 @@ static void Multiplication_Matrix(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix{ a * b };
+		benchmark::DoNotOptimize(a);
+		benchmark::DoNotOptimize(b);
+		benchmark::DoNotOptimize(matrixpp::matrix{ a * b });
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();

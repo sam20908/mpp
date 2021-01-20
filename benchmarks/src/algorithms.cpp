@@ -48,10 +48,13 @@ static void Determinant(benchmark::State& state)
 {
 	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(matrix);
 		// Use long double to ensure no overflow or underflow
-		(void)matrixpp::determinant(std::type_identity<long double>{}, matrix);
+		benchmark::DoNotOptimize(matrixpp::determinant(std::type_identity<long double>{}, matrix));
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -68,10 +71,13 @@ static void Inverse(benchmark::State& state)
 		fill_matrix_with_random_values(matrix);
 	}
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
+		benchmark::DoNotOptimize(matrix);
 		// Use long double to ensure no overflow or underflow
-		(void)matrixpp::inverse(std::type_identity<long double>{}, matrix);
+		benchmark::DoNotOptimize(matrixpp::inverse(std::type_identity<long double>{}, matrix));
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -81,13 +87,15 @@ static void Inverse(benchmark::State& state)
 static void Block(benchmark::State& state)
 {
 	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
+	auto n      = state.range() == 0 ? 0 : state.range() - 1; // avoid out of range on reaching max size
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		// -1 is for avoiding out of range on reaching max size
-		auto n = state.range() == 0 ? 0 : state.range() - 1;
-
-		(void)matrixpp::block(matrix, 0, 0, n, n);
+		benchmark::DoNotOptimize(matrix);
+		benchmark::DoNotOptimize(n);
+		benchmark::DoNotOptimize(matrixpp::block(matrix, 0, 0, n, n));
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -98,9 +106,12 @@ static void Transpose(benchmark::State& state)
 {
 	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 0 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::transpose(matrix);
+		benchmark::DoNotOptimize(matrix);
+		benchmark::DoNotOptimize(matrixpp::transpose(matrix));
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();

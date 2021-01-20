@@ -27,9 +27,12 @@ static void Cast(benchmark::State& state)
 {
 	auto matrix = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::cast(std::type_identity<long double>{}, matrix);
+		benchmark::DoNotOptimize(matrix);
+		benchmark::DoNotOptimize(matrixpp::cast(std::type_identity<long double>{}, matrix));
+		benchmark::ClobberMemory();
 	}
 
 	state.counters["Rows"]    = state.range();
@@ -41,6 +44,7 @@ static void Equal(benchmark::State& state)
 	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
 
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
