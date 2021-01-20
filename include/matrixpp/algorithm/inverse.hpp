@@ -75,13 +75,15 @@ namespace matrixpp
 				* to the rows as well
 				*/
 
+				using diff_t = typename std::decay_t<decltype(data)>::difference_type;
+
 				// First step: Compute matrix of minors
 
 				for (auto row_index = std::size_t{ 0 }; row_index < rows; ++row_index)
 				{
-					if (row_index == 0)
+					if (row_index == static_cast<std::size_t>(0))
 					{
-						auto second_row_first_element_it = std::next(data.begin(), columns);
+						auto second_row_first_element_it = std::next(data.begin(), static_cast<diff_t>(columns));
 
 						std::ranges::rotate(data, second_row_first_element_it);
 					}
@@ -90,11 +92,11 @@ namespace matrixpp
 						auto row_n_begin_index    = (row_index - 1) * columns;
 						auto last_row_begin_index = (columns - 1) * columns;
 
-						auto row_n_begin    = std::next(data.begin(), row_n_begin_index);
-						auto last_row_begin = std::next(data.begin(), last_row_begin_index);
+						auto row_n_begin    = std::next(data.begin(), static_cast<diff_t>(row_n_begin_index));
+						auto last_row_begin = std::next(data.begin(), static_cast<diff_t>(last_row_begin_index));
 
-						auto row_n    = std::views::counted(row_n_begin, columns);
-						auto last_row = std::views::counted(last_row_begin, columns);
+						auto row_n    = std::views::counted(row_n_begin, static_cast<diff_t>(columns));
+						auto last_row = std::views::counted(last_row_begin, static_cast<diff_t>(columns));
 
 						std::ranges::swap_ranges(row_n, last_row);
 					}
@@ -107,8 +109,9 @@ namespace matrixpp
 							{
 								auto minor_row_begin_index = idx_2d_to_1d(columns, minor_row_index, 0);
 
-								auto minor_row_begin          = std::next(data.begin(), minor_row_begin_index);
-								auto minor_row                = std::views::counted(minor_row_begin, columns);
+								auto minor_row_begin =
+									std::next(data.begin(), static_cast<diff_t>(minor_row_begin_index));
+								auto minor_row = std::views::counted(minor_row_begin, static_cast<diff_t>(columns));
 								auto minor_row_second_element = std::next(minor_row_begin, 1);
 
 								std::ranges::rotate(minor_row, minor_row_second_element);
@@ -120,9 +123,12 @@ namespace matrixpp
 							{
 								auto minor_row_begin_index = idx_2d_to_1d(columns, minor_row_index, 0);
 
-								auto minor_row_begin        = std::next(data.begin(), minor_row_begin_index);
-								auto minor_left_element_it  = std::next(minor_row_begin, column_index - 1);
-								auto minor_right_element_it = std::next(minor_row_begin, columns - 1);
+								auto minor_row_begin =
+									std::next(data.begin(), static_cast<diff_t>(minor_row_begin_index));
+								auto minor_left_element_it =
+									std::next(minor_row_begin, static_cast<diff_t>(column_index - 1));
+								auto minor_right_element_it =
+									std::next(minor_row_begin, static_cast<diff_t>(columns - 1));
 
 								std::iter_swap(minor_left_element_it, minor_right_element_it);
 							}
@@ -156,8 +162,8 @@ namespace matrixpp
 						auto upper_element_index = idx_2d_to_1d(columns, row_index, column_index);
 						auto lower_element_index = idx_2d_to_1d(columns, column_index, row_index);
 
-						auto upper_element_it = std::next(result.begin(), upper_element_index);
-						auto lower_element_it = std::next(result.begin(), lower_element_index);
+						auto upper_element_it = std::next(result.begin(), static_cast<diff_t>(upper_element_index));
+						auto lower_element_it = std::next(result.begin(), static_cast<diff_t>(lower_element_index));
 
 						std::iter_swap(upper_element_it, lower_element_it);
 					}

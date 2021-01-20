@@ -23,8 +23,10 @@
 
 static void Addition(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -35,14 +37,16 @@ static void Addition(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Addition_CompoundAssign(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -53,14 +57,16 @@ static void Addition_CompoundAssign(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Subtraction(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -71,14 +77,16 @@ static void Subtraction(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Subtraction_CompoundAssign(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -89,13 +97,14 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Multiplication_Scalar(benchmark::State& state)
 {
-	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -107,13 +116,14 @@ static void Multiplication_Scalar(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 {
-	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -125,13 +135,14 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Division_Scalar(benchmark::State& state)
 {
-	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -143,13 +154,14 @@ static void Division_Scalar(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Division_Scalar_CompoundAssign(benchmark::State& state)
 {
-	auto a      = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -161,14 +173,16 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 static void Multiplication_Matrix(benchmark::State& state)
 {
-	auto a = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
-	auto b = matrixpp::matrix<int>{ state.range(), state.range(), 125 };
+	auto a =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b =
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -179,8 +193,8 @@ static void Multiplication_Matrix(benchmark::State& state)
 		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 BENCHMARK(Addition)->RangeMultiplier(2)->Range(8, 8 << 10);

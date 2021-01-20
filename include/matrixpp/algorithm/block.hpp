@@ -86,12 +86,14 @@ namespace matrixpp
 
 			block_buf.reserve(block_rows * block_cols);
 
+			using diff_t = typename std::decay_t<decltype(obj.buffer())>::difference_type;
+
 			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
 			{
-				auto row_begin_idx = detail::idx_2d_to_1d(cols, row, top_column_idx);
+				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(cols, row, top_column_idx));
 				auto row_begin     = std::next(obj_begin, row_begin_idx);
 
-				std::ranges::copy_n(row_begin, block_cols, std::back_inserter(block_buf));
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), std::back_inserter(block_buf));
 			}
 
 			detail::init_matrix_base_with_1d_rng(block_matrix, block_buf, block_rows, block_cols);

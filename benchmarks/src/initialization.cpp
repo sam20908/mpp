@@ -25,13 +25,17 @@
 
 static void Initialization_Fill(benchmark::State& state)
 {
+	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		(void)matrixpp::matrix<int>{ state.range(), state.range(), 0 };
+		benchmark::DoNotOptimize(matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()),
+			static_cast<std::size_t>(state.range()),
+			0 });
+		benchmark::ClobberMemory();
 	}
 
-	state.counters["Rows"]    = state.range();
-	state.counters["Columns"] = state.range();
+	state.counters["Rows"]    = static_cast<double>(state.range());
+	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
 BENCHMARK(Initialization_Fill)->RangeMultiplier(2)->Range(8, 8 << 10);

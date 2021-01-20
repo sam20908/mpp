@@ -25,6 +25,7 @@
 #include "../utility/square.hpp"
 
 #include <algorithm>
+#include <iterator>
 #include <ranges>
 #include <utility>
 
@@ -120,16 +121,19 @@ namespace matrixpp
 				* where it should be
 				*/
 
+				using diff_t = typename std::decay_t<decltype(data)>::difference_type;
+
 				for (auto column_index = std::size_t{ 0 }; column_index <= column_end; ++column_index)
 				{
 					if (column_index == 0)
 					{
 						for (auto row_index = row_begin + 1; row_index < rows; ++row_index)
 						{
-							auto row_begin_index = idx_2d_to_1d(columns, row_index, 0);
+							auto row_begin_index = static_cast<diff_t>(idx_2d_to_1d(columns, row_index, 0));
+							auto row_end_index   = static_cast<diff_t>(column_end + 1);
 
 							auto row_begin          = std::next(data.begin(), row_begin_index);
-							auto row                = std::views::counted(row_begin, column_end + 1);
+							auto row                = std::views::counted(row_begin, row_end_index);
 							auto row_second_element = std::next(row_begin, 1);
 
 							std::ranges::rotate(row, row_second_element);
@@ -139,11 +143,12 @@ namespace matrixpp
 					{
 						for (auto row_index = row_begin + 1; row_index < rows; ++row_index)
 						{
-							auto row_begin_index = idx_2d_to_1d(columns, row_index, 0);
+							auto row_begin_index = static_cast<diff_t>(idx_2d_to_1d(columns, row_index, 0));
+							auto row_end_index   = static_cast<diff_t>(column_index - 1);
 
 							auto row_begin        = std::next(data.begin(), row_begin_index);
-							auto left_element_it  = std::next(row_begin, column_index - 1);
-							auto right_element_it = std::next(row_begin, column_end);
+							auto left_element_it  = std::next(row_begin, row_end_index);
+							auto right_element_it = std::next(row_begin, static_cast<diff_t>(column_end));
 
 							std::iter_swap(left_element_it, right_element_it);
 						}
