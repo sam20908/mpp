@@ -43,7 +43,7 @@ static void Equal(benchmark::State& state)
 
 	for (auto _ : state)
 	{
-		(void)(a == b);
+		benchmark::DoNotOptimize(a == b);
 	}
 
 	state.counters["Rows"]    = state.range();
