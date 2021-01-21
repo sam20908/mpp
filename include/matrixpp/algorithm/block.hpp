@@ -105,7 +105,7 @@ namespace matrixpp
 		[[nodiscard]] constexpr auto operator()(Args&&... args) const
 			-> detail::tag_invoke_impl::tag_invoke_result_t<block_t, Args...>
 		{
-			return tag_invoke(*this, std::forward<Args>(args)...);
+			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
 	};
 
