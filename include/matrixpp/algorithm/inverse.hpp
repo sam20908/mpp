@@ -25,13 +25,20 @@
 #include "determinant.hpp"
 
 #include <algorithm>
-#include <bits/ranges_algo.h>
 #include <ranges>
+#include <type_traits>
 
 namespace matrixpp
 {
 	namespace detail
 	{
+		// Special helper to catch special case of inverse of 0x0 fully static matrices
+		// which should still be a 1x1 matrix
+		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		using inv_t = std::conditional_t<RowsExtent == 0 && ColumnsExtent == 0,
+			matrix<To, 1, 1>,
+			matrix<To, RowsExtent, ColumnsExtent>>;
+
 		template<typename Precision>
 		inline void inv_impl(auto& result,
 			auto& data,
@@ -203,7 +210,7 @@ namespace matrixpp
 			auto cols     = obj.columns();
 			auto buf_copy = obj.buffer();
 
-			using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
+			using inverse_matrix_t = inv_t<To, RowsExtent, ColumnsExtent>;
 			auto inv               = inverse_matrix_t{};
 			auto det               = detail::det_impl<To>(buf_copy, rows, cols, 0, cols - 1);
 
@@ -230,7 +237,7 @@ namespace matrixpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<Value, RowsExtent, ColumnsExtent>
+			-> detail::inv_t<Value, RowsExtent, ColumnsExtent>
 		{
 			return detail::inv_func<Value>(obj);
 		}
@@ -238,7 +245,7 @@ namespace matrixpp
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t,
 			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> detail::inv_t<To, RowsExtent, ColumnsExtent>
 		{
 			return detail::inv_func<To>(obj);
 		}
