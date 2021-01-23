@@ -29,8 +29,8 @@
 namespace
 {
 	// Benchmark limit without hanging (UB?)
-	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 13;
-	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 11;
+	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 512;
+	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 512;
 
 	static inline auto random_device       = std::random_device{};
 	static inline auto random_engine       = std::mt19937{ random_device() };
@@ -126,7 +126,7 @@ static void Transpose(benchmark::State& state)
 	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
-BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 1);
-BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 1);
+BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 16);
+BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 16);
 BENCHMARK(Block)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Transpose)->RangeMultiplier(2)->Range(8, 8 << 10);
