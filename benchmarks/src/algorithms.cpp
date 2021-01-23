@@ -35,13 +35,6 @@ namespace
 	static inline auto random_device       = std::random_device{};
 	static inline auto random_engine       = std::mt19937{ random_device() };
 	static inline auto random_distribution = std::uniform_int_distribution{ 1, 50 };
-
-	void fill_matrix_with_random_values(auto& matrix)
-	{
-		std::ranges::transform(matrix, matrix.begin(), [](auto) {
-			return random_distribution(random_engine);
-		});
-	}
 } // namespace
 
 static void Determinant(benchmark::State& state)
@@ -65,13 +58,7 @@ static void Determinant(benchmark::State& state)
 static void Inverse(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
-	fill_matrix_with_random_values(matrix); // Initial fill, possibly non-singular first try
-
-	while (matrixpp::singular(matrix))
-	{
-		fill_matrix_with_random_values(matrix);
-	}
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
