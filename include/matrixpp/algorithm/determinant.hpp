@@ -59,14 +59,14 @@ namespace matrixpp
 
 			// Store U as floating time to allow accurate determinant
 			// long double is used to avoid overflow and underflow as much as possible
-			using lu_decomp_matrix_t = matrix<long double, RowsExtent, ColumnsExtent>;
+			using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
 			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
 			using lu_decomp_diff_t   = typename lu_decomp_matrix_t::difference_type;
 
 			auto u_buf = lu_decomp_buf_t{};
 
 			allocate_1d_buf_if_vector(u_buf, rows, cols);
-			std::ranges::copy(u_buf, u_buf.begin());
+			std::ranges::copy(obj, u_buf.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U)
 			// Since det(L) is always 1, we can avoid creating L entirely
