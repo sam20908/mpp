@@ -32,6 +32,12 @@
 
 namespace matrixpp
 {
+	struct identity_matrix_tag
+	{
+	};
+
+	inline constexpr auto identity_matrix = identity_matrix_tag{};
+
 	template<detail::arithmetic Value,
 		std::size_t RowsExtent    = detail::tag_invoke_cpo(matrix_rows_extent_tag{}, customize::customize_tag{}),
 		std::size_t ColumnsExtent = detail::tag_invoke_cpo(matrix_columns_extent_tag{}, customize::customize_tag{})>

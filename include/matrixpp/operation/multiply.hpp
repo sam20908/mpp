@@ -37,7 +37,7 @@ namespace matrixpp
 			return left(row_idx, col_idx) * right;
 		});
 		using mul_op_t          = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
-            using result_t = typename std::remove_cvref_t<decltype(left)>::value_type;
+            using result_t = typename std::decay_t<decltype(left)>::value_type;
 
             auto left_cols = left.columns();
             auto result    = result_t{ 0 };

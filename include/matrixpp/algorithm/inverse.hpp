@@ -19,10 +19,11 @@
 
 #pragma once
 
+#include "../detail/algo_types.hpp"
 #include "../detail/matrix_base.hpp"
+#include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
-#include "determinant.hpp"
 
 #include <algorithm>
 #include <ranges>
@@ -39,197 +40,190 @@ namespace matrixpp
 			matrix<To, 1, 1>,
 			matrix<To, RowsExtent, ColumnsExtent>>;
 
-		template<typename Precision>
-		inline void inv_impl(auto& result,
-			auto& data,
-			std::size_t rows,
-			std::size_t columns,
-			Precision determinant) // @TODO: ISSUE #20
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> inv_t<To, RowsExtent, ColumnsExtent>
 		{
+			const auto rows = obj.rows();
+			const auto cols = obj.columns();
+			auto det        = lu_decomp_value_t{ 0 };
+
+			// Handle special cases - compute determinant without LU Decomposition
 			if (rows == 0)
 			{
-				result[0] = static_cast<Precision>(1);
+				det = lu_decomp_value_t{ 1 };
 			}
 			else if (rows == 1)
 			{
-				result[0] = static_cast<Precision>(1) / static_cast<Precision>(data[0]);
+				det = static_cast<lu_decomp_value_t>(obj(0, 0));
 			}
 			else if (rows == 2)
 			{
-				auto element_1 = static_cast<Precision>(data[3]);
-				auto element_2 = static_cast<Precision>(data[1]) * -1;
-				auto element_3 = static_cast<Precision>(data[2]) * -1;
-				auto element_4 = static_cast<Precision>(data[0]);
+				const auto ad = static_cast<lu_decomp_value_t>(obj(0, 0)) * static_cast<lu_decomp_value_t>(obj(1, 1));
+				const auto bc = static_cast<lu_decomp_value_t>(obj(0, 1)) * static_cast<lu_decomp_value_t>(obj(1, 0));
 
-				result[0] = element_1;
-				result[1] = element_2;
-				result[2] = element_3;
-				result[3] = element_4;
+				det = ad - bc;
+			}
 
-				auto multiplier = static_cast<Precision>(1) / determinant;
+			// Early singular check for 2x2 and below matrices to avoid computing
+			// LU Decomposition if possible
+			if (rows < 3 && static_cast<To>(det) == To{ 0 })
+			{
+				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+			}
 
-				std::ranges::transform(result, result.begin(), std::bind_front(std::multiplies<>{}, multiplier));
+			using inv_matrix_t       = inv_t<To, RowsExtent, ColumnsExtent>;
+			using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
+			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
+			using lu_decomp_diff_t   = typename lu_decomp_matrix_t::difference_type;
+
+			auto inv_matrix     = inv_matrix_t{};
+			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
+			const auto n        = rows == 0 ? 1 : rows; // Handle 0x0 inverse case
+			allocate_1d_buf_if_vector(inv_matrix_buf, n, n);
+
+			auto l_buf = lu_decomp_buf_t{};
+			auto u_buf = lu_decomp_buf_t{};
+
+			allocate_1d_buf_if_vector(u_buf, rows, cols);
+			std::ranges::copy(obj, u_buf.begin());
+
+			allocate_1d_buf_if_vector(l_buf, rows, cols);
+			transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
+
+			// While computing LU Decomposition, we can compute the determinant,
+			// inv(L), and U at the same time
+			// The determinant is needed to evaluate the singularity of 3x3
+			// and bigger matrices
+			det = To{ 1 };
+			for (auto row = std::size_t{ 0 }; row < rows; ++row)
+			{
+				const auto begin_idx = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, std::size_t{ 0 }));
+				const auto end_idx   = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, cols));
+
+				auto begin = std::next(u_buf.begin(), begin_idx);
+				auto end   = std::next(u_buf.begin(), end_idx);
+
+				for (auto col = std::size_t{ 0 }; col < row; ++col)
+				{
+					// This allows us to keep track of the row of the factor
+					// later on without having to manually calculate from indexes
+					auto factor_idx = idx_2d_to_1d(cols, col, col);
+
+					const auto elem_idx = idx_2d_to_1d(cols, row, col);
+					const auto factor   = u_buf[elem_idx] / u_buf[factor_idx] * -1;
+
+					std::ranges::transform(begin, end, begin, [factor, factor_idx, &u_buf](auto elem) mutable {
+						return factor * u_buf[factor_idx++] + elem;
+					});
+
+					// L stores the opposite (opposite sign) of the factors used for
+					// U in the corresponding location, but since inv(A) equals
+					// the opposite sign of the non-pivot (diagnal elements) elements,
+					// we can directly compute the inverse by not changing the sign of
+					// the factor
+					l_buf[elem_idx] = factor;
+
+					++begin;
+				}
+
+				const auto pivot_idx = idx_2d_to_1d(cols, row, row);
+				det *= u_buf[pivot_idx];
+			}
+
+			if (rows >= 3 && static_cast<To>(det) == To{ 0 })
+			{
+				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+			}
+
+			// Handle special cases - avoid LU inverse multiplication
+			if (rows == 0)
+			{
+				inv_matrix_buf[0] = To{ 1 };
+			}
+			else if (rows == 1)
+			{
+				inv_matrix_buf[0] = To{ 1 } / static_cast<To>(obj(0, 0));
+			}
+			else if (rows == 2)
+			{
+				const auto element_1 = static_cast<To>(obj(1, 1));
+				const auto element_2 = static_cast<To>(obj(0, 1)) * -1;
+				const auto element_3 = static_cast<To>(obj(1, 0)) * -1;
+				const auto element_4 = static_cast<To>(obj(0, 0));
+
+				inv_matrix_buf[0] = element_1;
+				inv_matrix_buf[1] = element_2;
+				inv_matrix_buf[2] = element_3;
+				inv_matrix_buf[3] = element_4;
+
+				const auto multiplier = To{ 1 } / static_cast<To>(det);
+				std::ranges::transform(inv_matrix_buf,
+					inv_matrix_buf.begin(),
+					std::bind_front(std::multiplies<>{}, multiplier));
 			}
 			else
 			{
-				/**
-				* The swapping and rotating logic works a lot like `determinant_impl`'s
-				* logic, except that we put the minor matrix at the top left corner and
-				* call `determinant_impl` to calucate the determinant of that minor matrix.
-				* We do this because We ignore the values on the current row and column
-				*
-				* We use the same way to rotate and swap the columns, except that we do it
-				* to the rows as well
-				*/
-
-				using diff_t = typename std::decay_t<decltype(data)>::difference_type;
-
-				// First step: Compute matrix of minors
-
-				for (auto row_index = std::size_t{ 0 }; row_index < rows; ++row_index)
+				// Compute inverse of U directly on the same buffer
+				for (auto col = cols; col > 0; --col)
 				{
-					if (row_index == static_cast<std::size_t>(0))
+					// This is used to nagivate across the row where the diagnoal element
+					// is
+					auto elem_idx = idx_2d_to_1d(cols, col - 1, col - 1);
+
+					const auto elem   = u_buf[elem_idx];
+					const auto factor = lu_decomp_value_t{ 1 } / elem;
+
+					u_buf[elem_idx] = factor;
+					for (auto idx = cols; idx > col; --idx)
 					{
-						auto second_row_first_element_it = std::next(data.begin(), static_cast<diff_t>(columns));
-
-						std::ranges::rotate(data, second_row_first_element_it);
-					}
-					else
-					{
-						auto row_n_begin_index    = (row_index - 1) * columns;
-						auto last_row_begin_index = (columns - 1) * columns;
-
-						auto row_n_begin    = std::next(data.begin(), static_cast<diff_t>(row_n_begin_index));
-						auto last_row_begin = std::next(data.begin(), static_cast<diff_t>(last_row_begin_index));
-
-						auto row_n    = std::views::counted(row_n_begin, static_cast<diff_t>(columns));
-						auto last_row = std::views::counted(last_row_begin, static_cast<diff_t>(columns));
-
-						std::ranges::swap_ranges(row_n, last_row);
+						u_buf[++elem_idx] *= factor;
 					}
 
-					for (auto column_index = std::size_t{ 0 }; column_index < columns; ++column_index)
+					for (auto row = col - 1; row > 0; --row)
 					{
-						if (column_index == 0)
+						const auto cur_elem_idx        = idx_2d_to_1d(cols, row - 1, col - 1);
+						const auto factor_row_elem_idx = idx_2d_to_1d(cols, col - 1, col - 1);
+						const auto cur_elem            = u_buf[cur_elem_idx];
+						const auto cur_factor          = cur_elem * -1;
+
+						u_buf[cur_elem_idx] = cur_factor * u_buf[factor_row_elem_idx];
+					}
+
+					for (auto col_2 = cols; col_2 > col; --col_2)
+					{
+						for (auto row = col - 1; row > 0; --row)
 						{
-							for (auto minor_row_index = std::size_t{ 0 }; minor_row_index < rows - 1; ++minor_row_index)
-							{
-								auto minor_row_begin_index = idx_2d_to_1d(columns, minor_row_index, 0);
+							const auto cur_elem_idx = idx_2d_to_1d(cols, row - 1, col_2 - 1);
+							const auto row_idx      = idx_2d_to_1d(cols, col - 1, col_2 - 1);
+							const auto factor_idx   = idx_2d_to_1d(cols, row - 1, col - 1);
 
-								auto minor_row_begin =
-									std::next(data.begin(), static_cast<diff_t>(minor_row_begin_index));
-								auto minor_row = std::views::counted(minor_row_begin, static_cast<diff_t>(columns));
-								auto minor_row_second_element = std::next(minor_row_begin, 1);
+							const auto factor     = u_buf[factor_idx];
+							const auto cur_elem   = u_buf[cur_elem_idx];
+							const auto cur_factor = factor * -1;
 
-								std::ranges::rotate(minor_row, minor_row_second_element);
-							}
+							u_buf[cur_elem_idx] = cur_factor * u_buf[row_idx] + cur_elem;
 						}
-						else
-						{
-							for (auto minor_row_index = std::size_t{ 0 }; minor_row_index < rows - 1; ++minor_row_index)
-							{
-								auto minor_row_begin_index = idx_2d_to_1d(columns, minor_row_index, 0);
-
-								auto minor_row_begin =
-									std::next(data.begin(), static_cast<diff_t>(minor_row_begin_index));
-								auto minor_left_element_it =
-									std::next(minor_row_begin, static_cast<diff_t>(column_index - 1));
-								auto minor_right_element_it =
-									std::next(minor_row_begin, static_cast<diff_t>(columns - 1));
-
-								std::iter_swap(minor_left_element_it, minor_right_element_it);
-							}
-						}
-
-						auto minor_determinant = det_impl<Precision>(data, rows, columns, 0, columns - 2);
-						auto result_index      = idx_2d_to_1d(columns, row_index, column_index);
-
-						result[result_index] = minor_determinant;
 					}
 				}
 
-				// Second step: Apply a "checkerboard" pattern to the matrix of minors
-
-				std::ranges::for_each(result, [sign = static_cast<Precision>(1)](auto& element) mutable {
-					element *= sign;
-					sign *= -1;
-				});
-
-				// Third step: Transpose the matrix of cofactors to its adjugate
-
-				for (auto row_index = std::size_t{ 0 }; row_index < rows; ++row_index)
-				{
-					for (auto column_index = std::size_t{ 0 }; column_index < row_index + 1; ++column_index)
-					{
-						if (row_index == column_index)
-						{
-							continue;
-						}
-
-						auto upper_element_index = idx_2d_to_1d(columns, row_index, column_index);
-						auto lower_element_index = idx_2d_to_1d(columns, column_index, row_index);
-
-						auto upper_element_it = std::next(result.begin(), static_cast<diff_t>(upper_element_index));
-						auto lower_element_it = std::next(result.begin(), static_cast<diff_t>(lower_element_index));
-
-						std::iter_swap(upper_element_it, lower_element_it);
-					}
-				}
-
-				// Final step: Multiply by 1 / determinant of the original matrix
-
-				// We already obtained the determinant when we calculated the matrix of
-				// cofactors
-
-				auto determinant = static_cast<Precision>(0);
-
-				for (auto row_index = std::size_t{ 0 }; row_index < rows; ++row_index)
-				{
-					// The cofactors has been flipped by the previous step
-					auto cofactor_index = idx_2d_to_1d(columns, row_index, 0);
-
-					determinant += result[cofactor_index] * static_cast<Precision>(data[row_index]);
-				}
-
-				auto multiplier = static_cast<Precision>(1) / determinant;
-
-				std::ranges::transform(result, result.begin(), std::bind_front(std::multiplies<>{}, multiplier));
+				mul_square_bufs<To>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
+
+			init_matrix_base_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), n, n);
+			return inv_matrix;
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline decltype(auto) inv_func(
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) // @TODO: ISSUE #20
+		[[nodiscard]] inline auto inv_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> inv_t<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			if (!square(obj))
 			{
 				throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
 			}
 
-			auto rows     = obj.rows();
-			auto cols     = obj.columns();
-			auto buf_copy = obj.buffer();
-
-			using inverse_matrix_t = inv_t<To, RowsExtent, ColumnsExtent>;
-			auto inv               = inverse_matrix_t{};
-			auto det               = detail::det_impl<To>(buf_copy, rows, cols, 0, cols - 1);
-
-			// Avoid using singular here because that'd cause another determinant calculation
-			if (det == static_cast<To>(0))
-			{
-				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
-			}
-
-			auto inv_buf = typename inverse_matrix_t::buffer_type{};
-
-			// Allocate 1x1 for 0x0 matrix, because inverse of 0x0 matrix is 1
-			auto inv_buf_nxn = rows > 0 ? rows : std::size_t{ 1 };
-			detail::allocate_1d_buf_if_vector(inv_buf, inv_buf_nxn, inv_buf_nxn);
-
-			detail::inv_impl<To>(inv_buf, buf_copy, rows, cols, det);
-			detail::init_matrix_base_with_1d_rng(inv, std::move(inv_buf), inv_buf_nxn, inv_buf_nxn);
-
-			return inv;
+			return inv_lu_decomp<To>(obj);
 		}
 	} // namespace detail
 

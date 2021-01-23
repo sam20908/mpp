@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "utility.hpp"
-
 #include <concepts>
 #include <ranges>
 #include <span>
@@ -33,6 +31,9 @@ namespace matrixpp::detail
 
 	template<typename Range>
 	concept range_arithmetic = arithmetic<std::ranges::range_value_t<Range>>;
+
+	template<typename Range>
+	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
 	template<typename Range>
 	concept range_2d_arithmetic = arithmetic<range_2d_t<Range>>;

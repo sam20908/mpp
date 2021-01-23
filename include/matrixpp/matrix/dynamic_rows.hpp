@@ -100,5 +100,10 @@ namespace matrixpp
 			detail::allocate_1d_buf_if_vector(base::_buf, rows, ColumnsExtent);
 			std::ranges::fill(base::_buf, value);
 		}
+
+		matrix(std::size_t rows, identity_matrix_tag)
+		{
+			base::init_identity(rows, ColumnsExtent);
+		}
 	};
 } // namespace matrixpp

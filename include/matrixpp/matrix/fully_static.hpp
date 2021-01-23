@@ -37,7 +37,7 @@ namespace matrixpp
 	public:
 		using base::base;
 
-		constexpr explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d)
+		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
 
@@ -49,7 +49,7 @@ namespace matrixpp
 			base::init_buf_2d_static(init_2d, rows, cols);
 		}
 
-		constexpr explicit matrix(detail::range_2d_with_type<Value> auto&& rng_2d)
+		explicit matrix(detail::range_2d_with_type<Value> auto&& rng_2d) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
@@ -62,7 +62,7 @@ namespace matrixpp
 			base::init_buf_2d_static(std::forward<decayed_rng_2d_t>(rng_2d), rows, cols);
 		}
 
-		constexpr explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d)
+		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20
 		{
 			// We can ignore checking for same dimensions because the dimensions of the parameter uses the
 			// extent template parameters, which means they'll always be the same
@@ -71,7 +71,8 @@ namespace matrixpp
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
-		constexpr explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr)
+		explicit matrix(
+			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
 			if constexpr (RowsExtent != ExprRowsExtent || ColumnsExtent != ExprColumnsExtent)
 			{
@@ -94,9 +95,14 @@ namespace matrixpp
 			}
 		}
 
-		constexpr explicit matrix(Value value)
+		explicit matrix(Value value) // @TODO: ISSUE #20
 		{
 			std::ranges::fill(base::_buf, value);
+		}
+
+		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
+		{
+			base::init_identity(RowsExtent, ColumnsExtent);
 		}
 	};
 } // namespace matrixpp

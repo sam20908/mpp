@@ -17,26 +17,10 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
-#include <matrixpp/algorithm/determinant.hpp>
-#include <matrixpp/matrix.hpp>
-#include <utility>
+#pragma once
 
-namespace
+namespace matrixpp::detail
 {
-	TEST(Determinant, 3x3_SameType)
-	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(matrix);
-
-		EXPECT_EQ(det, 6);
-	}
-
-	TEST(Determinant, 3x3_IntToFloat)
-	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
-
-		EXPECT_FLOAT_EQ(det, 6.F);
-	}
-} // namespace
+	// Use long double to avoid overflow and underflow as much as possible
+	using lu_decomp_value_t = long double;
+} // namespace matrixpp::detail

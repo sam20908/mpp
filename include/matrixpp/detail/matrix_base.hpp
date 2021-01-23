@@ -46,7 +46,7 @@ namespace matrixpp::detail
 		std::size_t _rows{ RowsExtent == std::dynamic_extent ? 0 : RowsExtent };
 		std::size_t _cols{ ColumnsExtent == std::dynamic_extent ? 0 : ColumnsExtent };
 
-		constexpr void init_buf_2d_static(auto&& buf_2d, std::size_t rows, std::size_t cols)
+		void init_buf_2d_static(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -76,9 +76,24 @@ namespace matrixpp::detail
 			}
 		}
 
+		void init_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		{
+			if (rows != cols)
+			{
+				throw std::invalid_argument("Identity matrix must be square!");
+			}
+
+			_rows = rows;
+			_cols = columns;
+
+			allocate_1d_buf_if_vector(_buf, rows, cols);
+			transform_1d_buf_into_identity<Value>(_buf, rows);
+		}
+
 	public:
-		using buffer_type = Buffer;
-		using value_type  = Value;
+		using buffer_type     = Buffer;
+		using value_type      = Value;
+		using difference_type = typename buffer_type::difference_type;
 
 		matrix_base() = default; // @TODO: ISSUE #20
 
