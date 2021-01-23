@@ -19,14 +19,11 @@
 
 #pragma once
 
-#include "matrix_def.hpp"
-
 #include <cstddef>
-#include <iterator>
-#include <ranges>
+#include <limits>
 #include <span>
 #include <stdexcept>
-#include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace matrixpp::detail
@@ -139,6 +136,19 @@ namespace matrixpp::detail
 				auto idx = idx_2d_to_1d(n, row, col);
 				buf[idx] = result;
 			}
+		}
+	}
+
+	template<typename T>
+	inline auto accurate_equals(T left, T right) -> bool
+	{
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return (left - right) < std::numeric_limits<T>::epsilon();
+		}
+		else
+		{
+			return left == right;
 		}
 	}
 } // namespace matrixpp::detail

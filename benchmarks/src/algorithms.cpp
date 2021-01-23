@@ -17,13 +17,11 @@
  * under the License.
  */
 
-#include <algorithm>
 #include <benchmark/benchmark.h>
 #include <cstddef>
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
 #include <matrixpp/utility/singular.hpp>
-#include <random>
 #include <utility>
 
 namespace
@@ -31,10 +29,6 @@ namespace
 	// Benchmark limit without hanging (UB?)
 	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 512;
 	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 512;
-
-	static inline auto random_device       = std::random_device{};
-	static inline auto random_engine       = std::mt19937{ random_device() };
-	static inline auto random_distribution = std::uniform_int_distribution{ 1, 50 };
 } // namespace
 
 static void Determinant(benchmark::State& state)

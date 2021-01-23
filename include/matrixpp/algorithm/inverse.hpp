@@ -67,7 +67,7 @@ namespace matrixpp
 
 			// Early singular check for 2x2 and below matrices to avoid computing
 			// LU Decomposition if possible
-			if (rows < 3 && static_cast<To>(det) == To{ 0 })
+			if (rows < 3 && accurate_equals(det, lu_decomp_value_t{ 0 }))
 			{
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
@@ -131,7 +131,7 @@ namespace matrixpp
 				det *= u_buf[pivot_idx];
 			}
 
-			if (rows >= 3 && static_cast<To>(det) == To{ 0 })
+			if (rows >= 3 && accurate_equals(det, lu_decomp_value_t{ 0 }))
 			{
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
