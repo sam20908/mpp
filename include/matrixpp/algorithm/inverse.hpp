@@ -95,7 +95,7 @@ namespace matrixpp
 			// inv(L), and U at the same time
 			// The determinant is needed to evaluate the singularity of 3x3
 			// and bigger matrices
-			det = To{ 1 };
+			det = lu_decomp_value_t{ 1 };
 			for (auto row = std::size_t{ 0 }; row < rows; ++row)
 			{
 				const auto begin_idx = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, std::size_t{ 0 }));
