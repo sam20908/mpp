@@ -111,7 +111,24 @@ namespace matrixpp
 					// the opposite sign of the non-pivot (diagnal elements) elements,
 					// we can directly compute the inverse by not changing the sign of
 					// the factor
-					l_buf[elem_idx] = factor;
+
+					// Account for negative zeros in floating point. Not converting them to
+					// positive will result in incorrect inv(L)
+					if constexpr (std::is_floating_point_v<lu_decomp_value_t>)
+					{
+						if (accurate_equals(factor, lu_decomp_value_t{ 0 }))
+						{
+							l_buf[elem_idx] = 0;
+						}
+						else
+						{
+							l_buf[elem_idx] = factor;
+						}
+					}
+					else
+					{
+						l_buf[elem_idx] = factor;
+					}
 
 					++begin;
 				}
