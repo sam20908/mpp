@@ -141,7 +141,7 @@ namespace matrixpp::detail
 	}
 
 	template<typename T>
-	inline auto accurate_equals(T left, T right) -> bool
+	constexpr auto accurate_equals(T left, T right) -> bool
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
