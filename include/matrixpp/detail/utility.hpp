@@ -117,25 +117,25 @@ namespace matrixpp::detail
 		}
 	}
 
-	template<typename To>
+	template<typename To, typename From>
 	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n)
 	{
 		for (auto row = std::size_t{ 0 }; row < n; ++row)
 		{
 			for (auto col = std::size_t{ 0 }; col < n; ++col)
 			{
-				auto result = To{ 0 };
+				auto result = From{ 0 };
 
 				for (auto elem = std::size_t{ 0 }; elem < n; ++elem)
 				{
 					const auto left_idx  = idx_2d_to_1d(n, row, elem);
 					const auto right_idx = idx_2d_to_1d(n, elem, col);
 
-					result += static_cast<To>(l_buf[left_idx] * r_buf[right_idx]);
+					result += l_buf[left_idx] * r_buf[right_idx];
 				}
 
 				auto idx = idx_2d_to_1d(n, row, col);
-				buf[idx] = result;
+				buf[idx] = static_cast<To>(result);
 			}
 		}
 	}

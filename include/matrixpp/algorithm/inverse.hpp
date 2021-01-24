@@ -33,16 +33,9 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		// Special helper to catch special case of inverse of 0x0 fully static matrices
-		// which should still be a 1x1 matrix
-		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		using inv_t = std::conditional_t<RowsExtent == 0 && ColumnsExtent == 0,
-			matrix<To, 1, 1>,
-			matrix<To, RowsExtent, ColumnsExtent>>;
-
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> inv_t<To, RowsExtent, ColumnsExtent>
+			-> matrix<To, RowsExtent, ColumnsExtent>
 		{
 			const auto rows = obj.rows();
 			const auto cols = obj.columns();
@@ -72,18 +65,14 @@ namespace matrixpp
 				throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 			}
 
-			using inv_matrix_t       = inv_t<To, RowsExtent, ColumnsExtent>;
+			using inv_matrix_t       = matrix<To, RowsExtent, ColumnsExtent>;
 			using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
 			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
 			using lu_decomp_diff_t   = typename lu_decomp_matrix_t::difference_type;
 
-			auto inv_matrix     = inv_matrix_t{};
-			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			const auto n        = rows == 0 ? 1 : rows; // Handle 0x0 inverse case
-			allocate_1d_buf_if_vector(inv_matrix_buf, n, n);
-
-			auto l_buf = lu_decomp_buf_t{};
-			auto u_buf = lu_decomp_buf_t{};
+			auto inv_matrix = inv_matrix_t{};
+			auto l_buf      = lu_decomp_buf_t{};
+			auto u_buf      = lu_decomp_buf_t{};
 
 			allocate_1d_buf_if_vector(u_buf, rows, cols);
 			std::ranges::copy(obj, u_buf.begin());
@@ -137,11 +126,17 @@ namespace matrixpp
 			}
 
 			// Handle special cases - avoid LU inverse multiplication
+			// and computing inv(U)
 			if (rows == 0)
 			{
-				inv_matrix_buf[0] = To{ 1 };
+				// Avoiding creating extra buffer by returning early
+				return inv_matrix;
 			}
-			else if (rows == 1)
+
+			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
+			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols);
+
+			if (rows == 1)
 			{
 				inv_matrix_buf[0] = To{ 1 } / static_cast<To>(obj(0, 0));
 			}
@@ -207,16 +202,16 @@ namespace matrixpp
 					}
 				}
 
-				mul_square_bufs<To>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
+				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
-			init_matrix_base_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), n, n);
+			init_matrix_base_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, cols);
 			return inv_matrix;
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inv_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> inv_t<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			if (!square(obj))
 			{
@@ -231,7 +226,7 @@ namespace matrixpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> detail::inv_t<Value, RowsExtent, ColumnsExtent>
+			-> matrix<Value, RowsExtent, ColumnsExtent>
 		{
 			return detail::inv_func<Value>(obj);
 		}
@@ -239,7 +234,7 @@ namespace matrixpp
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t,
 			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> detail::inv_t<To, RowsExtent, ColumnsExtent>
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
 		{
 			return detail::inv_func<To>(obj);
 		}
