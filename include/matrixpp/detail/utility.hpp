@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstddef>
 #include <limits>
 #include <span>
@@ -130,7 +131,7 @@ namespace matrixpp::detail
 					const auto left_idx  = idx_2d_to_1d(n, row, elem);
 					const auto right_idx = idx_2d_to_1d(n, elem, col);
 
-					result += static_cast<To>(l_buf[left_idx]) * static_cast<To>(r_buf[right_idx]);
+					result += static_cast<To>(l_buf[left_idx] * r_buf[right_idx]);
 				}
 
 				auto idx = idx_2d_to_1d(n, row, col);
@@ -144,7 +145,8 @@ namespace matrixpp::detail
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return (left - right) < std::numeric_limits<T>::epsilon();
+			const auto epsilon = std::numeric_limits<T>::epsilon();
+			return std::abs(left - right) < epsilon;
 		}
 		else
 		{
