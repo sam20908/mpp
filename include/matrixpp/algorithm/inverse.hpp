@@ -21,6 +21,7 @@
 
 #include "../detail/algo_types.hpp"
 #include "../detail/matrix_base.hpp"
+#include "../detail/matrix_def.hpp"
 #include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
@@ -97,38 +98,20 @@ namespace matrixpp
 				{
 					// This allows us to keep track of the row of the factor
 					// later on without having to manually calculate from indexes
-					auto factor_idx = idx_2d_to_1d(cols, col, col);
+					auto factor_row_idx = idx_2d_to_1d(cols, col, col);
 
 					const auto elem_idx = idx_2d_to_1d(cols, row, col);
-					const auto factor   = u_buf[elem_idx] / u_buf[factor_idx] * -1;
+					const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
 
-					std::ranges::transform(begin, end, begin, [factor, factor_idx, &u_buf](auto elem) mutable {
-						return factor * u_buf[factor_idx++] + elem;
+					std::ranges::transform(begin, end, begin, [factor, factor_row_idx, &u_buf](auto elem) mutable {
+						return factor * u_buf[factor_row_idx++] + elem;
 					});
 
 					// L stores the opposite (opposite sign) of the factors used for
 					// U in the corresponding location, but since inv(A) equals
 					// the opposite sign of the non-pivot (diagnal elements) elements,
-					// we can directly compute the inverse by not changing the sign of
-					// the factor
-
-					// Account for negative zeros in floating point. Not converting them to
-					// positive will result in incorrect inv(L)
-					if constexpr (std::is_floating_point_v<lu_decomp_value_t>)
-					{
-						if (accurate_equals(factor, lu_decomp_value_t{ 0 }))
-						{
-							l_buf[elem_idx] = 0;
-						}
-						else
-						{
-							l_buf[elem_idx] = factor;
-						}
-					}
-					else
-					{
-						l_buf[elem_idx] = factor;
-					}
+					// we can directly compute the inverse by not changing the sign
+					l_buf[elem_idx] = factor;
 
 					++begin;
 				}
@@ -177,48 +160,90 @@ namespace matrixpp
 			else
 			{
 				// Compute inverse of U directly on the same buffer
+				// Look from the bottom to the top diagnoally for
+				// back-substitution
 				for (auto col = cols; col > 0; --col)
 				{
-					// This is used to nagivate across the row where the diagnoal element
-					// is
-					auto elem_idx = idx_2d_to_1d(cols, col - 1, col - 1);
+					const auto col_idx    = col - 1;
+					auto pivot_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
+					const auto pivot_elem = u_buf[pivot_elem_idx];
 
-					const auto elem   = u_buf[elem_idx];
-					const auto factor = lu_decomp_value_t{ 1 } / elem;
+					// Pivot can simply be replaced with the factor
+					const auto pivot_factor = lu_decomp_value_t{ 1 } / pivot_elem;
+					u_buf[pivot_elem_idx]   = pivot_factor;
 
-					u_buf[elem_idx] = factor;
-					for (auto idx = cols; idx > col; --idx)
+					// Multiply every element to the right of the pivot by the
+					// factor
+					for (auto idx = cols - col; idx > 0; --idx)
 					{
-						u_buf[++elem_idx] *= factor;
+						u_buf[++pivot_elem_idx] *= pivot_factor;
 					}
 
-					for (auto row = col - 1; row > 0; --row)
-					{
-						const auto cur_elem_idx        = idx_2d_to_1d(cols, row - 1, col - 1);
-						const auto factor_row_elem_idx = idx_2d_to_1d(cols, col - 1, col - 1);
-						const auto cur_elem            = u_buf[cur_elem_idx];
-						const auto cur_factor          = cur_elem * -1;
+					// Use the pivot as the factor to compute the numbers
+					// above the pivot in the same column (this works because)
+					// the augmented matrix would have zeroes above the pivot
+					// for (auto row = col_idx; row > 0; --row)
+					// {
+					// 	const auto elem_idx = idx_2d_to_1d(cols, row - 1, col_idx);
+					// 	const auto elem     = u_buf[elem_idx];
+					// 	u_buf[elem_idx]     = elem * pivot_factor * -1;
+					// }
 
-						u_buf[cur_elem_idx] = cur_factor * u_buf[factor_row_elem_idx];
-					}
-
-					for (auto col_2 = cols; col_2 > col; --col_2)
+					for (auto row = col_idx; row > 0; --row)
 					{
-						for (auto row = col - 1; row > 0; --row)
+						// Use the pivot as the factor to compute the numbers
+						// above the pivot in the same column (this works because)
+						// the augmented matrix would have zeroes above the pivot
+						const auto row_idx            = row - 1;
+						const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
+						const auto elem_before_factor = u_buf[elem_idx];
+						u_buf[elem_idx]               = elem_before_factor * pivot_factor * -1;
+
+						// Add the corresponding elements of the rows of the current
+						// pivot onto the rows above
+						for (auto col_2 = cols; col_2 > col; --col_2)
 						{
-							const auto cur_elem_idx = idx_2d_to_1d(cols, row - 1, col_2 - 1);
-							const auto row_idx      = idx_2d_to_1d(cols, col - 1, col_2 - 1);
-							const auto factor_idx   = idx_2d_to_1d(cols, row - 1, col - 1);
+							const auto col_2_idx      = col_2 - 1;
+							auto pivot_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
+							const auto pivot_row_elem = u_buf[pivot_row_idx];
 
-							const auto factor     = u_buf[factor_idx];
-							const auto cur_elem   = u_buf[cur_elem_idx];
-							const auto cur_factor = factor * -1;
+							const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+							const auto elem     = u_buf[elem_idx];
+							const auto factor   = elem_before_factor * -1;
 
-							u_buf[cur_elem_idx] = cur_factor * u_buf[row_idx] + cur_elem;
+							const auto new_elem = factor * pivot_row_elem + elem;
+							u_buf[elem_idx]     = new_elem;
 						}
 					}
+
+					// Add the corresponding elements of the rows of the current
+					// pivot onto the rows above
+					// for (auto col_2 = cols; col_2 > col; --col_2)
+					// {
+					// 	const auto col_2_idx    = col_2 - 1;
+					// 	auto pivot_row_nav_idx  = idx_2d_to_1d(cols, col_idx, col_2_idx);
+					// 	auto pivot_row_nav_elem = u_buf[pivot_row_nav_idx];
+
+					// 	for (auto row = col_idx; row > 0; --row)
+					// 	{
+					// 		const auto row_idx  = row - 1;
+					// 		const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+					// 		const auto elem     = u_buf[elem_idx];
+
+					// 		const auto factor_idx = idx_2d_to_1d(cols, row_idx, col_idx);
+					// 		// @TODO: FIXME factor needs to be the number before the factor
+					// 		// overrode it
+					// 		const auto factor = u_buf[factor_idx] * -1;
+
+					// 		const auto new_elem = factor * pivot_row_nav_elem + elem;
+					// 		u_buf[elem_idx]     = new_elem;
+					// 	}
+
+					// 	pivot_row_nav_elem = u_buf[--pivot_row_nav_idx];
+					// }
 				}
 
+				// @TODO: FIXME Multiplication is the only cause for test failure
 				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
