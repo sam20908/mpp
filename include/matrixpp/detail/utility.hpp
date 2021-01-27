@@ -118,7 +118,7 @@ namespace matrixpp::detail
 	}
 
 	template<typename To, typename From>
-	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n)
+	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n) // @TODO: ISSUE #20
 	{
 		for (auto row = std::size_t{ 0 }; row < n; ++row)
 		{
