@@ -25,6 +25,8 @@
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
 
+#include <concepts>
+
 namespace matrixpp
 {
 	namespace detail
@@ -233,10 +235,10 @@ namespace matrixpp
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<Value, RowsExtent, ColumnsExtent>
 		{
-			return detail::inv_func<Value>(obj);
+			return detail::inv_func<detail::lu_decomp_value_t>(obj);
 		}
 
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
