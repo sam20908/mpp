@@ -21,6 +21,5 @@
 
 namespace matrixpp::detail
 {
-	// Use long double to avoid overflow and underflow as much as possible
-	using lu_decomp_value_t = long double;
+	using lu_decomp_value_t = double;
 } // namespace matrixpp::detail
