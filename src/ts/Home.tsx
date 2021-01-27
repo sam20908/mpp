@@ -141,7 +141,7 @@ export default class Home extends React.Component<unknown, unknown> {
                   <MDBCardTitle>Fully Dynamic Matrices</MDBCardTitle>
                   <MDBCardText>
                     A matrix that can have a runtime size and can be very
-                    flexible. It can be imagined as <b>std::vcector</b> of
+                    flexible. It can be imagined as <b>std::vector</b> of
                     matrices because of how dynamic it can be.
                     <br />
                     <br />
