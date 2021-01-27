@@ -124,18 +124,18 @@ namespace matrixpp::detail
 		{
 			for (auto col = std::size_t{ 0 }; col < n; ++col)
 			{
-				auto result = From{ 0 };
+				auto result = To{ 0 };
 
 				for (auto elem = std::size_t{ 0 }; elem < n; ++elem)
 				{
 					const auto left_idx  = idx_2d_to_1d(n, row, elem);
 					const auto right_idx = idx_2d_to_1d(n, elem, col);
 
-					result += l_buf[left_idx] * r_buf[right_idx];
+					result += static_cast<To>(l_buf[left_idx]) * static_cast<To>(r_buf[right_idx]);
 				}
 
 				auto idx = idx_2d_to_1d(n, row, col);
-				buf[idx] = static_cast<To>(result);
+				buf[idx] = result;
 			}
 		}
 	}
@@ -145,8 +145,7 @@ namespace matrixpp::detail
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			const auto epsilon = std::numeric_limits<T>::epsilon();
-			return std::abs(left - right) < epsilon;
+			return std::abs(left - right) < std::numeric_limits<T>::epsilon();
 		}
 		else
 		{

@@ -26,7 +26,7 @@ namespace
 {
 	TEST(Inverse, 3x3)
 	{
-		auto matrix = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto matrix  = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_FLOAT_EQ(inverse(0, 0), 0.F);
@@ -87,7 +87,7 @@ namespace
 	// 	1 9 8 2 3 4 5 7 6
 	// 	2 8 5 6 9 1 2 0 4
 	// 	1 6 5 8 2 7 3 4 5
-	// 	9 8 7 6 0 9 5 6 4 
+	// 	9 8 7 6 0 9 5 6 4
 	// 	1 2 3 4 2 9 4 5 6
 	// 	0 8 9 6 7 8 1 2 3
 	// 	8 9 0 1 6 7 8 5 6

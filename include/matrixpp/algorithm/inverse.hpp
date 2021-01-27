@@ -44,10 +44,9 @@ namespace matrixpp
 			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
 			auto inv_matrix    = inv_matrix_t{};
 
-			// Handle special cases - avoid computations
+			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
 			{
-				// Avoiding creating extra buffer by returning early
 				return inv_matrix;
 			}
 
@@ -68,7 +67,6 @@ namespace matrixpp
 
 			auto det = lu_decomp_value_t{ 1 };
 
-			// Early singular check for 2x2 matrices to avoid computations
 			if (rows == 2)
 			{
 				const auto element_1 = static_cast<lu_decomp_value_t>(obj(1, 1));
@@ -109,10 +107,7 @@ namespace matrixpp
 				allocate_1d_buf_if_vector(l_buf, rows, cols);
 				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
 
-				// While computing LU Decomposition, we can compute the determinant,
-				// inv(L), and U at the same time
-				// The determinant is needed to evaluate the singularity of 3x3
-				// and bigger matrices
+				// Compute the determinant while also compute LU Decomposition
 				for (auto row = std::size_t{ 0 }; row < rows; ++row)
 				{
 					const auto begin_idx = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, std::size_t{ 0 }));
@@ -135,9 +130,11 @@ namespace matrixpp
 						});
 
 						// L stores the opposite (opposite sign) of the factors used for
-						// U in the corresponding location, but since inv(A) equals
-						// the opposite sign of the non-pivot (diagnal elements) elements,
-						// we can directly compute the inverse by not changing the sign
+						// U in the corresponding location. But, to help optimize the
+						// calculation of inv(L), we can just leave the sign because
+						// all the diagnoal elements below the diagonal element by 1
+						// are the opposite sign, and it's relatively easy to fix the
+						// values of other factors
 						l_buf[elem_idx] = factor;
 
 						++begin;
@@ -152,9 +149,27 @@ namespace matrixpp
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
+				// Compute inverse of L directly on the same buffer
+				for (auto col = std::size_t{ 1 }; col < cols; ++col)
+				{
+					// Optimized version of forward-substitution which
+					// skips making diagnoal 1's
+
+					for (auto row = col + 1; row < rows; ++row)
+					{
+						const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
+
+						for (auto col_2 = std::size_t{ 0 }; col_2 < col; ++col_2)
+						{
+							const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
+							const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
+
+							l_buf[elem_idx] -= factor * elem_above;
+						}
+					}
+				}
+
 				// Compute inverse of U directly on the same buffer
-				// Look from the bottom to the top diagnoally for
-				// back-substitution
 				for (auto col = cols; col > 0; --col)
 				{
 					const auto col_idx    = col - 1;
@@ -171,16 +186,6 @@ namespace matrixpp
 					{
 						u_buf[++pivot_elem_idx] *= pivot_factor;
 					}
-
-					// Use the pivot as the factor to compute the numbers
-					// above the pivot in the same column (this works because)
-					// the augmented matrix would have zeroes above the pivot
-					// for (auto row = col_idx; row > 0; --row)
-					// {
-					// 	const auto elem_idx = idx_2d_to_1d(cols, row - 1, col_idx);
-					// 	const auto elem     = u_buf[elem_idx];
-					// 	u_buf[elem_idx]     = elem * pivot_factor * -1;
-					// }
 
 					for (auto row = col_idx; row > 0; --row)
 					{
@@ -208,35 +213,8 @@ namespace matrixpp
 							u_buf[elem_idx]     = new_elem;
 						}
 					}
-
-					// Add the corresponding elements of the rows of the current
-					// pivot onto the rows above
-					// for (auto col_2 = cols; col_2 > col; --col_2)
-					// {
-					// 	const auto col_2_idx    = col_2 - 1;
-					// 	auto pivot_row_nav_idx  = idx_2d_to_1d(cols, col_idx, col_2_idx);
-					// 	auto pivot_row_nav_elem = u_buf[pivot_row_nav_idx];
-
-					// 	for (auto row = col_idx; row > 0; --row)
-					// 	{
-					// 		const auto row_idx  = row - 1;
-					// 		const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
-					// 		const auto elem     = u_buf[elem_idx];
-
-					// 		const auto factor_idx = idx_2d_to_1d(cols, row_idx, col_idx);
-					// 		// @TODO: FIXME factor needs to be the number before the factor
-					// 		// overrode it
-					// 		const auto factor = u_buf[factor_idx] * -1;
-
-					// 		const auto new_elem = factor * pivot_row_nav_elem + elem;
-					// 		u_buf[elem_idx]     = new_elem;
-					// 	}
-
-					// 	pivot_row_nav_elem = u_buf[--pivot_row_nav_idx];
-					// }
 				}
 
-				// @TODO: FIXME Multiplication is the only cause for test failure
 				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
