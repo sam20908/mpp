@@ -20,15 +20,10 @@
 #pragma once
 
 #include "../detail/algo_types.hpp"
-#include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
 #include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
-
-#include <algorithm>
-#include <ranges>
-#include <type_traits>
 
 namespace matrixpp
 {
@@ -96,7 +91,6 @@ namespace matrixpp
 			{
 				using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
 				using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
-				using lu_decomp_diff_t   = typename lu_decomp_matrix_t::difference_type;
 
 				auto l_buf = lu_decomp_buf_t{};
 				auto u_buf = lu_decomp_buf_t{};
@@ -110,11 +104,8 @@ namespace matrixpp
 				// Compute the determinant while also compute LU Decomposition
 				for (auto row = std::size_t{ 0 }; row < rows; ++row)
 				{
-					const auto begin_idx = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, std::size_t{ 0 }));
-					const auto end_idx   = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, cols));
-
-					auto begin = std::next(u_buf.begin(), begin_idx);
-					auto end   = std::next(u_buf.begin(), end_idx);
+					auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
+					const auto end_idx = idx_2d_to_1d(cols, row, cols);
 
 					for (auto col = std::size_t{ 0 }; col < row; ++col)
 					{
@@ -125,9 +116,10 @@ namespace matrixpp
 						const auto elem_idx = idx_2d_to_1d(cols, row, col);
 						const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
 
-						std::ranges::transform(begin, end, begin, [factor, factor_row_idx, &u_buf](auto elem) mutable {
-							return factor * u_buf[factor_row_idx++] + elem;
-						});
+						for (auto idx = begin_idx; idx < end_idx; ++idx)
+						{
+							u_buf[idx] += factor * u_buf[factor_row_idx++];
+						}
 
 						// L stores the opposite (opposite sign) of the factors used for
 						// U in the corresponding location. But, to help optimize the
@@ -137,7 +129,7 @@ namespace matrixpp
 						// values of other factors
 						l_buf[elem_idx] = factor;
 
-						++begin;
+						++begin_idx;
 					}
 
 					const auto pivot_idx = idx_2d_to_1d(cols, row, row);
@@ -172,19 +164,19 @@ namespace matrixpp
 				// Compute inverse of U directly on the same buffer
 				for (auto col = cols; col > 0; --col)
 				{
-					const auto col_idx    = col - 1;
-					auto pivot_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
-					const auto pivot_elem = u_buf[pivot_elem_idx];
+					const auto col_idx   = col - 1;
+					auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
+					const auto diag_elem = u_buf[diag_elem_idx];
 
 					// Pivot can simply be replaced with the factor
-					const auto pivot_factor = lu_decomp_value_t{ 1 } / pivot_elem;
-					u_buf[pivot_elem_idx]   = pivot_factor;
+					const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
+					u_buf[diag_elem_idx]   = diag_factor;
 
 					// Multiply every element to the right of the pivot by the
 					// factor
 					for (auto idx = cols - col; idx > 0; --idx)
 					{
-						u_buf[++pivot_elem_idx] *= pivot_factor;
+						u_buf[++diag_elem_idx] *= diag_factor;
 					}
 
 					for (auto row = col_idx; row > 0; --row)
@@ -195,21 +187,21 @@ namespace matrixpp
 						const auto row_idx            = row - 1;
 						const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
 						const auto elem_before_factor = u_buf[elem_idx];
-						u_buf[elem_idx]               = elem_before_factor * pivot_factor * -1;
+						u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
 
 						// Add the corresponding elements of the rows of the current
 						// pivot onto the rows above
 						for (auto col_2 = cols; col_2 > col; --col_2)
 						{
-							const auto col_2_idx      = col_2 - 1;
-							auto pivot_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
-							const auto pivot_row_elem = u_buf[pivot_row_idx];
+							const auto col_2_idx     = col_2 - 1;
+							auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
+							const auto diag_row_elem = u_buf[diag_row_idx];
 
 							const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
 							const auto elem     = u_buf[elem_idx];
 							const auto factor   = elem_before_factor * -1;
 
-							const auto new_elem = factor * pivot_row_elem + elem;
+							const auto new_elem = factor * diag_row_elem + elem;
 							u_buf[elem_idx]     = new_elem;
 						}
 					}
