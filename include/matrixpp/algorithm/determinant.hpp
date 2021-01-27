@@ -20,14 +20,10 @@
 #pragma once
 
 #include "../detail/algo_types.hpp"
+#include "../detail/matrix_def.hpp"
 #include "../detail/tag_invoke.hpp"
 #include "../detail/utility.hpp"
-#include "../matrix.hpp"
 #include "../utility/square.hpp"
-
-#include <algorithm>
-#include <ranges>
-#include <utility>
 
 namespace matrixpp
 {
@@ -61,7 +57,6 @@ namespace matrixpp
 			// long double is used to avoid overflow and underflow as much as possible
 			using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
 			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
-			using lu_decomp_diff_t   = typename lu_decomp_matrix_t::difference_type;
 
 			auto u_buf = lu_decomp_buf_t{};
 
@@ -74,26 +69,24 @@ namespace matrixpp
 			// Compute U
 			for (auto row = std::size_t{ 0 }; row < rows; ++row)
 			{
-				const auto begin_idx = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, std::size_t{ 0 }));
-				const auto end_idx   = static_cast<lu_decomp_diff_t>(idx_2d_to_1d(cols, row, cols));
-
-				auto begin = std::next(u_buf.begin(), begin_idx);
-				auto end   = std::next(u_buf.begin(), end_idx);
+				auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
+				const auto end_idx = idx_2d_to_1d(cols, row, cols);
 
 				for (auto col = std::size_t{ 0 }; col < row; ++col)
 				{
 					// This allows us to keep track of the row of the factor
 					// later on without having to manually calculate from indexes
-					auto factor_idx = idx_2d_to_1d(cols, col, col);
+					auto factor_row_idx = idx_2d_to_1d(cols, col, col);
 
 					const auto elem_idx = idx_2d_to_1d(cols, row, col);
-					const auto factor   = u_buf[elem_idx] / u_buf[factor_idx] * -1;
+					const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
 
-					std::ranges::transform(begin, end, begin, [factor, factor_idx, &u_buf](auto elem) mutable {
-						return factor * u_buf[factor_idx++] + elem;
-					});
+					for (auto idx = begin_idx; idx < end_idx; ++idx)
+					{
+						u_buf[idx] += factor * u_buf[factor_row_idx++];
+					}
 
-					++begin;
+					++begin_idx;
 				}
 			}
 
