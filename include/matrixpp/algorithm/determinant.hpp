@@ -25,6 +25,8 @@
 #include "../detail/utility.hpp"
 #include "../utility/square.hpp"
 
+#include <cmath>
+
 namespace matrixpp
 {
 	namespace detail
@@ -98,9 +100,8 @@ namespace matrixpp
 				det *= u_buf[elem_idx];
 			}
 
-			// Only cast the determinant back to user specified To because using it
-			// in the actual computation would've made the error way bigger
-			return static_cast<To>(det);
+			// We can't directly cast because that would round down floating points
+			return static_cast<To>(std::round(det));
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
