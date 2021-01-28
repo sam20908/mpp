@@ -55,8 +55,6 @@ namespace matrixpp
 				return ad - bc;
 			}
 
-			// Store U as floating time to allow accurate determinant
-			// long double is used to avoid overflow and underflow as much as possible
 			using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
 			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
 
