@@ -46,3 +46,6 @@ compile_commands.json
 
 # JetBrain IDE cache
 .idea/
+
+# Node modules
+node_modules/
