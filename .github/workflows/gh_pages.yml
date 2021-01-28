@@ -22,18 +22,24 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install All Dependencies
-        run: yarn install
+        run: |
+          cd website
+          yarn install
 
       - name: Lint Source Files
-        run: yarn lint
+        run: |
+          cd website
+          yarn lint
       
       - name: Build Website For Production
-        run: yarn build
+        run: yarn |
+          cd website
+          build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages-prod
-          FOLDER: build
+          FOLDER: website/build
           CLEAN: true
