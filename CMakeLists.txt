@@ -49,7 +49,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_sources(${PROJECT_NAME} INTERFACE
     # Main headers
     "include/matrixpp/algorithm.hpp"
-    "include/matrixpp/operation.hpp"
+    "include/matrixpp/arithmetic.hpp"
     "include/matrixpp/matrix.hpp"
     "include/matrixpp/utility.hpp"
 
@@ -65,11 +65,11 @@ target_sources(${PROJECT_NAME} INTERFACE
     "include/matrixpp/algorithm/inverse.hpp"
     "include/matrixpp/algorithm/transpose.hpp"
     
-    # Operation headers
-    "include/matrixpp/operation/add.hpp"
-    "include/matrixpp/operation/subtract.hpp"
-    "include/matrixpp/operation/multiply.hpp"
-    "include/matrixpp/operation/divide.hpp"
+    # Arithmetic headers
+    "include/matrixpp/arithmetic/add.hpp"
+    "include/matrixpp/arithmetic/subtract.hpp"
+    "include/matrixpp/arithmetic/multiply.hpp"
+    "include/matrixpp/arithmetic/divide.hpp"
 
     # Utility headers
     "include/matrixpp/utility/cast.hpp"

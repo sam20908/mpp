@@ -18,8 +18,8 @@
  */
 
 #include <gtest/gtest.h>
+#include <matrixpp/arithmetic.hpp>
 #include <matrixpp/matrix.hpp>
-#include <matrixpp/operation.hpp>
 #include <span>
 #include <stdexcept>
 
