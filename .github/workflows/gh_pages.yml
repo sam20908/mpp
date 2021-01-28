@@ -32,9 +32,9 @@ jobs:
           yarn lint
       
       - name: Build Website For Production
-        run: yarn |
+        run: |
           cd website
-          build
+          yarn build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
