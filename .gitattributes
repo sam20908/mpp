@@ -6,3 +6,6 @@ CMakeLists.txt.in linguist-language=CMake
 
 # .tpp files are C++
 *.tpp linguist-language=C++
+
+# Ignore website folder from language statistics
+website/* linguist-documentation
