@@ -79,6 +79,7 @@ target_sources(${PROJECT_NAME} INTERFACE
     "include/matrixpp/utility/type.hpp"
 
     # Detail headers
+    "include/matrixpp/detail/algo_types.hpp"
     "include/matrixpp/detail/constraints.hpp"
     "include/matrixpp/detail/expr_base.hpp"
     "include/matrixpp/detail/expr_binary_constant_op.hpp"

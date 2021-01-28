@@ -17,31 +17,18 @@
  * under the License.
  */
 
-#include <algorithm>
 #include <benchmark/benchmark.h>
 #include <cstddef>
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
 #include <matrixpp/utility/singular.hpp>
-#include <random>
 #include <utility>
 
 namespace
 {
 	// Benchmark limit without hanging (UB?)
-	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 13;
-	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 11;
-
-	static inline auto random_device       = std::random_device{};
-	static inline auto random_engine       = std::mt19937{ random_device() };
-	static inline auto random_distribution = std::uniform_int_distribution{ 1, 50 };
-
-	void fill_matrix_with_random_values(auto& matrix)
-	{
-		std::ranges::transform(matrix, matrix.begin(), [](auto) {
-			return random_distribution(random_engine);
-		});
-	}
+	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 512;
+	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 512;
 } // namespace
 
 static void Determinant(benchmark::State& state)
@@ -65,13 +52,7 @@ static void Determinant(benchmark::State& state)
 static void Inverse(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
-	fill_matrix_with_random_values(matrix); // Initial fill, possibly non-singular first try
-
-	while (matrixpp::singular(matrix))
-	{
-		fill_matrix_with_random_values(matrix);
-	}
+		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -126,7 +107,7 @@ static void Transpose(benchmark::State& state)
 	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
-BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 1);
-BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 1);
+BENCHMARK(Determinant)->DenseRange(0, MAX_DETERMINANT_NXN_WITHOUT_BREAKING, 16);
+BENCHMARK(Inverse)->DenseRange(0, MAX_INVERSE_NXN_WITHOUT_BREAKING, 16);
 BENCHMARK(Block)->RangeMultiplier(2)->Range(8, 8 << 10);
 BENCHMARK(Transpose)->RangeMultiplier(2)->Range(8, 8 << 10);

@@ -19,15 +19,52 @@
 
 #include <gtest/gtest.h>
 #include <matrixpp/algorithm/inverse.hpp>
-#include <matrixpp/matrix.hpp>
+#include <matrixpp/matrix/fully_dynamic.hpp>
 #include <utility>
 
 namespace
 {
+	TEST(Inverse, 0x0)
+	{
+		auto matrix  = matrixpp::matrix<int>{};
+		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+
+		EXPECT_EQ(inverse.rows(), 0);
+		EXPECT_EQ(inverse.columns(), 0);
+	}
+
+	TEST(Inverse, 1x1)
+	{
+		auto matrix  = matrixpp::matrix{ { 2 } };
+		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+
+		EXPECT_EQ(inverse.rows(), 1);
+		EXPECT_EQ(inverse.columns(), 1);
+
+		EXPECT_FLOAT_EQ(inverse(0, 0), 1.F / 2.F);
+	}
+
+	TEST(Inverse, 2x2)
+	{
+		auto matrix  = matrixpp::matrix{ { { 65, 4 }, { -9, 122 } } };
+		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+
+		EXPECT_EQ(inverse.rows(), 2);
+		EXPECT_EQ(inverse.columns(), 2);
+
+		EXPECT_FLOAT_EQ(inverse(0, 0), 61.F / 3983.F);
+		EXPECT_FLOAT_EQ(inverse(0, 1), -2.F / 3983.F);
+		EXPECT_FLOAT_EQ(inverse(1, 0), 9.F / 7966.F);
+		EXPECT_FLOAT_EQ(inverse(1, 1), 65.F / 7966.F);
+	}
+
 	TEST(Inverse, 3x3)
 	{
-		auto matrix  = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto matrix  = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+
+		EXPECT_EQ(inverse.rows(), 3);
+		EXPECT_EQ(inverse.columns(), 3);
 
 		EXPECT_FLOAT_EQ(inverse(0, 0), 0.F);
 		EXPECT_FLOAT_EQ(inverse(0, 1), 1.F / 3.F);
@@ -40,14 +77,29 @@ namespace
 		EXPECT_FLOAT_EQ(inverse(2, 2), 16.F / 3.F);
 	}
 
-	TEST(Inverse, 0x0_FullyStatic_Edgecase)
+	TEST(Inverse, 4x4)
 	{
-		auto matrix  = matrixpp::matrix<int, 0, 0>{};
+		auto matrix  = matrixpp::matrix{ { { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
-		EXPECT_EQ(inverse.rows_extent(), 1);
-		EXPECT_EQ(inverse.columns_extent(), 1);
+		EXPECT_EQ(inverse.rows(), 4);
+		EXPECT_EQ(inverse.columns(), 4);
 
-		EXPECT_FLOAT_EQ(inverse(0, 0), 1.F);
+		EXPECT_FLOAT_EQ(inverse(0, 0), 1.F / 2.F);
+		EXPECT_FLOAT_EQ(inverse(0, 1), 2.F);
+		EXPECT_FLOAT_EQ(inverse(0, 2), 689.F / 96.F);
+		EXPECT_FLOAT_EQ(inverse(0, 3), -169.F / 24.F);
+		EXPECT_FLOAT_EQ(inverse(1, 0), 0.F);
+		EXPECT_FLOAT_EQ(inverse(1, 1), -1.F);
+		EXPECT_FLOAT_EQ(inverse(1, 2), -17.F / 12.F);
+		EXPECT_FLOAT_EQ(inverse(1, 3), 4.F / 3.F);
+		EXPECT_FLOAT_EQ(inverse(2, 0), 0.F);
+		EXPECT_FLOAT_EQ(inverse(2, 1), 0.F);
+		EXPECT_FLOAT_EQ(inverse(2, 2), 5.F / 96.F);
+		EXPECT_FLOAT_EQ(inverse(2, 3), -1.F / 24.F);
+		EXPECT_FLOAT_EQ(inverse(3, 0), 0.F);
+		EXPECT_FLOAT_EQ(inverse(3, 1), 0.F);
+		EXPECT_FLOAT_EQ(inverse(3, 2), -1.F);
+		EXPECT_FLOAT_EQ(inverse(3, 3), 1.F);
 	}
 } // namespace

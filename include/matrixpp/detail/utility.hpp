@@ -19,18 +19,16 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstddef>
-#include <iterator>
-#include <ranges>
+#include <limits>
 #include <span>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 namespace matrixpp::detail
 {
-	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
-
 	/**
      * This is mainly for avoiding bug-prone code, because this calculation occurs
      * in a lot of places, and a typo can cause a lot of things to fail. It's
@@ -107,6 +105,51 @@ namespace matrixpp::detail
 		if constexpr (is_vec)
 		{
 			buf.resize(rows * cols);
+		}
+	}
+
+	template<typename Value>
+	inline void transform_1d_buf_into_identity(auto& buf, std::size_t n) // @TODO: ISSUE #20
+	{
+		for (auto idx = std::size_t{ 0 }; idx < n; ++idx)
+		{
+			buf[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
+		}
+	}
+
+	template<typename To, typename From>
+	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n) // @TODO: ISSUE #20
+	{
+		for (auto row = std::size_t{ 0 }; row < n; ++row)
+		{
+			for (auto col = std::size_t{ 0 }; col < n; ++col)
+			{
+				auto result = To{ 0 };
+
+				for (auto elem = std::size_t{ 0 }; elem < n; ++elem)
+				{
+					const auto left_idx  = idx_2d_to_1d(n, row, elem);
+					const auto right_idx = idx_2d_to_1d(n, elem, col);
+
+					result += static_cast<To>(l_buf[left_idx]) * static_cast<To>(r_buf[right_idx]);
+				}
+
+				auto idx = idx_2d_to_1d(n, row, col);
+				buf[idx] = result;
+			}
+		}
+	}
+
+	template<typename T>
+	constexpr auto accurate_equals(T left, T right) -> bool
+	{
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return std::abs(left - right) < std::numeric_limits<T>::epsilon();
+		}
+		else
+		{
+			return left == right;
 		}
 	}
 } // namespace matrixpp::detail

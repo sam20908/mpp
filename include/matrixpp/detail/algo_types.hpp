@@ -19,25 +19,7 @@
 
 #pragma once
 
-#include <concepts>
-#include <ranges>
-#include <span>
-#include <type_traits>
-
 namespace matrixpp::detail
 {
-	template<typename Value>
-	concept arithmetic = std::is_arithmetic_v<Value>;
-
-	template<typename Range>
-	concept range_arithmetic = arithmetic<std::ranges::range_value_t<Range>>;
-
-	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
-
-	template<typename Range>
-	concept range_2d_arithmetic = arithmetic<range_2d_t<Range>>;
-
-	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
+	using lu_decomp_value_t = double;
 } // namespace matrixpp::detail
