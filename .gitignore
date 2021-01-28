@@ -48,4 +48,7 @@ compile_commands.json
 .idea/
 
 # Node modules
-node_modules/
+website/node_modules/
+
+# ESLint cache
+website/.eslintcache
