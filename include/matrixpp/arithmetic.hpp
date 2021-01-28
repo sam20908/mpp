@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "operation/add.hpp"
-#include "operation/divide.hpp"
-#include "operation/multiply.hpp"
-#include "operation/subtract.hpp"
+#include "arithmetic/add.hpp"
+#include "arithmetic/divide.hpp"
+#include "arithmetic/multiply.hpp"
+#include "arithmetic/subtract.hpp"

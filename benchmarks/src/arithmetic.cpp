@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <benchmark/benchmark.h>
 #include <cstddef>
+#include <matrixpp/arithmetic.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
-#include <matrixpp/operation.hpp>
 
 static void Addition(benchmark::State& state)
 {

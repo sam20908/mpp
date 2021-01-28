@@ -77,4 +77,4 @@ _create_unit_test("type")
 # Basic tests
 _create_unit_test("customization")
 _create_unit_test("initialization")
-_create_unit_test("math_operations")
+_create_unit_test("arithmetic")
