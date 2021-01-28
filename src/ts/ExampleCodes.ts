@@ -37,8 +37,9 @@ int main()
 
     auto m_det = mpp::determinant(m); // You can specify larger types for safety to avoid type overflow from calculation
 
-    auto m_inv = mpp::inverse(std::type_identity<float>{}, m); // Usually want floating point for inverse
-    auto m_inv_int = mpp::inverse(m); // Inverse has the same value type as "m" -> int (LOSING PRECISION!)
+    auto m_inv = mpp::inverse(std::type_identity<float>{}, m); // Use "float" for result matrix type
+    auto m_inv_2 = mpp::inverse(std::type_identity<int>{}, m); // Compile error: user provided type must be a floating point!
+    auto m_inv_int = mpp::inverse(m); // Defaults to "double" for result matrix type
 
     auto m_transposed = mpp::transpose(m);
     auto m_block = mpp::block(m, 0, 0, 1, 1); // Grabs top corner 2 x 2 (the indexes are inclusive, so 1 x 1
