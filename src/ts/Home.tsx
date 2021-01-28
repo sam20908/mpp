@@ -15,7 +15,12 @@ import {
 
 import theme from "prism-react-renderer/themes/dracula";
 
-import { kinds, operations, customize_default_extent } from "./ExampleCodes";
+import {
+  kinds,
+  operations,
+  customize_default_extent,
+  customize_utilities,
+} from "./ExampleCodes";
 
 import CodeBlock from "./CodeBlock";
 import Logo128 from "../img/logo128.png";
@@ -240,6 +245,13 @@ export default class Home extends React.Component<unknown, unknown> {
             will default to:
           </MDBTypography>
           <CodeBlock code={customize_default_extent} theme={theme} />
+          <MDBTypography tag="p" className="lead mt-5">
+            All the customizations take place in the function <b>tag_invoke</b>.
+            It allows customization of all <b>matrixpp customization points</b>{" "}
+            in one function name, which reduces the chance of someone being
+            confused. Here is another example with another utility function:
+          </MDBTypography>
+          <CodeBlock code={customize_utilities} theme={theme} />
         </MDBContainer>
       </div>
     );

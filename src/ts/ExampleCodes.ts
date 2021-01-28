@@ -81,3 +81,40 @@ int main()
     return 0;
 }
 `;
+
+export const customize_utilities = `#include <matrixpp/matrix.hpp>
+
+namespace mpp = matrixpp;
+
+namespace ns
+{
+    enum class vec_types
+    {
+        vec
+    };
+
+    struct vec {};
+
+    [[nodiscard]] constexpr auto tag_invoke(mpp::type_t, vec) -> vec_types
+    {
+        return vec_types::vec;
+    }
+
+    [[nodiscard]] constexpr auto tag_invoke(mpp::determinant_t, vec) -> int
+    {
+        return 2000;
+    }
+
+    // You can customize even more customization points than shown here, but
+    // this is just to demonstrate the library picking up the customizations
+}
+
+int main()
+{
+    auto v = ns::vec;
+    auto t = mpp::type(v); // vec_types::vec
+    auto d = mpp::determinant(v); // 2000
+
+    return 0;
+}
+`;
