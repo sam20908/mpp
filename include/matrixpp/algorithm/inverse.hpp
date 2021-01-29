@@ -32,7 +32,7 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		inline void l_optimized_forward_substitution(auto& l_buf, std::size_t cols)
+		constexpr void l_optimized_forward_substitution(auto& l_buf, std::size_t cols)
 		{
 			for (auto col = std::size_t{ 1 }; col < cols; ++col)
 			{
@@ -54,7 +54,7 @@ namespace matrixpp
 			}
 		}
 
-		inline void u_back_substitution(auto& u_buf, std::size_t cols)
+		constexpr void u_back_substitution(auto& u_buf, std::size_t cols)
 		{
 			for (auto col = cols; col > 0; --col)
 			{
