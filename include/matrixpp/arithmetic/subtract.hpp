@@ -42,22 +42,18 @@ namespace matrixpp
 		std::size_t LeftColumnsExtent,
 		std::size_t RightRowsExtent,
 		std::size_t RightColumnsExtent>
-	[[nodiscard]] inline decltype(auto) operator-(
+	[[nodiscard]] inline auto operator-(
 		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
-		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right) // @TODO: ISSUE #20
+		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right)
+		-> detail::expr_binary_op<detail::prefer_static_extent(LeftRowsExtent, RightRowsExtent),
+			detail::prefer_static_extent(LeftColumnsExtent, RightColumnsExtent),
+			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
+			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
+			detail::sub_op_type> // @TODO: ISSUE #20
 	{
-		using left_type  = detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>;
-		using right_type = detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>;
-
 		detail::validate_matrices_same_size(left, right);
 
-		constexpr auto row_extent = detail::prefer_static_extent(LeftRowsExtent, RightRowsExtent);
-		constexpr auto col_extent = detail::prefer_static_extent(LeftColumnsExtent, RightColumnsExtent);
-
-		return detail::expr_binary_op<row_extent, col_extent, left_type, right_type, detail::sub_op_type>{ left,
-			right,
-			left.rows(),
-			left.columns() };
+		return { left, right, left.rows(), left.columns() };
 	}
 
 	template<typename Value,
@@ -66,8 +62,9 @@ namespace matrixpp
 		std::size_t LeftColumnsExtent,
 		std::size_t RightRowsExtent,
 		std::size_t RightColumnsExtent>
-	inline decltype(auto) operator-=(matrix<Value, LeftRowsExtent, LeftColumnsExtent>& left,
-		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right) // @TODO: ISSUE #20
+	inline auto operator-=(matrix<Value, LeftRowsExtent, LeftColumnsExtent>& left,
+		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right)
+		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
 		detail::validate_matrices_same_size(left, right);
 

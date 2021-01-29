@@ -29,38 +29,37 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		using div_op_t = decltype([](auto&& lhs, auto&& rhs, std::size_t row_index, std::size_t column_index) {
+		using div_op_t = decltype([](auto&& lhs, auto&& rhs, std::size_t row_index, std::size_t column_index)
+									  -> decltype(lhs(row_index, column_index) / rhs) {
 			return lhs(row_index, column_index) / rhs;
 		});
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] decltype(auto) operator/(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant)
+	[[nodiscard]] auto operator/(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj, Value constant)
+		-> detail::expr_binary_constant_op<RowsExtent,
+			ColumnsExtent,
+			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
+			Value,
+			detail::div_op_t> // @TODO: ISSUE #20
 	{
-		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
-
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_t>{ obj,
-			constant,
-			obj.rows(),
-			obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns() };
 	}
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] decltype(auto) operator/(Value constant,
-		const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj)
+	[[nodiscard]] auto operator/(Value constant, const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj)
+		-> detail::expr_binary_constant_op<RowsExtent,
+			ColumnsExtent,
+			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
+			Value,
+			detail::div_op_t> // @TODO: ISSUE #20
 	{
-		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
-
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::div_op_t>{ obj,
-			constant,
-			obj.rows(),
-			obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns() };
 	}
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	inline decltype(auto) operator/=(matrix<Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant) // @TODO: ISSUE #20
+	inline auto operator/=(matrix<Value, RowsExtent, ColumnsExtent>& obj, Value constant)
+		-> matrix<Value, RowsExtent, ColumnsExtent>& // @TODO: ISSUE #20
 	{
 		// Can't use bind_front here because we want elem / constant, not constant / elem
 		std::ranges::transform(obj, obj.begin(), [constant](auto elem) {

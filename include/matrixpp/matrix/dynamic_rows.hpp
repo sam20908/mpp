@@ -101,7 +101,7 @@ namespace matrixpp
 			std::ranges::fill(base::_buf, value);
 		}
 
-		matrix(std::size_t rows, identity_matrix_tag)
+		matrix(std::size_t rows, identity_matrix_tag) // @TODO: ISSUE #20
 		{
 			base::init_identity(rows, ColumnsExtent);
 		}
