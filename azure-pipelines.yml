@@ -29,7 +29,7 @@ jobs:
   - task: Cache@2
     displayName: Cache vcpkg
     inputs:
-      key: $(Build.SourcesDirectory)/vcpkg-dependencies.txt | "$(Build.SourcesDirectory)/.git/modules/vcpkg/HEAD" | "$(Agent.OS)"
+      key: $(Build.SourcesDirectory)/vcpkg-dependencies.txt | "$(Agent.OS)"
       path: '$(Build.SourcesDirectory)/vcpkg'
 
   - task: run-vcpkg@0
