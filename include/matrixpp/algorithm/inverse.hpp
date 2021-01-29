@@ -48,7 +48,7 @@ namespace matrixpp
 			}
 
 			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols);
+			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{ 0 });
 
 			if (rows == 1)
 			{
@@ -97,10 +97,10 @@ namespace matrixpp
 				auto l_buf = lu_decomp_buf_t{};
 				auto u_buf = lu_decomp_buf_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, cols);
+				allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{ 0 });
 				std::ranges::copy(obj, u_buf.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, cols);
+				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{ 0 });
 				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
 
 				// Compute the determinant while also compute LU Decomposition

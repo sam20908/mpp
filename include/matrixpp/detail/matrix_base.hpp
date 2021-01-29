@@ -219,7 +219,7 @@ namespace matrixpp::detail
 	{
 		base._rows = rows;
 		base._cols = cols;
-		allocate_1d_buf_if_vector(base._buf, rows, cols);
+		allocate_1d_buf_if_vector(base._buf, rows, cols, BaseValue{ 0 });
 
 		std::ranges::copy(rng, base._buf.begin());
 	}
@@ -233,7 +233,7 @@ namespace matrixpp::detail
 	{
 		base._rows = rows;
 		base._cols = cols;
-		allocate_1d_buf_if_vector(base._buf, rows, cols);
+		allocate_1d_buf_if_vector(base._buf, rows, cols, BaseValue{ 0 });
 
 		std::ranges::move(rng, base._buf.begin());
 	}

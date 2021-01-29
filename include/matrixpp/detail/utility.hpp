@@ -95,7 +95,7 @@ namespace matrixpp::detail
 		}
 	}
 
-	inline void allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	inline void allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, auto val) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = requires
 		{
@@ -104,7 +104,7 @@ namespace matrixpp::detail
 
 		if constexpr (is_vec)
 		{
-			buf.resize(rows * cols);
+			buf.resize(rows * cols, val);
 		}
 	}
 

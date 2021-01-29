@@ -82,8 +82,7 @@ namespace matrixpp
 			base::_rows = rows;
 			base::_cols = columns;
 
-			detail::allocate_1d_buf_if_vector(base::_buf, rows, columns);
-			std::ranges::fill(base::_buf, value);
+			detail::allocate_1d_buf_if_vector(base::_buf, rows, columns, value);
 		}
 
 		matrix(std::size_t rows, std::size_t columns, identity_matrix_tag) // @TODO: ISSUE #20
