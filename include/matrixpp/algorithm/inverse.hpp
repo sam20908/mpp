@@ -32,14 +32,14 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		inline void l_optimized_forward_substitution(auto& l_buf, std::size_t rows, std::size_t cols)
+		inline void l_optimized_forward_substitution(auto& l_buf, std::size_t cols)
 		{
 			for (auto col = std::size_t{ 1 }; col < cols; ++col)
 			{
 				// Optimized version of forward-substitution which
 				// skips making diagnoal 1's
 
-				for (auto row = col + 1; row < rows; ++row)
+				for (auto row = col + 1; row < cols; ++row)
 				{
 					const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
 
@@ -214,8 +214,8 @@ namespace matrixpp
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				auto l_inv_future = std::async(std::launch::async, [rows, cols, &l_buf]() {
-					l_optimized_forward_substitution(l_buf, rows, cols);
+				auto l_inv_future = std::async(std::launch::async, [cols, &l_buf]() {
+					l_optimized_forward_substitution(l_buf, cols);
 				});
 				auto u_inv_future = std::async(std::launch::async, [cols, &u_buf]() {
 					u_back_substitution(u_buf, cols);
