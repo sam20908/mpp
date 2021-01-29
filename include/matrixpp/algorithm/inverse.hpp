@@ -26,11 +26,82 @@
 #include "../utility/square.hpp"
 
 #include <concepts>
+#include <future>
 
 namespace matrixpp
 {
 	namespace detail
 	{
+		inline void l_optimized_forward_substitution(auto& l_buf, std::size_t rows, std::size_t cols)
+		{
+			for (auto col = std::size_t{ 1 }; col < cols; ++col)
+			{
+				// Optimized version of forward-substitution which
+				// skips making diagnoal 1's
+
+				for (auto row = col + 1; row < rows; ++row)
+				{
+					const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
+
+					for (auto col_2 = std::size_t{ 0 }; col_2 < col; ++col_2)
+					{
+						const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
+						const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
+
+						l_buf[elem_idx] -= factor * elem_above;
+					}
+				}
+			}
+		}
+
+		inline void u_back_substitution(auto& u_buf, std::size_t cols)
+		{
+			for (auto col = cols; col > 0; --col)
+			{
+				const auto col_idx   = col - 1;
+				auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
+				const auto diag_elem = u_buf[diag_elem_idx];
+
+				// Pivot can simply be replaced with the factor
+				const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
+				u_buf[diag_elem_idx]   = diag_factor;
+
+				// Multiply every element to the right of the pivot by the
+				// factor
+				for (auto idx = cols - col; idx > 0; --idx)
+				{
+					u_buf[++diag_elem_idx] *= diag_factor;
+				}
+
+				for (auto row = col_idx; row > 0; --row)
+				{
+					// Use the pivot as the factor to compute the numbers
+					// above the pivot in the same column (this works because)
+					// the augmented matrix would have zeroes above the pivot
+					const auto row_idx            = row - 1;
+					const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
+					const auto elem_before_factor = u_buf[elem_idx];
+					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
+
+					// Add the corresponding elements of the rows of the current
+					// pivot onto the rows above
+					for (auto col_2 = cols; col_2 > col; --col_2)
+					{
+						const auto col_2_idx     = col_2 - 1;
+						auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
+						const auto diag_row_elem = u_buf[diag_row_idx];
+
+						const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+						const auto elem     = u_buf[elem_idx];
+						const auto factor   = elem_before_factor * -1;
+
+						const auto new_elem = factor * diag_row_elem + elem;
+						u_buf[elem_idx]     = new_elem;
+					}
+				}
+			}
+		}
+
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent>
@@ -143,71 +214,15 @@ namespace matrixpp
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				// Compute inverse of L directly on the same buffer
-				for (auto col = std::size_t{ 1 }; col < cols; ++col)
-				{
-					// Optimized version of forward-substitution which
-					// skips making diagnoal 1's
+				auto l_inv_future = std::async(std::launch::async, [rows, cols, &l_buf]() {
+					l_optimized_forward_substitution(l_buf, rows, cols);
+				});
+				auto u_inv_future = std::async(std::launch::async, [cols, &u_buf]() {
+					u_back_substitution(u_buf, cols);
+				});
 
-					for (auto row = col + 1; row < rows; ++row)
-					{
-						const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
-
-						for (auto col_2 = std::size_t{ 0 }; col_2 < col; ++col_2)
-						{
-							const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
-							const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
-
-							l_buf[elem_idx] -= factor * elem_above;
-						}
-					}
-				}
-
-				// Compute inverse of U directly on the same buffer
-				for (auto col = cols; col > 0; --col)
-				{
-					const auto col_idx   = col - 1;
-					auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
-					const auto diag_elem = u_buf[diag_elem_idx];
-
-					// Pivot can simply be replaced with the factor
-					const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
-					u_buf[diag_elem_idx]   = diag_factor;
-
-					// Multiply every element to the right of the pivot by the
-					// factor
-					for (auto idx = cols - col; idx > 0; --idx)
-					{
-						u_buf[++diag_elem_idx] *= diag_factor;
-					}
-
-					for (auto row = col_idx; row > 0; --row)
-					{
-						// Use the pivot as the factor to compute the numbers
-						// above the pivot in the same column (this works because)
-						// the augmented matrix would have zeroes above the pivot
-						const auto row_idx            = row - 1;
-						const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
-						const auto elem_before_factor = u_buf[elem_idx];
-						u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
-
-						// Add the corresponding elements of the rows of the current
-						// pivot onto the rows above
-						for (auto col_2 = cols; col_2 > col; --col_2)
-						{
-							const auto col_2_idx     = col_2 - 1;
-							auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
-							const auto diag_row_elem = u_buf[diag_row_idx];
-
-							const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
-							const auto elem     = u_buf[elem_idx];
-							const auto factor   = elem_before_factor * -1;
-
-							const auto new_elem = factor * diag_row_elem + elem;
-							u_buf[elem_idx]     = new_elem;
-						}
-					}
-				}
+				l_inv_future.wait();
+				u_inv_future.wait();
 
 				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
