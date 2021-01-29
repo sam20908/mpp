@@ -96,7 +96,7 @@ namespace matrixpp
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), std::back_inserter(block_buf));
 			}
 
-			detail::init_matrix_base_with_1d_rng(block_matrix, block_buf, block_rows, block_cols);
+			detail::init_matrix_with_1d_rng_copy(block_matrix, block_buf, block_rows, block_cols);
 
 			return block_matrix;
 		}
