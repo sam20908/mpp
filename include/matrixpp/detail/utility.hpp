@@ -34,17 +34,17 @@ namespace matrixpp::detail
      * in a lot of places, and a typo can cause a lot of things to fail. It's
      * safer to wrap this calculation in a function, so the bug is easier to spot
      */
-	[[nodiscard]] constexpr std::size_t idx_2d_to_1d(std::size_t cols, std::size_t row_idx, std::size_t col_idx)
+	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t cols, std::size_t row_idx, std::size_t col_idx) -> std::size_t
 	{
 		return row_idx * cols + col_idx;
 	}
 
-	[[nodiscard]] constexpr auto dimension_not_zero_and_non_zero(std::size_t rows, std::size_t columns)
+	[[nodiscard]] constexpr auto dimension_not_zero_and_non_zero(std::size_t rows, std::size_t columns) -> bool
 	{
 		return (rows == 0 && columns != 0) || (rows != 0 && columns == 0);
 	}
 
-	[[nodiscard]] constexpr auto range_2d_dimensions(auto&& rng_2d)
+	[[nodiscard]] constexpr auto range_2d_dimensions(auto&& rng_2d) -> std::pair<std::size_t, std::size_t>
 	{
 		auto begin = std::ranges::begin(rng_2d);
 		auto rows  = std::ranges::size(rng_2d);
@@ -64,10 +64,10 @@ namespace matrixpp::detail
 			}
 		}
 
-		return std::pair{ rows, cols };
+		return { rows, cols };
 	}
 
-	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent)
+	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) -> std::size_t
 	{
 		if (left_extent != std::dynamic_extent || right_extent != std::dynamic_extent)
 		{

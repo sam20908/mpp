@@ -94,60 +94,63 @@ namespace matrixpp::detail
 		using buffer_type     = Buffer;
 		using value_type      = Value;
 		using difference_type = typename buffer_type::difference_type;
+		using pointer         = typename buffer_type::pointer;
+		using iterator        = typename buffer_type::iterator;
+		using const_iterator  = typename buffer_type::const_iterator;
 
 		matrix_base() = default; // @TODO: ISSUE #20
 
-		[[nodiscard]] const buffer_type& buffer() const // @TODO: ISSUE #20
+		[[nodiscard]] auto buffer() const -> const buffer_type& // @TODO: ISSUE #20
 		{
 			return _buf;
 		}
 
-		[[nodiscard]] decltype(auto) data() const // @TODO: ISSUE #20
+		[[nodiscard]] auto data() const -> pointer // @TODO: ISSUE #20
 		{
 			return _buf.data();
 		}
 
-		[[nodiscard]] decltype(auto) begin() // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto begin() -> iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.begin();
 		}
 
-		[[nodiscard]] decltype(auto) begin() const // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto begin() const -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cbegin();
 		}
 
-		[[nodiscard]] decltype(auto) end() // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto end() -> iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.end();
 		}
 
-		[[nodiscard]] decltype(auto) end() const // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto end() const -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cend();
 		}
 
-		[[nodiscard]] decltype(auto) cbegin() // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cbegin();
 		}
 
-		[[nodiscard]] decltype(auto) cbegin() const // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cbegin() const -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cbegin();
 		}
 
-		[[nodiscard]] decltype(auto) cend() // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cend() -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cend();
 		}
 
-		[[nodiscard]] decltype(auto) cend() const // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cend() const -> const_iterator // @TODO: ISSUE #20, #21
 		{
 			return _buf.cend();
 		}
 
-		[[nodiscard]] decltype(auto) at(std::size_t row_idx, std::size_t col_idx) const // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
 			if (row_idx >= _rows || col_idx >= _cols)
 			{
@@ -157,37 +160,37 @@ namespace matrixpp::detail
 			return operator()(row_idx, col_idx);
 		}
 
-		[[nodiscard]] value_type& operator()(std::size_t row_idx, std::size_t col_idx) // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) -> value_type& // @TODO: ISSUE #20
 		{
 			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
 
 			return _buf[index];
 		}
 
-		[[nodiscard]] const value_type& operator()(std::size_t row_idx,
-			std::size_t col_idx) const // @TODO: ISSUE #20
+		[[nodiscard]] const auto operator()(std::size_t row_idx,
+			std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
 			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
 
 			return _buf[index];
 		}
 
-		[[nodiscard]] auto rows() const // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _rows;
 		}
 
-		[[nodiscard]] auto columns() const // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _cols;
 		}
 
-		[[nodiscard]] constexpr static auto rows_extent()
+		[[nodiscard]] constexpr static auto rows_extent() -> std::size_t
 		{
 			return RowsExtent;
 		}
 
-		[[nodiscard]] constexpr static auto columns_extent()
+		[[nodiscard]] constexpr static auto columns_extent() -> std::size_t
 		{
 			return ColumnsExtent;
 		}
