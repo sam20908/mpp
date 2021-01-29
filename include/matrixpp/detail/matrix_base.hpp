@@ -196,7 +196,14 @@ namespace matrixpp::detail
 		}
 
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-		friend inline void init_matrix_base_with_1d_rng(
+		friend inline void init_matrix_with_1d_rng_copy(
+			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
+			detail::range_arithmetic auto&& rng,
+			std::size_t rows,
+			std::size_t cols); // @TODO: ISSUE #20
+
+		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
+		friend inline void init_matrix_with_1d_rng_move(
 			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
 			detail::range_arithmetic auto&& rng,
 			std::size_t rows,
@@ -204,7 +211,7 @@ namespace matrixpp::detail
 	};
 
 	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-	inline void init_matrix_base_with_1d_rng(
+	inline void init_matrix_with_1d_rng_copy(
 		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
 		detail::range_arithmetic auto&& rng,
 		std::size_t rows,
@@ -215,5 +222,19 @@ namespace matrixpp::detail
 		allocate_1d_buf_if_vector(base._buf, rows, cols);
 
 		std::ranges::copy(rng, base._buf.begin());
+	}
+
+	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
+	inline void init_matrix_with_1d_rng_move(
+		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
+		detail::range_arithmetic auto&& rng,
+		std::size_t rows,
+		std::size_t cols) // @TODO: ISSUE #20
+	{
+		base._rows = rows;
+		base._cols = cols;
+		allocate_1d_buf_if_vector(base._buf, rows, cols);
+
+		std::ranges::move(rng, base._buf.begin());
 	}
 } // namespace matrixpp::detail

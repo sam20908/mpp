@@ -36,7 +36,7 @@ namespace matrixpp
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
 		{
 			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			detail::init_matrix_base_with_1d_rng(casted, obj.buffer(), obj.rows(), obj.columns());
+			detail::init_matrix_with_1d_rng_copy(casted, obj.buffer(), obj.rows(), obj.columns());
 
 			return casted;
 		}
