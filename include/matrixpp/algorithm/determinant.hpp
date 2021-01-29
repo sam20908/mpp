@@ -60,7 +60,7 @@ namespace matrixpp
 
 			auto u_buf = lu_decomp_buf_t{};
 
-			allocate_1d_buf_if_vector(u_buf, rows, cols);
+			allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{ 0 });
 			std::ranges::copy(obj, u_buf.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U)
