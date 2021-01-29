@@ -33,50 +33,48 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		using mul_constant_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
-			return left(row_idx, col_idx) * right;
-		});
-		using mul_op_t          = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
-            using result_t = typename std::decay_t<decltype(left)>::value_type;
+		using mul_constant_op_t = decltype(
+			[](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) -> decltype(left(row_idx, col_idx) *
+																								right) {
+				return left(row_idx, col_idx) * right;
+			});
+		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) ->
+			typename std::decay_t<decltype(left)>::value_type {
+				using result_t = typename std::decay_t<decltype(left)>::value_type;
 
-            auto left_cols = left.columns();
-            auto result    = result_t{ 0 };
+				auto left_cols = left.columns();
+				auto result    = result_t{ 0 };
 
-            for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
-            {
-                result += left(row_idx, index) * right(index, col_idx);
-            }
+				for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
+				{
+					result += left(row_idx, index) * right(index, col_idx);
+				}
 
-            return result;
-        });
+				return result;
+			});
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) operator*(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant)
+	[[nodiscard]] inline auto operator*(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj,
+		Value constant) -> detail::expr_binary_constant_op<RowsExtent,
+		ColumnsExtent,
+		detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
+		Value,
+		detail::mul_constant_op_t> // @TODO: ISSUE #20
 	{
-		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
-
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_t>{
-			obj,
-			constant,
-			obj.rows(),
-			obj.columns()
-		};
+		return { obj, constant, obj.rows(), obj.columns() };
 	}
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline decltype(auto) operator*(Value constant,
+	[[nodiscard]] inline auto operator*(Value constant,
 		const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj)
+		-> detail::expr_binary_constant_op<RowsExtent,
+			ColumnsExtent,
+			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
+			Value,
+			detail::mul_constant_op_t> // @TODO: ISSUE #20
 	{
-		using obj_type = detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>;
-
-		return detail::expr_binary_constant_op<RowsExtent, ColumnsExtent, obj_type, Value, detail::mul_constant_op_t>{
-			obj,
-			constant,
-			obj.rows(),
-			obj.columns()
-		};
+		return { obj, constant, obj.rows(), obj.columns() };
 	}
 
 	template<typename LeftBase,
@@ -86,26 +84,23 @@ namespace matrixpp
 		std::size_t LeftColumnsExtent,
 		std::size_t RightRowsExtent,
 		std::size_t RightColumnsExtent>
-	[[nodiscard]] inline decltype(auto) operator*(
+	[[nodiscard]] inline auto operator*(
 		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
 		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right)
+		-> detail::expr_binary_op<LeftRowsExtent,
+			RightColumnsExtent,
+			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
+			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
+			detail::mul_op_t> // @TODO: ISSUE #20
 	{
-		using left_type  = detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>;
-		using right_type = detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>;
-
 		detail::validate_matrices_multipliable(left, right);
 
-		return detail::expr_binary_op<LeftRowsExtent, RightColumnsExtent, left_type, right_type, detail::mul_op_t>{
-			left,
-			right,
-			left.rows(),
-			right.columns()
-		};
+		return { left, right, left.rows(), right.columns() };
 	}
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	inline decltype(auto) operator*=(matrix<Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant) // @TODO: ISSUE #20
+	inline auto operator*=(matrix<Value, RowsExtent, ColumnsExtent>& obj, Value constant)
+		-> matrix<Value, RowsExtent, ColumnsExtent>& // @TODO: ISSUE #20
 	{
 		std::ranges::transform(obj, obj.begin(), std::bind_front(std::multiplies<>{}, constant));
 
