@@ -40,13 +40,13 @@ namespace matrixpp
 	} // namespace customize
 
 	template<typename... Args>
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, Args&&...)
+	[[nodiscard]] constexpr auto tag_invoke(matrix_rows_extent_tag, Args&&...) -> std::size_t
 	{
 		return std::dynamic_extent;
 	}
 
 	template<typename... Args>
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, Args&&...)
+	[[nodiscard]] constexpr auto tag_invoke(matrix_columns_extent_tag, Args&&...) -> std::size_t
 	{
 		return std::dynamic_extent;
 	}
