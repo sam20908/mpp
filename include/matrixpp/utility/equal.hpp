@@ -32,7 +32,7 @@ namespace matrixpp
 		std::size_t RightRowsExtent,
 		std::size_t RightColumnsExtent>
 	[[nodiscard]] inline auto operator==(const matrix<Value, LeftRowsExtent, LeftColumnsExtent>& left,
-		const matrix<Value, RightRowsExtent, RightColumnsExtent>& right) // @TODO: ISSUE #20
+		const matrix<Value, RightRowsExtent, RightColumnsExtent>& right) -> bool // @TODO: ISSUE #20
 	{
 		return std::ranges::equal(left, right);
 	}
