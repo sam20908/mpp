@@ -44,7 +44,8 @@ namespace matrixpp::detail
 		return (rows == 0 && columns != 0) || (rows != 0 && columns == 0);
 	}
 
-	[[nodiscard]] constexpr auto range_2d_dimensions(auto&& rng_2d) -> std::pair<std::size_t, std::size_t>
+	[[nodiscard]] inline auto range_2d_dimensions(auto&& rng_2d)
+		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20
 	{
 		auto begin = std::ranges::begin(rng_2d);
 		auto rows  = std::ranges::size(rng_2d);

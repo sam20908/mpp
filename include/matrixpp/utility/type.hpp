@@ -38,8 +38,8 @@ namespace matrixpp
 	struct type_t
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(type_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix_type
+		[[nodiscard]] friend inline auto tag_invoke(type_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix_type // @TODO: ISSUE #20
 		{
 			auto row_is_dynamic    = obj.rows_extent() == std::dynamic_extent;
 			auto column_is_dynamic = obj.columns_extent() == std::dynamic_extent;
@@ -63,8 +63,8 @@ namespace matrixpp
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<type_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<type_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
