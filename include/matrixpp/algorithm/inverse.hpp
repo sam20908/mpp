@@ -222,10 +222,12 @@ namespace matrixpp
 				}
 				else
 				{
-					auto l_inv_future = std::async(std::launch::async, [cols, &l_buf]() {
+					// Compute inv(L) and inv(U) in parallel because they don't share data
+
+					auto l_inv_future = std::async(std::launch::async, [&l_buf, cols]() {
 						l_optimized_forward_substitution(l_buf, cols);
 					});
-					auto u_inv_future = std::async(std::launch::async, [cols, &u_buf]() {
+					auto u_inv_future = std::async(std::launch::async, [&u_buf, cols]() {
 						u_back_substitution(u_buf, cols);
 					});
 
