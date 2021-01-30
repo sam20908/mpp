@@ -27,6 +27,7 @@
 
 #include <concepts>
 #include <future>
+#include <type_traits>
 
 namespace matrixpp
 {
@@ -214,15 +215,23 @@ namespace matrixpp
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				auto l_inv_future = std::async(std::launch::async, [cols, &l_buf]() {
+				if (std::is_constant_evaluated())
+				{
 					l_optimized_forward_substitution(l_buf, cols);
-				});
-				auto u_inv_future = std::async(std::launch::async, [cols, &u_buf]() {
 					u_back_substitution(u_buf, cols);
-				});
+				}
+				else
+				{
+					auto l_inv_future = std::async(std::launch::async, [cols, &l_buf]() {
+						l_optimized_forward_substitution(l_buf, cols);
+					});
+					auto u_inv_future = std::async(std::launch::async, [cols, &u_buf]() {
+						u_back_substitution(u_buf, cols);
+					});
 
-				l_inv_future.wait();
-				u_inv_future.wait();
+					l_inv_future.wait();
+					u_inv_future.wait();
+				}
 
 				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
