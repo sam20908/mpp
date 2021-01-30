@@ -17,6 +17,9 @@
  * under the License.
  */
 
+#include "../../include/utility.hpp"
+
+#include <functional>
 #include <gtest/gtest.h>
 #include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
@@ -101,5 +104,26 @@ namespace
 		EXPECT_FLOAT_EQ(inverse(3, 1), 0.F);
 		EXPECT_FLOAT_EQ(inverse(3, 2), -1.F);
 		EXPECT_FLOAT_EQ(inverse(3, 3), 1.F);
+	}
+
+	// Typed tests
+
+	template<typename>
+	class Inverse_TypedTest : public testing::Test
+	{
+	};
+
+	using default_return_test_types = testing::Types<matrixpp::matrix<int>,
+		matrixpp::matrix<unsigned int>,
+		matrixpp::matrix<double>,
+		matrixpp::matrix<long>,
+		matrixpp::matrix<long double>,
+		matrixpp::matrix<float>>;
+
+	TYPED_TEST_SUITE(Inverse_TypedTest, default_return_test_types, matrixpp_test::detail::value_type_names);
+
+	TYPED_TEST(Inverse_TypedTest, DefaultToDoubleMatrix)
+	{
+		testing::StaticAssertTypeEq<std::invoke_result_t<matrixpp::inverse_t, TypeParam>, matrixpp::matrix<double>>();
 	}
 } // namespace
