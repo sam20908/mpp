@@ -21,14 +21,10 @@
 
 #include "../utility/config.hpp"
 #include "constraints.hpp"
-#include "expr_base.hpp"
 #include "tag_invoke.hpp"
 
 #include <cstddef>
-#include <iterator>
-#include <ranges>
-#include <stdexcept>
-#include <utility>
+#include <initializer_list>
 
 namespace matrixpp
 {
