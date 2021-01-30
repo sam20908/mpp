@@ -58,6 +58,7 @@ namespace matrixpp_test::detail
 			// clang-format off
 			else [[unlikely]]
 			{
+				// This is to avoid the warning of control path not returning a value
 				return "";
 			}
 			// clang-format on
