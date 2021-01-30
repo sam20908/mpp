@@ -257,7 +257,7 @@ namespace matrixpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<Value, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+			-> matrix<detail::lu_decomp_value_t, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			return detail::inv_func<detail::lu_decomp_value_t>(obj);
 		}
