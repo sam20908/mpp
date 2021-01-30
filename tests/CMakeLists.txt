@@ -37,6 +37,8 @@ if(${PROJECT_NAME_UPPER}_BUILD_UNIT_TESTS)
     add_subdirectory("unit_tests")
 endif()
 
-add_test(NAME "test" 
-    COMMAND ${LLVM_LIT_EXEC} unit_tests compile_tests
-    WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")
+if(LLVM_LIT_EXEC)
+    add_test(NAME "test" 
+        COMMAND ${LLVM_LIT_EXEC} unit_tests compile_tests
+        WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")
+endif()

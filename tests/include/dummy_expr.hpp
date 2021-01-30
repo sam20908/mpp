@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <matrixpp/detail/expr_base.hpp>
 
 namespace matrixpp_test::detail
@@ -37,21 +38,22 @@ namespace matrixpp_test::detail
 
 		dummy_expr(const Obj& obj) : _obj(obj) {} // @TODO: ISSUE #20
 
-		[[nodiscard]] auto rows() const // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _obj.rows();
 		}
 
-		[[nodiscard]] auto columns() const // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _obj.columns();
 		}
-		[[nodiscard]] decltype(auto) at(std::size_t row_idx, std::size_t col_idx) const // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
 			return operator()(row_idx, col_idx);
 		}
 
-		[[nodiscard]] decltype(auto) operator()(std::size_t row_idx, std::size_t col_idx) const // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const
+			-> const value_type& // @TODO: ISSUE #20
 		{
 			return _obj(row_idx, col_idx);
 		}

@@ -25,9 +25,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
-#include <span>
-#include <type_traits>
 
 namespace matrixpp::detail
 {
@@ -86,7 +83,7 @@ namespace matrixpp::detail
 			_rows = rows;
 			_cols = columns;
 
-			allocate_1d_buf_if_vector(_buf, rows, cols);
+			allocate_1d_buf_if_vector(_buf, rows, cols, Value{ 0 });
 			transform_1d_buf_into_identity<Value>(_buf, rows);
 		}
 

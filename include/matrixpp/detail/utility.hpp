@@ -29,13 +29,14 @@
 
 namespace matrixpp::detail
 {
-	/**
-     * This is mainly for avoiding bug-prone code, because this calculation occurs
-     * in a lot of places, and a typo can cause a lot of things to fail. It's
-     * safer to wrap this calculation in a function, so the bug is easier to spot
-     */
 	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t cols, std::size_t row_idx, std::size_t col_idx) -> std::size_t
 	{
+		// This is mainly for avoiding bug-prone code, because this calculation occurs
+		// in a lot of places, and a typo can cause a lot of things to fail. It's
+		// safer to wrap this calculation in a function, so the bug is easier to spot
+
+		// This also assumes that the storage of row-major
+
 		return row_idx * cols + col_idx;
 	}
 
@@ -112,6 +113,8 @@ namespace matrixpp::detail
 	template<typename Value>
 	inline void transform_1d_buf_into_identity(auto& buf, std::size_t n) // @TODO: ISSUE #20
 	{
+		// This assumes that the buffer is already filled with zeroes
+
 		for (auto idx = std::size_t{ 0 }; idx < n; ++idx)
 		{
 			buf[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
@@ -121,6 +124,8 @@ namespace matrixpp::detail
 	template<typename To, typename From>
 	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n) // @TODO: ISSUE #20
 	{
+		// @TODO: Make this parallel?
+
 		for (auto row = std::size_t{ 0 }; row < n; ++row)
 		{
 			for (auto col = std::size_t{ 0 }; col < n; ++col)

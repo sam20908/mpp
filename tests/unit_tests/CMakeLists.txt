@@ -30,11 +30,7 @@ else()
     message(STATUS "LLVM Lit not found! LLVM test suite for unit tests won't be set up")
 endif()
 
-# This executable will contain all the unit tests
-add_executable("unit_test")
-target_sources("unit_test" PRIVATE "gtest_main.cpp")
-_setup_target("unit_test" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
-_turn_on_warnings("unit_test")
+add_custom_target("unit_test")
 
 function(_create_unit_test TEST_FILENAME)
     set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
@@ -47,7 +43,7 @@ function(_create_unit_test TEST_FILENAME)
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
 
-    target_sources("unit_test" PRIVATE "${TEST_SOURCE}")
+    add_dependencies("unit_test" ${TEST_NAME})
 endfunction()
 
 cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
@@ -58,7 +54,7 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE "$<TARGET_FILE:unit_test>"
+        EXECUTABLE "ctest"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "unit_test")
 endif()

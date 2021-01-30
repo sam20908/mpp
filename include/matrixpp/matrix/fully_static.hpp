@@ -19,8 +19,14 @@
 
 #pragma once
 
+#include "../detail/constraints.hpp"
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
+
+#include <initializer_list>
+#include <stdexcept>
+#include <utility>
+
 
 namespace matrixpp
 {
@@ -28,6 +34,9 @@ namespace matrixpp
 	class matrix :
 		public detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>
 	{
+		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents,
+		// it's picked up by other specializations, meaning we can avoid conditional inheritance of a base class
+
 		static_assert(!detail::dimension_not_zero_and_non_zero(RowsExtent, ColumnsExtent),
 			"Cannot have one side being zero and other side being non-zero!");
 
@@ -49,7 +58,8 @@ namespace matrixpp
 			base::init_buf_2d_static(init_2d, rows, cols);
 		}
 
-		explicit matrix(detail::range_2d_with_type<Value> auto&& rng_2d) // @TODO: ISSUE #20
+		template<detail::range_2d_with_type<Value> Range2D>
+		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
@@ -58,8 +68,7 @@ namespace matrixpp
 				throw std::invalid_argument("2D initializer's dimensions does not match the provided extents!");
 			}
 
-			using decayed_rng_2d_t = std::decay_t<decltype(rng_2d)>;
-			base::init_buf_2d_static(std::forward<decayed_rng_2d_t>(rng_2d), rows, cols);
+			base::init_buf_2d_static(std::forward<Range2D>(rng_2d), rows, cols);
 		}
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20

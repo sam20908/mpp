@@ -19,8 +19,13 @@
 
 #pragma once
 
+#include "../detail/constraints.hpp"
 #include "../detail/matrix_base.hpp"
 #include "../detail/matrix_def.hpp"
+
+#include <initializer_list>
+#include <stdexcept>
+#include <utility>
 
 namespace matrixpp
 {
@@ -50,7 +55,8 @@ namespace matrixpp
 			base::init_buf_2d_dynamic(init_2d, rows, ColumnsExtent);
 		}
 
-		explicit matrix(detail::range_2d_with_type<Value> auto&& rng_2d) // @TODO: ISSUE #20
+		template<detail::range_2d_with_type<Value> Range2D>
+		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
@@ -64,8 +70,7 @@ namespace matrixpp
 				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
 			}
 
-			using decayed_rng_2d_t = std::decay_t<decltype(rng_2d)>;
-			base::init_buf_2d_dynamic(std::forward<decayed_rng_2d_t>(rng_2d), rows, ColumnsExtent);
+			base::init_buf_2d_dynamic(std::forward<Range2D>(rng_2d), rows, ColumnsExtent);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>

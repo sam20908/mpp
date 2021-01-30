@@ -26,7 +26,7 @@
 
 namespace
 {
-	// Benchmark limit without hanging (UB?)
+	// Benchmark limit without exceeding max CI job time
 	static constexpr auto MAX_DETERMINANT_NXN_WITHOUT_BREAKING = 512;
 	static constexpr auto MAX_INVERSE_NXN_WITHOUT_BREAKING     = 512;
 } // namespace
@@ -40,8 +40,7 @@ static void Determinant(benchmark::State& state)
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
-		// Use long double to ensure no overflow or underflow
-		benchmark::DoNotOptimize(matrixpp::determinant(std::type_identity<long double>{}, matrix));
+		benchmark::DoNotOptimize(matrixpp::determinant(std::type_identity<long int>{}, matrix));
 		benchmark::ClobberMemory();
 	}
 
@@ -58,7 +57,6 @@ static void Inverse(benchmark::State& state)
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
-		// Use long double to ensure no overflow or underflow
 		benchmark::DoNotOptimize(matrixpp::inverse(std::type_identity<long double>{}, matrix));
 		benchmark::ClobberMemory();
 	}
@@ -71,7 +69,7 @@ static void Block(benchmark::State& state)
 {
 	auto matrix =
 		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
-	auto n = state.range() == 0 ? 0 : state.range() - 1; // avoid out of range on reaching max size
+	auto n = state.range() == 0 ? 0 : state.range() - 1; // Avoid out of range on reaching max size
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
