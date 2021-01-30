@@ -35,12 +35,13 @@ namespace matrixpp
 	struct block_t
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(block_t,
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
 			std::size_t top_row_idx,
 			std::size_t top_column_idx,
 			std::size_t bottom_row_idx,
-			std::size_t bottom_column_idx) -> matrix<Value, std::dynamic_extent, std::dynamic_extent>
+			std::size_t bottom_column_idx)
+			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
 		{
 			// The result matrix is always dynamic because function parameters are always
 			// treated as runtime expressions
@@ -102,8 +103,8 @@ namespace matrixpp
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<block_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<block_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}

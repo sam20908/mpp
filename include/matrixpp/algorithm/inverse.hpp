@@ -105,7 +105,7 @@ namespace matrixpp
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent>
+			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			const auto rows = obj.rows();
 			const auto cols = obj.columns();
@@ -256,23 +256,23 @@ namespace matrixpp
 	struct inverse_t
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<Value, RowsExtent, ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix<Value, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			return detail::inv_func<detail::lu_decomp_value_t>(obj);
 		}
 
 		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(inverse_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
+		[[nodiscard]] friend inline auto
+		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			return detail::inv_func<To>(obj);
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<inverse_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<inverse_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}

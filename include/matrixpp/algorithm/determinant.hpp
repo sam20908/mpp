@@ -118,22 +118,23 @@ namespace matrixpp
 	struct determinant_t
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> Value
+		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> Value // @TODO: ISSUE #20
 		{
 			return detail::det_func<Value>(obj);
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto
-		tag_invoke(determinant_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To
+		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
+			std::type_identity<To>,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
 			return detail::det_func<To>(obj);
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<determinant_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<determinant_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
