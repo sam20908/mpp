@@ -33,7 +33,7 @@ function(_turn_on_warnings target)
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
             -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
     else()
-        target_compile_options(${target} PRIVATE /W4 /WX)
+        target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
     endif()
 endfunction()
 
