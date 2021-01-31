@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <matrixpp/detail/constraints.hpp>
 #include <matrixpp/detail/expr_base.hpp>
 #include <matrixpp/detail/utility.hpp>
@@ -47,13 +48,13 @@ namespace matrixpp::detail
 			_rows = rows;
 			_cols = cols;
 
-			auto idx = std::size_t{ 0 };
-			for (const auto& row : buf_2d)
+			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
+			auto row_begin = _buf.begin();
+
+			for (auto&& row : buf_2d)
 			{
-				for (auto value : row)
-				{
-					_buf[idx++] = value;
-				}
+				std::ranges::copy(row, row_begin);
+				row_begin += rows;
 			}
 		}
 
@@ -63,12 +64,11 @@ namespace matrixpp::detail
 			_cols = cols;
 			_buf.reserve(rows * cols);
 
-			for (const auto& row : buf_2d)
+			auto buf_back_inserter = std::back_inserter(_buf);
+
+			for (auto&& row : buf_2d)
 			{
-				for (auto value : row)
-				{
-					_buf.push_back(value);
-				}
+				std::ranges::copy(row, buf_back_inserter);
 			}
 		}
 
