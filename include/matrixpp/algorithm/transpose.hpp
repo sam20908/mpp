@@ -50,7 +50,7 @@ namespace matrixpp
 				}
 			}
 
-			detail::init_matrix_with_1d_rng_copy(transposed, std::move(buf_copy), cols, rows);
+			detail::init_matrix_with_1d_rng_move(transposed, std::move(buf_copy), cols, rows);
 
 			return transposed;
 		}
