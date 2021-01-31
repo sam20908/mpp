@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include "constraints.hpp"
-#include "expr_base.hpp"
-#include "utility.hpp"
-
 #include <algorithm>
 #include <cstddef>
+#include <matrixpp/detail/constraints.hpp>
+#include <matrixpp/detail/expr_base.hpp>
+#include <matrixpp/detail/utility.hpp>
 
 namespace matrixpp::detail
 {

@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include "../detail/algo_types.hpp"
-#include "../detail/matrix_def.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../detail/utility.hpp"
-#include "../utility/square.hpp"
-
 #include <concepts>
 #include <future>
+#include <matrixpp/detail/algo_types.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
+#include <matrixpp/utility/square.hpp>
 #include <type_traits>
 
 namespace matrixpp

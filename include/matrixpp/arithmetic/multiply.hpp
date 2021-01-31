@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include "../detail/expr_binary_constant_op.hpp"
-#include "../detail/expr_binary_op.hpp"
-#include "../detail/utility.hpp"
-#include "../matrix.hpp"
-
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <matrixpp/detail/expr_binary_constant_op.hpp>
+#include <matrixpp/detail/expr_binary_op.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
 #include <type_traits>
 
 namespace matrixpp
@@ -40,10 +39,10 @@ namespace matrixpp
 			});
 		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) ->
 			typename std::decay_t<decltype(left)>::value_type {
-				using result_t = typename std::decay_t<decltype(left)>::value_type;
+				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
 				auto left_cols = left.columns();
-				auto result    = result_t{ 0 };
+				auto result    = value_type{ 0 };
 
 				for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
 				{

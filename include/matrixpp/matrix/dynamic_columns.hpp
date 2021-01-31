@@ -19,11 +19,10 @@
 
 #pragma once
 
-#include "../detail/constraints.hpp"
-#include "../detail/matrix_base.hpp"
-#include "../detail/matrix_def.hpp"
-
 #include <initializer_list>
+#include <matrixpp/detail/constraints.hpp>
+#include <matrixpp/detail/matrix_base.hpp>
+#include <matrixpp/detail/matrix_def.hpp>
 #include <stdexcept>
 #include <utility>
 

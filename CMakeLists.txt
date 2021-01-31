@@ -45,49 +45,6 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-
-target_sources(${PROJECT_NAME} INTERFACE
-    # Main headers
-    "include/matrixpp/algorithm.hpp"
-    "include/matrixpp/arithmetic.hpp"
-    "include/matrixpp/matrix.hpp"
-    "include/matrixpp/utility.hpp"
-
-    # Matrix headers
-    "include/matrixpp/matrix/dynamic_rows.hpp"
-    "include/matrixpp/matrix/dynamic_columns.hpp"
-    "include/matrixpp/matrix/fully_dynamic.hpp"
-    "include/matrixpp/matrix/fully_static.hpp"
-
-    # Algorithm headers
-    "include/matrixpp/algorithm/block.hpp"
-    "include/matrixpp/algorithm/determinant.hpp"
-    "include/matrixpp/algorithm/inverse.hpp"
-    "include/matrixpp/algorithm/transpose.hpp"
-    
-    # Arithmetic headers
-    "include/matrixpp/arithmetic/add.hpp"
-    "include/matrixpp/arithmetic/subtract.hpp"
-    "include/matrixpp/arithmetic/multiply.hpp"
-    "include/matrixpp/arithmetic/divide.hpp"
-
-    # Utility headers
-    "include/matrixpp/utility/cast.hpp"
-    "include/matrixpp/utility/config.hpp"
-    "include/matrixpp/utility/equal.hpp"
-    "include/matrixpp/utility/square.hpp"
-    "include/matrixpp/utility/type.hpp"
-
-    # Detail headers
-    "include/matrixpp/detail/algo_types.hpp"
-    "include/matrixpp/detail/constraints.hpp"
-    "include/matrixpp/detail/expr_base.hpp"
-    "include/matrixpp/detail/expr_binary_constant_op.hpp"
-    "include/matrixpp/detail/expr_binary_op.hpp"
-    "include/matrixpp/detail/matrix_base.hpp"
-    "include/matrixpp/detail/tag_invoke.hpp"
-    "include/matrixpp/detail/utility.hpp")
-
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 

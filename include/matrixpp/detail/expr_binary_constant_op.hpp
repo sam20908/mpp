@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include "expr_base.hpp"
-
 #include <cstddef>
+#include <matrixpp/detail/expr_base.hpp>
 #include <stdexcept>
 #include <utility>
 

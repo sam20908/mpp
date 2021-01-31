@@ -19,13 +19,12 @@
 
 #pragma once
 
-#include "../utility/config.hpp"
-#include "constraints.hpp"
-#include "expr_base.hpp"
-#include "tag_invoke.hpp"
-
 #include <cstddef>
 #include <initializer_list>
+#include <matrixpp/detail/constraints.hpp>
+#include <matrixpp/detail/expr_base.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/utility/config.hpp>
 
 namespace matrixpp
 {

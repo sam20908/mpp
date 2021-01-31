@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include "../matrix.hpp"
-
 #include <algorithm>
 #include <cstddef>
+#include <matrixpp/matrix.hpp>
 
 namespace matrixpp
 {

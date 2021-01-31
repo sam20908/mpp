@@ -20,10 +20,7 @@ find_package(benchmark CONFIG REQUIRED)
 set(BENCHMARKS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
 set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main)
 
-# This executable will contain all the benchmarks
-add_executable("benchmark")
-_setup_target("benchmark" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
-_turn_on_warnings("benchmark")
+add_custom_target("benchmark")
 
 function(_create_benchmark TEST_FILE)
     set(TEST_NAME "${TEST_FILE}_benchmark")
@@ -33,7 +30,7 @@ function(_create_benchmark TEST_FILE)
     _setup_target(${TEST_NAME} "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
 
-    target_sources("benchmark" PRIVATE "${TEST_SOURCE}")
+    add_dependencies("benchmark" ${TEST_NAME})
 endfunction()
 
 _create_benchmark("algorithms")
