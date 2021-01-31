@@ -106,6 +106,9 @@ namespace matrixpp
 
 		explicit matrix(Value value) // @TODO: ISSUE #20
 		{
+			base::_rows = RowsExtent;
+			base::_cols = ColumnsExtent;
+
 			std::ranges::fill(base::_buf, value);
 		}
 

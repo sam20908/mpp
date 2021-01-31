@@ -40,8 +40,8 @@ namespace matrixpp::detail
 	{
 	protected:
 		Buffer _buf;
-		std::size_t _rows{ RowsExtent == std::dynamic_extent ? 0 : RowsExtent };
-		std::size_t _cols{ ColumnsExtent == std::dynamic_extent ? 0 : ColumnsExtent };
+		std::size_t _rows;
+		std::size_t _cols;
 
 		void init_buf_2d_static(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
