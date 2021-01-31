@@ -26,7 +26,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <span>
 #include <stdexcept>
 
@@ -87,7 +86,7 @@ namespace matrixpp
 
 			block_buf.reserve(block_rows * block_cols);
 
-			using diff_t = typename std::decay_t<decltype(obj.buffer())>::difference_type;
+			using diff_t = typename matrix<Value, RowsExtent, ColumnsExtent>::difference_type;
 
 			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
 			{
