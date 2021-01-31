@@ -19,8 +19,21 @@ under the License.
 
 # pylint: skip-file
 
-from lit.formats import GoogleTest
+from lit.Test import FAIL, UNSUPPORTED, PASS
+from lit.util import executeCommand
+from lit.formats import FileBasedTest
 
-config.name = 'Unit Test'
-config.test_format = GoogleTest('@UNIT_TESTS_OUTPUT_DIR@', 
-    '@UNIT_TESTS_EXECUTABLE_SUFFIX@')
+
+# Check exit code of a simple executable with no input
+# NOTE: Copied from llvm-project!
+class ExecutableTest(FileBasedTest):
+    def execute(self, test, litConfig):
+        if test.config.unsupported:
+            return UNSUPPORTED
+
+        out, err, exitCode = executeCommand(test.getSourcePath())
+
+        if not exitCode:
+            return PASS, ''
+
+        return FAIL, out+err

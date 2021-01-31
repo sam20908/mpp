@@ -25,9 +25,10 @@ set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gt
 set(INCLUDE_HEADERS "../include/dummy_expr.hpp" "../include/utility.hpp")
 
 if(LLVM_LIT_EXEC)
+    message(STATUS "LLVM Lit found! LLVM Lit configuration for unit tests will be created")
     configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 else()
-    message(STATUS "LLVM Lit not found! LLVM test suite for unit tests won't be set up")
+    message(STATUS "LLVM Lit not found! LLVM Lit configuration for unit tests will not be created")
 endif()
 
 add_custom_target("unit_test")
@@ -57,6 +58,12 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
         EXECUTABLE "ctest"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "unit_test")
+endif()
+
+if(LLVM_LIT_EXEC)
+    add_test(NAME "unit_test" 
+        COMMAND ${LLVM_LIT_EXEC} .
+        WORKING_DIRECTORY "${UNIT_TESTS_BINARY_DIR}")
 endif()
 
 # Algorithm tests

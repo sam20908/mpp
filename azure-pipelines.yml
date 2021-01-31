@@ -93,7 +93,7 @@ jobs:
 
   - script: |
       cd build/bin/benchmarks
-      ./benchmark --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+      lit .
     displayName: Run All Benchmarks
 
 # - job: BuildAndTestWindows

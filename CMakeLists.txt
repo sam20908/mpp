@@ -51,6 +51,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the test suites" OFF)
 option(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS "Builds the benchmarks" OFF)
 
+# There are several LLVM Lit distributions: Python's Lit package and
+# LLVM Lit build from source, which also has version suffixes we need
+# to account for
+find_program(LLVM_LIT_EXEC NAMES lit llvm-lit llvm-lit-*)
+
 if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
     enable_testing()
     add_subdirectory("tests")
