@@ -34,6 +34,6 @@ class ExecutableTest(FileBasedTest):
         out, err, exitCode = executeCommand(test.getSourcePath())
 
         if not exitCode:
-            return PASS, ''
+            return PASS, out
 
         return FAIL, out+err
