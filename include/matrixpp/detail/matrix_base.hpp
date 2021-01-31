@@ -230,6 +230,6 @@ namespace matrixpp::detail
 	{
 		base._rows = rows;
 		base._cols = cols;
-		base._buf = std::move(rng);
+		base._buf  = std::move(rng);
 	}
 } // namespace matrixpp::detail
