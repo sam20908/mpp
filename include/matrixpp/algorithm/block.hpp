@@ -78,10 +78,11 @@ namespace matrixpp
 				throw std::invalid_argument("Top column index bigger than bottom column index!");
 			}
 
-			auto block_matrix = matrix<Value, std::dynamic_extent, std::dynamic_extent>{};
-			auto block_buf    = std::vector<Value>{};
-			auto block_rows   = bottom_row_idx - top_row_idx + 1;
-			auto block_cols   = bottom_column_idx - top_column_idx + 1;
+			auto block_matrix            = matrix<Value, std::dynamic_extent, std::dynamic_extent>{};
+			auto block_buf               = std::vector<Value>{};
+			auto block_buf_back_inserter = std::back_inserter(block_buf);
+			auto block_rows              = bottom_row_idx - top_row_idx + 1;
+			auto block_cols              = bottom_column_idx - top_column_idx + 1;
 
 			block_buf.reserve(block_rows * block_cols);
 
@@ -92,7 +93,7 @@ namespace matrixpp
 				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(cols, row, top_column_idx));
 				auto row_begin     = std::next(obj_begin, row_begin_idx);
 
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), std::back_inserter(block_buf));
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), block_buf_back_inserter);
 			}
 
 			detail::init_matrix_with_1d_rng_move(block_matrix, std::move(block_buf), block_rows, block_cols);
