@@ -21,7 +21,6 @@
 #include <cstddef>
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
-#include <matrixpp/utility/singular.hpp>
 #include <utility>
 
 namespace
