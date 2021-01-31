@@ -43,7 +43,7 @@ namespace matrixpp::detail
 		std::size_t _rows;
 		std::size_t _cols;
 
-		void init_buf_2d_static(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void init_buf_2d_static(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -51,14 +51,14 @@ namespace matrixpp::detail
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buf.begin();
 
-			for (auto&& row : buf_2d)
+			for (auto&& row : rng_2d)
 			{
 				std::ranges::copy(row, row_begin);
 				row_begin += rows;
 			}
 		}
 
-		void init_buf_2d_dynamic(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void init_buf_2d_dynamic(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -66,7 +66,7 @@ namespace matrixpp::detail
 
 			auto buf_back_inserter = std::back_inserter(_buf);
 
-			for (auto&& row : buf_2d)
+			for (auto&& row : rng_2d)
 			{
 				std::ranges::copy(row, buf_back_inserter);
 			}
