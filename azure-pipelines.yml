@@ -57,7 +57,7 @@ jobs:
   - script: |
       sudo apt-get update
       sudo apt-get install gcovr
-    displayName: Install Gcovr
+    displayName: Install GCC Gcovr
 
   - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
     displayName: Configure For Tests in Debug Configuration
@@ -77,13 +77,13 @@ jobs:
       cd build/bin/tests
       lit compile_tests unit_tests --xunit-xml-output results.xml
     continueOnError: true
-    displayName: Run Lit Test
+    displayName: Run Tests
 
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: JUnit
       testResultsFiles: '**/results.xml' 
-    displayName: Publish Lit Test Results
+    displayName: Publish Tests Results
 
   - script: cmake -DCMAKE_BUILD_TYPE=Release -DMATRIXPP_BUILD_BENCHMARKS=TRUE -B build
     displayName: Configure For Benchmarks in Release Configuration
