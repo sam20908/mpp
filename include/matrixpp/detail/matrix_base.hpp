@@ -201,14 +201,14 @@ namespace matrixpp::detail
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 		friend inline void init_matrix_with_1d_rng_copy(
 			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-			detail::range_arithmetic auto&& rng,
+			auto&& rng,
 			std::size_t rows,
 			std::size_t cols); // @TODO: ISSUE #20
 
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 		friend inline void init_matrix_with_1d_rng_move(
 			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-			detail::range_arithmetic auto&& rng,
+			auto&& rng,
 			std::size_t rows,
 			std::size_t cols); // @TODO: ISSUE #20
 	};
@@ -216,7 +216,7 @@ namespace matrixpp::detail
 	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 	inline void init_matrix_with_1d_rng_copy(
 		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		detail::range_arithmetic auto&& rng,
+		auto&& rng,
 		std::size_t rows,
 		std::size_t cols) // @TODO: ISSUE #20
 	{
@@ -230,7 +230,7 @@ namespace matrixpp::detail
 	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 	inline void init_matrix_with_1d_rng_move(
 		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		detail::range_arithmetic auto&& rng,
+		auto&& rng,
 		std::size_t rows,
 		std::size_t cols) // @TODO: ISSUE #20
 	{
