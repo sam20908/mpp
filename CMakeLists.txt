@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+cmake_minimum_required(VERSION 3.17)
+
 function(_setup_target target binary_dir libraries)
     target_link_libraries(${target} PRIVATE ${libraries})
 
@@ -34,8 +36,6 @@ function(_turn_on_warnings target)
         target_compile_options(${target} PRIVATE /W4 /WX)
     endif()
 endfunction()
-
-cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file")
