@@ -49,7 +49,7 @@ namespace
 
 	TEST(Inverse, 2x2)
 	{
-		auto matrix  = matrixpp::matrix{ { { 65, 4 }, { -9, 122 } } };
+		auto matrix  = matrixpp::matrix{ { 65, 4 }, { -9, 122 } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
@@ -63,7 +63,7 @@ namespace
 
 	TEST(Inverse, 3x3)
 	{
-		auto matrix  = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto matrix  = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 3);
@@ -82,7 +82,7 @@ namespace
 
 	TEST(Inverse, 4x4)
 	{
-		auto matrix  = matrixpp::matrix{ { { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } } };
+		auto matrix  = matrixpp::matrix{ { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } };
 		auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 4);

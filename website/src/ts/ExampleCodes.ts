@@ -23,11 +23,11 @@ namespace mpp = matrixpp;
 
 int main()
 {
-    auto m = mpp::matrix{{
+    auto m = mpp::matrix{
         { 1, 2, 3 },
         { 1, 2, 3 },
         { 1, 2, 3 }
-    }}; // Uses 2D initializer list initializer. Defaults to dynamic matrix
+    }; // Uses 2D initializer list initializer. Defaults to dynamic matrix
 
     // Remember that math operations are expression templates, so the results are not evaluated immediately
     auto expr = m + m - m * 2 + m / 3;

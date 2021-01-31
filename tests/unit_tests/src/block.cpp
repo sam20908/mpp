@@ -26,7 +26,7 @@ namespace
 {
 	TEST(Block, FullBlock)
 	{
-		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -49,7 +49,7 @@ namespace
 
 	TEST(Block, Cropped_3x3To2x2)
 	{
-		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -67,7 +67,7 @@ namespace
 
 	TEST(Block, Cropped_3x3To1x1)
 	{
-		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -82,7 +82,7 @@ namespace
 
 	TEST(Block, IndicesOverlap_Throw)
 	{
-		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		EXPECT_THROW((void)matrixpp::block(from,
 						 static_cast<std::size_t>(1),
 						 static_cast<std::size_t>(1),
@@ -93,7 +93,7 @@ namespace
 
 	TEST(Block, IndicesOutOfBounds_Throw)
 	{
-		auto from = matrixpp::matrix{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		EXPECT_THROW((void)matrixpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),

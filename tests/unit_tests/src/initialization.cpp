@@ -86,7 +86,7 @@ namespace
 
 	TEST(Initialization, FullyStatic_StaticExprObject)
 	{
-		auto m = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto m = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 		auto expr   = matrixpp_test::detail::dummy_expr{ m };
 		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
@@ -110,7 +110,7 @@ namespace
 
 	TEST(Initialization, FullyStatic_DynamicExprObject_SameSize)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		auto matrix = matrixpp::matrix<int, 3, 3>{ expr };
@@ -134,7 +134,7 @@ namespace
 
 	TEST(Initialization, FullyStatic_DynamicExprObject_DifferentSize_Throw)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		EXPECT_THROW((matrixpp::matrix<int, 3, 3>{ expr }), std::runtime_error);
@@ -197,7 +197,7 @@ namespace
 
 	TEST(Initialization, FullyDynamic_ExprObject)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		auto matrix = matrixpp::matrix<int>{ expr };
@@ -276,7 +276,7 @@ namespace
 
 	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		auto matrix = matrixpp::matrix<int, 3>{ expr };
@@ -300,7 +300,7 @@ namespace
 
 	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		EXPECT_THROW((matrixpp::matrix<int, 3>{ expr }), std::runtime_error);
@@ -363,7 +363,7 @@ namespace
 
 	TEST(Initialization, DynamicRows_ExprObject_SameColumns)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ expr };
@@ -387,7 +387,7 @@ namespace
 
 	TEST(Initialization, DynamicRows_ExprObject_DifferentColumns_Throw)
 	{
-		auto m    = matrixpp::matrix<int>{ { { 7, 3 }, { 8, 8 }, { 5, 8 } } };
+		auto m    = matrixpp::matrix<int>{ { 7, 3 }, { 8, 8 }, { 5, 8 } };
 		auto expr = matrixpp_test::detail::dummy_expr{ m };
 
 		EXPECT_THROW((matrixpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::runtime_error);
