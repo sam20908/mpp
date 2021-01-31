@@ -92,6 +92,7 @@ namespace matrixpp::detail
 		using value_type      = Value;
 		using difference_type = typename buffer_type::difference_type;
 		using pointer         = typename buffer_type::pointer;
+		using const_pointer   = typename buffer_type::const_pointer;
 		using iterator        = typename buffer_type::iterator;
 		using const_iterator  = typename buffer_type::const_iterator;
 
@@ -102,7 +103,12 @@ namespace matrixpp::detail
 			return _buf;
 		}
 
-		[[nodiscard]] auto data() const -> pointer // @TODO: ISSUE #20
+		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
+		{
+			return _buf.data();
+		}
+
+		[[nodiscard]] auto data() const -> const_pointer // @TODO: ISSUE #20
 		{
 			return _buf.data();
 		}
