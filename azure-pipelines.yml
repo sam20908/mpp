@@ -85,7 +85,7 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMATRIXPP_BUILD_BENCHMARKS=TRUE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=FALSE -DMATRIXPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
   - script: cmake --build build --config Release --target benchmark
