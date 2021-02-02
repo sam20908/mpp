@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include <cstddef>
 #include <matrixpp/detail/expr_binary_op.hpp>
 #include <matrixpp/detail/utility.hpp>
 #include <matrixpp/matrix.hpp>
+
+#include <cstddef>
 #include <span>
 
 namespace matrixpp

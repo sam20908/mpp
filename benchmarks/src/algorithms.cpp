@@ -18,9 +18,11 @@
  */
 
 #include <benchmark/benchmark.h>
-#include <cstddef>
-#include <matrixpp/algorithm.hpp>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
+#include <matrixpp/algorithm.hpp>
+
+#include <cstddef>
 #include <utility>
 
 namespace

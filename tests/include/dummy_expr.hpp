@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include <cstddef>
 #include <matrixpp/detail/expr_base.hpp>
+
+#include <cstddef>
 
 namespace matrixpp_test::detail
 {

@@ -33,6 +33,7 @@ namespace matrixpp::customize
 } // namespace matrixpp::customize
 
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm.hpp>
 #include <matrixpp/matrix.hpp>
 #include <matrixpp/utility.hpp>

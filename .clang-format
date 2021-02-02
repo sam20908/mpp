@@ -43,6 +43,17 @@ Cpp11BracedListStyle: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 FixNamespaceComments: true
 IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '^(<(gtest|benchmark)/)'
+    Priority:        0
+  - Regex:           '^(<matrixpp/.*/.*\.hpp>)'
+    Priority:        1
+  - Regex:           '^(<matrixpp/.*\.hpp>)'
+    Priority:        1
+    SortPriority:    2
+  - Regex:           '.*'
+    Priority:        3
+    SortPriority:    0
 IndentCaseLabels: false
 IndentPPDirectives: None
 IndentWidth: 4

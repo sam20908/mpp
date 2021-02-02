@@ -18,8 +18,10 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm/block.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
+
 #include <stdexcept>
 
 namespace

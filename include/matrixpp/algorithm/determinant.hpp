@@ -19,12 +19,13 @@
 
 #pragma once
 
-#include <cmath>
 #include <matrixpp/detail/algo_types.hpp>
 #include <matrixpp/detail/tag_invoke.hpp>
 #include <matrixpp/detail/utility.hpp>
-#include <matrixpp/matrix.hpp>
 #include <matrixpp/utility/square.hpp>
+#include <matrixpp/matrix.hpp>
+
+#include <cmath>
 
 namespace matrixpp
 {

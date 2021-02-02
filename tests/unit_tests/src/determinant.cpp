@@ -18,8 +18,10 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
+
 #include <utility>
 
 namespace

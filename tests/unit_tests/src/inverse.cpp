@@ -17,12 +17,13 @@
  * under the License.
  */
 
-#include "../../include/utility.hpp"
-
-#include <functional>
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
+
+#include "../../include/utility.hpp"
+#include <functional>
 #include <utility>
 
 namespace

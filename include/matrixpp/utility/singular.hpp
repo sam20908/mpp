@@ -19,11 +19,12 @@
 
 #pragma once
 
-#include <cstddef>
 #include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/detail/tag_invoke.hpp>
 #include <matrixpp/detail/utility.hpp>
 #include <matrixpp/matrix.hpp>
+
+#include <cstddef>
 
 namespace matrixpp
 {

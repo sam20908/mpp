@@ -18,8 +18,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <matrixpp/matrix.hpp>
+
 #include <matrixpp/utility/equal.hpp>
+#include <matrixpp/matrix.hpp>
 
 namespace
 {

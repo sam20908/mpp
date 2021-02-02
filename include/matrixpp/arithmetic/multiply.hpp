@@ -19,13 +19,14 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cstddef>
-#include <functional>
 #include <matrixpp/detail/expr_binary_constant_op.hpp>
 #include <matrixpp/detail/expr_binary_op.hpp>
 #include <matrixpp/detail/utility.hpp>
 #include <matrixpp/matrix.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <type_traits>
 
 namespace matrixpp

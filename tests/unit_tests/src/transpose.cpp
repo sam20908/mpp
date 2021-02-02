@@ -18,8 +18,10 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm/transpose.hpp>
 #include <matrixpp/matrix.hpp>
+
 #include <span>
 
 namespace

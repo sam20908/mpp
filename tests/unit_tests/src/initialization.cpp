@@ -17,11 +17,12 @@
  * under the License.
  */
 
-#include "../../include/dummy_expr.hpp"
-
-#include <array>
 #include <gtest/gtest.h>
+
 #include <matrixpp/matrix.hpp>
+
+#include "../../include/dummy_expr.hpp"
+#include <array>
 #include <span>
 #include <stdexcept>
 #include <vector>
