@@ -44,7 +44,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '^(<(gtest|benchmark)/.*>)'
+  - Regex:           '^(<(gtest|gmock|benchmark)/.*>)'
     Priority:        0
   - Regex:           '^(<matrixpp/.*/.*\.hpp>)'
     Priority:        1
