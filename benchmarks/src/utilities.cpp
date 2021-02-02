@@ -18,6 +18,7 @@
  */
 
 #include <benchmark/benchmark.h>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
 #include <matrixpp/utility.hpp>
 

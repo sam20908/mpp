@@ -18,6 +18,7 @@
  */
 
 #include <benchmark/benchmark.h>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
 
 // Benchmarking any other matrices (at least one side has compile time specified extent)
