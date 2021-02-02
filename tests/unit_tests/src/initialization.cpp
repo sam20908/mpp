@@ -395,7 +395,7 @@ namespace
 
 	TEST(Initialization, DymamicRowsValueConstructor)
 	{
-		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 3, 1 };
+		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 2, 1 };
 
 		EXPECT_EQ(matrix.rows(), 2);
 		EXPECT_EQ(matrix.columns(), 3);
