@@ -63,8 +63,8 @@ namespace matrixpp
 			allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{ 0 });
 			std::ranges::copy(obj, u_buf.begin());
 
-			// The determinant of a LU Decomposition is det(A) = det(L) * det(U)
-			// Since det(L) is always 1, we can avoid creating L entirely
+			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
+			// creating L entirely
 
 			// Compute U
 			for (auto row = std::size_t{ 0 }; row < rows; ++row)
@@ -74,8 +74,8 @@ namespace matrixpp
 
 				for (auto col = std::size_t{ 0 }; col < row; ++col)
 				{
-					// This allows us to keep track of the row of the factor
-					// later on without having to manually calculate from indexes
+					// This allows us to keep track of the row of the factor later on without having to manually
+					// calculate from indexes
 					auto factor_row_idx = idx_2d_to_1d(cols, col, col);
 
 					const auto elem_idx = idx_2d_to_1d(cols, row, col);

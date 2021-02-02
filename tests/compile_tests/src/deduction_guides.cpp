@@ -24,6 +24,7 @@
 #include <matrixpp/matrix.hpp>
 
 #include "../../include/dummy_expr.hpp"
+
 #include <vector>
 
 int main()

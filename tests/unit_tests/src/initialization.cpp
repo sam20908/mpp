@@ -22,6 +22,7 @@
 #include <matrixpp/matrix.hpp>
 
 #include "../../include/dummy_expr.hpp"
+
 #include <array>
 #include <span>
 #include <stdexcept>

@@ -42,8 +42,7 @@ namespace matrixpp
 			std::size_t bottom_column_idx)
 			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
 		{
-			// The result matrix is always dynamic because function parameters are always
-			// treated as runtime expressions
+			// The result matrix is always dynamic because function parameters are always treated as runtime expressions
 
 			// Out of bounds checks
 
