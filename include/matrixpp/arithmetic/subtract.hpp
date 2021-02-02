@@ -30,7 +30,8 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) {
+		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx)
+										 -> decltype(left(row_idx, col_idx) - right(row_idx, col_idx)) {
 			return left(row_idx, col_idx) - right(row_idx, col_idx);
 		});
 	} // namespace detail
