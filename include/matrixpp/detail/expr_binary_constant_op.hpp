@@ -28,9 +28,9 @@
 namespace matrixpp::detail
 {
 	/**
-     * Binary expression object (one of the operands is a constant, so we have to store it
-     * differently, which differs from expr_binary_op)
-     */
+	 * Binary expression object (one of the operands is a constant, so we have to store it
+	 * differently, which differs from expr_binary_op)
+	 */
 	template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Obj, typename Value, typename Op>
 	class [[nodiscard]] expr_binary_constant_op :
 		public expr_base<expr_binary_constant_op<RowsExtent, ColumnsExtent, Obj, Value, Op>,

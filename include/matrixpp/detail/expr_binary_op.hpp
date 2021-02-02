@@ -28,8 +28,8 @@
 namespace matrixpp::detail
 {
 	/**
-     * Binary expression object (no operand is a constant)
-     */
+	 * Binary expression object (no operand is a constant)
+	 */
 	template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Left, typename Right, typename Op>
 	class [[nodiscard]] expr_binary_op :
 		public expr_base<expr_binary_op<RowsExtent, ColumnsExtent, Left, Right, Op>,

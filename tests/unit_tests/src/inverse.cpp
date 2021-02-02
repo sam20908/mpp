@@ -23,6 +23,7 @@
 #include <matrixpp/matrix/fully_dynamic.hpp>
 
 #include "../../include/utility.hpp"
+
 #include <functional>
 #include <utility>
 

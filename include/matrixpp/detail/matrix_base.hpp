@@ -30,8 +30,8 @@
 namespace matrixpp::detail
 {
 	/**
-     * Base matrix class to store internal data and define common member functions
-     */
+	 * Base matrix class to store internal data and define common member functions
+	 */
 	template<typename Buffer, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class matrix_base :
 		public expr_base<matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>,

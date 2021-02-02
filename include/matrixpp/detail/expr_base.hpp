@@ -25,8 +25,8 @@
 namespace matrixpp::detail
 {
 	/**
-     * Base class for expression objects
-     */
+	 * Base class for expression objects
+	 */
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class [[nodiscard]] expr_base
 	{
