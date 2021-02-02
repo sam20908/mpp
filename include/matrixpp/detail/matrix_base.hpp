@@ -55,7 +55,7 @@ namespace matrixpp::detail
 			for (auto&& row : rng_2d)
 			{
 				std::ranges::copy(row, row_begin);
-				row_begin += rows;
+				row_begin += cols;
 			}
 		}
 
