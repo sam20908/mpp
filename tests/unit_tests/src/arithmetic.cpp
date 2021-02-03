@@ -1384,6 +1384,8 @@ namespace
 		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
 	}
 
+	// @TODO: Revamp multiplication and division tests
+
 	// TEST(Arithmetic, Multiplication_MatrixXScalar)
 	// {
 	// 	auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
