@@ -91,50 +91,52 @@ namespace
 
 	TEST(Customization, DefaultExtents)
 	{
-		auto m = matrixpp::matrix<int>{};
-		EXPECT_EQ(m.rows_extent(), 10);
-		EXPECT_EQ(m.columns_extent(), 10);
+		const auto matrix = matrixpp::matrix<int>{};
+		EXPECT_EQ(matrix.rows_extent(), 10);
+		EXPECT_EQ(matrix.columns_extent(), 10);
 	}
 
 	TEST(Customization, Type)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::type(dummy), dumb_type::lol);
 	}
 
 	TEST(Customization, Cast)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::cast(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Square)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_FALSE(matrixpp::square(dummy));
 	}
 
 	TEST(Customization, Block)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::block(dummy, 0, 0, 0, 0), dumb_class2{});
 	}
 
 	TEST(Customization, Determinant)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::determinant(dummy), 2);
 	}
 
 	TEST(Customization, Inverse)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::inverse(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Transpose)
 	{
-		auto dummy = dumb_class{};
+		const auto dummy = dumb_class{};
 		EXPECT_EQ(matrixpp::transpose(dummy), dumb_class2{});
 	}
+
+	// @TODO: Add customization test for singular and (upcoming) equal CPOs
 } // namespace
