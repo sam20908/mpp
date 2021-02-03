@@ -449,4 +449,100 @@ namespace
 						 static_cast<std::size_t>(3)), // Out of range
 			std::invalid_argument);
 	}
+
+	/**
+	 * Top row index bigger than bottom row index
+	 */
+
+	TEST(Block, TopRowBiggerThanBottomRow_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopRowBiggerThanBottomRow_FullyDynamic_Throw)
+	{
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopRowBiggerThanBottomRow_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopRowBiggerThanBottomRow_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	/**
+	 * Top column index bigger than bottom column index
+	 */
+
+	TEST(Block, TopColumnBiggerThanBottomColumn_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnBiggerThanBottomColumn_FullyDynamic_Throw)
+	{
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnBiggerThanBottomColumn_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnBiggerThanBottomColumn_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0)),
+			std::invalid_argument);
+	}
 } // namespace
