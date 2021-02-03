@@ -50,7 +50,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic2DRange_Copy)
@@ -64,7 +64,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic2DRange_Move)
@@ -78,7 +78,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic2DArray_Copy)
@@ -92,7 +92,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic2DArray_Move)
@@ -106,7 +106,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic_StaticExprObject)
@@ -122,7 +122,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic_DynamicExprObject_SameSize)
@@ -138,7 +138,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyStatic_DynamicExprObject_DifferentSize_Throw)
@@ -159,7 +159,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), Each(Eq(1)));
+		EXPECT_THAT(matrix, Each(Eq(1)));
 	}
 
 	/**
@@ -176,7 +176,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyDynamic2DRange_Copy)
@@ -190,7 +190,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyDynamic2DRange_Move)
@@ -204,7 +204,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyDynamic_ExprObject)
@@ -223,7 +223,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, FullyDynamicValueConstructor)
@@ -236,7 +236,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), Each(Eq(1)));
+		EXPECT_THAT(matrix, Each(Eq(1)));
 	}
 
 	/**
@@ -253,7 +253,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicColumns2DRange_Copy)
@@ -267,7 +267,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicColumns2DRange_Move)
@@ -281,7 +281,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
@@ -297,7 +297,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
@@ -318,7 +318,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix.buffer(), Each(Eq(1)));
+		EXPECT_THAT(matrix, Each(Eq(1)));
 	}
 
 	/**
@@ -335,7 +335,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicRows2DRange_Copy)
@@ -349,7 +349,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicRows2DRange_Move)
@@ -363,7 +363,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 
@@ -380,7 +380,7 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
 	TEST(Initialization, DynamicRows_ExprObject_DifferentColumns_Throw)
@@ -401,6 +401,6 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix.buffer(), Each(Eq(1)));
+		EXPECT_THAT(matrix, Each(Eq(1)));
 	}
 } // namespace

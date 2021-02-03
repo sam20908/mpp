@@ -34,9 +34,9 @@ namespace matrixpp
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
 		{
-			auto rows       = obj.rows();
-			auto cols       = obj.columns();
-			const auto& buf = obj.buffer();
+			auto rows = obj.rows();
+			auto cols = obj.columns();
+			auto data = obj.data();
 
 			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
 			using transposed_buf_t = typename transposed_t::buffer_type;
@@ -51,7 +51,7 @@ namespace matrixpp
 					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
 					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
 
-					transposed_buf[transposed_idx] = buf[normal_idx];
+					transposed_buf[transposed_idx] = data[normal_idx];
 				}
 			}
 

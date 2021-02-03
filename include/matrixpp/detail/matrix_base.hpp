@@ -98,11 +98,6 @@ namespace matrixpp::detail
 
 		matrix_base() = default; // @TODO: ISSUE #20
 
-		[[nodiscard]] auto buffer() const -> const buffer_type& // @TODO: ISSUE #20
-		{
-			return _buf;
-		}
-
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
 			return _buf.data();
