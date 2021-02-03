@@ -36,8 +36,6 @@ namespace
 	using ::testing::ElementsAre;
 	using ::testing::Eq;
 
-	// Test initialization by rows which are not equal to columns to catch edge cases
-
 	/**
 	 * Fully static matrices
 	 */

@@ -170,7 +170,7 @@ namespace matrixpp::detail
 			return _buf[index];
 		}
 
-		[[nodiscard]] const auto operator()(std::size_t row_idx,
+		[[nodiscard]] auto operator()(std::size_t row_idx,
 			std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
 			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
@@ -186,16 +186,6 @@ namespace matrixpp::detail
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _cols;
-		}
-
-		[[nodiscard]] constexpr static auto rows_extent() -> std::size_t
-		{
-			return RowsExtent;
-		}
-
-		[[nodiscard]] constexpr static auto columns_extent() -> std::size_t
-		{
-			return ColumnsExtent;
 		}
 
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>

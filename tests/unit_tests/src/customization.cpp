@@ -98,43 +98,43 @@ namespace
 
 	TEST(Customization, Type)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::type(d), dumb_type::lol);
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::type(dummy), dumb_type::lol);
 	}
 
 	TEST(Customization, Cast)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::cast(d), dumb_class2{});
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::cast(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Square)
 	{
-		auto d = dumb_class{};
-		EXPECT_FALSE(matrixpp::square(d));
+		auto dummy = dumb_class{};
+		EXPECT_FALSE(matrixpp::square(dummy));
 	}
 
 	TEST(Customization, Block)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::block(d, 0, 0, 0, 0), dumb_class2{});
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::block(dummy, 0, 0, 0, 0), dumb_class2{});
 	}
 
 	TEST(Customization, Determinant)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::determinant(d), 2);
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::determinant(dummy), 2);
 	}
 
 	TEST(Customization, Inverse)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::inverse(d), dumb_class2{});
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::inverse(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Transpose)
 	{
-		auto d = dumb_class{};
-		EXPECT_EQ(matrixpp::transpose(d), dumb_class2{});
+		auto dummy = dumb_class{};
+		EXPECT_EQ(matrixpp::transpose(dummy), dumb_class2{});
 	}
 } // namespace
