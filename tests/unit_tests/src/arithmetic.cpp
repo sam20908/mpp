@@ -1670,9 +1670,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyStatic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1688,9 +1688,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyDynamic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1706,9 +1706,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicRows_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1724,9 +1724,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicColumns_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1742,9 +1742,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyStatic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1760,9 +1760,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyDynamic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1778,9 +1778,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicRows_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1796,9 +1796,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicColumns_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		auto matrix        = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1814,9 +1814,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyStatic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1832,9 +1832,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyDynamic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1850,9 +1850,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicRows_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1868,9 +1868,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicColumns_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1886,9 +1886,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyStatic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1904,9 +1904,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyDynamic_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1922,9 +1922,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicRows_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1940,9 +1940,9 @@ namespace
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicColumns_Expr)
 	{
-		auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
-		auto expr    = matrix * matrix2;
+		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr    = matrix * matrix2;
 
 		EXPECT_EQ(expr.rows(), 2);
 		EXPECT_EQ(expr.columns(), 2);
@@ -1956,7 +1956,295 @@ namespace
 		EXPECT_EQ(expr(1, 1), 92);
 	}
 
-	// @TODO: Revamp matrix times matrix evaluated, matrix throw and division tests
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicRows_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicColumns_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicRows_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicColumns_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicRows_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicColumns_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicRows_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, std::dynamic_extent, 2>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 2);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicColumns_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2     = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3 }, { 1, 8 }, { 8, 2 } };
+		const auto expr_matrix = matrixpp::matrix{ matrix * matrix2 };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 2);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr_matrix(0, 0), 60);
+		EXPECT_EQ(expr_matrix(0, 1), 47);
+		EXPECT_EQ(expr_matrix(1, 0), 80);
+		EXPECT_EQ(expr_matrix(1, 1), 92);
+	}
+
+	// @TODO: Revamp matrix throw and division tests
 
 	// TEST(Arithmetic, Multiplication_MatrixXMatrix_NotMultipliableMatrices_Throw)
 	// {
