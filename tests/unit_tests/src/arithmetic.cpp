@@ -2356,63 +2356,287 @@ namespace
 		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
 	}
 
-	// @TODO: Revamp addition throwing tests, subtraction throwing tests, and division tests
+	/**
+	 * Division
+	 */
 
-	// TEST(Arithmetic, Division_MatrixXScalar)
-	// {
-	// 	auto matrix = matrixpp::matrix<float>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto expr   = matrix / 2.F;
+	TEST(Arithmetic, Division_MatrixXScalar_FullyStatic_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = matrix / scalar;
 
-	// 	EXPECT_EQ(expr.rows(), 3);
-	// 	EXPECT_EQ(expr.columns(), 3);
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
 
-	// 	EXPECT_EQ(expr(0, 0), 3.5F);
-	// 	EXPECT_EQ(expr(0, 1), 1.5F);
-	// 	EXPECT_EQ(expr(0, 2), 0.5F);
-	// 	EXPECT_EQ(expr(1, 0), 4.F);
-	// 	EXPECT_EQ(expr(1, 1), 4.F);
-	// 	EXPECT_EQ(expr(1, 2), 1.F);
-	// 	EXPECT_EQ(expr(2, 0), 2.5F);
-	// 	EXPECT_EQ(expr(2, 1), 4.F);
-	// 	EXPECT_EQ(expr(2, 2), 1.F);
-	// }
+		EXPECT_EQ(expr.rows_extent(), 2);
+		EXPECT_EQ(expr.columns_extent(), 3);
 
-	// TEST(Arithmetic, Division_ScalarXMatrix)
-	// {
-	// 	auto matrix = matrixpp::matrix<float>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto expr   = 2.F / matrix;
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
 
-	// 	EXPECT_EQ(expr.rows(), 3);
-	// 	EXPECT_EQ(expr.columns(), 3);
+	TEST(Arithmetic, Division_MatrixXScalar_FullyDynamic_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = matrix / scalar;
 
-	// 	EXPECT_EQ(expr(0, 0), 3.5F);
-	// 	EXPECT_EQ(expr(0, 1), 1.5F);
-	// 	EXPECT_EQ(expr(0, 2), 0.5F);
-	// 	EXPECT_EQ(expr(1, 0), 4.F);
-	// 	EXPECT_EQ(expr(1, 1), 4.F);
-	// 	EXPECT_EQ(expr(1, 2), 1.F);
-	// 	EXPECT_EQ(expr(2, 0), 2.5F);
-	// 	EXPECT_EQ(expr(2, 1), 4.F);
-	// 	EXPECT_EQ(expr(2, 2), 1.F);
-	// }
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
 
-	// TEST(Arithmetic, Addition_PreferStaticExtent)
-	// {
-	// 	auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto result  = matrixpp::matrix{ matrix1 + matrix2 };
+		EXPECT_EQ(expr.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr.columns_extent(), std::dynamic_extent);
 
-	// 	EXPECT_EQ(result.rows_extent(), 3);
-	// 	EXPECT_EQ(result.columns_extent(), 3);
-	// }
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
 
-	// TEST(Arithmetic, Subtraction_PreferStaticExtent)
-	// {
-	// 	auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto result  = matrixpp::matrix{ matrix1 - matrix2 };
+	TEST(Arithmetic, Division_MatrixXScalar_DynamicRows_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = matrix / scalar;
 
-	// 	EXPECT_EQ(result.rows_extent(), 3);
-	// 	EXPECT_EQ(result.columns_extent(), 3);
-	// }
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr.columns_extent(), 3);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_MatrixXScalar_DynamicColumns_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = matrix / scalar;
+
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), 2);
+		EXPECT_EQ(expr.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_FullyStatic_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = scalar / matrix;
+
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), 2);
+		EXPECT_EQ(expr.columns_extent(), 3);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_FullyDynamic_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = scalar / matrix;
+
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_DynamicRows_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = scalar / matrix;
+
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr.columns_extent(), 3);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_DynamicColumns_Expr)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr   = scalar / matrix;
+
+		EXPECT_EQ(expr.rows(), 2);
+		EXPECT_EQ(expr.columns(), 3);
+
+		EXPECT_EQ(expr.rows_extent(), 2);
+		EXPECT_EQ(expr.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(expr(0, 0), 3.5F);
+		EXPECT_EQ(expr(0, 1), 1.5F);
+		EXPECT_EQ(expr(0, 2), 0.5F);
+		EXPECT_EQ(expr(1, 0), 4.F);
+		EXPECT_EQ(expr(1, 1), 4.F);
+		EXPECT_EQ(expr(1, 2), 1.F);
+	}
+
+	TEST(Arithmetic, Division_MatrixXScalar_FullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ matrix / scalar };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 3);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_MatrixXScalar_FullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ matrix / scalar };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_MatrixXScalar_DynamicRows_Evaluated)
+	{
+		const auto matrix = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ matrix / scalar };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 3);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_MatrixXScalar_DynamicColumns_Evaluated)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ matrix / scalar };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_FullyStatic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ scalar / matrix };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), 3);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_FullyDynamic_Evaluated)
+	{
+		const auto matrix      = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ scalar / matrix };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_DynamicRows_Evaluated)
+	{
+		const auto matrix = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ scalar / matrix };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(expr_matrix.columns_extent(), 3);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
+
+	TEST(Arithmetic, Division_ScalarXMatrix_DynamicColumns_Evaluated)
+	{
+		const auto matrix = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar = 2.F;
+		const auto expr_matrix = matrixpp::matrix{ scalar / matrix };
+
+		EXPECT_EQ(expr_matrix.rows(), 2);
+		EXPECT_EQ(expr_matrix.columns(), 3);
+
+		EXPECT_EQ(expr_matrix.rows_extent(), 2);
+		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(expr_matrix, ElementsAre(3.5F, 1.5F, 0.5F, 4.F, 4.F, 1.F));
+	}
 } // namespace
