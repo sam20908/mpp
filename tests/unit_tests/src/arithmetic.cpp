@@ -1956,7 +1956,7 @@ namespace
 		EXPECT_EQ(expr(1, 1), 92);
 	}
 
-	// @TODO: Revamp matrix throw and division tests
+	// @TODO: Revamp matrix times matrix evaluated, matrix throw and division tests
 
 	// TEST(Arithmetic, Multiplication_MatrixXMatrix_NotMultipliableMatrices_Throw)
 	// {
