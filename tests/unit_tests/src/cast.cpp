@@ -35,8 +35,8 @@ namespace
 
 	TEST(Cast, CastToDifferentType_FullyStatic)
 	{
-		auto from = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<int>{}, from);
+		const auto from = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<int>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -49,8 +49,8 @@ namespace
 
 	TEST(Cast, CastToDifferentType_FullyDynamic)
 	{
-		auto from = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<int>{}, from);
+		const auto from = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<int>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -63,8 +63,8 @@ namespace
 
 	TEST(Cast, CastToDifferentType_DynamicRows)
 	{
-		auto from = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<int>{}, from);
+		const auto from = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<int>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -77,8 +77,8 @@ namespace
 
 	TEST(Cast, CastToDifferentType_DynamicColumns)
 	{
-		auto from = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<int>{}, from);
+		const auto from = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<int>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -95,8 +95,8 @@ namespace
 
 	TEST(Cast, CastToSameType_FullyStatic)
 	{
-		auto from = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<float>{}, from);
+		const auto from = matrixpp::matrix<float, 2, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<float>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -109,8 +109,8 @@ namespace
 
 	TEST(Cast, CastToSameType_FullyDynamic)
 	{
-		auto from = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<float>{}, from);
+		const auto from = matrixpp::matrix<float>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<float>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -123,8 +123,8 @@ namespace
 
 	TEST(Cast, CastToSameType_DynamicRows)
 	{
-		auto from = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<float>{}, from);
+		const auto from = matrixpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<float>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -137,8 +137,8 @@ namespace
 
 	TEST(Cast, CastToSameType_DynamicColumns)
 	{
-		auto from = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		auto to   = matrixpp::cast(std::type_identity<float>{}, from);
+		const auto from = matrixpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto to   = matrixpp::cast(std::type_identity<float>{}, from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
