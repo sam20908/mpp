@@ -17,41 +17,102 @@
  * under the License.
  */
 
+#include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 #include <matrixpp/algorithm/block.hpp>
-#include <matrixpp/matrix/fully_dynamic.hpp>
+#include <matrixpp/matrix.hpp>
 
+#include <span>
 #include <stdexcept>
 
 namespace
 {
-	TEST(Block, FullBlock)
+	using ::testing::ElementsAre;
+
+	/**
+	 * Full block crop
+	 */
+
+	TEST(Block, FullBlock_FullyStatic)
 	{
-		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
-            static_cast<std::size_t>(2),
+            static_cast<std::size_t>(1),
             static_cast<std::size_t>(2));
 
-		EXPECT_EQ(to.rows(), 3);
+		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
 
-		EXPECT_EQ(to(0, 0), 7);
-		EXPECT_EQ(to(0, 1), 3);
-		EXPECT_EQ(to(0, 2), 1);
-		EXPECT_EQ(to(1, 0), 8);
-		EXPECT_EQ(to(1, 1), 8);
-		EXPECT_EQ(to(1, 2), 2);
-		EXPECT_EQ(to(2, 0), 5);
-		EXPECT_EQ(to(2, 1), 8);
-		EXPECT_EQ(to(2, 2), 2);
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Block, Cropped_3x3To2x2)
+	TEST(Block, FullBlock_FullyDynamic)
 	{
-		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(2));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 3);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Block, FullBlock_DynamicRows)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(2));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 3);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Block, FullBlock_DynamicColumns)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(2));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 3);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	/**
+	 * Crop 2x3 to 2x2
+	 */
+
+	TEST(Block, Cropped_2x3To2x2_FullyStatic)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -61,15 +122,73 @@ namespace
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 2);
 
-		EXPECT_EQ(to(0, 0), 7);
-		EXPECT_EQ(to(0, 1), 3);
-		EXPECT_EQ(to(0, 2), 8);
-		EXPECT_EQ(to(1, 0), 8);
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 8, 8));
 	}
 
-	TEST(Block, Cropped_3x3To1x1)
+	TEST(Block, Cropped_2x3To2x2_FullyDynamic)
 	{
-		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(1));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 2);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 8, 8));
+	}
+
+	TEST(Block, Cropped_2x3To2x2_DynamicRows)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(1));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 2);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 8, 8));
+	}
+
+	TEST(Block, Cropped_2x3To2x2_DynamicColumns)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(1),
+            static_cast<std::size_t>(1));
+
+		EXPECT_EQ(to.rows(), 2);
+		EXPECT_EQ(to.columns(), 2);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7, 3, 8, 8));
+	}
+
+	/**
+	 * Crop 2x3 to 1x1
+	 */
+
+	TEST(Block, Cropped_2x3To1x1_FullyStatic)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto to   = matrixpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -79,28 +198,255 @@ namespace
 		EXPECT_EQ(to.rows(), 1);
 		EXPECT_EQ(to.columns(), 1);
 
-		EXPECT_EQ(to(0, 0), 7);
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7));
 	}
 
-	TEST(Block, IndicesOverlap_Throw)
+	TEST(Block, Cropped_2x3To1x1_FullyDynamic)
 	{
-		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0));
+
+		EXPECT_EQ(to.rows(), 1);
+		EXPECT_EQ(to.columns(), 1);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7));
+	}
+
+	TEST(Block, Cropped_2x3To1x1_DynamicRows)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0));
+
+		EXPECT_EQ(to.rows(), 1);
+		EXPECT_EQ(to.columns(), 1);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7));
+	}
+
+	TEST(Block, Cropped_2x3To1x1_DynamicColumns)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto to   = matrixpp::block(from,
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(0));
+
+		EXPECT_EQ(to.rows(), 1);
+		EXPECT_EQ(to.columns(), 1);
+
+		EXPECT_EQ(to.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(to.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(to, ElementsAre(7));
+	}
+
+	/**
+	 * Top row index out of range
+	 */
+
+	TEST(Block, TopRowIndexOutOfBounds_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		EXPECT_THROW((void)matrixpp::block(from,
-						 static_cast<std::size_t>(1),
-						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2), // Out of range
 						 static_cast<std::size_t>(0),
-						 static_cast<std::size_t>(0)),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
 			std::invalid_argument);
 	}
 
-	TEST(Block, IndicesOutOfBounds_Throw)
+	TEST(Block, TopRowIndexOutOfBounds_FullyDynamic_Throw)
 	{
-		auto from = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopRowIndexOutOfBounds_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopRowIndexOutOfBounds_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	/**
+	 * Top column index out of range
+	 */
+
+	TEST(Block, TopColumnIndexOutOfBounds_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(3), // Out of range
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnIndexOutOfBounds_FullyDynamic_Throw)
+	{
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(3), // Out of range
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnIndexOutOfBounds_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(3), // Out of range
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, TopColumnIndexOutOfBounds_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(3), // Out of range
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	/**
+	 * Bottom row index out of range
+	 */
+
+	TEST(Block, BottomRowIndexOutOfBounds_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		EXPECT_THROW((void)matrixpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
-						 static_cast<std::size_t>(2),
-						 static_cast<std::size_t>(3)),
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomRowIndexOutOfBounds_FullyDynamic_Throw)
+	{
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomRowIndexOutOfBounds_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomRowIndexOutOfBounds_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(2), // Out of range
+						 static_cast<std::size_t>(2)),
+			std::invalid_argument);
+	}
+
+	/**
+	 * Bottom column index out of range
+	 */
+
+	TEST(Block, BottomColumnIndexOutOfBounds_FullyStatic_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(3)), // Out of range
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomColumnIndexOutOfBounds_FullyDynamic_Throw)
+	{
+		auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(3)), // Out of range
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomColumnIndexOutOfBounds_DynamicRows_Throw)
+	{
+		auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(3)), // Out of range
+			std::invalid_argument);
+	}
+
+	TEST(Block, BottomColumnIndexOutOfBounds_DynamicColumns_Throw)
+	{
+		auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)matrixpp::block(from,
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(0),
+						 static_cast<std::size_t>(1),
+						 static_cast<std::size_t>(3)), // Out of range
 			std::invalid_argument);
 	}
 } // namespace
