@@ -2244,14 +2244,119 @@ namespace
 		EXPECT_EQ(expr_matrix(1, 1), 92);
 	}
 
-	// @TODO: Revamp matrix throw and division tests
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyStatic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
 
-	// TEST(Arithmetic, Multiplication_MatrixXMatrix_NotMultipliableMatrices_Throw)
-	// {
-	// 	auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-	// 	auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 1, 1, 1 } };
-	// 	EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
-	// }
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyDynamic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicRows_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicColumns_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyStatic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyDynamic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicRows_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicColumns_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyStatic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyDynamic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicRows_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicColumns_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyStatic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyDynamic_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicRows_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicColumns_NotMultipliableMatrices_Throw)
+	{
+		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+	}
+
+	// @TODO: Revamp addition throwing tests, subtraction throwing tests, and division tests
 
 	// TEST(Arithmetic, Division_MatrixXScalar)
 	// {
