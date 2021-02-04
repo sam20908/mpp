@@ -24,7 +24,6 @@
 #include <matrixpp/matrix.hpp>
 
 #include <cstddef>
-#include <type_traits>
 
 namespace matrixpp
 {
