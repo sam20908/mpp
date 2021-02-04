@@ -160,17 +160,17 @@ namespace matrixpp::detail
 
 		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) -> value_type& // @TODO: ISSUE #20
 		{
-			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
 
-			return _buf[index];
+			return _buf[idx];
 		}
 
 		[[nodiscard]] auto operator()(std::size_t row_idx,
 			std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
-			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
 
-			return _buf[index];
+			return _buf[idx];
 		}
 
 		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20

@@ -24,24 +24,23 @@
 #include <matrixpp/detail/tag_invoke.hpp>
 #include <matrixpp/utility/config.hpp>
 
+// @TODO: Make sure to export this when this file becomes a module to allow users to access tags
+#include <matrixpp/detail/public_tags.hpp>
+
 #include <cstddef>
 #include <initializer_list>
 
 namespace matrixpp
 {
-	struct identity_matrix_tag
-	{
-	};
-
-	inline constexpr auto identity_matrix = identity_matrix_tag{};
-
 	template<detail::arithmetic Value,
 		std::size_t RowsExtent = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize_tag{}),
 		std::size_t ColumnsExtent =
 			detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize_tag{})>
 	class matrix;
 
-	// Deduction guides
+	/**
+	 * Deduction guides
+	 */
 
 	template<typename Value>
 	matrix(std::initializer_list<std::initializer_list<Value>>) -> matrix<Value>;
