@@ -96,8 +96,6 @@ namespace matrixpp::detail
 		using iterator        = typename buffer_type::iterator;
 		using const_iterator  = typename buffer_type::const_iterator;
 
-		matrix_base() = default; // @TODO: ISSUE #20
-
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
 			return _buf.data();

@@ -149,6 +149,19 @@ namespace
 		EXPECT_THROW((matrixpp::matrix<int, 3, 3>{ expr }), std::runtime_error);
 	}
 
+	TEST(Initialization, FullyStaticDefaultConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int, 2, 3>{};
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
 	TEST(Initialization, FullyStaticValueConstructor)
 	{
 		const auto matrix = matrixpp::matrix<int, 2, 3>{ 1 };
@@ -224,6 +237,17 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamicDefaultConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int>{};
+
+		EXPECT_EQ(matrix.rows(), 0);
+		EXPECT_EQ(matrix.columns(), 0);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 	}
 
 	TEST(Initialization, FullyDynamicValueConstructor)
@@ -308,6 +332,19 @@ namespace
 		EXPECT_THROW((matrixpp::matrix<int, 3, std::dynamic_extent>{ expr }), std::runtime_error);
 	}
 
+	TEST(Initialization, DynamicColumnsDefaultConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
 	TEST(Initialization, DynamicColumnsValueConstructor)
 	{
 		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3, 1 };
@@ -389,6 +426,19 @@ namespace
 		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
 
 		EXPECT_THROW((matrixpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::runtime_error);
+	}
+
+	TEST(Initialization, DynamicRowsDefaultConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 2 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Initialization, DymamicRowsValueConstructor)

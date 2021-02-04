@@ -97,6 +97,15 @@ namespace matrixpp
 			}
 		}
 
+		explicit matrix(std::size_t rows) // @TODO: ISSUE #20
+		{
+			base::_rows = rows;
+			base::_cols = ColumnsExtent;
+
+			// @TODO: ISSUE #129
+			detail::allocate_1d_buf_if_vector(base::_buf, rows, ColumnsExtent, Value{ 0 });
+		}
+
 		matrix(std::size_t rows, Value value) // @TODO: ISSUE #20
 		{
 			base::_rows = rows;

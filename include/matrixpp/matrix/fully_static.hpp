@@ -104,6 +104,15 @@ namespace matrixpp
 			}
 		}
 
+		matrix() // @TODO: ISSUE #20
+		{
+			base::_rows = RowsExtent;
+			base::_cols = ColumnsExtent;
+
+			// @TODO: ISSUE #129
+			std::ranges::fill(base::_buf, Value{ 0 });
+		}
+
 		explicit matrix(Value value) // @TODO: ISSUE #20
 		{
 			base::_rows = RowsExtent;
