@@ -37,7 +37,8 @@ namespace matrixpp
 		{
 			for (auto col = std::size_t{ 1 }; col < cols; ++col)
 			{
-				// Optimized version of forward-substitution which skips making diagnoal 1's
+				// Optimized version of forward-substitution which skips making diagnoal 1's because L would've already
+				// had 1's along the diagonal
 
 				for (auto row = col + 1; row < cols; ++row)
 				{
