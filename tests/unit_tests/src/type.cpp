@@ -28,14 +28,14 @@ namespace
 {
 	TEST(Type, FullyStatic)
 	{
-		auto matrix = matrixpp::matrix<int, 2, 3>{};
+		const auto matrix = matrixpp::matrix<int, 2, 3>{};
 
 		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::fully_static);
 	}
 
 	TEST(Type, FullyDynamic)
 	{
-		auto matrix = matrixpp::matrix<int>{};
+		const auto matrix = matrixpp::matrix<int>{};
 
 		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::fully_dynamic);
 	}
@@ -43,14 +43,14 @@ namespace
 
 	TEST(Type, DynamicColumns)
 	{
-		auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{};
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{};
 
 		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::dynamic_columns);
 	}
 
 	TEST(Type, DynamicRows)
 	{
-		auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{};
+		const auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{};
 
 		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::dynamic_rows);
 	}
