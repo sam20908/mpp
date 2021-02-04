@@ -42,8 +42,8 @@ namespace matrixpp
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
-				auto left_cols = left.columns();
-				auto result    = value_type{ 0 };
+				const auto left_cols = left.columns();
+				auto result          = value_type{ 0 };
 
 				for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
 				{

@@ -69,8 +69,10 @@ namespace matrixpp
 	{
 		detail::validate_matrices_same_size(left, right);
 
-		auto rows = left.rows();
-		auto cols = left.columns();
+		// @TODO: Take advantage of std::ranges::transform
+
+		const auto rows = left.rows();
+		const auto cols = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)
 		{
