@@ -128,4 +128,6 @@ namespace
 	{
 		testing::StaticAssertTypeEq<std::invoke_result_t<matrixpp::inverse_t, TypeParam>, matrixpp::matrix<double>>();
 	}
+
+	// @TODO: Test all combinations of matrices with extents
 } // namespace

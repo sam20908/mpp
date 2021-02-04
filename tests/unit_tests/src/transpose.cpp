@@ -41,4 +41,6 @@ namespace
 		EXPECT_EQ(to(1, 1), 4);
 		EXPECT_EQ(to(1, 2), 6);
 	}
+
+	// @TODO: Test all combinations of matrices with extents
 } // namespace

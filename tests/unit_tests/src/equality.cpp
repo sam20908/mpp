@@ -26,41 +26,43 @@ namespace
 {
 	TEST(Equality, SameSize_SameData_SameExtent)
 	{
-		auto left  = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto left  = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 		EXPECT_EQ(left, right);
 	}
 
 	TEST(Equality, SameSize_DifferentData_SameExtent)
 	{
-		auto left  = matrixpp::matrix<int, 3, 3>{ { 7, 4, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 1, 2 }, { 5, 8, 1 } };
+		const auto left  = matrixpp::matrix<int, 3, 3>{ { 7, 4, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 1, 2 }, { 5, 8, 1 } };
 
 		EXPECT_NE(left, right);
 	}
 
 	TEST(Equality, DifferentSize_FullyStaticMatrices)
 	{
-		auto left  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto left  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 		EXPECT_NE(left, right);
 	}
 
 	TEST(Equality, DifferentSize_FullyDynamicMatrices)
 	{
-		auto left  = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto right = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto left  = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto right = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 		EXPECT_NE(left, right);
 	}
 
 	TEST(Equality, DifferentSize_DifferentKindsMatrices)
 	{
-		auto left  = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto left  = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto right = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 		EXPECT_NE(left, right);
 	}
+
+	// @TODO: Test all combinations of matrices with extents
 } // namespace
