@@ -62,11 +62,11 @@ namespace matrixpp
 				auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
 				const auto diag_elem = u_buf[diag_elem_idx];
 
-				// Pivot can simply be replaced with the factor
+				// Diagonal element can simply be replaced with the factor
 				const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
 				u_buf[diag_elem_idx]   = diag_factor;
 
-				// Multiply every element to the right of the pivot by the factor
+				// Multiply every element to the right of the diagonal element by the factor
 				for (auto idx = cols - col; idx > 0; --idx)
 				{
 					u_buf[++diag_elem_idx] *= diag_factor;
@@ -74,14 +74,14 @@ namespace matrixpp
 
 				for (auto row = col_idx; row > 0; --row)
 				{
-					// Use the pivot as the factor to compute the numbers above the pivot in the same column (this works
-					// because) the augmented matrix would have zeroes above the pivot
+					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
+					// (this works because) the augmented matrix would have zeroes above the diagonal element
 					const auto row_idx            = row - 1;
 					const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
 					const auto elem_before_factor = u_buf[elem_idx];
 					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
 
-					// Add the corresponding elements of the rows of the current pivot onto the rows above
+					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
 					for (auto col_2 = cols; col_2 > col; --col_2)
 					{
 						const auto col_2_idx     = col_2 - 1;
@@ -179,8 +179,8 @@ namespace matrixpp
 
 					for (auto col = std::size_t{ 0 }; col < row; ++col)
 					{
-						// This allows us to keep track of the row of the factor
-						// later on without having to manually calculate from indexes
+						// This allows us to keep track of the row of the factor later on without having to manually
+						// calculate from indexes
 						auto factor_row_idx = idx_2d_to_1d(cols, col, col);
 
 						const auto elem_idx = idx_2d_to_1d(cols, row, col);
@@ -200,8 +200,8 @@ namespace matrixpp
 						++begin_idx;
 					}
 
-					const auto pivot_idx = idx_2d_to_1d(cols, row, row);
-					det *= u_buf[pivot_idx];
+					const auto diag_elem_idx = idx_2d_to_1d(cols, row, row);
+					det *= u_buf[diag_elem_idx];
 				}
 
 				if (accurate_equals(det, lu_decomp_value_t{ 0 }))
