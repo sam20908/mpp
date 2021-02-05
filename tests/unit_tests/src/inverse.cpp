@@ -186,5 +186,4 @@ namespace
 		EXPECT_FLOAT_EQ(inverse(3, 2), -1.F);
 		EXPECT_FLOAT_EQ(inverse(3, 3), 1.F);
 	}
-	// @TODO: Test all combinations of matrices with extents
 } // namespace
