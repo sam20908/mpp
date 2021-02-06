@@ -159,7 +159,7 @@ namespace matrixpp::detail
 	template<typename To, bool FillLBuf>
 	inline auto lu_decomp_common(std::size_t rows, std::size_t cols, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
 	{
-		// Things this function expects from the l_buf and r_buf:
+		// Things this function expects from l_buf and u_buf:
 		// 1. l_buf is already an identity buffer
 		// 2. u_buf has the original values
 
