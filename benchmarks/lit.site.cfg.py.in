@@ -19,8 +19,18 @@ under the License.
 
 # pylint: skip-file
 
-from lit.formats import GoogleTest
+import sys
+sys.path.append('@BENCHMARKS_BINARY_DIR@')
 
-config.name = 'Unit Test'
-config.test_format = GoogleTest('@UNIT_TESTS_OUTPUT_DIR@', 
-    '@UNIT_TESTS_EXECUTABLE_SUFFIX@')
+from format import ExecutableTest
+
+
+config.name = 'Benchmark'
+config.test_source_root = '@BENCHMARKS_BINARY_DIR@'
+
+if lit_config.isWindows:
+  config.suffixes = ['.exe']
+else:
+  config.suffixes = ['']
+
+config.test_format = ExecutableTest()

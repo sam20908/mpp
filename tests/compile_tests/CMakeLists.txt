@@ -17,6 +17,8 @@
 
 if(NOT LLVM_LIT_EXEC)
     message(FATAL_ERROR "Compile tests requires LLVM Lit to be found in PATH!")
+else()
+    message(STATUS "LLVM Lit found! LLVM Lit configuration for compile tests will be created")
 endif()
 
 set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
@@ -35,5 +37,11 @@ add_custom_target("compile_test"
 
 configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
+
+if(LLVM_LIT_EXEC)
+    add_test(NAME "compile_test" 
+        COMMAND ${LLVM_LIT_EXEC} .
+        WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
+endif()
 
 _create_compile_test("deduction_guides")

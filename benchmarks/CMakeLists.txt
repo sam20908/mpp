@@ -17,24 +17,35 @@
 
 find_package(benchmark CONFIG REQUIRED)
 
-set(BENCHMARKS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
+set(BENCHMARKS_BINARY_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
 set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main)
 
-# This executable will contain all the benchmarks
-add_executable("benchmark")
-_setup_target("benchmark" "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
-_turn_on_warnings("benchmark")
+if(LLVM_LIT_EXEC)
+    message(STATUS "LLVM Lit found! LLVM Lit configuration for benchmarks will be created")
+    configure_file("lit.site.cfg.py.in" "${BENCHMARKS_BINARY_DIR}/lit.site.cfg.py")
+    configure_file("format.py.in" "${BENCHMARKS_BINARY_DIR}/format.py")
+else()
+    message(STATUS "LLVM Lit not found! LLVM Lit configuration for benchmarks will not be created")
+endif()
+
+add_custom_target("benchmark")
 
 function(_create_benchmark TEST_FILE)
     set(TEST_NAME "${TEST_FILE}_benchmark")
     set(TEST_SOURCE "src/${TEST_FILE}.cpp")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
-    _setup_target(${TEST_NAME} "${BENCHMARKS_OUTPUT_DIR}" "${BENCHMARKS_LIBRARIES}")
+    _setup_target(${TEST_NAME} "${BENCHMARKS_BINARY_DIR}" "${BENCHMARKS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
 
-    target_sources("benchmark" PRIVATE "${TEST_SOURCE}")
+    add_dependencies("benchmark" ${TEST_NAME})
 endfunction()
+
+if(LLVM_LIT_EXEC)
+    add_test(NAME "benchmark" 
+        COMMAND ${LLVM_LIT_EXEC} .
+        WORKING_DIRECTORY "${BENCHMARKS_BINARY_DIR}")
+endif()
 
 _create_benchmark("algorithms")
 _create_benchmark("arithmetic")

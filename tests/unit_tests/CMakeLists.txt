@@ -22,19 +22,16 @@ set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
-set(INCLUDE_HEADERS "../include/dummy_expr.hpp" "../include/utility.hpp")
+set(INCLUDE_HEADERS "../include/dummy_expr.hpp")
 
 if(LLVM_LIT_EXEC)
+    message(STATUS "LLVM Lit found! LLVM Lit configuration for unit tests will be created")
     configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 else()
-    message(STATUS "LLVM Lit not found! LLVM test suite for unit tests won't be set up")
+    message(STATUS "LLVM Lit not found! LLVM Lit configuration for unit tests will not be created")
 endif()
 
-# This executable will contain all the unit tests
-add_executable("unit_test")
-target_sources("unit_test" PRIVATE "gtest_main.cpp")
-_setup_target("unit_test" "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
-_turn_on_warnings("unit_test")
+add_custom_target("unit_test")
 
 function(_create_unit_test TEST_FILENAME)
     set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
@@ -47,7 +44,7 @@ function(_create_unit_test TEST_FILENAME)
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
 
-    target_sources("unit_test" PRIVATE "${TEST_SOURCE}")
+    add_dependencies("unit_test" ${TEST_NAME})
 endfunction()
 
 cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
@@ -58,9 +55,15 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE "$<TARGET_FILE:unit_test>"
+        EXECUTABLE "ctest"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "unit_test")
+endif()
+
+if(LLVM_LIT_EXEC)
+    add_test(NAME "unit_test" 
+        COMMAND ${LLVM_LIT_EXEC} .
+        WORKING_DIRECTORY "${UNIT_TESTS_BINARY_DIR}")
 endif()
 
 # Algorithm tests
@@ -71,7 +74,7 @@ _create_unit_test("transpose")
 
 # Utility tests
 _create_unit_test("cast")
-_create_unit_test("equality")
+_create_unit_test("singular")
 _create_unit_test("type")
 
 # Basic tests

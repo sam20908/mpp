@@ -18,10 +18,11 @@
  */
 
 #include <benchmark/benchmark.h>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
 
-// Benchmarking any other matrices (at least one side has compile time specified extent)
-// isn't viable because no functionality is provided to access the range at compile time
+// Benchmarking any other matrices (at least one side has compile time specified extent) isn't viable because no
+// functionality is provided to access the range at compile time
 
 static void Initialization_Fill(benchmark::State& state)
 {

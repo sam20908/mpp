@@ -18,6 +18,7 @@
  */
 
 #include <benchmark/benchmark.h>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
 #include <matrixpp/utility.hpp>
 
@@ -40,25 +41,4 @@ static void Cast(benchmark::State& state)
 	state.counters["Columns"] = static_cast<double>(state.range());
 }
 
-static void Equal(benchmark::State& state)
-{
-	auto a =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-
-	benchmark::ClobberMemory();
-	for (auto _ : state)
-	{
-		benchmark::DoNotOptimize(a);
-		benchmark::DoNotOptimize(b);
-		benchmark::DoNotOptimize(a == b);
-		benchmark::ClobberMemory();
-	}
-
-	state.counters["Rows"]    = static_cast<double>(state.range());
-	state.counters["Columns"] = static_cast<double>(state.range());
-}
-
 BENCHMARK(Cast)->RangeMultiplier(2)->Range(8, 8 << 10);
-BENCHMARK(Equal)->RangeMultiplier(2)->Range(8, 8 << 10);

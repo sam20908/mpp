@@ -26,13 +26,10 @@ A C++20 and later matrix library
 ## Using the Lit Test Suite:
 - Running `ctest` in `<build directory>` directory invokes all tests (use `ctest -V` for verbose output).
 - Running `lit` either in `<build directory>/bin/tests/unit_tests` or `<build directory>/bin/tests/compile_tests` runs all the test in that directory (CMake will detect if `lit` is found in PATH before setting up the test suite).
-- You can manually run specific unit tests by invoking the executable (don't double click on them, instead run them from command line).
-- You can manually run specific compile tests by using Lit's parameter `--filter` and pass a regex string to match the tests.
 
 ## Using the Performance Test Suite:
 - Each benchmarks will be comppiled to an executable, and all the benchmarks will be located in `<build directory>/bin/benchmarks`.
 - The benchmarks are written using `Google Benchmark`, which means you may use `Google Benchmark` command line options when invoking the executable.
-- There will be an executable called `all_benchmarks`, which invokes all the benchmarks.
 
 ## Using Code Coverage:
 - ***Requires unit tests to be enabled!***

@@ -19,31 +19,30 @@
 
 #pragma once
 
-#include "../detail/matrix_base.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/detail/matrix_base.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <cstddef>
-#include <utility>
 
 namespace matrixpp
 {
 	struct cast_t
 	{
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(cast_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> matrix<To, RowsExtent, ColumnsExtent>
+		[[nodiscard]] friend inline auto
+		tag_invoke(cast_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			detail::init_matrix_with_1d_rng_copy(casted, obj.buffer(), obj.rows(), obj.columns());
+			detail::init_matrix_with_1d_rng_copy(casted, obj, obj.rows(), obj.columns());
 
 			return casted;
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<cast_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<cast_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}

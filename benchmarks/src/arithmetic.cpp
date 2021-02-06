@@ -15,11 +15,13 @@
  * under the License.
  */
 
-#include <algorithm>
 #include <benchmark/benchmark.h>
-#include <cstddef>
-#include <matrixpp/arithmetic.hpp>
+
 #include <matrixpp/matrix/fully_dynamic.hpp>
+#include <matrixpp/arithmetic.hpp>
+
+#include <algorithm>
+#include <cstddef>
 
 static void Addition(benchmark::State& state)
 {

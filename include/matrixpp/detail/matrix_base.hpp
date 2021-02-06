@@ -19,21 +19,19 @@
 
 #pragma once
 
-#include "constraints.hpp"
-#include "expr_base.hpp"
-#include "utility.hpp"
+#include <matrixpp/detail/constraints.hpp>
+#include <matrixpp/detail/expr_base.hpp>
+#include <matrixpp/detail/utility.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <span>
-#include <type_traits>
 
 namespace matrixpp::detail
 {
 	/**
-     * Base matrix class to store internal data and define common member functions
-     */
+	 * Base matrix class to store internal data and define common member functions
+	 */
 	template<typename Buffer, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class matrix_base :
 		public expr_base<matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>,
@@ -42,36 +40,63 @@ namespace matrixpp::detail
 			ColumnsExtent>
 	{
 	protected:
-		Buffer _buf;
-		std::size_t _rows{ RowsExtent == std::dynamic_extent ? 0 : RowsExtent };
-		std::size_t _cols{ ColumnsExtent == std::dynamic_extent ? 0 : ColumnsExtent };
+		Buffer _buf{}; // Default initialize elements to 0 for static buffers
+		std::size_t _rows;
+		std::size_t _cols;
 
-		void init_buf_2d_static(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void init_buf_2d_static(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
 
-			auto idx = std::size_t{ 0 };
-			for (const auto& row : buf_2d)
+			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
+			auto row_begin = _buf.begin();
+
+			// @TODO: Perfect forward row range
+			for (auto&& row : rng_2d)
 			{
-				for (auto value : row)
-				{
-					_buf[idx++] = value;
-				}
+				std::ranges::copy(row, row_begin);
+				row_begin += cols;
 			}
 		}
 
-		void init_buf_2d_dynamic(auto&& buf_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void init_buf_2d_dynamic(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
+			if (detail::dimension_not_zero_and_non_zero(rows, cols))
+			{
+				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
+			}
+
 			_rows = rows;
 			_cols = cols;
 			_buf.reserve(rows * cols);
 
-			for (const auto& row : buf_2d)
+			const auto buf_back_inserter = std::back_inserter(_buf);
+
+			// @TODO: Perfect forward row range
+			for (auto&& row : rng_2d)
 			{
-				for (auto value : row)
+				std::ranges::copy(row, buf_back_inserter);
+			}
+		}
+
+		void init_expr_dynamic(std::size_t rows, std::size_t cols, auto&& expr, bool check_size)
+		{
+			_rows = rows;
+			_cols = cols;
+
+			if (check_size)
+			{
+				validate_same_size(*this, expr);
+			}
+
+			_buf.reserve(rows * cols);
+
+			for (auto row = std::size_t{ 0 }; row < _rows; ++row)
+			{
+				for (auto col = std::size_t{ 0 }; col < _cols; ++col)
 				{
-					_buf.push_back(value);
+					_buf.push_back(expr(row, col));
 				}
 			}
 		}
@@ -84,9 +109,9 @@ namespace matrixpp::detail
 			}
 
 			_rows = rows;
-			_cols = columns;
+			_cols = cols;
 
-			allocate_1d_buf_if_vector(_buf, rows, cols);
+			allocate_1d_buf_if_vector(_buf, rows, cols, Value{ 0 });
 			transform_1d_buf_into_identity<Value>(_buf, rows);
 		}
 
@@ -95,17 +120,16 @@ namespace matrixpp::detail
 		using value_type      = Value;
 		using difference_type = typename buffer_type::difference_type;
 		using pointer         = typename buffer_type::pointer;
+		using const_pointer   = typename buffer_type::const_pointer;
 		using iterator        = typename buffer_type::iterator;
 		using const_iterator  = typename buffer_type::const_iterator;
 
-		matrix_base() = default; // @TODO: ISSUE #20
-
-		[[nodiscard]] auto buffer() const -> const buffer_type& // @TODO: ISSUE #20
+		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
-			return _buf;
+			return _buf.data();
 		}
 
-		[[nodiscard]] auto data() const -> pointer // @TODO: ISSUE #20
+		[[nodiscard]] auto data() const -> const_pointer // @TODO: ISSUE #20
 		{
 			return _buf.data();
 		}
@@ -162,17 +186,17 @@ namespace matrixpp::detail
 
 		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) -> value_type& // @TODO: ISSUE #20
 		{
-			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
 
-			return _buf[index];
+			return _buf[idx];
 		}
 
-		[[nodiscard]] const auto operator()(std::size_t row_idx,
+		[[nodiscard]] auto operator()(std::size_t row_idx,
 			std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20
 		{
-			auto index = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
 
-			return _buf[index];
+			return _buf[idx];
 		}
 
 		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
@@ -185,27 +209,17 @@ namespace matrixpp::detail
 			return _cols;
 		}
 
-		[[nodiscard]] constexpr static auto rows_extent() -> std::size_t
-		{
-			return RowsExtent;
-		}
-
-		[[nodiscard]] constexpr static auto columns_extent() -> std::size_t
-		{
-			return ColumnsExtent;
-		}
-
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 		friend inline void init_matrix_with_1d_rng_copy(
 			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-			detail::range_arithmetic auto&& rng,
+			auto&& rng,
 			std::size_t rows,
 			std::size_t cols); // @TODO: ISSUE #20
 
 		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 		friend inline void init_matrix_with_1d_rng_move(
 			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-			detail::range_arithmetic auto&& rng,
+			auto&& rng,
 			std::size_t rows,
 			std::size_t cols); // @TODO: ISSUE #20
 	};
@@ -213,7 +227,7 @@ namespace matrixpp::detail
 	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 	inline void init_matrix_with_1d_rng_copy(
 		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		detail::range_arithmetic auto&& rng,
+		auto&& rng,
 		std::size_t rows,
 		std::size_t cols) // @TODO: ISSUE #20
 	{
@@ -227,14 +241,12 @@ namespace matrixpp::detail
 	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
 	inline void init_matrix_with_1d_rng_move(
 		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		detail::range_arithmetic auto&& rng,
+		auto&& rng,
 		std::size_t rows,
 		std::size_t cols) // @TODO: ISSUE #20
 	{
 		base._rows = rows;
 		base._cols = cols;
-		allocate_1d_buf_if_vector(base._buf, rows, cols, BaseValue{ 0 });
-
-		std::ranges::move(rng, base._buf.begin());
+		base._buf  = std::move(rng);
 	}
 } // namespace matrixpp::detail

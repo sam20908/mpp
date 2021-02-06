@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "../detail/algo_types.hpp"
-#include "../detail/matrix_def.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../detail/utility.hpp"
-#include "../utility/square.hpp"
+#include <matrixpp/detail/algo_types.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/utility/square.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <concepts>
 #include <future>
@@ -33,12 +33,12 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		constexpr void l_optimized_forward_substitution(auto& l_buf, std::size_t cols)
+		inline void forward_substitution(auto& l_buf, std::size_t cols) // @TODO: ISSUE #20
 		{
 			for (auto col = std::size_t{ 1 }; col < cols; ++col)
 			{
-				// Optimized version of forward-substitution which
-				// skips making diagnoal 1's
+				// Optimized version of forward-substitution which skips making diagnoal 1's because L would've already
+				// had 1's along the diagonal
 
 				for (auto row = col + 1; row < cols; ++row)
 				{
@@ -55,7 +55,7 @@ namespace matrixpp
 			}
 		}
 
-		constexpr void u_back_substitution(auto& u_buf, std::size_t cols)
+		inline void back_substitution(auto& u_buf, std::size_t cols) // @TODO: ISSUE #20
 		{
 			for (auto col = cols; col > 0; --col)
 			{
@@ -63,12 +63,11 @@ namespace matrixpp
 				auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
 				const auto diag_elem = u_buf[diag_elem_idx];
 
-				// Pivot can simply be replaced with the factor
+				// Diagonal element can simply be replaced with the factor
 				const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
 				u_buf[diag_elem_idx]   = diag_factor;
 
-				// Multiply every element to the right of the pivot by the
-				// factor
+				// Multiply every element to the right of the diagonal element by the factor
 				for (auto idx = cols - col; idx > 0; --idx)
 				{
 					u_buf[++diag_elem_idx] *= diag_factor;
@@ -76,16 +75,14 @@ namespace matrixpp
 
 				for (auto row = col_idx; row > 0; --row)
 				{
-					// Use the pivot as the factor to compute the numbers
-					// above the pivot in the same column (this works because)
-					// the augmented matrix would have zeroes above the pivot
+					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
+					// (this works because) the augmented matrix would have zeroes above the diagonal element
 					const auto row_idx            = row - 1;
 					const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
 					const auto elem_before_factor = u_buf[elem_idx];
 					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
 
-					// Add the corresponding elements of the rows of the current
-					// pivot onto the rows above
+					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
 					for (auto col_2 = cols; col_2 > col; --col_2)
 					{
 						const auto col_2_idx     = col_2 - 1;
@@ -175,40 +172,7 @@ namespace matrixpp
 				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{ 0 });
 				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
 
-				// Compute the determinant while also compute LU Decomposition
-				for (auto row = std::size_t{ 0 }; row < rows; ++row)
-				{
-					auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
-					const auto end_idx = idx_2d_to_1d(cols, row, cols);
-
-					for (auto col = std::size_t{ 0 }; col < row; ++col)
-					{
-						// This allows us to keep track of the row of the factor
-						// later on without having to manually calculate from indexes
-						auto factor_row_idx = idx_2d_to_1d(cols, col, col);
-
-						const auto elem_idx = idx_2d_to_1d(cols, row, col);
-						const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
-
-						for (auto idx = begin_idx; idx < end_idx; ++idx)
-						{
-							u_buf[idx] += factor * u_buf[factor_row_idx++];
-						}
-
-						// L stores the opposite (opposite sign) of the factors used for
-						// U in the corresponding location. But, to help optimize the
-						// calculation of inv(L), we can just leave the sign because
-						// all the diagnoal elements below the diagonal element by 1
-						// are the opposite sign, and it's relatively easy to fix the
-						// values of other factors
-						l_buf[elem_idx] = factor;
-
-						++begin_idx;
-					}
-
-					const auto pivot_idx = idx_2d_to_1d(cols, row, row);
-					det *= u_buf[pivot_idx];
-				}
+				det = lu_decomp_common<lu_decomp_value_t, true>(rows, cols, l_buf, u_buf);
 
 				if (accurate_equals(det, lu_decomp_value_t{ 0 }))
 				{
@@ -217,18 +181,18 @@ namespace matrixpp
 
 				if (std::is_constant_evaluated())
 				{
-					l_optimized_forward_substitution(l_buf, cols);
-					u_back_substitution(u_buf, cols);
+					forward_substitution(l_buf, cols);
+					back_substitution(u_buf, cols);
 				}
 				else
 				{
 					// Compute inv(L) and inv(U) in parallel because they don't share data
 
 					auto l_inv_future = std::async(std::launch::async, [&l_buf, cols]() {
-						l_optimized_forward_substitution(l_buf, cols);
+						forward_substitution(l_buf, cols);
 					});
 					auto u_inv_future = std::async(std::launch::async, [&u_buf, cols]() {
-						u_back_substitution(u_buf, cols);
+						back_substitution(u_buf, cols);
 					});
 
 					l_inv_future.wait();

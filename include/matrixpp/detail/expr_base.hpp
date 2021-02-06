@@ -25,8 +25,8 @@
 namespace matrixpp::detail
 {
 	/**
-     * Base class for expression objects
-     */
+	 * Base class for expression objects
+	 */
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class [[nodiscard]] expr_base
 	{
@@ -47,6 +47,16 @@ namespace matrixpp::detail
 		[[nodiscard]] auto columns() const->std::size_t // @TODO: ISSUE #20
 		{
 			return expr_obj().columns();
+		}
+
+		[[nodiscard]] constexpr static auto rows_extent()->std::size_t
+		{
+			return RowsExtent;
+		}
+
+		[[nodiscard]] constexpr static auto columns_extent()->std::size_t
+		{
+			return ColumnsExtent;
 		}
 
 		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const->value_type // @TODO: ISSUE #20

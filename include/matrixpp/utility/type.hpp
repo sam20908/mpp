@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "../detail/tag_invoke.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <cstddef>
 #include <span>

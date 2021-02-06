@@ -21,5 +21,7 @@
 
 namespace matrixpp::detail
 {
+	// Double was tested to be *at least* accurate enough to do calculations involve irrational fractions (e.g. 1/3) and
+	// provide accurate enough results
 	using lu_decomp_value_t = double;
 } // namespace matrixpp::detail

@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include "../detail/matrix_base.hpp"
-#include "../detail/utility.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/detail/matrix_base.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <cstddef>
-#include <type_traits>
 
 namespace matrixpp
 {
@@ -34,11 +33,15 @@ namespace matrixpp
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
 		{
-			auto transposed = matrix<Value, ColumnsExtent, RowsExtent>{};
-			auto buf_copy   = obj.buffer();
-			auto rows       = obj.rows();
-			auto cols       = obj.columns();
-			const auto& buf = obj.buffer();
+			const auto rows = obj.rows();
+			const auto cols = obj.columns();
+			const auto data = obj.data();
+
+			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
+			using transposed_buf_t = typename transposed_t::buffer_type;
+			auto transposed        = transposed_t{};
+			auto transposed_buf    = transposed_buf_t{};
+			detail::allocate_1d_buf_if_vector(transposed_buf, cols, rows, Value{ 0 });
 
 			for (auto col = std::size_t{ 0 }; col < cols; ++col)
 			{
@@ -47,11 +50,11 @@ namespace matrixpp
 					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
 					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
 
-					buf_copy[transposed_idx] = buf[normal_idx];
+					transposed_buf[transposed_idx] = data[normal_idx];
 				}
 			}
 
-			detail::init_matrix_with_1d_rng_copy(transposed, std::move(buf_copy), cols, rows);
+			detail::init_matrix_with_1d_rng_move(transposed, std::move(transposed_buf), cols, rows);
 
 			return transposed;
 		}

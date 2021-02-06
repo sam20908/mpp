@@ -19,28 +19,28 @@
 
 #pragma once
 
-#include "../algorithm/determinant.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/algorithm/determinant.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <cstddef>
-#include <utility>
 
 namespace matrixpp
 {
 	struct singular_t
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend constexpr auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool
+		[[nodiscard]] friend inline auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> bool // @TODO: ISSUE #20
 		{
-			// Set precision to long double to avoid overflow or underflow
-			return determinant(std::type_identity<long double>{}, obj) == 0.0L;
+			return detail::accurate_equals(detail::det_lu_decomp<detail::lu_decomp_value_t>(obj),
+				detail::lu_decomp_value_t{ 0 });
 		}
 
 		template<typename... Args>
-		[[nodiscard]] constexpr auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<singular_t, Args...>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<singular_t, Args...> // @TODO: ISSUE #20
 		{
 			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}

@@ -30,7 +30,18 @@ namespace matrixpp::detail
 		template<typename CPO, typename... Args>
 		using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
 
-		struct tag_invoke_fn
+		struct tag_invoke_t
+		{
+			template<typename CPO, typename... Args>
+			[[nodiscard]] auto operator()(CPO&& cpo, Args&&... args) const
+				-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+			{
+				return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
+			}
+		};
+
+		// @TODO: Remove this and make tag_invoke_t constexpr when #20 is resolved
+		struct tag_invoke_t_constexpr
 		{
 			template<typename CPO, typename... Args>
 			[[nodiscard]] constexpr auto operator()(CPO&& cpo, Args&&... args) const
@@ -41,5 +52,9 @@ namespace matrixpp::detail
 		};
 	} // namespace tag_invoke_impl
 
-	inline constexpr auto tag_invoke_cpo = detail::tag_invoke_impl::tag_invoke_fn{};
+	inline constexpr auto tag_invoke_cpo = detail::tag_invoke_impl::tag_invoke_t{};
+
+	// @TODO: Remove this and make tag_invoke_t constexpr when #20 is resolved
+	inline constexpr auto tag_invoke_cpo_constexpr = detail::tag_invoke_impl::tag_invoke_t_constexpr{};
+
 } // namespace matrixpp::detail

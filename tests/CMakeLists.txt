@@ -19,11 +19,6 @@ include(CMakeDependentOption)
 
 set(TEST_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/tests")
 
-# There are several LLVM Lit distributions: Python's Lit package and
-# LLVM Lit build from source, which also has version suffixes we need
-# to account for
-find_program(LLVM_LIT_EXEC NAMES lit llvm-lit llvm-lit-*)
-
 cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TESTS "Builds compile test suite" 
     ON "${PROJECT_NAME_UPPER}_BUILD_TESTS" OFF)
 cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_UNIT_TESTS "Builds unit test suite" 
@@ -36,7 +31,3 @@ endif()
 if(${PROJECT_NAME_UPPER}_BUILD_UNIT_TESTS)
     add_subdirectory("unit_tests")
 endif()
-
-add_test(NAME "test" 
-    COMMAND ${LLVM_LIT_EXEC} unit_tests compile_tests
-    WORKING_DIRECTORY "${TEST_OUTPUT_DIR}")

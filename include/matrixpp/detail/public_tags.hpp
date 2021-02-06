@@ -17,25 +17,13 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
-#include <matrixpp/matrix.hpp>
-#include <matrixpp/utility/equal.hpp>
+#pragma once
 
-namespace
+namespace matrixpp
 {
-	TEST(Equality, SameData)
+	struct identity_matrix_tag
 	{
-		auto left  = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
+	};
 
-		EXPECT_EQ(left, right);
-	}
-
-	TEST(Equality, DifferentData)
-	{
-		auto left  = matrixpp::matrix<int, 3, 3>{ { { 7, 4, 1 }, { 8, 8, 2 }, { 5, 8, 2 } } };
-		auto right = matrixpp::matrix<int, 3, 3>{ { { 7, 3, 1 }, { 8, 1, 2 }, { 5, 8, 1 } } };
-
-		EXPECT_NE(left, right);
-	}
-} // namespace
+	inline constexpr auto identity_matrix = identity_matrix_tag{};
+} // namespace matrixpp

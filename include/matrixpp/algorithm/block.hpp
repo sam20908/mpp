@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include "../detail/matrix_base.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../detail/utility.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/detail/matrix_base.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <span>
 #include <stdexcept>
 
@@ -43,14 +42,14 @@ namespace matrixpp
 			std::size_t bottom_column_idx)
 			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
 		{
-			// The result matrix is always dynamic because function parameters are always
-			// treated as runtime expressions
+			// The result matrix is always dynamic because function parameters are always treated as runtime
+			// expressions, which means it's impossible to change the extent to resized extent
 
 			// Out of bounds checks
 
-			auto rows      = obj.rows();
-			auto cols      = obj.columns();
-			auto obj_begin = obj.begin();
+			const auto rows  = obj.rows();
+			const auto cols  = obj.columns();
+			const auto begin = obj.begin();
 
 			if (top_row_idx >= rows)
 			{
@@ -80,24 +79,27 @@ namespace matrixpp
 				throw std::invalid_argument("Top column index bigger than bottom column index!");
 			}
 
-			auto block_matrix = matrix<Value, std::dynamic_extent, std::dynamic_extent>{};
-			auto block_buf    = std::vector<Value>{};
-			auto block_rows   = bottom_row_idx - top_row_idx + 1;
-			auto block_cols   = bottom_column_idx - top_column_idx + 1;
+			using block_matrix_t = matrix<Value, std::dynamic_extent, std::dynamic_extent>;
+			using block_buf_t    = typename block_matrix_t::buffer_type;
+			using diff_t         = typename block_matrix_t::difference_type;
 
+			auto block_matrix            = block_matrix_t{};
+			auto block_buf               = block_buf_t{};
+			auto block_buf_back_inserter = std::back_inserter(block_buf);
+
+			const auto block_rows = bottom_row_idx - top_row_idx + 1;
+			const auto block_cols = bottom_column_idx - top_column_idx + 1;
 			block_buf.reserve(block_rows * block_cols);
-
-			using diff_t = typename std::decay_t<decltype(obj.buffer())>::difference_type;
 
 			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
 			{
 				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(cols, row, top_column_idx));
-				auto row_begin     = std::next(obj_begin, row_begin_idx);
+				auto row_begin     = std::next(begin, row_begin_idx);
 
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), std::back_inserter(block_buf));
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), block_buf_back_inserter);
 			}
 
-			detail::init_matrix_with_1d_rng_copy(block_matrix, block_buf, block_rows, block_cols);
+			detail::init_matrix_with_1d_rng_move(block_matrix, std::move(block_buf), block_rows, block_cols);
 
 			return block_matrix;
 		}

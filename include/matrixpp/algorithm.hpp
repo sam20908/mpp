@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "algorithm/block.hpp"
-#include "algorithm/determinant.hpp"
-#include "algorithm/inverse.hpp"
-#include "algorithm/transpose.hpp"
+#include <matrixpp/algorithm/block.hpp>
+#include <matrixpp/algorithm/determinant.hpp>
+#include <matrixpp/algorithm/inverse.hpp>
+#include <matrixpp/algorithm/transpose.hpp>

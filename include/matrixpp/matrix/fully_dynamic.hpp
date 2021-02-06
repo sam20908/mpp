@@ -19,8 +19,13 @@
 
 #pragma once
 
-#include "../detail/matrix_base.hpp"
-#include "../detail/matrix_def.hpp"
+#include <matrixpp/detail/constraints.hpp>
+#include <matrixpp/detail/matrix_base.hpp>
+#include <matrixpp/detail/matrix_def.hpp>
+
+#include <initializer_list>
+#include <stdexcept>
+#include <utility>
 
 namespace matrixpp
 {
@@ -35,46 +40,33 @@ namespace matrixpp
 
 		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
-
-			if (detail::dimension_not_zero_and_non_zero(rows, cols))
-			{
-				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
-			}
+			const auto [rows, cols] = detail::range_2d_dimensions(init_2d);
 
 			base::init_buf_2d_dynamic(init_2d, rows, cols);
 		}
 
-		explicit matrix(detail::range_2d_with_type<Value> auto&& rng_2d) // @TODO: ISSUE #20
+		template<detail::range_2d_with_type<Value> Range2D>
+		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
+			const auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
-			if (detail::dimension_not_zero_and_non_zero(rows, cols))
-			{
-				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
-			}
-
-			using decayed_rng_2d_t = std::decay_t<decltype(rng_2d)>;
-			base::init_buf_2d_dynamic(std::forward<decayed_rng_2d_t>(rng_2d), rows, cols);
+			base::init_buf_2d_dynamic(std::forward<Range2D>(rng_2d), rows, cols);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
-			base::_rows = expr.rows();
-			base::_cols = expr.columns();
-			base::_buf.reserve(expr.rows() * expr.columns());
+			base::init_expr_dynamic(expr.rows(), expr.columns(), expr, false);
+		}
 
-			detail::validate_matrices_same_size(*this, expr);
+		matrix(std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
+		{
+			base::_rows = rows;
+			base::_cols = columns;
 
-			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
-			{
-				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
-				{
-					base::_buf.push_back(expr(row, col));
-				}
-			}
+			// @TODO: ISSUE #129
+			detail::allocate_1d_buf_if_vector(base::_buf, rows, columns, Value{ 0 });
 		}
 
 		matrix(std::size_t rows, std::size_t columns, Value value) // @TODO: ISSUE #20

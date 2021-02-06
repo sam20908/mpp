@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "utility/cast.hpp"
-#include "utility/config.hpp"
-#include "utility/equal.hpp"
-#include "utility/square.hpp"
-#include "utility/type.hpp"
+#include <matrixpp/utility/cast.hpp>
+#include <matrixpp/utility/config.hpp>
+#include <matrixpp/utility/square.hpp>
+#include <matrixpp/utility/type.hpp>

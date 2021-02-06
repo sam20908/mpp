@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "../detail/expr_binary_op.hpp"
-#include "../detail/utility.hpp"
-#include "../matrix.hpp"
+#include <matrixpp/detail/expr_binary_op.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/matrix.hpp>
 
 #include <cstddef>
 #include <span>
@@ -52,7 +52,7 @@ namespace matrixpp
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
 			detail::add_op_t> // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
+		detail::validate_same_size(left, right);
 
 		return { left, right, left.rows(), left.columns() };
 	}
@@ -67,10 +67,12 @@ namespace matrixpp
 		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
+		detail::validate_same_size(left, right);
 
-		auto rows = left.rows();
-		auto cols = left.columns();
+		// @TODO: Take advantage of std::ranges::transform
+
+		const auto rows = left.rows();
+		const auto cols = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)
 		{

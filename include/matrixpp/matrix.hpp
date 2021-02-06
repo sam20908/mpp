@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "matrix/dynamic_columns.hpp"
-#include "matrix/dynamic_rows.hpp"
-#include "matrix/fully_dynamic.hpp"
-#include "matrix/fully_static.hpp"
+#include <matrixpp/matrix/dynamic_columns.hpp>
+#include <matrixpp/matrix/dynamic_rows.hpp>
+#include <matrixpp/matrix/fully_dynamic.hpp>
+#include <matrixpp/matrix/fully_static.hpp>

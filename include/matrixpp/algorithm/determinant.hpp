@@ -19,18 +19,21 @@
 
 #pragma once
 
-#include "../detail/algo_types.hpp"
-#include "../detail/matrix_def.hpp"
-#include "../detail/tag_invoke.hpp"
-#include "../detail/utility.hpp"
-#include "../utility/square.hpp"
+#include <matrixpp/detail/algo_types.hpp>
+#include <matrixpp/detail/tag_invoke.hpp>
+#include <matrixpp/detail/utility.hpp>
+#include <matrixpp/utility/square.hpp>
+#include <matrixpp/matrix.hpp>
 
+#include <array>
 #include <cmath>
 
 namespace matrixpp
 {
 	namespace detail
 	{
+		inline static constexpr auto dummy_empty_l_buf = std::array<char, 0>{};
+
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
@@ -63,40 +66,9 @@ namespace matrixpp
 			allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{ 0 });
 			std::ranges::copy(obj, u_buf.begin());
 
-			// The determinant of a LU Decomposition is det(A) = det(L) * det(U)
-			// Since det(L) is always 1, we can avoid creating L entirely
-
-			// Compute U
-			for (auto row = std::size_t{ 0 }; row < rows; ++row)
-			{
-				auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
-				const auto end_idx = idx_2d_to_1d(cols, row, cols);
-
-				for (auto col = std::size_t{ 0 }; col < row; ++col)
-				{
-					// This allows us to keep track of the row of the factor
-					// later on without having to manually calculate from indexes
-					auto factor_row_idx = idx_2d_to_1d(cols, col, col);
-
-					const auto elem_idx = idx_2d_to_1d(cols, row, col);
-					const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
-
-					for (auto idx = begin_idx; idx < end_idx; ++idx)
-					{
-						u_buf[idx] += factor * u_buf[factor_row_idx++];
-					}
-
-					++begin_idx;
-				}
-			}
-
-			auto det = lu_decomp_value_t{ 1 };
-			// The determinant is the product of all pivots of U (diagnoal elements)
-			for (auto idx = std::size_t{ 0 }; idx < cols; ++idx)
-			{
-				const auto elem_idx = idx_2d_to_1d(cols, idx, idx);
-				det *= u_buf[elem_idx];
-			}
+			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
+			// creating L entirely
+			const auto det = lu_decomp_common<lu_decomp_value_t, false>(rows, cols, dummy_empty_l_buf, u_buf);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));

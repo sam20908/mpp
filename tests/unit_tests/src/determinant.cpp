@@ -18,61 +18,63 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <matrixpp/algorithm/determinant.hpp>
 #include <matrixpp/matrix/fully_dynamic.hpp>
+
 #include <utility>
 
 namespace
 {
 	TEST(Determinant, 0x0)
 	{
-		auto matrix = matrixpp::matrix<int>{};
-		auto det    = matrixpp::determinant(matrix);
+		const auto matrix = matrixpp::matrix<int>{};
+		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, 1);
 	}
 
 	TEST(Determinant, 1x1)
 	{
-		auto matrix = matrixpp::matrix{ { 123456 } };
-		auto det    = matrixpp::determinant(matrix);
+		const auto matrix = matrixpp::matrix<int>{ { 123456 } };
+		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, 123456);
 	}
 
 	TEST(Determinant, 2x2)
 	{
-		auto matrix = matrixpp::matrix{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
-		auto det    = matrixpp::determinant(matrix);
+		const auto matrix = matrixpp::matrix<float>{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
+		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, -984026.F);
 	}
 
 	TEST(Determinant, 3x3_SameType)
 	{
-		auto matrix = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(matrix);
+		const auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, 6);
 	}
 
 	TEST(Determinant, 3x3_IntToFloat)
 	{
-		auto matrix = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
+		const auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
 
 		EXPECT_FLOAT_EQ(det, 6.F);
 	}
 
 	TEST(Determiant, 6x6)
 	{
-		auto matrix = matrixpp::matrix{ { 65, 4, 5, 3, 3, 4 },
+		const auto matrix = matrixpp::matrix<int>{ { 65, 4, 5, 3, 3, 4 },
 			{ -9, 122, -234, 6, 5, 23 },
 			{ 7, 3, 5, 32, 5, 4 },
 			{ 4, 2, 2, 4, 2, 4 },
 			{ 5, 34, 1, 45, -12, 4 },
 			{ 1, 2, 23, 6, 543, 4 } };
-		auto det    = matrixpp::determinant(std::type_identity<long>{}, matrix);
+		const auto det    = matrixpp::determinant(std::type_identity<long>{}, matrix);
 
 		EXPECT_EQ(det, -25581825570L);
 	}
