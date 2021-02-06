@@ -59,7 +59,7 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install GCC Gcovr
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Debug -Dmpp_BUILD_TESTS=TRUE -Dmpp_CODE_COVERAGE=TRUE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
     displayName: Configure For Tests in Debug Configuration
 
   - script: cmake --build build --config Debug --target mpp_code_coverage
@@ -85,7 +85,7 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -Dmpp_BUILD_BENCHMARKS=TRUE -Dmpp_CODE_COVERAGE=FALSE -Dmpp_BUILD_TESTS=FALSE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_CODE_COVERAGE=FALSE -DMPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
   - script: cmake --build build --config Release --target benchmark
