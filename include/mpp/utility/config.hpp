@@ -17,41 +17,37 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <mpp/utility/type.hpp>
-#include <mpp/matrix.hpp>
-
+#include <cstddef>
 #include <span>
 
-namespace
+namespace mpp
 {
-	TEST(Type, FullyStatic)
+	struct matrix_rows_extent_tag
 	{
-		const auto matrix = mpp::matrix<int, 2, 3>{};
+	};
 
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
+	struct matrix_columns_extent_tag
+	{
+	};
+
+	namespace customize
+	{
+		struct customize_tag
+		{
+		};
+	} // namespace customize
+
+	template<typename... Args>
+	[[nodiscard]] constexpr auto tag_invoke(matrix_rows_extent_tag, Args&&...) -> std::size_t
+	{
+		return std::dynamic_extent;
 	}
 
-	TEST(Type, FullyDynamic)
+	template<typename... Args>
+	[[nodiscard]] constexpr auto tag_invoke(matrix_columns_extent_tag, Args&&...) -> std::size_t
 	{
-		const auto matrix = mpp::matrix<int>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
+		return std::dynamic_extent;
 	}
-
-
-	TEST(Type, DynamicColumns)
-	{
-		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
-	}
-
-	TEST(Type, DynamicRows)
-	{
-		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
-	}
-} // namespace
+} // namespace mpp

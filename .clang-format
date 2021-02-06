@@ -46,9 +46,9 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '^(<(gtest|gmock|benchmark)/.*>)'
     Priority:        0
-  - Regex:           '^(<matrixpp/.*/.*\.hpp>)'
+  - Regex:           '^(<mpp/.*/.*\.hpp>)'
     Priority:        1
-  - Regex:           '^(<matrixpp/.*\.hpp>)'
+  - Regex:           '^(<mpp/.*\.hpp>)'
     Priority:        1
     SortPriority:    2
   - Regex:           '^(".*")'

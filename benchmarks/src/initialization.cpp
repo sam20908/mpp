@@ -19,7 +19,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include <matrixpp/matrix/fully_dynamic.hpp>
+#include <mpp/matrix/fully_dynamic.hpp>
 
 // Benchmarking any other matrices (at least one side has compile time specified extent) isn't viable because no
 // functionality is provided to access the range at compile time
@@ -29,7 +29,7 @@ static void Initialization_Fill(benchmark::State& state)
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		benchmark::DoNotOptimize(matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()),
+		benchmark::DoNotOptimize(mpp::matrix<int>{ static_cast<std::size_t>(state.range()),
 			static_cast<std::size_t>(state.range()),
 			0 });
 		benchmark::ClobberMemory();

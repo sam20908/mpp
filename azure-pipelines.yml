@@ -59,17 +59,17 @@ jobs:
       sudo apt-get install gcovr
     displayName: Install GCC Gcovr
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_CODE_COVERAGE=TRUE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Debug -Dmpp_BUILD_TESTS=TRUE -Dmpp_CODE_COVERAGE=TRUE -B build
     displayName: Configure For Tests in Debug Configuration
 
-  - script: cmake --build build --config Debug --target matrixpp_code_coverage
+  - script: cmake --build build --config Debug --target mpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration
     continueOnError: true
 
   - task: PublishCodeCoverageResults@1
     inputs:
       codeCoverageTool: cobertura
-      summaryFileLocation: build/matrixpp_code_coverage.xml
+      summaryFileLocation: build/mpp_code_coverage.xml
       pathToSources: $(Build.SourcesDirectory)
     displayName: Publish Code Coverage
 
@@ -85,7 +85,7 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMATRIXPP_BUILD_BENCHMARKS=TRUE -DMATRIXPP_CODE_COVERAGE=FALSE -DMATRIXPP_BUILD_TESTS=FALSE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -Dmpp_BUILD_BENCHMARKS=TRUE -Dmpp_CODE_COVERAGE=FALSE -Dmpp_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
   - script: cmake --build build --config Release --target benchmark
@@ -126,7 +126,7 @@ jobs:
 
 #   - script: |
 #       call "%PROGRAMFILES(X86)%\Microsoft Visual Studio\2019\Preview\Common7\Tools\VsDevCmd.bat" -host_arch=amd64 -arch=amd64 -no_logo
-#       cmake -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE -B build
+#       cmake -Dmpp_BUILD_TESTS=TRUE -Dmpp_BUILD_BENCHMARKS=FALSE -B build
 #       cmake --build build
 #     displayName: Configure and Build
 
@@ -180,7 +180,7 @@ jobs:
 #   - task: run-cmake@0
 #     inputs:
 #       cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-#       cmakeAppendedArgs: -G "Ninja Multi-Config" -DMATRIXPP_BUILD_TESTS=TRUE -DMATRIXPP_BUILD_BENCHMARKS=FALSE
+#       cmakeAppendedArgs: -G "Ninja Multi-Config" -Dmpp_BUILD_TESTS=TRUE -Dmpp_BUILD_BENCHMARKS=FALSE
 #       buildDirectory: build
 #     displayName: Configure and Build
 

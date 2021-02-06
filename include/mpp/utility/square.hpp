@@ -17,41 +17,31 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <mpp/utility/type.hpp>
+#include <mpp/detail/tag_invoke.hpp>
 #include <mpp/matrix.hpp>
 
-#include <span>
+#include <cstddef>
 
-namespace
+namespace mpp
 {
-	TEST(Type, FullyStatic)
+	struct square_t
 	{
-		const auto matrix = mpp::matrix<int, 2, 3>{};
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+			-> bool // @TODO: ISSUE #20
+		{
+			return obj.rows() == obj.columns();
+		}
 
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
-	}
+		template<typename... Args>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<square_t, Args...> // @TODO: ISSUE #20
+		{
+			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
+		}
+	};
 
-	TEST(Type, FullyDynamic)
-	{
-		const auto matrix = mpp::matrix<int>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
-	}
-
-
-	TEST(Type, DynamicColumns)
-	{
-		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
-	}
-
-	TEST(Type, DynamicRows)
-	{
-		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
-	}
-} // namespace
+	inline constexpr auto square = square_t{};
+} // namespace mpp

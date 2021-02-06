@@ -1,6 +1,6 @@
 {
-  "short_name": "matrixpp",
-  "name": "matrixpp - C++20 and later matrix library",
+  "short_name": "mpp",
+  "name": "mpp - C++20 and later matrix library",
   "icons": [
     {
       "src": "favicon.ico",

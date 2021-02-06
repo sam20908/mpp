@@ -17,41 +17,11 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <mpp/utility/type.hpp>
-#include <mpp/matrix.hpp>
-
-#include <span>
-
-namespace
+namespace mpp::detail
 {
-	TEST(Type, FullyStatic)
-	{
-		const auto matrix = mpp::matrix<int, 2, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
-	}
-
-	TEST(Type, FullyDynamic)
-	{
-		const auto matrix = mpp::matrix<int>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
-	}
-
-
-	TEST(Type, DynamicColumns)
-	{
-		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
-	}
-
-	TEST(Type, DynamicRows)
-	{
-		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
-	}
-} // namespace
+	// Double was tested to be *at least* accurate enough to do calculations involve irrational fractions (e.g. 1/3) and
+	// provide accurate enough results
+	using lu_decomp_value_t = double;
+} // namespace mpp::detail

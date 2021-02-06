@@ -20,8 +20,8 @@
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
-#include <matrixpp/algorithm/transpose.hpp>
-#include <matrixpp/matrix.hpp>
+#include <mpp/algorithm/transpose.hpp>
+#include <mpp/matrix.hpp>
 
 #include <span>
 
@@ -31,8 +31,8 @@ namespace
 
 	TEST(Transpose, DimensionsAndExtents_FullyStatic)
 	{
-		const auto matrix  = matrixpp::matrix<int, 1, 2>{ 1 };
-		const auto inverse = matrixpp::transpose(matrix);
+		const auto matrix  = mpp::matrix<int, 1, 2>{ 1 };
+		const auto inverse = mpp::transpose(matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -43,8 +43,8 @@ namespace
 
 	TEST(Transpose, DimensionsAndExtents_FullyDynamic)
 	{
-		const auto matrix  = matrixpp::matrix<int>{ 1, 2, 1 };
-		const auto inverse = matrixpp::transpose(matrix);
+		const auto matrix  = mpp::matrix<int>{ 1, 2, 1 };
+		const auto inverse = mpp::transpose(matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -55,8 +55,8 @@ namespace
 
 	TEST(Transpose, DimensionsAndExtents_DynamicRows)
 	{
-		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 2>{ 1 };
-		const auto inverse = matrixpp::transpose(matrix);
+		const auto matrix  = mpp::matrix<int, std::dynamic_extent, 2>{ 1 };
+		const auto inverse = mpp::transpose(matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -67,8 +67,8 @@ namespace
 
 	TEST(Transpose, DimensionsAndExtents_DynamicColumns)
 	{
-		const auto matrix  = matrixpp::matrix<int, 1, std::dynamic_extent>{ 2, 1 };
-		const auto inverse = matrixpp::transpose(matrix);
+		const auto matrix  = mpp::matrix<int, 1, std::dynamic_extent>{ 2, 1 };
+		const auto inverse = mpp::transpose(matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -79,8 +79,8 @@ namespace
 
 	TEST(Transpose, 3x2To2x3)
 	{
-		const auto from = matrixpp::matrix<int>{ { 1, 2 }, { 3, 4 }, { 5, 6 } };
-		const auto to   = matrixpp::transpose(from);
+		const auto from = mpp::matrix<int>{ { 1, 2 }, { 3, 4 }, { 5, 6 } };
+		const auto to   = mpp::transpose(from);
 
 		EXPECT_EQ(to.rows(), 2);
 		EXPECT_EQ(to.columns(), 3);
@@ -93,8 +93,8 @@ namespace
 
 	TEST(Transpose, 6x1To1x6)
 	{
-		const auto from = matrixpp::matrix<int>{ { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 } };
-		const auto to   = matrixpp::transpose(from);
+		const auto from = mpp::matrix<int>{ { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 } };
+		const auto to   = mpp::transpose(from);
 
 		EXPECT_EQ(to.rows(), 1);
 		EXPECT_EQ(to.columns(), 6);

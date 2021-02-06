@@ -20,8 +20,8 @@
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
-#include <matrixpp/algorithm/block.hpp>
-#include <matrixpp/matrix.hpp>
+#include <mpp/algorithm/block.hpp>
+#include <mpp/matrix.hpp>
 
 #include <span>
 #include <stdexcept>
@@ -36,8 +36,8 @@ namespace
 
 	TEST(Block, FullBlock_FullyStatic)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -54,8 +54,8 @@ namespace
 
 	TEST(Block, FullBlock_FullyDynamic)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -72,8 +72,8 @@ namespace
 
 	TEST(Block, FullBlock_DynamicRows)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -90,8 +90,8 @@ namespace
 
 	TEST(Block, FullBlock_DynamicColumns)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -112,8 +112,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To2x2_FullyStatic)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -130,8 +130,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To2x2_FullyDynamic)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -148,8 +148,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To2x2_DynamicRows)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -166,8 +166,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To2x2_DynamicColumns)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(1),
@@ -188,8 +188,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To1x1_FullyStatic)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -206,8 +206,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To1x1_FullyDynamic)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -224,8 +224,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To1x1_DynamicRows)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -242,8 +242,8 @@ namespace
 
 	TEST(Block, Cropped_2x3To1x1_DynamicColumns)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto to   = matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto to   = mpp::block(from,
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
             static_cast<std::size_t>(0),
@@ -264,8 +264,8 @@ namespace
 
 	TEST(Block, TopRowIndexOutOfBounds_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(2), // Out of range
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -275,8 +275,8 @@ namespace
 
 	TEST(Block, TopRowIndexOutOfBounds_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(2), // Out of range
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -286,8 +286,8 @@ namespace
 
 	TEST(Block, TopRowIndexOutOfBounds_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(2), // Out of range
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -297,8 +297,8 @@ namespace
 
 	TEST(Block, TopRowIndexOutOfBounds_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(2), // Out of range
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -312,8 +312,8 @@ namespace
 
 	TEST(Block, TopColumnIndexOutOfBounds_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(3), // Out of range
 						 static_cast<std::size_t>(1),
@@ -323,8 +323,8 @@ namespace
 
 	TEST(Block, TopColumnIndexOutOfBounds_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(3), // Out of range
 						 static_cast<std::size_t>(1),
@@ -334,8 +334,8 @@ namespace
 
 	TEST(Block, TopColumnIndexOutOfBounds_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(3), // Out of range
 						 static_cast<std::size_t>(1),
@@ -345,8 +345,8 @@ namespace
 
 	TEST(Block, TopColumnIndexOutOfBounds_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(3), // Out of range
 						 static_cast<std::size_t>(1),
@@ -360,8 +360,8 @@ namespace
 
 	TEST(Block, BottomRowIndexOutOfBounds_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(2), // Out of range
@@ -371,8 +371,8 @@ namespace
 
 	TEST(Block, BottomRowIndexOutOfBounds_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(2), // Out of range
@@ -382,8 +382,8 @@ namespace
 
 	TEST(Block, BottomRowIndexOutOfBounds_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(2), // Out of range
@@ -393,8 +393,8 @@ namespace
 
 	TEST(Block, BottomRowIndexOutOfBounds_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(2), // Out of range
@@ -408,8 +408,8 @@ namespace
 
 	TEST(Block, BottomColumnIndexOutOfBounds_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -419,8 +419,8 @@ namespace
 
 	TEST(Block, BottomColumnIndexOutOfBounds_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -430,8 +430,8 @@ namespace
 
 	TEST(Block, BottomColumnIndexOutOfBounds_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -441,8 +441,8 @@ namespace
 
 	TEST(Block, BottomColumnIndexOutOfBounds_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1),
@@ -456,8 +456,8 @@ namespace
 
 	TEST(Block, TopRowBiggerThanBottomRow_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
@@ -467,8 +467,8 @@ namespace
 
 	TEST(Block, TopRowBiggerThanBottomRow_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
@@ -478,8 +478,8 @@ namespace
 
 	TEST(Block, TopRowBiggerThanBottomRow_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
@@ -489,8 +489,8 @@ namespace
 
 	TEST(Block, TopRowBiggerThanBottomRow_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(1), // Overlaps bottom row index "0"
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(0),
@@ -504,8 +504,8 @@ namespace
 
 	TEST(Block, TopColumnBiggerThanBottomColumn_FullyStatic_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
 						 static_cast<std::size_t>(0),
@@ -515,8 +515,8 @@ namespace
 
 	TEST(Block, TopColumnBiggerThanBottomColumn_FullyDynamic_Throw)
 	{
-		const auto from = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
 						 static_cast<std::size_t>(0),
@@ -526,8 +526,8 @@ namespace
 
 	TEST(Block, TopColumnBiggerThanBottomColumn_DynamicRows_Throw)
 	{
-		const auto from = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
 						 static_cast<std::size_t>(0),
@@ -537,8 +537,8 @@ namespace
 
 	TEST(Block, TopColumnBiggerThanBottomColumn_DynamicColumns_Throw)
 	{
-		const auto from = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)matrixpp::block(from,
+		const auto from = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		EXPECT_THROW((void)mpp::block(from,
 						 static_cast<std::size_t>(0),
 						 static_cast<std::size_t>(1), // Overlaps bottom column index "0"
 						 static_cast<std::size_t>(0),

@@ -17,41 +17,13 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <mpp/utility/type.hpp>
-#include <mpp/matrix.hpp>
-
-#include <span>
-
-namespace
+namespace mpp
 {
-	TEST(Type, FullyStatic)
+	struct identity_matrix_tag
 	{
-		const auto matrix = mpp::matrix<int, 2, 3>{};
+	};
 
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
-	}
-
-	TEST(Type, FullyDynamic)
-	{
-		const auto matrix = mpp::matrix<int>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
-	}
-
-
-	TEST(Type, DynamicColumns)
-	{
-		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
-	}
-
-	TEST(Type, DynamicRows)
-	{
-		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
-	}
-} // namespace
+	inline constexpr auto identity_matrix = identity_matrix_tag{};
+} // namespace mpp

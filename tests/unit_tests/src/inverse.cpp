@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include <matrixpp/algorithm/inverse.hpp>
-#include <matrixpp/matrix.hpp>
+#include <mpp/algorithm/inverse.hpp>
+#include <mpp/matrix.hpp>
 
 #include <functional>
 #include <stdexcept>
@@ -32,8 +32,8 @@ namespace
 
 	TEST(Inverse, DimensionsAndExtents_FullyStatic)
 	{
-		const auto matrix  = matrixpp::matrix<float, 1, 1>{ 1.F };
-		const auto inverse = matrixpp::inverse(matrix);
+		const auto matrix  = mpp::matrix<float, 1, 1>{ 1.F };
+		const auto inverse = mpp::inverse(matrix);
 
 		EXPECT_EQ(inverse.rows(), 1);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -44,8 +44,8 @@ namespace
 
 	TEST(Inverse, DimensionsAndExtents_FullyDynamic)
 	{
-		const auto matrix  = matrixpp::matrix<float>{ 1, 1, 1.F };
-		const auto inverse = matrixpp::inverse(matrix);
+		const auto matrix  = mpp::matrix<float>{ 1, 1, 1.F };
+		const auto inverse = mpp::inverse(matrix);
 
 		EXPECT_EQ(inverse.rows(), 1);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -56,8 +56,8 @@ namespace
 
 	TEST(Inverse, DimensionsAndExtents_DynamicRows)
 	{
-		const auto matrix  = matrixpp::matrix<float, std::dynamic_extent, 1>{ 1, 1.F };
-		const auto inverse = matrixpp::inverse(matrix);
+		const auto matrix  = mpp::matrix<float, std::dynamic_extent, 1>{ 1, 1.F };
+		const auto inverse = mpp::inverse(matrix);
 
 		EXPECT_EQ(inverse.rows(), 1);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -68,8 +68,8 @@ namespace
 
 	TEST(Inverse, DimensionsAndExtents_DynamicColumns)
 	{
-		const auto matrix  = matrixpp::matrix<float, 1, std::dynamic_extent>{ 1, 1.F };
-		const auto inverse = matrixpp::inverse(matrix);
+		const auto matrix  = mpp::matrix<float, 1, std::dynamic_extent>{ 1, 1.F };
+		const auto inverse = mpp::inverse(matrix);
 
 		EXPECT_EQ(inverse.rows(), 1);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -80,33 +80,33 @@ namespace
 
 	TEST(Inverse, NonSquareMatrix_FullyStatic_Throw)
 	{
-		const auto matrix = matrixpp::matrix<float, 1, 2>{ 1.F };
-		EXPECT_THROW((void)(matrixpp::inverse(matrix)), std::runtime_error);
+		const auto matrix = mpp::matrix<float, 1, 2>{ 1.F };
+		EXPECT_THROW((void)(mpp::inverse(matrix)), std::runtime_error);
 	}
 
 	TEST(Inverse, NonSquareMatrix_FullyDynamic_Throw)
 	{
-		const auto matrix = matrixpp::matrix<float>{ 1, 2, 1.F };
-		EXPECT_THROW((void)(matrixpp::inverse(matrix)), std::runtime_error);
+		const auto matrix = mpp::matrix<float>{ 1, 2, 1.F };
+		EXPECT_THROW((void)(mpp::inverse(matrix)), std::runtime_error);
 	}
 
 	TEST(Inverse, NonSquareMatrix_DynamicRows_Throw)
 	{
-		const auto matrix = matrixpp::matrix<float, std::dynamic_extent, 2>{ 1, 1.F };
-		EXPECT_THROW((void)(matrixpp::inverse(matrix)), std::runtime_error);
+		const auto matrix = mpp::matrix<float, std::dynamic_extent, 2>{ 1, 1.F };
+		EXPECT_THROW((void)(mpp::inverse(matrix)), std::runtime_error);
 	}
 
 
 	TEST(Inverse, NonSquareMatrix_DynamicColumns_Throw)
 	{
-		const auto matrix = matrixpp::matrix<float, 1, std::dynamic_extent>{ 2, 1.F };
-		EXPECT_THROW((void)(matrixpp::inverse(matrix)), std::runtime_error);
+		const auto matrix = mpp::matrix<float, 1, std::dynamic_extent>{ 2, 1.F };
+		EXPECT_THROW((void)(mpp::inverse(matrix)), std::runtime_error);
 	}
 
 	TEST(Inverse, 0x0)
 	{
-		const auto matrix  = matrixpp::matrix<int>{ 0, 0, 0 };
-		const auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+		const auto matrix  = mpp::matrix<int>{ 0, 0, 0 };
+		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 0);
 		EXPECT_EQ(inverse.columns(), 0);
@@ -114,8 +114,8 @@ namespace
 
 	TEST(Inverse, 1x1)
 	{
-		const auto matrix  = matrixpp::matrix<int>{ { 2 } };
-		const auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+		const auto matrix  = mpp::matrix<int>{ { 2 } };
+		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 1);
 		EXPECT_EQ(inverse.columns(), 1);
@@ -125,8 +125,8 @@ namespace
 
 	TEST(Inverse, 2x2)
 	{
-		const auto matrix  = matrixpp::matrix<int>{ { 65, 4 }, { -9, 122 } };
-		const auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+		const auto matrix  = mpp::matrix<int>{ { 65, 4 }, { -9, 122 } };
+		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 2);
 		EXPECT_EQ(inverse.columns(), 2);
@@ -139,14 +139,14 @@ namespace
 
 	TEST(Inverse, 2x2_SingularMatrix_Throw)
 	{
-		const auto matrix = matrixpp::matrix<int>{ { 0, 0 }, { 0, 0 } };
-		EXPECT_THROW((void)(matrixpp::inverse(std::type_identity<float>{}, matrix)), std::runtime_error);
+		const auto matrix = mpp::matrix<int>{ { 0, 0 }, { 0, 0 } };
+		EXPECT_THROW((void)(mpp::inverse(std::type_identity<float>{}, matrix)), std::runtime_error);
 	}
 
 	TEST(Inverse, 3x3)
 	{
-		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		const auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+		const auto matrix  = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 3);
 		EXPECT_EQ(inverse.columns(), 3);
@@ -164,8 +164,8 @@ namespace
 
 	TEST(Inverse, 4x4)
 	{
-		const auto matrix = matrixpp::matrix<int>{ { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } };
-		const auto inverse = matrixpp::inverse(std::type_identity<float>{}, matrix);
+		const auto matrix = mpp::matrix<int>{ { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } };
+		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 4);
 		EXPECT_EQ(inverse.columns(), 4);

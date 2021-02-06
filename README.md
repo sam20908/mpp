@@ -1,10 +1,10 @@
-# matrixpp
+# mpp
 A C++20 and later matrix library
 
-![Build Status](https://img.shields.io/azure-devops/build/samestimable2016/matrixpp/2/main?label=%F0%9F%94%A8%20Build%20Status) ![Test Results](https://img.shields.io/azure-devops/tests/samestimable2016/matrixpp/2/main?label=%F0%9F%A7%AA%20Test%20Results) ![Code Coverage](https://img.shields.io/azure-devops/coverage/samestimable2016/matrixpp/2/main?label=%F0%9F%93%B6%20Code%20Coverage) ![GitHub Pages](https://img.shields.io/github/deployments/sam20908/matrixpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages)
+![Build Status](https://img.shields.io/azure-devops/build/samestimable2016/mpp/2/main?label=%F0%9F%94%A8%20Build%20Status) ![Test Results](https://img.shields.io/azure-devops/tests/samestimable2016/mpp/2/main?label=%F0%9F%A7%AA%20Test%20Results) ![Code Coverage](https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/2/main?label=%F0%9F%93%B6%20Code%20Coverage) ![GitHub Pages](https://img.shields.io/github/deployments/sam20908/mpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages)
 
 ## Including the Project:
-- A target `matrixpp` will be created (or `matrixpp::matrixpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
+- A target `mpp` will be created (or `mpp::mpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
 - You can also just include the headers into your project manually if that's your decision.
 
 ## Test Suite Dependencies:
@@ -14,13 +14,13 @@ A C++20 and later matrix library
 - `gcov` and `gcovr` for code coverage (has to be found in **PATH**).
 
 ## Using Built-in Tests:
-- Specify `MATRIXPP_BUILD_TESTS` to a boolean value to enable or disable building the test.
+- Specify `mpp_BUILD_TESTS` to a boolean value to enable or disable building the test.
     - This enables all of the following implicitly:
-        - `MATRIXPP_BUILD_COMPILE_TESTS` to `TRUE`.
-        - `MATRIXPP_BUILD_UNIT_TESTS` to `TRUE`.
+        - `mpp_BUILD_COMPILE_TESTS` to `TRUE`.
+        - `mpp_BUILD_UNIT_TESTS` to `TRUE`.
             - **Note: Multi configuration generators will put same executables of different configurations in unit tests binary directory!**
     - You can manually specify one of those above options to `FALSE` should you disable that specific test.
-- Specify `MATRIXPP_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
+- Specify `mpp_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
     - Recommended to build in **Release** configuration.
 
 ## Using the Lit Test Suite:
@@ -34,7 +34,7 @@ A C++20 and later matrix library
 ## Using Code Coverage:
 - ***Requires unit tests to be enabled!***
 - NOTE: **Ninja** won't work for code coverage due to a bug, so a workaround is to use **Ninja Multi-Config**.
-- Specify `MATRIXPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
+- Specify `mpp_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
 - **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
     - Recommended to build in **Debug** configuration.
-    - Coverage file will be in `<build directory>` named `matrixpp_code_coverage.xml`.
+    - Coverage file will be in `<build directory>` named `mpp_code_coverage.xml`.

@@ -19,21 +19,21 @@
 
 #include <benchmark/benchmark.h>
 
-#include <matrixpp/matrix/fully_dynamic.hpp>
-#include <matrixpp/utility.hpp>
+#include <mpp/matrix/fully_dynamic.hpp>
+#include <mpp/utility.hpp>
 
 // Don't benchmark singular because determinant is the only heavy operation
 
 static void Cast(benchmark::State& state)
 {
 	auto a =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(a);
-		benchmark::DoNotOptimize(matrixpp::cast(std::type_identity<long double>{}, a));
+		benchmark::DoNotOptimize(mpp::cast(std::type_identity<long double>{}, a));
 		benchmark::ClobberMemory();
 	}
 

@@ -17,41 +17,23 @@
  * under the License.
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <mpp/utility/type.hpp>
-#include <mpp/matrix.hpp>
+#include <concepts>
+#include <ranges>
+#include <type_traits>
 
-#include <span>
-
-namespace
+namespace mpp::detail
 {
-	TEST(Type, FullyStatic)
-	{
-		const auto matrix = mpp::matrix<int, 2, 3>{};
+	template<typename Value>
+	concept arithmetic = std::is_arithmetic_v<Value>;
 
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
-	}
+	template<typename Range>
+	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
-	TEST(Type, FullyDynamic)
-	{
-		const auto matrix = mpp::matrix<int>{};
+	template<typename Range>
+	concept range_2d_arithmetic = arithmetic<range_2d_t<Range>>;
 
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
-	}
-
-
-	TEST(Type, DynamicColumns)
-	{
-		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
-	}
-
-	TEST(Type, DynamicRows)
-	{
-		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
-
-		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
-	}
-} // namespace
+	template<typename Range, typename Value>
+	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
+} // namespace mpp::detail
