@@ -35,7 +35,7 @@ namespace mpp
 		public detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>
 	{
 		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents, it's
-		// picked up by other specializations, meaning we can avoid conditional inheritance of a base class
+		// picked up by other specializations
 
 		static_assert(!detail::dimension_not_zero_and_non_zero(RowsExtent, ColumnsExtent),
 			"Cannot have one side being zero and other side being non-zero!");
