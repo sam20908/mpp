@@ -804,7 +804,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyStaticAndFullyDynamic_Evaluated)
@@ -819,7 +819,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyStaticAndDynamicRows_Evaluated)
@@ -834,7 +834,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyStaticAndDynamicColumns_Evaluated)
@@ -849,7 +849,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyStaticAndFullyStatic_Throw)
@@ -972,7 +972,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyDynamicAndFullyDynamic_Evaluated)
@@ -987,7 +987,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyDynamicAndDynamicRows_Evaluated)
@@ -1002,7 +1002,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyDynamicAndDynamicColumns_Evaluated)
@@ -1017,7 +1017,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyDynamicAndFullyStatic_Throw)
@@ -1140,7 +1140,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicRowsAndFullyDynamic_Evaluated)
@@ -1155,7 +1155,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicRowsAndDynamicRows_Evaluated)
@@ -1170,7 +1170,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicRowsAndDynamicColumns_Evaluated)
@@ -1185,7 +1185,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicRowsAndFullyStatic_Throw)
@@ -1308,7 +1308,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicColumnsAndFullyDynamic_Evaluated)
@@ -1323,7 +1323,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicColumnsAndDynamicRows_Evaluated)
@@ -1338,7 +1338,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), 3);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicColumnsAndDynamicColumns_Evaluated)
@@ -1353,7 +1353,7 @@ namespace
 		EXPECT_EQ(expr_matrix.rows_extent(), 2);
 		EXPECT_EQ(expr_matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(expr_matrix, Each(Eq(0)));
+		EXPECT_THAT(expr_matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicColumnsAndFullyStatic_Throw)
