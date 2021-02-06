@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include <matrixpp/utility/type.hpp>
-#include <matrixpp/matrix.hpp>
+#include <mpp/utility/type.hpp>
+#include <mpp/matrix.hpp>
 
 #include <span>
 
@@ -28,30 +28,30 @@ namespace
 {
 	TEST(Type, FullyStatic)
 	{
-		const auto matrix = matrixpp::matrix<int, 2, 3>{};
+		const auto matrix = mpp::matrix<int, 2, 3>{};
 
-		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::fully_static);
+		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_static);
 	}
 
 	TEST(Type, FullyDynamic)
 	{
-		const auto matrix = matrixpp::matrix<int>{};
+		const auto matrix = mpp::matrix<int>{};
 
-		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::fully_dynamic);
+		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::fully_dynamic);
 	}
 
 
 	TEST(Type, DynamicColumns)
 	{
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{};
+		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
 
-		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::dynamic_columns);
+		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_columns);
 	}
 
 	TEST(Type, DynamicRows)
 	{
-		const auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{};
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
 
-		EXPECT_EQ(matrixpp::type(matrix), matrixpp::matrix_type::dynamic_rows);
+		EXPECT_EQ(mpp::type(matrix), mpp::matrix_type::dynamic_rows);
 	}
 } // namespace

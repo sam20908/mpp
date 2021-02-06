@@ -17,27 +17,23 @@
  * under the License.
  */
 
-#include <benchmark/benchmark.h>
+#pragma once
 
-#include <mpp/matrix/fully_dynamic.hpp>
-#include <mpp/utility.hpp>
+#include <concepts>
+#include <ranges>
+#include <type_traits>
 
-// Don't benchmark singular because determinant is the only heavy operation
-
-static void Cast(benchmark::State& state)
+namespace mpp::detail
 {
-	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	template<typename Value>
+	concept arithmetic = std::is_arithmetic_v<Value>;
 
-	benchmark::ClobberMemory();
-	for (auto _ : state)
-	{
-		benchmark::DoNotOptimize(a);
-		benchmark::DoNotOptimize(mpp::cast(std::type_identity<long double>{}, a));
-		benchmark::ClobberMemory();
-	}
+	template<typename Range>
+	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
-	state.counters["Rows"]    = static_cast<double>(state.range());
-	state.counters["Columns"] = static_cast<double>(state.range());
-}
+	template<typename Range>
+	concept range_2d_arithmetic = arithmetic<range_2d_t<Range>>;
 
-BENCHMARK(Cast)->RangeMultiplier(2)->Range(8, 8 << 10);
+	template<typename Range, typename Value>
+	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
+} // namespace mpp::detail

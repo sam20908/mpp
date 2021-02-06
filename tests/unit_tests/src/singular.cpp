@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include <matrixpp/matrix/fully_dynamic.hpp>
-#include <matrixpp/utility/singular.hpp>
+#include <mpp/matrix/fully_dynamic.hpp>
+#include <mpp/utility/singular.hpp>
 
 #include <utility>
 
@@ -28,24 +28,24 @@ namespace
 {
 	TEST(Singular, 1x1_0_Initialized)
 	{
-		const auto matrix      = matrixpp::matrix<int>{ 1, 1, 0 };
-		const auto is_singular = matrixpp::singular(matrix);
+		const auto matrix      = mpp::matrix<int>{ 1, 1, 0 };
+		const auto is_singular = mpp::singular(matrix);
 
 		EXPECT_TRUE(is_singular);
 	}
 
 	TEST(Singular, 1x1)
 	{
-		const auto matrix      = matrixpp::matrix<int>{ { 123456 } };
-		const auto is_singular = matrixpp::singular(matrix);
+		const auto matrix      = mpp::matrix<int>{ { 123456 } };
+		const auto is_singular = mpp::singular(matrix);
 
 		EXPECT_FALSE(is_singular);
 	}
 
 	TEST(Singular, 2x2)
 	{
-		const auto matrix      = matrixpp::matrix<float>{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
-		const auto is_singular = matrixpp::singular(matrix);
+		const auto matrix      = mpp::matrix<float>{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
+		const auto is_singular = mpp::singular(matrix);
 
 		EXPECT_FALSE(is_singular);
 	}
@@ -53,21 +53,21 @@ namespace
 
 	TEST(Singular, 3x3)
 	{
-		const auto matrix      = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
-		const auto is_singular = matrixpp::singular(matrix);
+		const auto matrix      = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto is_singular = mpp::singular(matrix);
 
 		EXPECT_FALSE(is_singular);
 	}
 
 	TEST(Singular, 6x6)
 	{
-		const auto matrix      = matrixpp::matrix<int>{ { 65, 4, 5, 3, 3, 4 },
+		const auto matrix      = mpp::matrix<int>{ { 65, 4, 5, 3, 3, 4 },
             { -9, 122, -234, 6, 5, 23 },
             { 7, 3, 5, 32, 5, 4 },
             { 4, 2, 2, 4, 2, 4 },
             { 5, 34, 1, 45, -12, 4 },
             { 1, 2, 23, 6, 543, 4 } };
-		const auto is_singular = matrixpp::singular(matrix);
+		const auto is_singular = mpp::singular(matrix);
 
 		EXPECT_FALSE(is_singular);
 	}

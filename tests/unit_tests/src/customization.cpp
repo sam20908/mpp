@@ -17,9 +17,9 @@
  * under the License.
  */
 
-#include <matrixpp/utility/config.hpp>
+#include <mpp/utility/config.hpp>
 
-namespace matrixpp::customize
+namespace mpp::customize
 {
 	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
 	{
@@ -30,13 +30,13 @@ namespace matrixpp::customize
 	{
 		return 10;
 	}
-} // namespace matrixpp::customize
+} // namespace mpp::customize
 
 #include <gtest/gtest.h>
 
-#include <matrixpp/algorithm.hpp>
-#include <matrixpp/matrix.hpp>
-#include <matrixpp/utility.hpp>
+#include <mpp/algorithm.hpp>
+#include <mpp/matrix.hpp>
+#include <mpp/utility.hpp>
 
 namespace
 {
@@ -54,44 +54,44 @@ namespace
 		[[nodiscard]] constexpr auto operator==(const dumb_class2&) const -> bool = default;
 	};
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::type_t, dumb_class) -> dumb_type
+	[[nodiscard]] constexpr auto tag_invoke(mpp::type_t, dumb_class) -> dumb_type
 	{
 		return dumb_type::lol;
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::cast_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::cast_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::square_t, dumb_class) -> bool
+	[[nodiscard]] constexpr auto tag_invoke(mpp::square_t, dumb_class) -> bool
 	{
 		return false;
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::block_t, dumb_class, int, int, int, int) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::block_t, dumb_class, int, int, int, int) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::determinant_t, dumb_class) -> int
+	[[nodiscard]] constexpr auto tag_invoke(mpp::determinant_t, dumb_class) -> int
 	{
 		return 2;
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::inverse_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::inverse_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(matrixpp::transpose_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::transpose_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
 	TEST(Customization, DefaultExtents)
 	{
-		const auto matrix = matrixpp::matrix<int>{};
+		const auto matrix = mpp::matrix<int>{};
 		EXPECT_EQ(matrix.rows_extent(), 10);
 		EXPECT_EQ(matrix.columns_extent(), 10);
 	}
@@ -99,43 +99,43 @@ namespace
 	TEST(Customization, Type)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::type(dummy), dumb_type::lol);
+		EXPECT_EQ(mpp::type(dummy), dumb_type::lol);
 	}
 
 	TEST(Customization, Cast)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::cast(dummy), dumb_class2{});
+		EXPECT_EQ(mpp::cast(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Square)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_FALSE(matrixpp::square(dummy));
+		EXPECT_FALSE(mpp::square(dummy));
 	}
 
 	TEST(Customization, Block)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::block(dummy, 0, 0, 0, 0), dumb_class2{});
+		EXPECT_EQ(mpp::block(dummy, 0, 0, 0, 0), dumb_class2{});
 	}
 
 	TEST(Customization, Determinant)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::determinant(dummy), 2);
+		EXPECT_EQ(mpp::determinant(dummy), 2);
 	}
 
 	TEST(Customization, Inverse)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::inverse(dummy), dumb_class2{});
+		EXPECT_EQ(mpp::inverse(dummy), dumb_class2{});
 	}
 
 	TEST(Customization, Transpose)
 	{
 		const auto dummy = dumb_class{};
-		EXPECT_EQ(matrixpp::transpose(dummy), dumb_class2{});
+		EXPECT_EQ(mpp::transpose(dummy), dumb_class2{});
 	}
 
 	// @TODO: Add customization test for singular and (upcoming) equal CPOs

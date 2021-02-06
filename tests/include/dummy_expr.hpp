@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include <matrixpp/detail/expr_base.hpp>
+#include <mpp/detail/expr_base.hpp>
 
 #include <cstddef>
 
-namespace matrixpp_test::detail
+namespace mpp_test::detail
 {
 	/**
 	 * A dummy expression object for testing purposes
 	 */
 	template<typename Obj, std::size_t RowsExtent = Obj::rows_extent(), std::size_t ColumnsExtent = Obj::rows_extent()>
 	class dummy_expr :
-		public ::matrixpp::detail::expr_base<dummy_expr<Obj>, typename Obj::value_type, RowsExtent, ColumnsExtent>
+		public ::mpp::detail::expr_base<dummy_expr<Obj>, typename Obj::value_type, RowsExtent, ColumnsExtent>
 	{
 		const Obj& _obj;
 
@@ -59,4 +59,4 @@ namespace matrixpp_test::detail
 			return _obj(row_idx, col_idx);
 		}
 	};
-} // namespace matrixpp_test::detail
+} // namespace mpp_test::detail

@@ -1,6 +1,4 @@
-export const kinds = `#include <matrixpp/matrix.h>
-
-namespace mpp = matrixpp;
+export const kinds = `#include <mpp/matrix.h>
 
 int main()
 {
@@ -14,12 +12,10 @@ int main()
     return 0;
 }`;
 
-export const operations = `#include <matrixpp/matrix.h>
-#include <matrixpp/operations.hpp> // +, -, *, and /
-#include <matrixpp/algorithms.hpp> // determinant, inverse, transpose, block, and etc...
+export const operations = `#include <mpp/matrix.h>
+#include <mpp/operations.hpp> // +, -, *, and /
+#include <mpp/algorithms.hpp> // determinant, inverse, transpose, block, and etc...
 #include <utility> // std::type_identity
-
-namespace mpp = matrixpp;
 
 int main()
 {
@@ -48,11 +44,11 @@ int main()
     return 0;
 }`;
 
-export const customize_default_extent = `#include <matrixpp/utility/config.hpp>
+export const customize_default_extent = `#include <mpp/utility/config.hpp>
 
 // It's very important to do this before including matrix.hpp, otherwise the customization
 // is not going to be detected
-namespace matrixpp::customize
+namespace mpp::customize
 {
     // Customization for default extent for matrix class has to take place here because
     // the library looks for customizations via ADL, and customize_tag is declared in this
@@ -67,11 +63,9 @@ namespace matrixpp::customize
     {
         return 10;
     }
-} // namespace matrixpp::customize
+} // namespace mpp::customize
 
-#include <matrixpp/matrix.hpp>
-
-namespace mpp = matrixpp;
+#include <mpp/matrix.hpp>
 
 int main()
 {
@@ -83,9 +77,7 @@ int main()
 }
 `;
 
-export const customize_utilities = `#include <matrixpp/matrix.hpp>
-
-namespace mpp = matrixpp;
+export const customize_utilities = `#include <mpp/matrix.hpp>
 
 namespace ns
 {

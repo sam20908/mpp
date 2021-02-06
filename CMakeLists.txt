@@ -40,7 +40,7 @@ endfunction()
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file")
 
-project("matrixpp")
+project("mpp")
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 add_library(${PROJECT_NAME} INTERFACE)

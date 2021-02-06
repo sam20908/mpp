@@ -43,22 +43,22 @@ export default class Home extends React.Component<unknown, unknown> {
 								</p>
 								<MDBRow center>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/build/samestimable2016/matrixpp/2/main?label=%F0%9F%94%A8%20Build%20Status" />
+										<img src="https://img.shields.io/azure-devops/build/samestimable2016/mpp/2/main?label=%F0%9F%94%A8%20Build%20Status" />
 									</MDBCol>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/tests/samestimable2016/matrixpp/2/main?label=%F0%9F%A7%AA%20Test%20Results" />
+										<img src="https://img.shields.io/azure-devops/tests/samestimable2016/mpp/2/main?label=%F0%9F%A7%AA%20Test%20Results" />
 									</MDBCol>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/coverage/samestimable2016/matrixpp/2/main?label=%F0%9F%93%B6%20Code%20Coverage" />
+										<img src="https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/2/main?label=%F0%9F%93%B6%20Code%20Coverage" />
 									</MDBCol>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/github/deployments/sam20908/matrixpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages" />
+										<img src="https://img.shields.io/github/deployments/sam20908/mpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages" />
 									</MDBCol>
 								</MDBRow>
 								<MDBBtn
 									gradient="blue"
 									className="mt-5"
-									href="https://github.com/sam20908/matrixpp"
+									href="https://github.com/sam20908/mpp"
 								>
 									GitHub Repository
 								</MDBBtn>
@@ -77,9 +77,9 @@ export default class Home extends React.Component<unknown, unknown> {
 					</MDBTypography>
 					<hr />
 					<MDBTypography tag="p" className="lead mt-3">
-						<b>matrixpp</b> strives to mimic STL-style interface
-						with algorithms and operations declared outside of the
-						matrix class to allow users to &quot;Pay For What You
+						<b>mpp</b> strives to mimic STL-style interface with
+						algorithms and operations declared outside of the matrix
+						class to allow users to &quot;Pay For What You
 						Use&quot;. The API was also designed to be compatible
 						with standard STL algorithms, which means it strives to
 						meet the C++ Named Requirements for whatever operation
@@ -92,10 +92,10 @@ export default class Home extends React.Component<unknown, unknown> {
 						techniques like <b>expression template objects</b>,
 						which for example delays evaluation for a given
 						expression until it needs to be evaluated. Lastly,{" "}
-						<b>matrixpp</b> is designed to be widely customizable,
-						with the help of <b>customization point objects</b> to
-						allow customizing all algorithms and operations in the
-						library for certain user-defined types.
+						<b>mpp</b> is designed to be widely customizable, with
+						the help of <b>customization point objects</b> to allow
+						customizing all algorithms and operations in the library
+						for certain user-defined types.
 					</MDBTypography>
 					<br />
 					<MDBTypography
@@ -109,7 +109,7 @@ export default class Home extends React.Component<unknown, unknown> {
 						to improve it as time goes on.{" "}
 						<b>
 							If you want to help contribute, just send an issue
-							or a pull request on matrixpp GitHub!
+							or a pull request on mpp GitHub!
 						</b>
 					</MDBTypography>
 				</MDBContainer>
@@ -301,10 +301,9 @@ export default class Home extends React.Component<unknown, unknown> {
 					<MDBTypography tag="p" className="lead mt-5">
 						All the customizations take place in the function{" "}
 						<b>tag_invoke</b>. It allows customization of all{" "}
-						<b>matrixpp customization points</b> in one function
-						name, which reduces the chance of someone being
-						confused. Here is another example with another utility
-						function:
+						<b>mpp customization points</b> in one function name,
+						which reduces the chance of someone being confused. Here
+						is another example with another utility function:
 					</MDBTypography>
 					<CodeBlock code={customize_utilities} theme={theme} />
 				</MDBContainer>

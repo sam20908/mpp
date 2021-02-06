@@ -17,27 +17,37 @@
  * under the License.
  */
 
-#include <benchmark/benchmark.h>
+#pragma once
 
-#include <mpp/matrix/fully_dynamic.hpp>
-#include <mpp/utility.hpp>
+#include <cstddef>
+#include <span>
 
-// Don't benchmark singular because determinant is the only heavy operation
-
-static void Cast(benchmark::State& state)
+namespace mpp
 {
-	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-
-	benchmark::ClobberMemory();
-	for (auto _ : state)
+	struct matrix_rows_extent_tag
 	{
-		benchmark::DoNotOptimize(a);
-		benchmark::DoNotOptimize(mpp::cast(std::type_identity<long double>{}, a));
-		benchmark::ClobberMemory();
+	};
+
+	struct matrix_columns_extent_tag
+	{
+	};
+
+	namespace customize
+	{
+		struct customize_tag
+		{
+		};
+	} // namespace customize
+
+	template<typename... Args>
+	[[nodiscard]] constexpr auto tag_invoke(matrix_rows_extent_tag, Args&&...) -> std::size_t
+	{
+		return std::dynamic_extent;
 	}
 
-	state.counters["Rows"]    = static_cast<double>(state.range());
-	state.counters["Columns"] = static_cast<double>(state.range());
-}
-
-BENCHMARK(Cast)->RangeMultiplier(2)->Range(8, 8 << 10);
+	template<typename... Args>
+	[[nodiscard]] constexpr auto tag_invoke(matrix_columns_extent_tag, Args&&...) -> std::size_t
+	{
+		return std::dynamic_extent;
+	}
+} // namespace mpp

@@ -19,8 +19,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include <matrixpp/matrix/fully_dynamic.hpp>
-#include <matrixpp/algorithm.hpp>
+#include <mpp/matrix/fully_dynamic.hpp>
+#include <mpp/algorithm.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -35,13 +35,13 @@ namespace
 static void Determinant(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
-		benchmark::DoNotOptimize(matrixpp::determinant(std::type_identity<long int>{}, matrix));
+		benchmark::DoNotOptimize(mpp::determinant(std::type_identity<long int>{}, matrix));
 		benchmark::ClobberMemory();
 	}
 
@@ -52,13 +52,13 @@ static void Determinant(benchmark::State& state)
 static void Inverse(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
-		benchmark::DoNotOptimize(matrixpp::inverse(std::type_identity<long double>{}, matrix));
+		benchmark::DoNotOptimize(mpp::inverse(std::type_identity<long double>{}, matrix));
 		benchmark::ClobberMemory();
 	}
 
@@ -69,7 +69,7 @@ static void Inverse(benchmark::State& state)
 static void Block(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
+		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
 	auto n = state.range() == 0 ? 0 : state.range() - 1; // Avoid out of range on reaching max size
 
 	benchmark::ClobberMemory();
@@ -77,7 +77,7 @@ static void Block(benchmark::State& state)
 	{
 		benchmark::DoNotOptimize(matrix);
 		benchmark::DoNotOptimize(n);
-		benchmark::DoNotOptimize(matrixpp::block(matrix,
+		benchmark::DoNotOptimize(mpp::block(matrix,
 			static_cast<std::size_t>(0),
 			static_cast<std::size_t>(0),
 			static_cast<std::size_t>(n),
@@ -92,13 +92,13 @@ static void Block(benchmark::State& state)
 static void Transpose(benchmark::State& state)
 {
 	auto matrix =
-		matrixpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
+		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
 		benchmark::DoNotOptimize(matrix);
-		benchmark::DoNotOptimize(matrixpp::transpose(matrix));
+		benchmark::DoNotOptimize(mpp::transpose(matrix));
 		benchmark::ClobberMemory();
 	}
 

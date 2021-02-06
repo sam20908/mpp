@@ -21,7 +21,7 @@
 // RUN: cmake -DTEST_NAME=deduction_guides -DTEST_SOURCE=%s -B build/deduction_guides
 // RUN: cmake --build build/deduction_guides --target deduction_guides
 
-#include <matrixpp/matrix.hpp>
+#include <mpp/matrix.hpp>
 
 #include "../../include/dummy_expr.hpp"
 
@@ -30,15 +30,15 @@
 int main()
 {
 	// 2D initializer list
-	(void)matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+	(void)mpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 	// Expression object
-	auto matrix = matrixpp::matrix<int>{};
-	(void)matrixpp::matrix{ matrixpp_test::detail::dummy_expr{ matrix } };
+	auto matrix = mpp::matrix<int>{};
+	(void)mpp::matrix{ mpp_test::detail::dummy_expr{ matrix } };
 
 	// 2D range
 	auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
-	(void)matrixpp::matrix{ rng_2d };
+	(void)mpp::matrix{ rng_2d };
 
 	return 0;
 }
