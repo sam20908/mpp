@@ -74,6 +74,7 @@ _create_unit_test("transpose")
 
 # Utility tests
 _create_unit_test("cast")
+_create_unit_test("singular")
 _create_unit_test("type")
 
 # Basic tests

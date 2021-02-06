@@ -36,7 +36,7 @@ namespace
 
 	TEST(Determinant, 1x1)
 	{
-		const auto matrix = matrixpp::matrix{ { 123456 } };
+		const auto matrix = matrixpp::matrix<int>{ { 123456 } };
 		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, 123456);
@@ -44,7 +44,7 @@ namespace
 
 	TEST(Determinant, 2x2)
 	{
-		const auto matrix = matrixpp::matrix{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
+		const auto matrix = matrixpp::matrix<float>{ { 123.F, 4234.F }, { 1.F / 2.F, -7983.F } };
 		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, -984026.F);
@@ -52,7 +52,7 @@ namespace
 
 	TEST(Determinant, 3x3_SameType)
 	{
-		const auto matrix = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		const auto det    = matrixpp::determinant(matrix);
 
 		EXPECT_EQ(det, 6);
@@ -60,7 +60,7 @@ namespace
 
 	TEST(Determinant, 3x3_IntToFloat)
 	{
-		const auto matrix = matrixpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
+		const auto matrix = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 		const auto det    = matrixpp::determinant(std::type_identity<float>{}, matrix);
 
 		EXPECT_FLOAT_EQ(det, 6.F);
@@ -68,7 +68,7 @@ namespace
 
 	TEST(Determiant, 6x6)
 	{
-		const auto matrix = matrixpp::matrix{ { 65, 4, 5, 3, 3, 4 },
+		const auto matrix = matrixpp::matrix<int>{ { 65, 4, 5, 3, 3, 4 },
 			{ -9, 122, -234, 6, 5, 23 },
 			{ 7, 3, 5, 32, 5, 4 },
 			{ 4, 2, 2, 4, 2, 4 },

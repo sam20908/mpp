@@ -137,6 +137,12 @@ namespace
 		EXPECT_FLOAT_EQ(inverse(1, 1), 65.F / 7966.F);
 	}
 
+	TEST(Inverse, 2x2_SingularMatrix_Throw)
+	{
+		const auto matrix = matrixpp::matrix<int>{ { 0, 0 }, { 0, 0 } };
+		EXPECT_THROW((void)(matrixpp::inverse(std::type_identity<float>{}, matrix)), std::runtime_error);
+	}
+
 	TEST(Inverse, 3x3)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
