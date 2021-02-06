@@ -33,7 +33,7 @@ namespace matrixpp
 {
 	namespace detail
 	{
-		constexpr void forward_substitution(auto& l_buf, std::size_t cols)
+		inline void forward_substitution(auto& l_buf, std::size_t cols) // @TODO: ISSUE #20
 		{
 			for (auto col = std::size_t{ 1 }; col < cols; ++col)
 			{
@@ -55,7 +55,7 @@ namespace matrixpp
 			}
 		}
 
-		constexpr void back_substitution(auto& u_buf, std::size_t cols)
+		inline void back_substitution(auto& u_buf, std::size_t cols) // @TODO: ISSUE #20
 		{
 			for (auto col = cols; col > 0; --col)
 			{
@@ -172,38 +172,7 @@ namespace matrixpp
 				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{ 0 });
 				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
 
-				// Compute the determinant while also compute LU Decomposition
-				for (auto row = std::size_t{ 0 }; row < rows; ++row)
-				{
-					auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
-					const auto end_idx = idx_2d_to_1d(cols, row, cols);
-
-					for (auto col = std::size_t{ 0 }; col < row; ++col)
-					{
-						// This allows us to keep track of the row of the factor later on without having to manually
-						// calculate from indexes
-						auto factor_row_idx = idx_2d_to_1d(cols, col, col);
-
-						const auto elem_idx = idx_2d_to_1d(cols, row, col);
-						const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
-
-						for (auto idx = begin_idx; idx < end_idx; ++idx)
-						{
-							u_buf[idx] += factor * u_buf[factor_row_idx++];
-						}
-
-						// L stores the opposite (opposite sign) of the factors used for U in the corresponding
-						// location. But, to help optimize the calculation of inv(L), we can just leave the sign because
-						// all the diagnoal elements below the diagonal element by 1 are the opposite sign, and it's
-						// relatively easy to fix the values of other factors
-						l_buf[elem_idx] = factor;
-
-						++begin_idx;
-					}
-
-					const auto diag_elem_idx = idx_2d_to_1d(cols, row, row);
-					det *= u_buf[diag_elem_idx];
-				}
+				det = lu_decomp_common<lu_decomp_value_t, true>(rows, cols, l_buf, u_buf);
 
 				if (accurate_equals(det, lu_decomp_value_t{ 0 }))
 				{

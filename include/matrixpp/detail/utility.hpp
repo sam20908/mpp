@@ -155,4 +155,54 @@ namespace matrixpp::detail
 			return left == right;
 		}
 	}
+
+	template<typename To, bool FillLBuf>
+	inline auto lu_decomp_common(std::size_t rows, std::size_t cols, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
+	{
+		// Things this function expects from the l_buf and r_buf:
+		// 1. l_buf is already an identity buffer
+		// 2. u_buf has the original values
+
+		auto det = To{ 1 };
+
+		// Compute the determinant while also compute LU Decomposition
+		for (auto row = std::size_t{ 0 }; row < rows; ++row)
+		{
+			auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
+			const auto end_idx = idx_2d_to_1d(cols, row, cols);
+
+			for (auto col = std::size_t{ 0 }; col < row; ++col)
+			{
+				// This allows us to keep track of the row of the factor later on without having to manually
+				// calculate from indexes
+				auto factor_row_idx = idx_2d_to_1d(cols, col, col);
+
+				const auto elem_idx = idx_2d_to_1d(cols, row, col);
+				const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
+
+				for (auto idx = begin_idx; idx < end_idx; ++idx)
+				{
+					u_buf[idx] += factor * u_buf[factor_row_idx++];
+				}
+
+				// Handle cases where we don't need to store the factors in a separate buffer (plain determinant
+				// algorithm for example). This allows passing empty buffer as l_buf for optimization
+				if constexpr (FillLBuf)
+				{
+					// L stores the opposite (opposite sign) of the factors used for U in the corresponding
+					// location. But, to help optimize the calculation of inv(L), we can just leave the sign because
+					// all the diagnoal elements below the diagonal element by 1 are the opposite sign, and it's
+					// relatively easy to fix the values of other factors
+					l_buf[elem_idx] = factor;
+				}
+
+				++begin_idx;
+			}
+
+			const auto diag_elem_idx = idx_2d_to_1d(cols, row, row);
+			det *= u_buf[diag_elem_idx];
+		}
+
+		return det;
+	}
 } // namespace matrixpp::detail
