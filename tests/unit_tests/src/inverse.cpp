@@ -28,12 +28,9 @@
 
 namespace
 {
-	// 0x0 matrix is used to validate the correct extents and rows. It is pointless to test every combination of extents
-	// along with all the dimensions rather than have "baseline" tests for those sort of things
+	// ElementsAre matcher cannot accurately compare irrational values. We check each element manually instead
 
-	// We also can't use matchers because they don't properly compare floating points
-
-	TEST(Inverse, RowsAndExtents_FullyStatic)
+	TEST(Inverse, DimensionsAndExtents_FullyStatic)
 	{
 		const auto matrix  = matrixpp::matrix<float, 1, 1>{ 1.F };
 		const auto inverse = matrixpp::inverse(matrix);
@@ -45,7 +42,7 @@ namespace
 		EXPECT_EQ(inverse.columns_extent(), 1);
 	}
 
-	TEST(Inverse, RowsAndExtents_FullyDynamic)
+	TEST(Inverse, DimensionsAndExtents_FullyDynamic)
 	{
 		const auto matrix  = matrixpp::matrix<float>{ 1, 1, 1.F };
 		const auto inverse = matrixpp::inverse(matrix);
@@ -57,7 +54,7 @@ namespace
 		EXPECT_EQ(inverse.columns_extent(), std::dynamic_extent);
 	}
 
-	TEST(Inverse, RowsAndExtents_DynamicRows)
+	TEST(Inverse, DimensionsAndExtents_DynamicRows)
 	{
 		const auto matrix  = matrixpp::matrix<float, std::dynamic_extent, 1>{ 1, 1.F };
 		const auto inverse = matrixpp::inverse(matrix);
@@ -69,7 +66,7 @@ namespace
 		EXPECT_EQ(inverse.columns_extent(), 1);
 	}
 
-	TEST(Inverse, RowsAndExtents_DynamicColumns)
+	TEST(Inverse, DimensionsAndExtents_DynamicColumns)
 	{
 		const auto matrix  = matrixpp::matrix<float, 1, std::dynamic_extent>{ 1, 1.F };
 		const auto inverse = matrixpp::inverse(matrix);
