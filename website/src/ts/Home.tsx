@@ -43,13 +43,13 @@ export default class Home extends React.Component<unknown, unknown> {
 								</p>
 								<MDBRow center>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/build/samestimable2016/mpp/2/main?label=%F0%9F%94%A8%20Build%20Status" />
+										<img src="https://img.shields.io/azure-devops/build/samestimable2016/mpp/3/main?label=%F0%9F%94%A8%20Build%20Status" />
 									</MDBCol>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/tests/samestimable2016/mpp/2/main?label=%F0%9F%A7%AA%20Test%20Results" />
+										<img src="https://img.shields.io/azure-devops/tests/samestimable2016/mpp/3/main?label=%F0%9F%A7%AA%20Test%20Results" />
 									</MDBCol>
 									<MDBCol size="2">
-										<img src="https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/2/main?label=%F0%9F%93%B6%20Code%20Coverage" />
+										<img src="https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/3/main?label=%F0%9F%93%B6%20Code%20Coverage" />
 									</MDBCol>
 									<MDBCol size="2">
 										<img src="https://img.shields.io/github/deployments/sam20908/mpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages" />
