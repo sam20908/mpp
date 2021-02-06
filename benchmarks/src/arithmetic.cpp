@@ -25,10 +25,8 @@
 
 static void Addition(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -45,10 +43,8 @@ static void Addition(benchmark::State& state)
 
 static void Addition_CompoundAssign(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -65,10 +61,8 @@ static void Addition_CompoundAssign(benchmark::State& state)
 
 static void Subtraction(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -85,10 +79,8 @@ static void Subtraction(benchmark::State& state)
 
 static void Subtraction_CompoundAssign(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
@@ -105,8 +97,7 @@ static void Subtraction_CompoundAssign(benchmark::State& state)
 
 static void Multiplication_Scalar(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -124,8 +115,7 @@ static void Multiplication_Scalar(benchmark::State& state)
 
 static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -143,8 +133,7 @@ static void Multiplication_Scalar_CompoundAssign(benchmark::State& state)
 
 static void Division_Scalar(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -162,8 +151,7 @@ static void Division_Scalar(benchmark::State& state)
 
 static void Division_Scalar_CompoundAssign(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 	auto scalar = 1;
 
 	benchmark::ClobberMemory();
@@ -181,10 +169,8 @@ static void Division_Scalar_CompoundAssign(benchmark::State& state)
 
 static void Multiplication_Matrix(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
-	auto b =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto b = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)

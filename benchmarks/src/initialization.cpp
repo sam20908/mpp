@@ -29,9 +29,8 @@ static void Initialization_Fill(benchmark::State& state)
 	benchmark::ClobberMemory();
 	for (auto _ : state)
 	{
-		benchmark::DoNotOptimize(mpp::matrix<int>{ static_cast<std::size_t>(state.range()),
-			static_cast<std::size_t>(state.range()),
-			0 });
+		benchmark::DoNotOptimize(
+			mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 0 });
 		benchmark::ClobberMemory();
 	}
 

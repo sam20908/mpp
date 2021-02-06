@@ -164,7 +164,7 @@ namespace
 
 	TEST(Inverse, 4x4)
 	{
-		const auto matrix = mpp::matrix<int>{ { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } };
+		const auto matrix  = mpp::matrix<int>{ { 2, 4, 6, 9 }, { 0, -1, -8, 1 }, { 0, 0, 96, 4 }, { 0, 0, 96, 5 } };
 		const auto inverse = mpp::inverse(std::type_identity<float>{}, matrix);
 
 		EXPECT_EQ(inverse.rows(), 4);

@@ -2550,8 +2550,8 @@ namespace
 
 	TEST(Arithmetic, Division_MatrixXScalar_DynamicRows_Evaluated)
 	{
-		const auto matrix = mpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		const auto scalar = 2.F;
+		const auto matrix      = mpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
 		const auto expr_matrix = mpp::matrix{ matrix / scalar };
 
 		EXPECT_EQ(expr_matrix.rows(), 2);
@@ -2565,8 +2565,8 @@ namespace
 
 	TEST(Arithmetic, Division_MatrixXScalar_DynamicColumns_Evaluated)
 	{
-		const auto matrix = mpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		const auto scalar = 2.F;
+		const auto matrix      = mpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
 		const auto expr_matrix = mpp::matrix{ matrix / scalar };
 
 		EXPECT_EQ(expr_matrix.rows(), 2);
@@ -2610,8 +2610,8 @@ namespace
 
 	TEST(Arithmetic, Division_ScalarXMatrix_DynamicRows_Evaluated)
 	{
-		const auto matrix = mpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		const auto scalar = 2.F;
+		const auto matrix      = mpp::matrix<float, std::dynamic_extent, 3>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
 		const auto expr_matrix = mpp::matrix{ scalar / matrix };
 
 		EXPECT_EQ(expr_matrix.rows(), 2);
@@ -2625,8 +2625,8 @@ namespace
 
 	TEST(Arithmetic, Division_ScalarXMatrix_DynamicColumns_Evaluated)
 	{
-		const auto matrix = mpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
-		const auto scalar = 2.F;
+		const auto matrix      = mpp::matrix<float, 2, std::dynamic_extent>{ { 7.F, 3.F, 1.F }, { 8.F, 8.F, 2.F } };
+		const auto scalar      = 2.F;
 		const auto expr_matrix = mpp::matrix{ scalar / matrix };
 
 		EXPECT_EQ(expr_matrix.rows(), 2);

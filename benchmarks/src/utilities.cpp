@@ -26,8 +26,7 @@
 
 static void Cast(benchmark::State& state)
 {
-	auto a =
-		mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
+	auto a = mpp::matrix<int>{ static_cast<std::size_t>(state.range()), static_cast<std::size_t>(state.range()), 125 };
 
 	benchmark::ClobberMemory();
 	for (auto _ : state)
