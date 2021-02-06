@@ -52,7 +52,7 @@ namespace matrixpp
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
 			detail::add_op_t> // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
+		detail::validate_same_size(left, right);
 
 		return { left, right, left.rows(), left.columns() };
 	}
@@ -67,7 +67,7 @@ namespace matrixpp
 		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
+		detail::validate_same_size(left, right);
 
 		// @TODO: Take advantage of std::ranges::transform
 

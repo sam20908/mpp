@@ -83,11 +83,13 @@ namespace matrixpp
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
+			// This is not made into a spearate method because it only occurs here
+
 			if constexpr (RowsExtent != ExprRowsExtent || ColumnsExtent != ExprColumnsExtent)
 			{
 				if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
 				{
-					throw std::runtime_error("Dimensions of expression object doesn't match provided extents!");
+					throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
 				}
 			}
 
@@ -118,7 +120,11 @@ namespace matrixpp
 			base::_rows = RowsExtent;
 			base::_cols = ColumnsExtent;
 
-			std::ranges::fill(base::_buf, value);
+			// Static buffers are default initialized to zero, so avoid doing more work if the value is 0
+			if (value != Value{ 0 })
+			{
+				std::ranges::fill(base::_buf, value);
+			}
 		}
 
 		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20

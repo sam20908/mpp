@@ -40,7 +40,7 @@ namespace matrixpp::detail
 			ColumnsExtent>
 	{
 	protected:
-		Buffer _buf;
+		Buffer _buf{}; // Default initialize elements to 0 for static buffers
 		std::size_t _rows;
 		std::size_t _cols;
 
@@ -62,6 +62,11 @@ namespace matrixpp::detail
 
 		void init_buf_2d_dynamic(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
+			if (detail::dimension_not_zero_and_non_zero(rows, cols))
+			{
+				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
+			}
+
 			_rows = rows;
 			_cols = cols;
 			_buf.reserve(rows * cols);
@@ -75,6 +80,27 @@ namespace matrixpp::detail
 			}
 		}
 
+		void init_expr_dynamic(std::size_t rows, std::size_t cols, auto&& expr, bool check_size)
+		{
+			_rows = rows;
+			_cols = cols;
+
+			if (check_size)
+			{
+				validate_same_size(*this, expr);
+			}
+
+			_buf.reserve(rows * cols);
+
+			for (auto row = std::size_t{ 0 }; row < _rows; ++row)
+			{
+				for (auto col = std::size_t{ 0 }; col < _cols; ++col)
+				{
+					_buf.push_back(expr(row, col));
+				}
+			}
+		}
+
 		void init_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			if (rows != cols)
@@ -83,7 +109,7 @@ namespace matrixpp::detail
 			}
 
 			_rows = rows;
-			_cols = columns;
+			_cols = cols;
 
 			allocate_1d_buf_if_vector(_buf, rows, cols, Value{ 0 });
 			transform_1d_buf_into_identity<Value>(_buf, rows);

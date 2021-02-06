@@ -28,9 +28,7 @@
 
 namespace
 {
-	using ::testing::Each;
 	using ::testing::ElementsAre;
-	using ::testing::Eq;
 
 	/**
 	 * Addition
@@ -180,28 +178,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyStaticAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyStaticAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyStaticAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_SameSizedOperands_FullyDynamicAndFullyStatic_Expr)
@@ -348,28 +346,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyDynamicAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyDynamicAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_FullyDynamicAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_SameSizedOperands_DynamicRowsAndFullyStatic_Expr)
@@ -516,28 +514,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicRowsAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicRowsAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicRowsAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_SameSizedOperands_DynamicColumnsAndFullyStatic_Expr)
@@ -684,28 +682,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicColumnsAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicColumnsAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Addition_DifferentSizedOperands_DynamicColumnsAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix + matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix + matrix2), std::invalid_argument);
 	}
 
 	/**
@@ -856,28 +854,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyStaticAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyStaticAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyStaticAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_FullyDynamicAndFullyStatic_Expr)
@@ -1024,28 +1022,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyDynamicAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyDynamicAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_FullyDynamicAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicRowsAndFullyStatic_Expr)
@@ -1192,28 +1190,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicRowsAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicRowsAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicRowsAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_SameSizedOperands_DynamicColumnsAndFullyStatic_Expr)
@@ -1360,28 +1358,28 @@ namespace
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicColumnsAndFullyDynamic_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicColumnsAndDynamicRows_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Subtraction_DifferentSizedOperands_DynamicColumnsAndDynamicColumns_Throw)
 	{
 		const auto matrix  = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 3, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 6, 7, 8 } };
-		EXPECT_THROW((void)(matrix - matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix - matrix2), std::invalid_argument);
 	}
 
 	/**
@@ -2248,112 +2246,112 @@ namespace
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndFullyDynamic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicRows_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyStaticAndDynamicColumns_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyStatic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndFullyDynamic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicRows_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_FullyDynamicAndDynamicColumns_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyStatic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndFullyDynamic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicRows_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicRowsAndDynamicColumns_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyStatic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndFullyDynamic_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicRows_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	TEST(Arithmetic, Multiplication_MatrixXMatrix_DynamicColumnsAndDynamicColumns_NotMultipliableMatrices_Throw)
 	{
 		const auto matrix1 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix2 = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		EXPECT_THROW((void)(matrix1 * matrix2), std::runtime_error);
+		EXPECT_THROW((void)(matrix1 * matrix2), std::invalid_argument);
 	}
 
 	/**

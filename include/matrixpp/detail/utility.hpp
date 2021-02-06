@@ -79,19 +79,20 @@ namespace matrixpp::detail
 		}
 	}
 
-	inline void validate_matrices_same_size(const auto& left, const auto& right) // @TODO: ISSUE #20
+	inline void validate_same_size(auto&& left, auto&& right) // @TODO: ISSUE #20
 	{
 		if (left.rows() != right.rows() || left.columns() != right.columns())
 		{
-			throw std::runtime_error("Both matrices don't have the same size!");
+			throw std::invalid_argument("1. Both objects must have same size or 2. Compatible dimension extents in "
+										"expression template initialization");
 		}
 	}
 
-	inline void validate_matrices_multipliable(const auto& left, const auto& right) // @TODO: ISSUE #20
+	inline void validate_matrices_multipliable(auto&& left, auto&& right) // @TODO: ISSUE #20
 	{
 		if (left.columns() != right.rows())
 		{
-			throw std::runtime_error("Left matrix's columns is not equal to right matrix's rows!");
+			throw std::invalid_argument("Left matrix's columns is not equal to right matrix's rows!");
 		}
 	}
 

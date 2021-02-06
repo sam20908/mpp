@@ -32,9 +32,7 @@
 
 namespace
 {
-	using ::testing::Each;
 	using ::testing::ElementsAre;
-	using ::testing::Eq;
 
 	/**
 	 * Fully static matrices
@@ -146,7 +144,7 @@ namespace
 		const auto dummy = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
 
-		EXPECT_THROW((matrixpp::matrix<int, 3, 3>{ expr }), std::runtime_error);
+		EXPECT_THROW((matrixpp::matrix<int, 3, 3>{ expr }), std::invalid_argument);
 	}
 
 	TEST(Initialization, FullyStaticDefaultConstructor)
@@ -172,7 +170,25 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix, Each(Eq(1)));
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
+	}
+
+	TEST(Initialization, FullyStaticIdentityMatrix)
+	{
+		const auto matrix = matrixpp::matrix<int, 3, 3>{ matrixpp::identity_matrix };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, FullyStaticIdentityMatrix_NotSquare_Throw)
+	{
+		EXPECT_THROW((void)(matrixpp::matrix<int, 3, 4>{ matrixpp::identity_matrix }), std::invalid_argument);
 	}
 
 	/**
@@ -260,102 +276,25 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix, Each(Eq(1)));
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
 	}
 
-	/**
-	 * Dynamic columns matrices
-	 */
-
-	TEST(Initialization, DynamicColumns2DInitializerList)
+	TEST(Initialization, FullyDynamicIdentityMatrix)
 	{
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = matrixpp::matrix<int>{ 3, 3, matrixpp::identity_matrix };
 
-		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.rows(), 3);
 		EXPECT_EQ(matrix.columns(), 3);
 
-		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
-		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
 	}
 
-	TEST(Initialization, DynamicColumns2DRange_Copy)
+	TEST(Initialization, FullyDynamicIdentityMatrix_NotSquare_Throw)
 	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ rng_2d };
-
-		EXPECT_EQ(matrix.rows(), 2);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 2);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
-	}
-
-	TEST(Initialization, DynamicColumns2DRange_Move)
-	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ std::move(rng_2d) };
-
-		EXPECT_EQ(matrix.rows(), 2);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 2);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
-	}
-
-	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
-	{
-		const auto dummy = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
-
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ expr };
-
-		EXPECT_EQ(matrix.rows(), 2);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 2);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
-	}
-
-	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
-	{
-		const auto dummy = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
-
-		EXPECT_THROW((matrixpp::matrix<int, 3, std::dynamic_extent>{ expr }), std::runtime_error);
-	}
-
-	TEST(Initialization, DynamicColumnsDefaultConstructor)
-	{
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3 };
-
-		EXPECT_EQ(matrix.rows(), 2);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 2);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
-	}
-
-	TEST(Initialization, DynamicColumnsValueConstructor)
-	{
-		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3, 1 };
-
-		EXPECT_EQ(matrix.rows(), 2);
-		EXPECT_EQ(matrix.columns(), 3);
-
-		EXPECT_EQ(matrix.rows_extent(), 2);
-		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
-
-		EXPECT_THAT(matrix, Each(Eq(1)));
+		EXPECT_THROW((void)(matrixpp::matrix<int>{ 3, 4, matrixpp::identity_matrix }), std::invalid_argument);
 	}
 
 	/**
@@ -425,7 +364,7 @@ namespace
 		const auto dummy = matrixpp::matrix<int>{ { 7, 3 }, { 8, 8 } };
 		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
 
-		EXPECT_THROW((matrixpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::runtime_error);
+		EXPECT_THROW((matrixpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::invalid_argument);
 	}
 
 	TEST(Initialization, DynamicRowsDefaultConstructor)
@@ -451,6 +390,139 @@ namespace
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
-		EXPECT_THAT(matrix, Each(Eq(1)));
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
+	}
+
+	TEST(Initialization, DynamicRowsIdentityMatrix)
+	{
+		const auto matrix = matrixpp::matrix<int, std::dynamic_extent, 3>{ 3, matrixpp::identity_matrix };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, DynamicRowsIdentityMatrix_NotSquare_Throw)
+	{
+		EXPECT_THROW((void)(matrixpp::matrix<int, std::dynamic_extent, 3>{ 4, matrixpp::identity_matrix }),
+			std::invalid_argument);
+	}
+
+	/**
+	 * Dynamic columns matrices
+	 */
+
+	TEST(Initialization, DynamicColumns2DInitializerList)
+	{
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DRange_Copy)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ rng_2d };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DRange_Move)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ std::move(rng_2d) };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
+	{
+		const auto dummy = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
+
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ expr };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
+	{
+		const auto dummy = matrixpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto expr  = matrixpp_test::detail::dummy_expr{ dummy };
+
+		EXPECT_THROW((matrixpp::matrix<int, 3, std::dynamic_extent>{ expr }), std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicColumnsDefaultConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
+	TEST(Initialization, DynamicColumnsValueConstructor)
+	{
+		const auto matrix = matrixpp::matrix<int, 2, std::dynamic_extent>{ 3, 1 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
+	}
+
+	TEST(Initialization, DynamicColumnsIdentityMatrix)
+	{
+		const auto matrix = matrixpp::matrix<int, 3, std::dynamic_extent>{ 3, matrixpp::identity_matrix };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, DynamicColumnsIdentityMatrix_NotSquare_Throw)
+	{
+		EXPECT_THROW((void)(matrixpp::matrix<int, 3, std::dynamic_extent>{ 4, matrixpp::identity_matrix }),
+			std::invalid_argument);
 	}
 } // namespace

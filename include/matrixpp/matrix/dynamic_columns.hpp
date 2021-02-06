@@ -47,11 +47,6 @@ namespace matrixpp
 				throw std::invalid_argument("2D initializer's rows does not match the provided row extent!");
 			}
 
-			if (detail::dimension_not_zero_and_non_zero(RowsExtent, cols))
-			{
-				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
-			}
-
 			base::init_buf_2d_dynamic(init_2d, RowsExtent, cols);
 		}
 
@@ -65,11 +60,6 @@ namespace matrixpp
 				throw std::invalid_argument("2D initializer's rows does not match the provided row extent!");
 			}
 
-			if (detail::dimension_not_zero_and_non_zero(RowsExtent, cols))
-			{
-				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
-			}
-
 			base::init_buf_2d_dynamic(std::forward<Range2D>(rng_2d), RowsExtent, cols);
 		}
 
@@ -77,22 +67,7 @@ namespace matrixpp
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
-			if (RowsExtent != expr.rows())
-			{
-				throw std::runtime_error("Rows of expression object doesn't match provided rows extent!");
-			}
-
-			base::_rows = expr.rows();
-			base::_cols = expr.columns();
-			base::_buf.reserve(expr.rows() * expr.columns());
-
-			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
-			{
-				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
-				{
-					base::_buf.push_back(expr(row, col));
-				}
-			}
+			base::init_expr_dynamic(RowsExtent, expr.columns(), expr, true);
 		}
 
 		explicit matrix(std::size_t columns) // @TODO: ISSUE #20
