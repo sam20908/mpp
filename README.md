@@ -14,13 +14,13 @@ A C++20 and later matrix library
 - `gcov` and `gcovr` for code coverage (has to be found in **PATH**).
 
 ## Using Built-in Tests:
-- Specify `mpp_BUILD_TESTS` to a boolean value to enable or disable building the test.
+- Specify `MPP_BUILD_TESTS` to a boolean value to enable or disable building the test.
     - This enables all of the following implicitly:
-        - `mpp_BUILD_COMPILE_TESTS` to `TRUE`.
-        - `mpp_BUILD_UNIT_TESTS` to `TRUE`.
+        - `MPP_BUILD_COMPILE_TESTS` to `TRUE`.
+        - `MPP_BUILD_UNIT_TESTS` to `TRUE`.
             - **Note: Multi configuration generators will put same executables of different configurations in unit tests binary directory!**
     - You can manually specify one of those above options to `FALSE` should you disable that specific test.
-- Specify `mpp_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
+- Specify `MPP_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
     - Recommended to build in **Release** configuration.
 
 ## Using the Lit Test Suite:
@@ -34,7 +34,7 @@ A C++20 and later matrix library
 ## Using Code Coverage:
 - ***Requires unit tests to be enabled!***
 - NOTE: **Ninja** won't work for code coverage due to a bug, so a workaround is to use **Ninja Multi-Config**.
-- Specify `mpp_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
+- Specify `MPP_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
 - **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
     - Recommended to build in **Debug** configuration.
     - Coverage file will be in `<build directory>` named `mpp_code_coverage.xml`.
