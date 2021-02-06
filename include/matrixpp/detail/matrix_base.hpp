@@ -52,6 +52,7 @@ namespace matrixpp::detail
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buf.begin();
 
+			// @TODO: Perfect forward row range
 			for (auto&& row : rng_2d)
 			{
 				std::ranges::copy(row, row_begin);
@@ -65,8 +66,9 @@ namespace matrixpp::detail
 			_cols = cols;
 			_buf.reserve(rows * cols);
 
-			auto buf_back_inserter = std::back_inserter(_buf);
+			const auto buf_back_inserter = std::back_inserter(_buf);
 
+			// @TODO: Perfect forward row range
 			for (auto&& row : rng_2d)
 			{
 				std::ranges::copy(row, buf_back_inserter);

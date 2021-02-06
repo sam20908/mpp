@@ -22,8 +22,6 @@
 #include <matrixpp/algorithm/inverse.hpp>
 #include <matrixpp/matrix.hpp>
 
-#include "../../include/utility.hpp"
-
 #include <functional>
 #include <stdexcept>
 #include <utility>

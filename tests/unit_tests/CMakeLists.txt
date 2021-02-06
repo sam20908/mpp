@@ -22,7 +22,7 @@ set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
-set(INCLUDE_HEADERS "../include/dummy_expr.hpp" "../include/utility.hpp")
+set(INCLUDE_HEADERS "../include/dummy_expr.hpp")
 
 if(LLVM_LIT_EXEC)
     message(STATUS "LLVM Lit found! LLVM Lit configuration for unit tests will be created")
@@ -74,7 +74,6 @@ _create_unit_test("transpose")
 
 # Utility tests
 _create_unit_test("cast")
-_create_unit_test("equality")
 _create_unit_test("type")
 
 # Basic tests
