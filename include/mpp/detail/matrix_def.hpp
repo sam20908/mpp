@@ -47,7 +47,7 @@ namespace mpp
 
 	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
 	// clang-format off
-	template<detail::range_2d_arithmetic Range2D>
+	template<typename Range2D>
 	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
 	// clang-format on
 

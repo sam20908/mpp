@@ -31,9 +31,6 @@ namespace mpp::detail
 	template<typename Range>
 	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
-	template<typename Range>
-	concept range_2d_arithmetic = arithmetic<range_2d_t<Range>>;
-
 	template<typename Range, typename Value>
 	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
 } // namespace mpp::detail
