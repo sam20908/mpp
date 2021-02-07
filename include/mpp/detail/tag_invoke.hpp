@@ -25,7 +25,8 @@ namespace mpp::detail
 {
 	namespace tag_invoke_impl
 	{
-		void tag_invoke();
+		// This is for just providing a valid name at the point of tag_invoke_result_t
+		inline void tag_invoke();
 
 		template<typename CPO, typename... Args>
 		using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
