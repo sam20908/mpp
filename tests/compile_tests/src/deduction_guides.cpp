@@ -33,11 +33,11 @@ int main()
 	(void)mpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 	// Expression object
-	auto matrix = mpp::matrix<int>{};
+	const auto matrix = mpp::matrix<int>{};
 	(void)mpp::matrix{ mpp_test::detail::dummy_expr{ matrix } };
 
 	// 2D range
-	auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
+	const auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
 	(void)mpp::matrix{ rng_2d };
 
 	return 0;

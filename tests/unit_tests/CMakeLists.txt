@@ -22,8 +22,6 @@ set(UNIT_TESTS_SOURCE_FILENAME "test.cpp")
 set(UNIT_TESTS_EXECUTABLE_SUFFIX "unit_test")
 set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gtest)
 
-set(INCLUDE_HEADERS "../include/dummy_expr.hpp")
-
 if(LLVM_LIT_EXEC)
     message(STATUS "LLVM Lit found! LLVM Lit configuration for unit tests will be created")
     configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
@@ -36,10 +34,7 @@ add_custom_target("unit_test")
 function(_create_unit_test TEST_FILENAME)
     set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
     set(TEST_SOURCE "src/${TEST_FILENAME}.cpp")
-    add_executable(${TEST_NAME} 
-        "${TEST_SOURCE}" 
-        "${INCLUDE_HEADERS}"
-        "gtest_main.cpp")
+    add_executable(${TEST_NAME} "${TEST_SOURCE}" "gtest_main.cpp")
 
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
