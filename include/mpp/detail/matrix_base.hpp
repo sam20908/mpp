@@ -209,44 +209,26 @@ namespace mpp::detail
 			return _cols;
 		}
 
-		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-		friend inline void init_matrix_with_1d_rng_copy(
-			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
+		friend inline void init_matrix_with_1d_rng_copy(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
 			auto&& rng,
 			std::size_t rows,
-			std::size_t cols); // @TODO: ISSUE #20
+			std::size_t cols) // @TODO: ISSUE #20
+		{
+			base._rows = rows;
+			base._cols = cols;
+			allocate_1d_buf_if_vector(base._buf, rows, cols, Value{ 0 });
 
-		template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-		friend inline void init_matrix_with_1d_rng_move(
-			matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
+			std::ranges::copy(rng, base._buf.begin());
+		}
+
+		friend inline void init_matrix_with_1d_rng_move(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
 			auto&& rng,
 			std::size_t rows,
-			std::size_t cols); // @TODO: ISSUE #20
+			std::size_t cols) // @TODO: ISSUE #20
+		{
+			base._rows = rows;
+			base._cols = cols;
+			base._buf  = std::move(rng);
+		}
 	};
-
-	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-	inline void init_matrix_with_1d_rng_copy(
-		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		auto&& rng,
-		std::size_t rows,
-		std::size_t cols) // @TODO: ISSUE #20
-	{
-		base._rows = rows;
-		base._cols = cols;
-		allocate_1d_buf_if_vector(base._buf, rows, cols, BaseValue{ 0 });
-
-		std::ranges::copy(rng, base._buf.begin());
-	}
-
-	template<typename BaseBuffer, typename BaseValue, std::size_t BaseRowsExtent, std::size_t BaseColumnsExtent>
-	inline void init_matrix_with_1d_rng_move(
-		matrix_base<BaseBuffer, BaseValue, BaseRowsExtent, BaseColumnsExtent>& base,
-		auto&& rng,
-		std::size_t rows,
-		std::size_t cols) // @TODO: ISSUE #20
-	{
-		base._rows = rows;
-		base._cols = cols;
-		base._buf  = std::move(rng);
-	}
 } // namespace mpp::detail
