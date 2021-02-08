@@ -22,6 +22,7 @@
 #include <mpp/detail/constraints.hpp>
 #include <mpp/detail/expr_base.hpp>
 #include <mpp/detail/utility.hpp>
+#include <mpp/utility/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -37,10 +38,11 @@ namespace mpp::detail
 		public expr_base<matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>,
 			typename Buffer::value_type,
 			RowsExtent,
-			ColumnsExtent>
+			ColumnsExtent>,
+		public traits<Value>
 	{
 	protected:
-		Buffer _buf{}; // Default initialize elements to 0 for static buffers
+		Buffer _buf; // Don't default initailize because custom types might not be DefaultConstructible
 		std::size_t _rows;
 		std::size_t _cols;
 
