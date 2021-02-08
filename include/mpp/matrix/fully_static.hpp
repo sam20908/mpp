@@ -129,6 +129,8 @@ namespace mpp
 
 		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
 		{
+			std::ranges::fill(base::_buf, Value{ 0 });
+
 			base::init_identity(RowsExtent, ColumnsExtent);
 		}
 	};
