@@ -104,6 +104,4 @@ namespace
 
 		EXPECT_THAT(to, ElementsAre(1, 2, 3, 4, 5, 6));
 	}
-
-	// @TODO: Test all combinations of matrices with extents
 } // namespace
