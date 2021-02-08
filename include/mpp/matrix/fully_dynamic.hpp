@@ -60,16 +60,7 @@ namespace mpp
 			base::init_expr_dynamic(expr.rows(), expr.columns(), expr, false);
 		}
 
-		matrix(std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
-		{
-			base::_rows = rows;
-			base::_cols = columns;
-
-			// @TODO: ISSUE #129
-			detail::allocate_1d_buf_if_vector(base::_buf, rows, columns, Value{});
-		}
-
-		matrix(std::size_t rows, std::size_t columns, Value value) // @TODO: ISSUE #20
+		matrix(std::size_t rows, std::size_t columns, const Value& value = Value{}) // @TODO: ISSUE #20
 		{
 			base::_rows = rows;
 			base::_cols = columns;

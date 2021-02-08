@@ -95,41 +95,28 @@ namespace mpp
 
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
-			auto idx    = std::size_t{ 0 };
+			auto idx    = std::size_t{};
 
-			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
+			for (auto row = std::size_t{}; row < base::_rows; ++row)
 			{
-				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
+				for (auto col = std::size_t{}; col < base::_cols; ++col)
 				{
 					base::_buf[idx++] = expr(row, col);
 				}
 			}
 		}
 
-		matrix() // @TODO: ISSUE #20
+		explicit matrix(const Value& value = Value{}) // @TODO: ISSUE #20
 		{
 			base::_rows = RowsExtent;
 			base::_cols = ColumnsExtent;
 
-			// @TODO: ISSUE #129
-			std::ranges::fill(base::_buf, Value{ 0 });
-		}
-
-		explicit matrix(Value value) // @TODO: ISSUE #20
-		{
-			base::_rows = RowsExtent;
-			base::_cols = ColumnsExtent;
-
-			// Static buffers are default initialized to zero, so avoid doing more work if the value is 0
-			if (value != Value{ 0 })
-			{
-				std::ranges::fill(base::_buf, value);
-			}
+			std::ranges::fill(base::_buf, value);
 		}
 
 		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
 		{
-			std::ranges::fill(base::_buf, Value{ 0 });
+			std::ranges::fill(base::_buf, Value{});
 
 			base::init_identity(RowsExtent, ColumnsExtent);
 		}

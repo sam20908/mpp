@@ -70,16 +70,7 @@ namespace mpp
 			base::init_expr_dynamic(expr.rows(), ColumnsExtent, expr, true);
 		}
 
-		explicit matrix(std::size_t rows) // @TODO: ISSUE #20
-		{
-			base::_rows = rows;
-			base::_cols = ColumnsExtent;
-
-			// @TODO: ISSUE #129
-			detail::allocate_1d_buf_if_vector(base::_buf, rows, ColumnsExtent, Value{});
-		}
-
-		matrix(std::size_t rows, Value value) // @TODO: ISSUE #20
+		explicit matrix(std::size_t rows, const Value& value = Value{}) // @TODO: ISSUE #20
 		{
 			base::_rows = rows;
 			base::_cols = ColumnsExtent;
