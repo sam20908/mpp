@@ -74,9 +74,9 @@ namespace mpp
 		const auto rows = left.rows();
 		const auto cols = left.columns();
 
-		for (auto row = std::size_t{ 0 }; row < rows; ++row)
+		for (auto row = std::size_t{}; row < rows; ++row)
 		{
-			for (auto col = std::size_t{ 0 }; col < cols; ++col)
+			for (auto col = std::size_t{}; col < cols; ++col)
 			{
 				left(row, col) -= right(row, col);
 			}

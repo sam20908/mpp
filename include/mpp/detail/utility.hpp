@@ -114,7 +114,7 @@ namespace mpp::detail
 	{
 		// This assumes that the buffer is already filled with zeroes
 
-		for (auto idx = std::size_t{ 0 }; idx < n; ++idx)
+		for (auto idx = std::size_t{}; idx < n; ++idx)
 		{
 			buf[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
 		}
@@ -123,13 +123,13 @@ namespace mpp::detail
 	template<typename To, typename From>
 	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n) // @TODO: ISSUE #20
 	{
-		for (auto row = std::size_t{ 0 }; row < n; ++row)
+		for (auto row = std::size_t{}; row < n; ++row)
 		{
-			for (auto col = std::size_t{ 0 }; col < n; ++col)
+			for (auto col = std::size_t{}; col < n; ++col)
 			{
-				auto result = To{ 0 };
+				auto result = To{};
 
-				for (auto elem = std::size_t{ 0 }; elem < n; ++elem)
+				for (auto elem = std::size_t{}; elem < n; ++elem)
 				{
 					const auto left_idx  = idx_2d_to_1d(n, row, elem);
 					const auto right_idx = idx_2d_to_1d(n, elem, col);
@@ -166,12 +166,12 @@ namespace mpp::detail
 		auto det = To{ 1 };
 
 		// Compute the determinant while also compute LU Decomposition
-		for (auto row = std::size_t{ 0 }; row < rows; ++row)
+		for (auto row = std::size_t{}; row < rows; ++row)
 		{
-			auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{ 0 });
+			auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{});
 			const auto end_idx = idx_2d_to_1d(cols, row, cols);
 
-			for (auto col = std::size_t{ 0 }; col < row; ++col)
+			for (auto col = std::size_t{}; col < row; ++col)
 			{
 				// This allows us to keep track of the row of the factor later on without having to manually
 				// calculate from indexes

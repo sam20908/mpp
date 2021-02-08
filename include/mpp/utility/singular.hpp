@@ -35,7 +35,7 @@ namespace mpp
 			-> bool // @TODO: ISSUE #20
 		{
 			return detail::accurate_equals(detail::det_lu_decomp<detail::lu_decomp_value_t>(obj),
-				detail::lu_decomp_value_t{ 0 });
+				detail::lu_decomp_value_t{});
 		}
 
 		template<typename... Args>

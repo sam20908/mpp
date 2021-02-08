@@ -94,9 +94,9 @@ namespace mpp::detail
 
 			_buf.reserve(rows * cols);
 
-			for (auto row = std::size_t{ 0 }; row < _rows; ++row)
+			for (auto row = std::size_t{}; row < _rows; ++row)
 			{
-				for (auto col = std::size_t{ 0 }; col < _cols; ++col)
+				for (auto col = std::size_t{}; col < _cols; ++col)
 				{
 					_buf.push_back(expr(row, col));
 				}
@@ -113,7 +113,7 @@ namespace mpp::detail
 			_rows = rows;
 			_cols = cols;
 
-			allocate_1d_buf_if_vector(_buf, rows, cols, Value{ 0 });
+			allocate_1d_buf_if_vector(_buf, rows, cols, Value{});
 			transform_1d_buf_into_identity<Value>(_buf, rows);
 		}
 
@@ -218,7 +218,7 @@ namespace mpp::detail
 		{
 			base._rows = rows;
 			base._cols = cols;
-			allocate_1d_buf_if_vector(base._buf, rows, cols, Value{ 0 });
+			allocate_1d_buf_if_vector(base._buf, rows, cols, Value{});
 
 			std::ranges::copy(rng, base._buf.begin());
 		}

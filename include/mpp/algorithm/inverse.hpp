@@ -44,7 +44,7 @@ namespace mpp
 				{
 					const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
 
-					for (auto col_2 = std::size_t{ 0 }; col_2 < col; ++col_2)
+					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
 					{
 						const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
 						const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
@@ -117,13 +117,13 @@ namespace mpp
 			}
 
 			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{ 0 });
+			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{});
 
 			if (rows == 1)
 			{
 				const auto elem = static_cast<To>(obj(0, 0));
 
-				if (accurate_equals(elem, To{ 0 }))
+				if (accurate_equals(elem, To{}))
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -145,7 +145,7 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (accurate_equals(det, lu_decomp_value_t{ 0 }))
+				if (accurate_equals(det, lu_decomp_value_t{}))
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -166,15 +166,15 @@ namespace mpp
 				auto l_buf = lu_decomp_buf_t{};
 				auto u_buf = lu_decomp_buf_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{ 0 });
+				allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{});
 				std::ranges::copy(obj, u_buf.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{ 0 });
+				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{});
 				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
 
 				det = lu_decomp_common<lu_decomp_value_t, true>(rows, cols, l_buf, u_buf);
 
-				if (accurate_equals(det, lu_decomp_value_t{ 0 }))
+				if (accurate_equals(det, lu_decomp_value_t{}))
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}

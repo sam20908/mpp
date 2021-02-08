@@ -76,7 +76,7 @@ namespace mpp
 			base::_cols = columns;
 
 			// @TODO: ISSUE #129
-			detail::allocate_1d_buf_if_vector(base::_buf, RowsExtent, columns, Value{ 0 });
+			detail::allocate_1d_buf_if_vector(base::_buf, RowsExtent, columns, Value{});
 		}
 
 		matrix(std::size_t columns, Value value) // @TODO: ISSUE #20

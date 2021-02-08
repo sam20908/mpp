@@ -41,11 +41,11 @@ namespace mpp
 			using transposed_buf_t = typename transposed_t::buffer_type;
 			auto transposed        = transposed_t{};
 			auto transposed_buf    = transposed_buf_t{};
-			detail::allocate_1d_buf_if_vector(transposed_buf, cols, rows, Value{ 0 });
+			detail::allocate_1d_buf_if_vector(transposed_buf, cols, rows, Value{});
 
-			for (auto col = std::size_t{ 0 }; col < cols; ++col)
+			for (auto col = std::size_t{}; col < cols; ++col)
 			{
-				for (auto row = std::size_t{ 0 }; row < rows; ++row)
+				for (auto row = std::size_t{}; row < rows; ++row)
 				{
 					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
 					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
