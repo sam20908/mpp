@@ -28,11 +28,17 @@ namespace mpp::detail
 	template<typename Value>
 	concept arithmetic = requires(Value&& value)
 	{
-		// Supports +, -, *, and /
+		// +, -, *, and /
 		{ value + value };
 		{ value - value };
 		{ value * value };
 		{ value / value };
+
+		// +=, -=, *=, and /=
+		{ value += value };
+		{ value -= value };
+		{ value *= value };
+		{ value /= value };
 	};
 
 	template<typename Range>
