@@ -37,9 +37,6 @@ namespace mpp
 		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents, it's
 		// picked up by other specializations, meaning we can avoid conditional inheritance of a base class
 
-		static_assert(!detail::dimension_not_zero_and_non_zero(RowsExtent, ColumnsExtent),
-			"Cannot have one side being zero and other side being non-zero!");
-
 		using base =
 			detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>;
 
@@ -50,9 +47,9 @@ namespace mpp
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
 
-			if (rows != RowsExtent || cols != ColumnsExtent)
+			if (RowsExtent != rows || ColumnsExtent != cols)
 			{
-				throw std::invalid_argument("2D initializer's dimensions does not match the provided extents!");
+				throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
 			}
 
 			base::init_buf_2d_static(init_2d, rows, cols);
@@ -63,9 +60,9 @@ namespace mpp
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
-			if (rows != RowsExtent || cols != ColumnsExtent)
+			if (RowsExtent != rows || ColumnsExtent != cols)
 			{
-				throw std::invalid_argument("2D initializer's dimensions does not match the provided extents!");
+				throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
 			}
 
 			base::init_buf_2d_static(std::forward<Range2D>(rng_2d), rows, cols);
@@ -78,6 +75,8 @@ namespace mpp
 
 			base::init_buf_2d_static(arr_2d, RowsExtent, ColumnsExtent);
 		}
+
+		// @TODO: ISSUE #143
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(
@@ -108,6 +107,8 @@ namespace mpp
 
 		explicit matrix(const Value& value = Value{}) // @TODO: ISSUE #20
 		{
+			detail::validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
+
 			base::_rows = RowsExtent;
 			base::_cols = ColumnsExtent;
 

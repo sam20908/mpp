@@ -62,6 +62,8 @@ namespace mpp
 
 		matrix(std::size_t rows, std::size_t columns, const Value& value = Value{}) // @TODO: ISSUE #20
 		{
+			detail::validate_not_dimension_zero_and_non_zero(rows, columns);
+
 			base::_rows = rows;
 			base::_cols = columns;
 

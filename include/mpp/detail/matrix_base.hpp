@@ -64,11 +64,6 @@ namespace mpp::detail
 
 		void init_buf_2d_dynamic(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
-			if (detail::dimension_not_zero_and_non_zero(rows, cols))
-			{
-				throw std::invalid_argument("Cannot have one side being zero and other side being non-zero!");
-			}
-
 			_rows = rows;
 			_cols = cols;
 			_buf.reserve(rows * cols);
@@ -105,6 +100,11 @@ namespace mpp::detail
 
 		void init_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
+			if (rows == 0 || cols == 0)
+			{
+				throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
+			}
+
 			if (rows != cols)
 			{
 				throw std::invalid_argument("Identity matrix must be square!");

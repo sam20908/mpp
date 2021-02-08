@@ -72,6 +72,8 @@ namespace mpp
 
 		explicit matrix(std::size_t columns, const Value& value = Value{}) // @TODO: ISSUE #20
 		{
+			detail::validate_not_dimension_zero_and_non_zero(RowsExtent, columns);
+
 			base::_rows = RowsExtent;
 			base::_cols = columns;
 

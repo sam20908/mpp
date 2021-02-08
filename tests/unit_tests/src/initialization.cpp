@@ -218,12 +218,12 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int, 0, 0>{ mpp::identity_matrix }), std::invalid_argument);
 	}
 
-	TEST(Initialization, FullyStaticIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	TEST(Initialization, FullyStatic_ZeroAndNonZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, 0, 1>{ 0 }), std::invalid_argument);
 	}
 
-	TEST(Initialization, FullyStaticIdentityMatrix_NonZeroAndZeroSide_Throw)
+	TEST(Initialization, FullyStatic_NonZeroAndZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, 1, 0>{ 0 }), std::invalid_argument);
 	}
@@ -341,12 +341,12 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 0, mpp::identity_matrix }), std::invalid_argument);
 	}
 
-	TEST(Initialization, FullyDynamicIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	TEST(Initialization, FullyDynamic_ZeroAndNonZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int>{ 1, 0, 0 }), std::invalid_argument);
 	}
 
-	TEST(Initialization, FullyDynamicIdentityMatrix_NonZeroAndZeroSide_Throw)
+	TEST(Initialization, FullyDynamic_NonZeroAndZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 1, 0 }), std::invalid_argument);
 	}
@@ -490,12 +490,12 @@ namespace
 			std::invalid_argument);
 	}
 
-	TEST(Initialization, DynamicRowsIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	TEST(Initialization, DynamicRows_ZeroAndNonZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 0>{ 1, 0 }), std::invalid_argument);
 	}
 
-	TEST(Initialization, DynamicRowsIdentityMatrix_NonZeroAndZeroSide_Throw)
+	TEST(Initialization, DynamicRows_NonZeroAndZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 1>{ 0, 0 }), std::invalid_argument);
 	}
@@ -640,12 +640,12 @@ namespace
 			std::invalid_argument);
 	}
 
-	TEST(Initialization, DynamicColumnsIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	TEST(Initialization, DynamicColumns_ZeroAndNonZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, 0, std::dynamic_extent>{ 1, 0 }), std::invalid_argument);
 	}
 
-	TEST(Initialization, DynamicColumnsIdentityMatrix_NonZeroAndZeroSide_Throw)
+	TEST(Initialization, DynamicColumns_NonZeroAndZeroSide_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, 1, std::dynamic_extent>{ 0, 0 }), std::invalid_argument);
 	}
