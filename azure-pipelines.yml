@@ -8,7 +8,7 @@ jobs:
 
   steps:
   - checkout: self
-    submodules: true
+    submodules: false
 
   - script: curl https://raw.githubusercontent.com/Sarcasm/run-clang-format/master/run-clang-format.py --output run-clang-format.py
     displayName: Download run-clang-format.py
