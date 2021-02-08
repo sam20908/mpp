@@ -51,6 +51,11 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyStatic2DInitializerList_SizeMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ { 7, 3 }, { 8, 8 } }), std::invalid_argument);
+	}
+
 	TEST(Initialization, FullyStatic2DRange_Copy)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -65,9 +70,16 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyStatic2DRange_Copy_SizeMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3 }, { 8, 8 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ rng_2d }), std::invalid_argument);
+	}
+
 	TEST(Initialization, FullyStatic2DRange_Move)
 	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto rng_2d       = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix = mpp::matrix<int, 2, 3>{ std::move(rng_2d) };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -77,6 +89,13 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyStatic2DRange_Move_SizeMismatch_Throw)
+	{
+		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3 }, { 8, 8 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ std::move(rng_2d) }), std::invalid_argument);
 	}
 
 	TEST(Initialization, FullyStatic2DArray_Copy)
@@ -95,7 +114,7 @@ namespace
 
 	TEST(Initialization, FullyStatic2DArray_Move)
 	{
-		const auto arr_2d = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 } };
+		auto arr_2d       = std::array{ std::array{ 7, 3, 1 }, std::array{ 8, 8, 2 } };
 		const auto matrix = mpp::matrix<int, 2, 3>{ std::move(arr_2d) };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -106,6 +125,9 @@ namespace
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
+
+	// Can't test array size mismatch for fully static matrices because that results in no viable overload, thus compile
+	// error
 
 	TEST(Initialization, FullyStatic_StaticExprObject)
 	{
@@ -191,6 +213,21 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int, 3, 4>{ mpp::identity_matrix }), std::invalid_argument);
 	}
 
+	TEST(Initialization, FullyStaticIdentityMatrix_0x0_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 0, 0>{ mpp::identity_matrix }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyStaticIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 0, 1>{ 0 }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyStaticIdentityMatrix_NonZeroAndZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 1, 0>{ 0 }), std::invalid_argument);
+	}
+
 	/**
 	 * Fully dynamic matrices
 	 */
@@ -224,7 +261,7 @@ namespace
 
 	TEST(Initialization, FullyDynamic2DRange_Move)
 	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto rng_2d       = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix = mpp::matrix<int>{ std::move(rng_2d) };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -235,6 +272,8 @@ namespace
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
+
+	// Can't test size mismatch of 2D ranges for fully dynamic matrices because fully dynamic matrices accept any size
 
 	TEST(Initialization, FullyDynamic_ExprObject)
 	{
@@ -297,11 +336,26 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int>{ 3, 4, mpp::identity_matrix }), std::invalid_argument);
 	}
 
+	TEST(Initialization, FullyDynamicIdentityMatrix_0x0_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 0, mpp::identity_matrix }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyDynamicIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int>{ 1, 0, 0 }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyDynamicIdentityMatrix_NonZeroAndZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 1, 0 }), std::invalid_argument);
+	}
+
 	/**
 	 * Dynamic rows matrices
 	 */
 
-	TEST(Initialization, DymamicRowsSDInitializerList)
+	TEST(Initialization, DymamicRows2DInitializerList)
 	{
 		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 
@@ -312,6 +366,11 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DymamicRows2DInitializerList_SizeMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3 }, { 8, 8 } }), std::invalid_argument);
 	}
 
 	TEST(Initialization, DynamicRows2DRange_Copy)
@@ -328,9 +387,16 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicRows2DRange_Copy_SizeMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3 }, { 8, 8 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 3>{ rng_2d }), std::invalid_argument);
+	}
+
 	TEST(Initialization, DynamicRows2DRange_Move)
 	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto rng_2d       = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ std::move(rng_2d) };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -342,6 +408,12 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicRows2DRange_Move_SizeMismatch_Throw)
+	{
+		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3 }, { 8, 8 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 3>{ std::move(rng_2d) }), std::invalid_argument);
+	}
 
 	TEST(Initialization, DynamicRows_ExprObject_SameColumns)
 	{
@@ -412,6 +484,22 @@ namespace
 			std::invalid_argument);
 	}
 
+	TEST(Initialization, DynamicRowsIdentityMatrix_0x0_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 0>{ 0, mpp::identity_matrix }),
+			std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicRowsIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 0>{ 1, 0 }), std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicRowsIdentityMatrix_NonZeroAndZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 1>{ 0, 0 }), std::invalid_argument);
+	}
+
 	/**
 	 * Dynamic columns matrices
 	 */
@@ -429,6 +517,12 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicColumns2DInitializerList_SizeMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 }, { 1, 2, 3 } }),
+			std::invalid_argument);
+	}
+
 	TEST(Initialization, DynamicColumns2DRange_Copy)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -443,9 +537,16 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicColumns2DRange_Copy_SizeMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 }, { 1, 2, 3 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, 2, std::dynamic_extent>{ rng_2d }), std::invalid_argument);
+	}
+
 	TEST(Initialization, DynamicColumns2DRange_Move)
 	{
-		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto rng_2d       = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{ std::move(rng_2d) };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -455,6 +556,13 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DRange_Move_SizeMismatch_Throw)
+	{
+		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 }, { 1, 2, 3 } };
+
+		EXPECT_THROW((void)(mpp::matrix<int, 2, std::dynamic_extent>{ std::move(rng_2d) }), std::invalid_argument);
 	}
 
 	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
@@ -524,5 +632,21 @@ namespace
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, 3, std::dynamic_extent>{ 4, mpp::identity_matrix }),
 			std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicColumnsIdentityMatrix_0x0_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 0, std::dynamic_extent>{ 0, mpp::identity_matrix }),
+			std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicColumnsIdentityMatrix_ZeroAndNonZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 0, std::dynamic_extent>{ 1, 0 }), std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicColumnsIdentityMatrix_NonZeroAndZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 1, std::dynamic_extent>{ 0, 0 }), std::invalid_argument);
 	}
 } // namespace
