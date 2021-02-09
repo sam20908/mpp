@@ -21,17 +21,91 @@ under the License.
 
 
 from lit.formats import ShTest
-from os.path import dirname
+from lit.util import executeCommand
+from os.path import dirname, exists
+from os import getppid, getenv, pathsep
+from pathlib import Path
+
+
+def get_multi_command_separator():
+    # Returns the separator used to execute multiple commands for the current terminal
+    if lit_config.isWindows:
+        is_powershell = len(getenv('PSModulePath', '').split(pathsep)) >= 3
+
+        # With powershell, we can use ;
+        # With others, we can use &&
+        if is_powershell:
+            return ";"
+        else:
+            return "&&"
+
+    else:
+        # Both MacOS and Linux uses &&
+        return "&&"
+
+
+def get_compilers_from_cache():
+    cache_exists = False
+    c_compiler = ''
+    cxx_compiler = ''
+
+    if exists('build'):
+        cache_exists = True
+
+        # CMakeCache.txt can have multiple lines stating
+        c_compiler_found = False
+        cxx_compiler_found = False
+
+        # Since the compiler is propagated through all compile tests, it is safe to just find
+        # CMakeCache.txt from one of the compile tests
+        for cache in Path('build').rglob('*.txt'):
+            with open(cache, 'r') as cache_reader:
+                for line in cache_reader:
+                    line = line.rstrip()  # Account for different line endings
+
+                    if not c_compiler_found and 'CMAKE_C_COMPILER:UNINITIALIZED' in line:
+                        c_compiler = line.split('=')[1]
+                        c_compiler_found = True
+
+                    elif not cxx_compiler_found and 'CMAKE_CXX_COMPILER:UNINITIALIZED' in line:
+                        cxx_compiler = line.split('=')[1]
+                        cxx_compiler_found = True
+
+            if c_compiler_found and cxx_compiler_found:
+                break  # We don't need to find other CMakeCache.txt anymore
+
+    return [cache_exists, c_compiler, cxx_compiler]
 
 
 has_binary_dir = hasattr(config, 'binary_dir')
 has_source_dir = hasattr(config, 'source_dir')
-if not has_binary_dir or not has_source_dir:
+has_c_compiler = hasattr(config, 'c_compiler')
+has_cxx_compiler = hasattr(config, 'cxx_compiler')
+if not has_binary_dir or not has_source_dir or not has_c_compiler or not has_cxx_compiler:
     # The user probably tried to run lit in this directory, which means we can't
     # access some of the properties defined by the lit.site.cfg.py file in the
     # binary dir
     lit_config.fatal(
         'Lit must be ran in <build directory>/bin/tests/compile_tests!')
+
+c_compiler = config.c_compiler
+cxx_compiler = config.cxx_compiler
+lit_config.note('C compiler is ' + c_compiler +
+                ' (propagated from mpp CMakeLists)')
+lit_config.note('CXX compiler is ' + cxx_compiler +
+                ' (propagated from mpp CMakeLists)')
+
+[cache_exists, cache_c_compiler, cache_cxx_compiler] = get_compilers_from_cache()
+
+if cache_exists:
+    lit_config.note('Existing cache has C compiler: ' + cache_c_compiler)
+    lit_config.note('Existing cache has CXX compiler: ' + cache_cxx_compiler)
+
+    if cache_c_compiler != c_compiler or cache_cxx_compiler != cxx_compiler:
+        # There is a conflict between the existing cache and the configuration. Error
+        # the user about it
+        lit_config.error(
+            'There will be conflicting compilers when configuring for compile tests! Remove the build folder to avoid conflict')
 
 config.name = 'Compile Test'
 config.suffixes = ['.cpp']
@@ -39,5 +113,6 @@ config.test_format = ShTest()
 config.test_source_root = dirname(__file__)
 config.test_exec_root = config.binary_dir
 
-config.excludes = ['__pycache__', 'build']
-config.substitutions.append(('%binary_dir', config.binary_dir))
+config.excludes = ['build']
+config.substitutions.append(('%build_and_run', "cd {binary_dir} {separator} cmake -DTEST_NAME=%basename_t -DTEST_SOURCE=%s -B build/%basename_t -DCMAKE_C_COMPILER={c_compiler} -DCMAKE_CXX_COMPILER={cxx_compiler} {separator} cmake --build build/%basename_t --target %basename_t".format(
+    binary_dir=config.binary_dir, separator=get_multi_command_separator(), c_compiler=c_compiler, cxx_compiler=cxx_compiler)))

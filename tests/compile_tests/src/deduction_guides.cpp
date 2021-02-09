@@ -17,9 +17,7 @@
  * under the License.
  */
 
-// RUN: cd %binary_dir
-// RUN: cmake -DTEST_NAME=deduction_guides -DTEST_SOURCE=%s -B build/deduction_guides
-// RUN: cmake --build build/deduction_guides --target deduction_guides
+// RUN: %build_and_run
 
 #include <mpp/matrix.hpp>
 
