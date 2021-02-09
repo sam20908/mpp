@@ -106,6 +106,9 @@ if cache_exists:
         # the user about it
         lit_config.error(
             'There will be conflicting compilers when configuring for compile tests! Remove the build folder to avoid conflict')
+    else:
+        lit_config.note(
+            'No conflicts between compilers from existing cache and propagated compilers from mpp CMakeLists')
 
 config.name = 'Compile Test'
 config.suffixes = ['.cpp']
