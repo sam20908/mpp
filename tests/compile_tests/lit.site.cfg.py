@@ -116,6 +116,5 @@ config.test_format = ShTest()
 config.test_source_root = dirname(__file__)
 config.test_exec_root = config.binary_dir
 
-config.excludes = ['build']
 config.substitutions.append(('%build_and_run', "cd {binary_dir} {separator} cmake -DTEST_NAME=%basename_t -DTEST_SOURCE=%s -B build/%basename_t -DCMAKE_C_COMPILER={c_compiler} -DCMAKE_CXX_COMPILER={cxx_compiler} {separator} cmake --build build/%basename_t --target %basename_t".format(
     binary_dir=config.binary_dir, separator=get_multi_command_separator(), c_compiler=c_compiler, cxx_compiler=cxx_compiler)))
