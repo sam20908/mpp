@@ -45,3 +45,4 @@ if(LLVM_LIT_EXEC)
 endif()
 
 _create_compile_test("deduction_guides")
+_create_compile_test("rule_of_five")
