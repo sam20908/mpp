@@ -10,7 +10,12 @@ jobs:
   - checkout: self
     submodules: false
 
-  - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file
+  - script: |
+      sudo apt-get update
+      sudo apt-get install clang-format-11
+    displayName: Install Clang-Format 11
+
+  - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file --clang-format-executable=clang-format-11
     displayName: Validate
 
 - job: PythonFormatValidation
