@@ -70,10 +70,12 @@ namespace mpp
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20
 		{
-			// We can ignore checking for same dimensions because the dimensions of the parameter uses the
-			// extent template parameters, which means they'll always be the same
-
 			base::init_buf_2d_static(arr_2d, RowsExtent, ColumnsExtent);
+		}
+
+		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& arr_2d) // @TODO: ISSUE #20
+		{
+			base::init_buf_2d_static(std::move(arr_2d), RowsExtent, ColumnsExtent);
 		}
 
 		// @TODO: ISSUE #143
