@@ -22,6 +22,11 @@ jobs:
   - checkout: self
     submodules: false
 
+  - script: |
+      pip3 install pylint
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Pylint
+
   - script: python ./tools/pylint_recursive.py . pylintrc
     displayName: Validate
 
@@ -94,7 +99,7 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_CODE_COVERAGE=FALSE -DMPP_BUILD_TESTS=FALSE -B build
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
   - script: cmake --build build --config Release --target benchmark
