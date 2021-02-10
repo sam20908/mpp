@@ -432,7 +432,7 @@ def main():
         print("The following files needs to be formatted:\n")
         print(*files_require_changes, sep="\n")
     else:
-        print("All files are formatted!")
+        print("All files are formatted properly!")
 
     return retcode
 

@@ -28,9 +28,9 @@ jobs:
     submodules: false
 
   - script: |
-      pip3 install pylint lit
+      pip3 install pylint lit --no-warn-script-location
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
-    displayName: Install Pylint + LLVM Lit (for validation)
+    displayName: Install Pylint + LLVM Lit
 
   - script: python ./tools/pylint_recursive.py . pylintrc
     displayName: Validate
@@ -58,7 +58,7 @@ jobs:
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - script: |
-      pip3 install lit
+      pip3 install lit --no-warn-script-location
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
 
