@@ -108,14 +108,14 @@ Testing Time: 0.09s
 ```
 
 ### Compile Tests
-It's very much the same as unit tests, except that LLVM Lit is required to run any compile tests. There is a corresponding CTest target called `compile_tests` which just runs the compile tests through Lit.
+It's very much the same as unit tests, except that LLVM Lit is required to run any compile test. There is also a corresponding CTest target called `compile_tests` which just runs the compile tests through Lit.
 
-Because it uses a separate CMakeLists to compile the tests, the Lit configuration propagates the compiler used to build mpp to also build the compile tests. This avoids issues of both mpp and the compile tests having different compilers (e.g. compile tests being "faulty").
+Because it uses a separate CMakeLists to compile the tests, the Lit configuration propagates the compiler used to build mpp to also build the compile tests. This avoids issues of both mpp and the compile tests having different compilers (e.g. compile tests being "faulty" because it picked a non-conforming compiler unlike mpp).
 
 However, the Lit configuration checks the compiler stored in the cache before it attempts to compile the tests. It will produce an error when the compilers in the cache are different than the propagated compilers (just like what CMake does).
 
 ### Runtime Benchmarks
-Pretty much the same as unit tests. Different categories of benchmarks get built into their own executable, and corresponding CTest target `benchmark` invokes all benchmarks through Lit.
+Pretty much the same as unit tests. Different categories of benchmarks get built into their own executable, and a corresponding CTest target `benchmark` invokes all benchmarks through Lit.
 
 ### (upcoming) Compile Benchmarks
 TODO: Add documentation once compile benchmarks are implemented!
