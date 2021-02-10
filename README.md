@@ -1,40 +1,44 @@
-# mpp
+# mpp (matrix++)
 A C++20 and later matrix library
 
 ![Build Status](https://img.shields.io/azure-devops/build/samestimable2016/mpp/3/main?label=%F0%9F%94%A8%20Build%20Status) ![Test Results](https://img.shields.io/azure-devops/tests/samestimable2016/mpp/3/main?label=%F0%9F%A7%AA%20Test%20Results) ![Code Coverage](https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/3/main?label=%F0%9F%93%B6%20Code%20Coverage) ![GitHub Pages](https://img.shields.io/github/deployments/sam20908/mpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages)
 
+# How to use?
+
 ## Including the Project:
-- A target `mpp` will be created (or `mpp::mpp` if you prefer this form). This means you can simply `add_subdirectory` the project and link the target.
-- You can also just include the headers into your project manually if that's your decision.
+All you need to do is just add it as a subdirectory and link the target (see below):
+```cmake
+add_subdirectory("mpp")
 
-## Test Suite Dependencies:
-- Python package `lit` for compile tests (has to be found in **PATH**).
-- `gtest` in `vcpkg` for unit tests.
-- `benchmark` in `vcpkg` for benchmarks.
-- `gcov` and `gcovr` for code coverage (has to be found in **PATH**).
+target_link_libraries(your_target mpp::mpp)
+```
 
-## Using Built-in Tests:
-- Specify `mpp_BUILD_TESTS` to a boolean value to enable or disable building the test.
-    - This enables all of the following implicitly:
-        - `mpp_BUILD_COMPILE_TESTS` to `TRUE`.
-        - `mpp_BUILD_UNIT_TESTS` to `TRUE`.
-            - **Note: Multi configuration generators will put same executables of different configurations in unit tests binary directory!**
-    - You can manually specify one of those above options to `FALSE` should you disable that specific test.
-- Specify `mpp_BUILD_BENCHMARKS` to a boolean value to enable or disable building the benchmarks.
-    - Recommended to build in **Release** configuration.
+# About Built-In Suites
 
-## Using the Lit Test Suite:
-- Running `ctest` in `<build directory>` directory invokes all tests (use `ctest -V` for verbose output).
-- Running `lit` either in `<build directory>/bin/tests/unit_tests` or `<build directory>/bin/tests/compile_tests` runs all the test in that directory (CMake will detect if `lit` is found in PATH before setting up the test suite).
+## Using Built-In Tests:
+CMake option `MPP_BUILD_TESTS` builds all tests by default. You can toggle unit tests and compile tests via their corresponding options.
+- `MPP_BUILD_UNIT_TESTS` for unit tests.
+- `MPP_BUILD_COMPILE_TESTS` for compile tests.
 
-## Using the Performance Test Suite:
-- Each benchmarks will be comppiled to an executable, and all the benchmarks will be located in `<build directory>/bin/benchmarks`.
-- The benchmarks are written using `Google Benchmark`, which means you may use `Google Benchmark` command line options when invoking the executable.
+It has the following dependencies:
+- `gtest` installed via `vcpkg` submodule for unit tests.
+- LLVM Lit Test Runner `lit` installed and found in **PATH**. **It is only required for ___compile tests___!**
+
+## Using Built-In Benchmarks:
+CMake option `MPP_BUILD_BENCHMARKS` builds both runtime benchmarks and (upcoming) compile time benchmarks. You can toggle individual runtime benchmarks and compile time benchmarks via their corresponding options.
+- `MPP_BUILD_RUNTIME_BENCHMARKS` for runtime benchmarks.
+- `MPP_BUILD_COMPILE_TIME_BENCHMARKS` for compile time benchmarks.
+
+It has the following dependencies:
+- `benchmark` installed via `vcpkg` submodule for runtime benchmarks.
+- (upcoming) `ruby` installed and found in **PATH** for compile benchmarks.
 
 ## Using Code Coverage:
-- ***Requires unit tests to be enabled!***
-- NOTE: **Ninja** won't work for code coverage due to a bug, so a workaround is to use **Ninja Multi-Config**.
-- Specify `mpp_CODE_COVERAGE` to a boolean value to enable or disable code coverage.
-- **NOTE**: All the requirements are found in https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake.
-    - Recommended to build in **Debug** configuration.
-    - Coverage file will be in `<build directory>` named `mpp_code_coverage.xml`.
+CMake option `MPP_CODE_COVERAGE` defines the target `mpp_code_coverage`, which will output `mpp_code_coverage.xml` in the build folder. It has the following conditions to be met.
+- `gcov` and `gcovr` installed and found in **PATH**.
+- Requires unit tests to be enabled.
+
+## Execute the tests
+
+### FAQ: Why LLVM Lit?
+LLVM Lit Test Infrastructure helps developing test suites and benchmarks easily. It also allows combination of tests and benchmarks to be run at the same time given its flexibility. mpp's CMake scripts are also designed to integrate tests with LLVM Lit to help debug tests.
