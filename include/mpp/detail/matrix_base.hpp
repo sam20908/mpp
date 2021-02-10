@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 namespace mpp::detail
 {
@@ -54,11 +55,21 @@ namespace mpp::detail
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buf.begin();
 
-			// @TODO: Perfect forward row range
-			for (auto&& row : rng_2d)
+			if constexpr (std::is_rvalue_reference_v<decltype(rng_2d)>)
 			{
-				std::ranges::copy(row, row_begin);
-				row_begin += cols;
+				for (auto&& row : rng_2d)
+				{
+					std::ranges::move(row, row_begin);
+					row_begin += cols;
+				}
+			}
+			else
+			{
+				for (auto&& row : rng_2d)
+				{
+					std::ranges::copy(row, row_begin);
+					row_begin += cols;
+				}
 			}
 		}
 
@@ -70,10 +81,19 @@ namespace mpp::detail
 
 			const auto buf_back_inserter = std::back_inserter(_buf);
 
-			// @TODO: Perfect forward row range
-			for (auto&& row : rng_2d)
+			if constexpr (std::is_rvalue_reference_v<decltype(rng_2d)>)
 			{
-				std::ranges::copy(row, buf_back_inserter);
+				for (auto&& row : rng_2d)
+				{
+					std::ranges::move(row, buf_back_inserter);
+				}
+			}
+			else
+			{
+				for (auto&& row : rng_2d)
+				{
+					std::ranges::copy(row, buf_back_inserter);
+				}
 			}
 		}
 
