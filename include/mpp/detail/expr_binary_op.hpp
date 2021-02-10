@@ -62,17 +62,17 @@ namespace mpp::detail
 		{
 		}
 
-		[[nodiscard]] auto rows() const->std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _result_rows;
 		}
 
-		[[nodiscard]] auto columns() const->std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _result_cols;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const->value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
 		{
 			if (row_idx >= _result_rows || col_idx >= _result_cols)
 			{
@@ -82,7 +82,7 @@ namespace mpp::detail
 			return operator()(row_idx, col_idx);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const->value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
 		{
 			return _op(_left, _right, row_idx, col_idx);
 		}

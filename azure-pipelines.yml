@@ -1,8 +1,8 @@
 name: CI
 
 jobs:
-- job: FormatValidation
-  displayName: Format Validation
+- job: CppFormatValidation
+  displayName: C++ Code Format Validation
   pool:
     vmImage: ubuntu-20.04
 
@@ -10,10 +10,20 @@ jobs:
   - checkout: self
     submodules: false
 
-  - script: curl https://raw.githubusercontent.com/Sarcasm/run-clang-format/master/run-clang-format.py --output run-clang-format.py
-    displayName: Download run-clang-format.py
+  - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file
+    displayName: Validate
 
-  - script: python ./run-clang-format.py -r include tests benchmarks --style file
+jobs:
+- job: PythonFormatValidation
+  displayName: Python Infrastructure Code Format Validation
+  pool:
+    vmImage: ubuntu-20.04
+
+  steps:
+  - checkout: self
+    submodules: false
+
+  - script: python ./tools/pylint_recursive.py . pylintrc
     displayName: Validate
 
 - job: BuildAndTestAndBenchmarkUbuntu

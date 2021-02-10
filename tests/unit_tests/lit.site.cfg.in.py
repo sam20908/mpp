@@ -17,20 +17,12 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
-
-import sys
-sys.path.append('@BENCHMARKS_BINARY_DIR@')
-
-from format import ExecutableTest
+from lit.formats import GoogleTest
+from lit import TestingConfig
 
 
-config.name = 'Benchmark'
-config.test_source_root = '@BENCHMARKS_BINARY_DIR@'
+config: TestingConfig
 
-if lit_config.isWindows:
-  config.suffixes = ['.exe']
-else:
-  config.suffixes = ['']
-
-config.test_format = ExecutableTest()
+config.name = 'Unit Test'
+config.test_format = GoogleTest('@UNIT_TESTS_OUTPUT_DIR@',
+                                '@UNIT_TESTS_EXECUTABLE_SUFFIX@')

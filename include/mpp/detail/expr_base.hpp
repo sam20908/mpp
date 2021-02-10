@@ -30,7 +30,7 @@ namespace mpp::detail
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class [[nodiscard]] expr_base
 	{
-		[[nodiscard]] constexpr auto expr_obj() const->const Expr&
+		[[nodiscard]] constexpr auto expr_obj() const -> const Expr&
 		{
 			// Grabs reference to the subclass
 			return static_cast<const Expr&>(*this);
@@ -39,27 +39,27 @@ namespace mpp::detail
 	public:
 		using value_type = Value;
 
-		[[nodiscard]] auto rows() const->std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return expr_obj().rows();
 		}
 
-		[[nodiscard]] auto columns() const->std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return expr_obj().columns();
 		}
 
-		[[nodiscard]] constexpr static auto rows_extent()->std::size_t
+		[[nodiscard]] constexpr static auto rows_extent() -> std::size_t
 		{
 			return RowsExtent;
 		}
 
-		[[nodiscard]] constexpr static auto columns_extent()->std::size_t
+		[[nodiscard]] constexpr static auto columns_extent() -> std::size_t
 		{
 			return ColumnsExtent;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const->value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
 		{
 			if (row_idx >= rows() || col_idx >= columns())
 			{
@@ -69,7 +69,7 @@ namespace mpp::detail
 			return expr_obj().at(row_idx, col_idx);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const->value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
 		{
 			return expr_obj()(row_idx, col_idx);
 		}

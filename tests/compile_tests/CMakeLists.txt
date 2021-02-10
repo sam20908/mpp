@@ -35,7 +35,7 @@ add_custom_target("compile_test"
     COMMAND ${LLVM_LIT_EXEC} .
     WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
 
-configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
+configure_file("lit.site.cfg.in.py" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
 
 if(LLVM_LIT_EXEC)

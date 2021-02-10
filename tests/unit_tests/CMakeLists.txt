@@ -24,7 +24,7 @@ set(UNIT_TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} GTest::gmock GTest::gt
 
 if(LLVM_LIT_EXEC)
     message(STATUS "LLVM Lit found! LLVM Lit configuration for unit tests will be created")
-    configure_file("lit.site.cfg.py.in" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
+    configure_file("lit.site.cfg.in.py" "${UNIT_TESTS_BINARY_DIR}/lit.site.cfg.py")
 else()
     message(STATUS "LLVM Lit not found! LLVM Lit configuration for unit tests will not be created")
 endif()

@@ -17,23 +17,26 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
-
 from lit.Test import FAIL, UNSUPPORTED, PASS
 from lit.util import executeCommand
 from lit.formats import FileBasedTest
 
-
-# Check exit code of a simple executable with no input
+# pylint: disable=W0612,R0201
 # NOTE: Copied from llvm-project!
+
+
 class ExecutableTest(FileBasedTest):
-    def execute(self, test, litConfig):
+    """ Test format that runs executables and check their exit code """
+
+    def execute(self, test, _):
+        """ Executes current executable passed by test runner """
+
         if test.config.unsupported:
             return UNSUPPORTED
 
-        out, err, exitCode = executeCommand(test.getSourcePath())
+        out, err, exit_code = executeCommand(test.getSourcePath())
 
-        if not exitCode:
+        if not exit_code:
             return PASS, out
 
         return FAIL, out+err

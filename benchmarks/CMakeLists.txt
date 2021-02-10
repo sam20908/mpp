@@ -22,8 +22,8 @@ set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark b
 
 if(LLVM_LIT_EXEC)
     message(STATUS "LLVM Lit found! LLVM Lit configuration for benchmarks will be created")
-    configure_file("lit.site.cfg.py.in" "${BENCHMARKS_BINARY_DIR}/lit.site.cfg.py")
-    configure_file("format.py.in" "${BENCHMARKS_BINARY_DIR}/format.py")
+    configure_file("lit.site.cfg.in.py" "${BENCHMARKS_BINARY_DIR}/lit.site.cfg.py")
+    configure_file("format.in.py" "${BENCHMARKS_BINARY_DIR}/format.py")
 else()
     message(STATUS "LLVM Lit not found! LLVM Lit configuration for benchmarks will not be created")
 endif()

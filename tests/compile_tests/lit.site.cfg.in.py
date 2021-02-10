@@ -17,9 +17,12 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
-
 from os.path import join
+from lit import LitConfig, TestingConfig
+
+
+lit_config: LitConfig
+config: TestingConfig
 
 
 config.source_dir = '@COMPILE_TESTS_SOURCE_DIR@'
