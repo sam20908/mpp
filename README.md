@@ -35,6 +35,7 @@ It has the following dependencies:
 
 ## Using Code Coverage:
 CMake option `MPP_CODE_COVERAGE` defines the target `mpp_code_coverage`, which will output `mpp_code_coverage.xml` in the build folder. It has the following conditions to be met.
+- The current compiler is `gcc`.
 - `gcov` and `gcovr` installed and found in **PATH**.
 - Requires unit tests to be enabled.
 
