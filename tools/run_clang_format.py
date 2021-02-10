@@ -431,6 +431,8 @@ def main():
         print("==" * 50)
         print("The following files need to be formatted:\n")
         print(*files_require_changes, sep="\n")
+    else:
+        print("All files are formatted!")
 
     return retcode
 

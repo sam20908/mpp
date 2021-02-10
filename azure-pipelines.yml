@@ -13,9 +13,8 @@ jobs:
   - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file
     displayName: Validate
 
-jobs:
 - job: PythonFormatValidation
-  displayName: Python Infrastructure Code Format Validation
+  displayName: Python LLVM Lit Code Format Validation
   pool:
     vmImage: ubuntu-20.04
 

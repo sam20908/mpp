@@ -1,11 +1,5 @@
 # Configured CMake files are coded in CMake
 CMakeLists.txt.in linguist-language=CMake
 
-# Configured Python files are coded in Python
-*.py.in linguist-language=Python
-
-# .tpp files are C++
-*.tpp linguist-language=C++
-
 # Ignore website folder from language statistics
 website/* linguist-documentation
