@@ -38,7 +38,87 @@ CMake option `MPP_CODE_COVERAGE` defines the target `mpp_code_coverage`, which w
 - `gcov` and `gcovr` installed and found in **PATH**.
 - Requires unit tests to be enabled.
 
-## Execute the tests
+## Executing the Tests and Benchmarks
+
+### Psst: if you want the nice features of having Lit targets, then you need to have LLVM Lit installed and found in PATH!
+
+#### Unit Tests
+Different categories of unit tests are built into their own executables, so it makes failing tests easier to debug. A CTest target `unit_test` is defined, which invokes the Lit configuration of unit tests.
+
+Example:
+```
+# Assuming you are in the build folder
+
+> ctest -R unit_test
+
+UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
+Test project /home/sames/Projects/matrixpp_actual_code/matrixpp/build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 2
+    Start 2: unit_test
+
+2: Test command: /home/sames/.local/bin/lit "."
+2: Test timeout computed to be: 10000000
+2: -- Testing: 68 tests, 8 workers --
+
+# Bunch more tests here...
+
+2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_NonZeroAndZeroSide_Throw (65 of 68)
+2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_DynamicExprObject_DifferentSize_Throw (66 of 68)
+2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_ZeroAndNonZeroSide_Throw (67 of 68)
+2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_StaticExprObject (68 of 68)
+2: 
+2: Testing Time: 0.10s
+2:   Passed: 68
+1/1 Test #2: unit_test ........................   Passed    0.23 sec
+
+The following tests passed:
+        unit_test
+```
+If you want to run subset of tests by regular expression, you can `cd` into `build/bin/tests/unit_tests` and pass a regular expression into `--filter=` when running `lit .`
+
+Example:
+```
+# Assuming you are in "build/bin/tests/unit_tests"
+
+> lit . --filter=Initialization
+
+PASS: Unit Test :: /initialization_unit_test/Initialization.DynamicColumns2DInitializerList_SizeMismatch_Throw (1 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRows2DInitializerList_SizeMismatch_Throw (2 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRowsValueConstructor (3 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.DynamicColumns2DInitializerList (4 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRows2DInitializerList (5 of 59)
+
+# Bunch more initialization tests here...
+
+PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_NonZeroAndZeroSide_Throw (56 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_ZeroAndNonZeroSide_Throw (57 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_DynamicExprObject_SameSize (58 of 59)
+PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_StaticExprObject (59 of 59)
+
+Testing Time: 0.09s
+  Excluded:  9
+  Passed  : 59
+```
+
+#### Compile Tests
+It's very much the same as unit tests, except that LLVM Lit is required to run any compile tests. There is a corresponding CTest target called `compile_tests` which just runs the compile tests through Lit.
+
+Because it uses a separate CMakeLists to compile the tests, the Lit configuration propagates the compiler used to build mpp to also build the compile tests. This avoids issues of both mpp and the compile tests having different compilers (e.g. compile tests being "faulty").
+
+However, the Lit configuration checks the compiler stored in the cache before it attempts to compile the tests. It will produce an error when the compilers in the cache are different than the propagated compilers (just like what CMake does).
+
+#### Runtime Benchmarks
+Pretty much the same as unit tests. Different categories of benchmarks get built into their own executable, and corresponding CTest target `benchmark` invokes all benchmarks through Lit.
+
+#### (upcoming) Compile Benchmarks
+TODO: Add documentation once compile benchmarks are implemented!
 
 ### FAQ: Why LLVM Lit?
 LLVM Lit Test Infrastructure helps developing test suites and benchmarks easily. It also allows combination of tests and benchmarks to be run at the same time given its flexibility. mpp's CMake scripts are also designed to integrate tests with LLVM Lit to help debug tests.
