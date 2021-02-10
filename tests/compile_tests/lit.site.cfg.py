@@ -67,11 +67,11 @@ def get_compilers_from_cache():
                 for line in cache_reader:
                     line = line.rstrip()  # Account for different line endings
 
-                    if not c_compiler_found and 'CMAKE_C_COMPILER:UNINITIALIZED' in line:
+                    if not c_compiler_found and 'CMAKE_C_COMPILER:STRING' in line:
                         cache_c_compiler_ = line.split('=')[1]
                         c_compiler_found = True
 
-                    elif not cxx_compiler_found and 'CMAKE_CXX_COMPILER:UNINITIALIZED' in line:
+                    elif not cxx_compiler_found and 'CMAKE_CXX_COMPILER:STRING' in line:
                         cache_cxx_compiler_ = line.split('=')[1]
                         cxx_compiler_found = True
 
