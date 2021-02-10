@@ -73,6 +73,6 @@ if __name__ == "__main__":
 
     if len(FAILED_MODULES) > 0:
         print("==" * 50)
-        print("The following modules need to be fixed:\n")
+        print("The following modules needs to be fixed:\n")
         print(*FAILED_MODULES, sep="\n")
         sys.exit(1)

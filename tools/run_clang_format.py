@@ -429,7 +429,7 @@ def main():
 
     if len(files_require_changes) > 0:
         print("==" * 50)
-        print("The following files need to be formatted:\n")
+        print("The following files needs to be formatted:\n")
         print(*files_require_changes, sep="\n")
     else:
         print("All files are formatted!")
