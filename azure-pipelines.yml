@@ -28,9 +28,9 @@ jobs:
     submodules: false
 
   - script: |
-      pip3 install pylint
+      pip3 install pylint lit
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
-    displayName: Install Pylint
+    displayName: Install Pylint + LLVM Lit (for validation)
 
   - script: python ./tools/pylint_recursive.py . pylintrc
     displayName: Validate
