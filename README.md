@@ -105,6 +105,34 @@ int main()
 }
 ```
 
+Finally, note that **all algorithms and utilities** are _customization point objects_. It means that you can customize them by overloading with `tag_invoke` and it will detect your customization.
+
+```cpp
+namespace ns
+{
+  struct dumb_matrix {};
+
+  [[nodiscard]] auto tag_invoke(mpp::determinant_t, dumb_matrix) -> int
+  {
+    /**
+     * Say that dumb_matrix was a "optimized" data structure and has guarantees.
+     * Lets say that dumb_matrix GUARANTEES a determinant of 2000 (inpractical example).
+     */
+    return 2000;
+  }
+} // namespace ns
+
+int main()
+{
+  auto dummy = ns::dumb_matrix{};
+  auto det = mpp::determinant(dummy); // 2000
+
+  return 0;
+}
+```
+
+Learn more about the rationale of using `tag_invoke` in FAQ.
+
 You can find more APIs that are not mentioned in this README in the (upcoming) documentation.
 
 # About Built-In Suites
@@ -230,6 +258,45 @@ Pretty much the same as unit tests. Different categories of benchmarks get built
 
 TODO: Add documentation once compile benchmarks are implemented!
 
-### FAQ: Why LLVM Lit?
+## FAQ
+#### Why LLVM Lit?
 
 LLVM Lit Test Infrastructure helps developing test suites and benchmarks easily. It also allows combination of tests and benchmarks to be run at the same time given its flexibility. mpp's CMake scripts are also designed to integrate tests with LLVM Lit to help debug tests.
+
+#### Why `tag_invoke` for customization?
+
+`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`, which helps the user to overload by the *type* of the customization point objects (it is always "the name you want to overload" + `_t`), and not having to remember unique names to overload.
+
+This was inspired from `<ranges>`, which has the customization point objects automatically perform the "two step":
+
+```cpp
+/**
+ * Somewhere in the determinant implemetation WITHOUT customization point objects.
+ * We have to "remember" to make an UNQUALIFIED call, only them customizations are picked up.
+ */
+using mpp::determinant;
+determinant(obj); // Unqualified call, able to pick up overloads (customizations).
+```
+
+With `tag_invoke`, we can avoid doing `using ...`, and instead provide default implementations. Consider the following:
+
+```cpp
+struct determinant_t
+{
+  friend inline auto tag_invoke(determinant_t)
+  {
+    // Default implementation of the algorithm...
+  }
+
+  auto operator()() const
+  {
+    return tag_invoke(*this);
+  }
+};
+```
+
+The `friend` specifier makes the default `tag_invoke` in the same namespace scope as `determinant_t`, and it all works out because `tag_invoke(*this)` uses ADL to find the default overload of `tag_invoke`, and it'll also pick up other overloads because it performed an unqualified call.
+
+#### Why store the website code in the "website" folder?
+
+It has been painful to work between different branches for the library and the website in the same workspace. It is also NOT an optimal solution by just checking out different branches in different locations. I have decided to at least give it a dedicated folder, isolated from library code. This way, updating library code and website is a lot less painful.
