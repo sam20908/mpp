@@ -44,16 +44,18 @@ int main()
     return 0;
 }`;
 
-export const customize_default_extent = `#include <mpp/utility/config.hpp>
+export const customize_default_extent = `// Import appropriate tags for customization
+#include <mpp/utility/config.hpp>
 
-// It's very important to do this before including matrix.hpp, otherwise the customization
-// is not going to be detected
 namespace mpp::customize
 {
-    // Customization for default extent for matrix class has to take place here because
-    // the library looks for customizations via ADL, and customize_tag is declared in this
-    // scope
-    // Also, customizing extents means tag_invoke MUST be constexpr!
+    /**
+     * Customizations has to take place BEFORE ANY INSTANTIATIONS!
+     * (it will NOT be detected in time after).
+     * 
+     * The namespace mpp::customize is where the user can freely open to customize.
+     */
+
     [[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
     {
         return 10;
