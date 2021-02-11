@@ -106,7 +106,7 @@ namespace ns
 
 int main()
 {
-    auto v = ns::vec;
+    auto v = ns::vec{};
     auto t = mpp::type(v); // vec_types::vec
     auto d = mpp::determinant(v); // 2000
 
