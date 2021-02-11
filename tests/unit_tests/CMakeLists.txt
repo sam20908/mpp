@@ -52,7 +52,7 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
         NAME ${PROJECT_NAME}_code_coverage
         EXECUTABLE "ctest -R unit_tests"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
-        DEPENDENCIES "unit_test")
+        DEPENDENCIES "unit_tests")
 endif()
 
 if(LLVM_LIT_EXEC)
