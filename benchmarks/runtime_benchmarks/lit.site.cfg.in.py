@@ -32,7 +32,7 @@ lit_config: LitConfig
 config: TestingConfig
 
 config.name = 'Runtime Benchmark'
-config.test_source_root = '@BENCHMARKS_BINARY_DIR@'
+config.test_source_root = '@RUNTIME_BENCHMARKS_BINARY_DIR@'
 
 if lit_config.isWindows:
     config.suffixes = ['.exe']
