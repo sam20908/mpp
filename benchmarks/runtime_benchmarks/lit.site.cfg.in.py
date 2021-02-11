@@ -23,7 +23,7 @@ from lit import LitConfig, TestingConfig
 
 import sys
 # This has to happen before importing the test format
-sys.path.append('@BENCHMARKS_BINARY_DIR@')
+sys.path.append('@RUNTIME_BENCHMARKS_BINARY_DIR@')
 
 from format import ExecutableTest
 
