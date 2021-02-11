@@ -29,7 +29,7 @@ else()
     message(STATUS "LLVM Lit not found! LLVM Lit configuration for unit tests will not be created")
 endif()
 
-add_custom_target("unit_test")
+add_custom_target("unit_tests")
 
 function(_create_unit_test TEST_FILENAME)
     set(TEST_NAME "${TEST_FILENAME}_${UNIT_TESTS_EXECUTABLE_SUFFIX}")
@@ -39,7 +39,7 @@ function(_create_unit_test TEST_FILENAME)
     _setup_target(${TEST_NAME} "${UNIT_TESTS_BINARY_DIR}" "${UNIT_TESTS_LIBRARIES}")
     _turn_on_warnings(${TEST_NAME})
 
-    add_dependencies("unit_test" ${TEST_NAME})
+    add_dependencies("unit_tests" ${TEST_NAME})
 endfunction()
 
 cmake_dependent_option(${PROJECT_NAME_UPPER}_CODE_COVERAGE "Enables code coverage" 
@@ -50,13 +50,13 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE "ctest -R unit_test"
+        EXECUTABLE "ctest -R unit_tests"
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "unit_test")
 endif()
 
 if(LLVM_LIT_EXEC)
-    add_test(NAME "unit_test" 
+    add_test(NAME "unit_tests" 
         COMMAND ${LLVM_LIT_EXEC} .
         WORKING_DIRECTORY "${UNIT_TESTS_BINARY_DIR}")
 endif()

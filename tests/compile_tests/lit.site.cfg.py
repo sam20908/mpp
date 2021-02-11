@@ -22,7 +22,6 @@ under the License.
 
 from os import getenv, pathsep
 from os.path import dirname, exists
-from pathlib import Path
 from lit.formats import ShTest
 from lit import LitConfig, TestingConfig
 
@@ -48,37 +47,16 @@ def get_multi_command_separator():
 
 
 def get_compilers_from_cache():
-    """ Gets cached compilers by CMake """
-    does_cache_exists = False
-    cache_c_compiler_ = ''
-    cache_cxx_compiler_ = ''
+    """ Gets cached compilers from CMake cache """
 
-    if exists('build'):
-        does_cache_exists = True
+    if exists('build/current_compiler.txt'):
+        with open('build/current_compiler.txt', 'r') as compiler_reader:
+            line = compiler_reader.readline()
+            [cache_c_compiler_, cache_cxx_compiler_] = line.split(',')
 
-        # CMakeCache.txt can have multiple lines stating
-        c_compiler_found = False
-        cxx_compiler_found = False
-
-        # Since the compiler is propagated through all compile tests, it is safe to just find
-        # CMakeCache.txt from one of the compile tests
-        for cache in Path('build').rglob('*.txt'):
-            with open(cache, 'r') as cache_reader:
-                for line in cache_reader:
-                    line = line.rstrip()  # Account for different line endings
-
-                    if not c_compiler_found and 'CMAKE_C_COMPILER:STRING' in line:
-                        cache_c_compiler_ = line.split('=')[1]
-                        c_compiler_found = True
-
-                    elif not cxx_compiler_found and 'CMAKE_CXX_COMPILER:STRING' in line:
-                        cache_cxx_compiler_ = line.split('=')[1]
-                        cxx_compiler_found = True
-
-            if c_compiler_found and cxx_compiler_found:
-                break  # We don't need to find other CMakeCache.txt anymore
-
-    return (does_cache_exists, cache_c_compiler_, cache_cxx_compiler_)
+            return (True, cache_c_compiler_, cache_cxx_compiler_)
+    else:
+        return (False, '', '')
 
 
 has_binary_dir = hasattr(config, 'binary_dir')
@@ -113,6 +91,9 @@ if cache_exists:
     else:
         lit_config.note(
             'No conflicts between compilers from existing cache and propagated compilers from mpp CMakeLists')
+else:
+    lit_config.note(
+        'No CMake cache generated yet. Generating CMake cache for compile tests')
 
 config.name = 'Compile Test'
 config.suffixes = ['.cpp']

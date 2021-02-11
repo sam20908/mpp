@@ -31,7 +31,7 @@ function(_create_compile_test TEST_NAME)
         WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
 endfunction()
 
-add_custom_target("compile_test"
+add_custom_target("compile_tests"
     COMMAND ${LLVM_LIT_EXEC} .
     WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
 
@@ -39,7 +39,7 @@ configure_file("lit.site.cfg.in.py" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
 
 if(LLVM_LIT_EXEC)
-    add_test(NAME "compile_test" 
+    add_test(NAME "compile_tests" 
         COMMAND ${LLVM_LIT_EXEC} .
         WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
 endif()
