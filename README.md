@@ -29,7 +29,7 @@ int main()
 {
   /**
    * Creating matrices
-   * 
+   *
    * Extents determine if a matrix is fixed or (partially) flexible
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
@@ -78,7 +78,7 @@ namespace mpp::customize
   /**
    * Customizations has to take place BEFORE ANY INSTANTIATIONS!
    * (it will NOT be detected in time after).
-   * 
+   *
    * The namespace mpp::customize is where the user can freely open to customize.
    */
 
@@ -151,15 +151,11 @@ It has the following dependencies:
 
 ## Using Built-In Benchmarks:
 
-CMake option `MPP_BUILD_BENCHMARKS` builds both runtime benchmarks and (upcoming) compile time benchmarks. You can toggle individual runtime benchmarks and compile time benchmarks via their corresponding options.
-
--   `MPP_BUILD_RUNTIME_BENCHMARKS` for runtime benchmarks.
--   `MPP_BUILD_COMPILE_TIME_BENCHMARKS` for compile time benchmarks.
+CMake option `MPP_BUILD_BENCHMARKS` builds benchmarks that run against various algorithms.
 
 It has the following dependencies:
 
 -   `benchmark` installed via `vcpkg` submodule for runtime benchmarks.
--   (upcoming) `ruby` installed and found in **PATH** for compile benchmarks.
 
 ## Using Code Coverage:
 
@@ -175,7 +171,7 @@ CMake option `MPP_CODE_COVERAGE` defines the target `mpp_code_coverage`, which w
 
 ### Unit Tests
 
-Different categories of unit tests are built into their own executables, so it makes failing tests easier to debug. A CTest target `unit_test` is defined, which invokes the Lit configuration of unit tests.
+Different categories of unit tests are built into their own executables, so it makes failing tests easier to debug. A CTest target `unit_tests` is defined, which invokes the Lit configuration of unit tests.
 
 Example:
 
@@ -244,28 +240,27 @@ Testing Time: 0.09s
 
 ### Compile Tests
 
-It's very much the same as unit tests, except that LLVM Lit is required to run any compile test. There is also a corresponding CTest target called `compile_test` which just runs the compile tests through Lit.
+It's very much the same as unit tests, except that LLVM Lit is required to run any compile test. There is also a corresponding CTest target called `compile_tests` which just runs the compile tests through Lit.
 
 Because it uses a separate CMakeLists to compile the tests, the Lit configuration propagates the compiler used to build mpp to also build the compile tests. This avoids issues of both mpp and the compile tests having different compilers (e.g. compile tests being "faulty" because it picked a non-conforming compiler unlike mpp).
 
 However, the Lit configuration checks the compiler stored in the cache before it attempts to compile the tests. It will produce an error when the compilers in the cache are different than the propagated compilers (just like what CMake does).
 
-### Runtime Benchmarks
+### Benchmarks
 
-Pretty much the same as unit tests. Different categories of benchmarks get built into their own executable, and a corresponding CTest target `benchmark` invokes all benchmarks through Lit.
-
-### (upcoming) Compile Benchmarks
+Pretty much the same as unit tests. Different benchmarks of algorithms, and etc get built into their own executable, and a corresponding CTest target `benchmarks` invokes all benchmarks through Lit.
 
 TODO: Add documentation once compile benchmarks are implemented!
 
 ## FAQ
+
 #### Why LLVM Lit?
 
 LLVM Lit Test Infrastructure helps developing test suites and benchmarks easily. It also allows combination of tests and benchmarks to be run at the same time given its flexibility. mpp's CMake scripts are also designed to integrate tests with LLVM Lit to help debug tests.
 
 #### Why `tag_invoke` for customization?
 
-`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`, which helps the user to overload by the *type* of the customization point objects (it is always "the name you want to overload" + `_t`), and not having to remember unique names to overload.
+`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`, which helps the user to overload by the _type_ of the customization point objects (it is always "the name you want to overload" + `_t`), and not having to remember unique names to overload.
 
 This was inspired from `<ranges>`, which has the customization point objects automatically perform the "two step":
 

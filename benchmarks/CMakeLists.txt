@@ -1,4 +1,3 @@
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,20 +15,39 @@
 # specific language governing permissions and limitations
 # under the License.
 
-include(CMakeDependentOption)
+find_package(benchmark CONFIG REQUIRED)
 
-set(BENCHMARKS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
+set(BENCHMARKS_BINARY_DIR "${CMAKE_BINARY_DIR}/bin/benchmarks")
+set(BENCHMARKS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME} benchmark::benchmark benchmark::benchmark_main)
 
-cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TIME_BENCHMARKS "Builds compile time benchmarks suite" 
-    ON "${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS" OFF)
-cmake_dependent_option(${PROJECT_NAME_UPPER}_BUILD_RUNTIME_BENCHMARKS "Builds runtime benchmarks suite" 
-    ON "${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS" OFF)
-
-if(${PROJECT_NAME_UPPER}_BUILD_COMPILE_TIME_BENCHMARKS)
-    # @TODO: Enable this after added compile benchmarks
-    # add_subdirectory("compile_time_benchmarks")
+if(LLVM_LIT_EXEC)
+    message(STATUS "LLVM Lit found! LLVM Lit configuration for runtime benchmarks will be created")
+    configure_file("lit.site.cfg.in.py" "${BENCHMARKS_BINARY_DIR}/lit.site.cfg.py")
+    configure_file("format.in.py" "${BENCHMARKS_BINARY_DIR}/format.py")
+else()
+    message(STATUS "LLVM Lit not found! LLVM Lit configuration for runtime benchmarks will not be created")
 endif()
 
-if(${PROJECT_NAME_UPPER}_BUILD_RUNTIME_BENCHMARKS)
-    add_subdirectory("runtime_benchmarks")
+add_custom_target("benchmarks")
+
+function(_create_benchmark TEST_FILE)
+    set(TEST_NAME "${TEST_FILE}_benchmark")
+    set(TEST_SOURCE "src/${TEST_FILE}.cpp")
+    add_executable(${TEST_NAME} "${TEST_SOURCE}")
+
+    _setup_target(${TEST_NAME} "${BENCHMARKS_BINARY_DIR}" "${BENCHMARKS_LIBRARIES}")
+    _turn_on_warnings(${TEST_NAME})
+
+    add_dependencies("benchmarks" ${TEST_NAME})
+endfunction()
+
+if(LLVM_LIT_EXEC)
+    add_test(NAME "benchmarks" 
+        COMMAND ${LLVM_LIT_EXEC} .
+        WORKING_DIRECTORY "${BENCHMARKS_BINARY_DIR}")
 endif()
+
+_create_benchmark("algorithms")
+_create_benchmark("arithmetic")
+_create_benchmark("initialization")
+_create_benchmark("utilities")
