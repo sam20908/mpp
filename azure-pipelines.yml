@@ -83,7 +83,6 @@ jobs:
 
   - script: cmake --build build --config Debug --target unit_tests
     displayName: Build Unit Tests
-    continueOnError: true
 
   - script: |
       cd build/bin/tests
