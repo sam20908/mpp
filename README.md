@@ -250,8 +250,6 @@ However, the Lit configuration checks the compiler stored in the cache before it
 
 Pretty much the same as unit tests. Different benchmarks of algorithms, and etc get built into their own executable, and a corresponding CTest target `benchmarks` invokes all benchmarks through Lit.
 
-TODO: Add documentation once compile benchmarks are implemented!
-
 ## FAQ
 
 #### Why LLVM Lit?
