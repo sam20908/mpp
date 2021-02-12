@@ -25,8 +25,8 @@
 #include <type_traits>
 
 template<typename Type>
-constexpr bool has_rule_of_five_v =
-	std::is_default_constructible_v<Type>&& std::is_copy_assignable_v<Type>&& std::is_move_assignable_v<Type>;
+constexpr bool has_rule_of_five_v = std::is_default_constructible_v<Type>&& std::is_copy_constructible_v<Type>&&
+	std::is_copy_assignable_v<Type>&& std::is_move_constructible_v<Type>&& std::is_move_assignable_v<Type>;
 
 int main()
 {
