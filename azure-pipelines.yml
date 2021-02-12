@@ -110,7 +110,7 @@ jobs:
     displayName: Configure For Benchmarks in Release Configuration
 
   - script: cmake --build build --config Release --target benchmarks
-    displayName: Build Benchmarks in Release Configuration
+    displayName: Build Benchmarks
 
   - script: |
       cd build/bin/benchmarks
