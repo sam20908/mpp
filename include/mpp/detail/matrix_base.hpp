@@ -231,26 +231,38 @@ namespace mpp::detail
 			return _cols;
 		}
 
-		friend inline void init_matrix_with_1d_rng_copy(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
+		friend inline void init_matrix_with_1d_rng(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
 			auto&& rng,
 			std::size_t rows,
 			std::size_t cols) // @TODO: ISSUE #20
 		{
 			base._rows = rows;
 			base._cols = cols;
-			allocate_1d_buf_if_vector(base._buf, rows, cols, Value{});
 
-			std::ranges::copy(rng, base._buf.begin());
-		}
+			reserve_1d_buf_if_vector(base._buf, rows, cols);
 
-		friend inline void init_matrix_with_1d_rng_move(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
-			auto&& rng,
-			std::size_t rows,
-			std::size_t cols) // @TODO: ISSUE #20
-		{
-			base._rows = rows;
-			base._cols = cols;
-			base._buf  = std::move(rng);
+			if constexpr (std::is_rvalue_reference_v<decltype(rng)>)
+			{
+				if constexpr (is_vector<Buffer>::value)
+				{
+					std::ranges::move(rng, std::back_inserter(base._buf));
+				}
+				else
+				{
+					std::ranges::move(rng, base._buf.begin());
+				}
+			}
+			else
+			{
+				if constexpr (is_vector<Buffer>::value)
+				{
+					std::ranges::copy(rng, std::back_inserter(base._buf));
+				}
+				else
+				{
+					std::ranges::copy(rng, base._buf.begin());
+				}
+			}
 		}
 	};
 } // namespace mpp::detail

@@ -202,7 +202,7 @@ namespace mpp
 				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
-			init_matrix_with_1d_rng_move(inv_matrix, std::move(inv_matrix_buf), rows, cols);
+			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, cols);
 			return inv_matrix;
 		}
 

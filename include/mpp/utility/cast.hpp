@@ -35,7 +35,7 @@ namespace mpp
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			init_matrix_with_1d_rng_copy(casted, obj, obj.rows(), obj.columns());
+			init_matrix_with_1d_rng(casted, obj, obj.rows(), obj.columns());
 
 			return casted;
 		}

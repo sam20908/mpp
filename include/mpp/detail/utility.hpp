@@ -26,9 +26,28 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace mpp::detail
 {
+	/**
+	 * Helper type traits
+	 */
+
+	template<typename T>
+	struct is_vector : std::false_type
+	{
+	};
+
+	template<typename T>
+	struct is_vector<std::vector<T>> : std::true_type
+	{
+	};
+
+	/**
+	 * Helper functions
+	 */
+
 	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t cols, std::size_t row_idx, std::size_t col_idx) -> std::size_t
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
@@ -103,12 +122,25 @@ namespace mpp::detail
 	{
 		constexpr auto is_vec = requires
 		{
-			buf.push_back(0);
+			buf.reserve(0);
 		};
 
 		if constexpr (is_vec)
 		{
 			buf.resize(rows * cols, val);
+		}
+	}
+
+	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	{
+		constexpr auto is_vec = requires
+		{
+			buf.reserve(0);
+		};
+
+		if constexpr (is_vec)
+		{
+			buf.reserve(rows * cols);
 		}
 	}
 
