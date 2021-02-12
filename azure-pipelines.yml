@@ -1,8 +1,8 @@
 name: CI
 
 jobs:
-- job: CppFormatValidation
-  displayName: C++ Code Format Validation
+- job: LibraryFormatValidation
+  displayName: Library Code Format Validation
   pool:
     vmImage: ubuntu-20.04
 
@@ -18,8 +18,8 @@ jobs:
   - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file --clang-format-executable=clang-format-11
     displayName: Validate
 
-- job: PythonFormatValidation
-  displayName: Python LLVM Lit Code Format Validation
+- job: PythonInfrastructureFormatValidation
+  displayName: Python Infrastructure Code Format Validation
   pool:
     vmImage: ubuntu-20.04
 
@@ -79,7 +79,7 @@ jobs:
     displayName: Install GCC Gcovr
 
   - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
-    displayName: Configure For Tests in Debug Configuration
+    displayName: Configure For Code Coverage in Debug Configuration
 
   - script: cmake --build build --config Debug --target mpp_code_coverage
     displayName: Generate Code Coverage in Debug Configuration

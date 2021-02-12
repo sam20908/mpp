@@ -50,7 +50,7 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE ctest -R unit_tests
+        EXECUTABLE "" # Tests might fail, but we still want code coverage regardless
         EXCLUDE "${PROJECT_SOURCE_DIR}/vcpkg/*" "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "unit_tests")
 endif()
