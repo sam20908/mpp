@@ -79,23 +79,16 @@ jobs:
     displayName: Install GCC Gcovr
 
   - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
-    displayName: Configure For Code Coverage in Debug Configuration
+    displayName: Configure For Tests and Code Coverage in Debug Configuration
 
-  - script: cmake --build build --config Debug --target mpp_code_coverage
-    displayName: Generate Code Coverage in Debug Configuration
+  - script: cmake --build build --config Debug --target unit_tests
+    displayName: Build Unit Tests
     continueOnError: true
-
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: build/mpp_code_coverage.xml
-      pathToSources: $(Build.SourcesDirectory)
-    displayName: Publish Code Coverage
 
   - script: |
       cd build/bin/tests
       lit compile_tests unit_tests --xunit-xml-output results.xml
-    continueOnError: true
+    continueOnError: true # Tests might fail, but we still want the results
     displayName: Run Tests
 
   - task: PublishTestResults@2
@@ -103,6 +96,16 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
+
+  - script: cmake --build build --config Debug --target mpp_code_coverage
+    displayName: Generate Code Coverage
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: cobertura
+      summaryFileLocation: build/mpp_code_coverage.xml
+      pathToSources: $(Build.SourcesDirectory)
+    displayName: Publish Code Coverage
 
   - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
