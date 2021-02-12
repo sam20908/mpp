@@ -107,13 +107,13 @@ jobs:
   - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
-  - script: cmake --build build --config Release --target runtime_benchmarks
+  - script: cmake --build build --config Release --target benchmarks
     displayName: Build Benchmarks in Release Configuration
 
   - script: |
-      cd build/bin/benchmarks/runtime_benchmarks
+      cd build/bin/benchmarks
       lit . -a
-    displayName: Run All Runtime Benchmarks
+    displayName: Run All Benchmarks
 
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
