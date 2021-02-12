@@ -64,7 +64,7 @@ namespace mpp
 				const auto diag_elem = u_buf[diag_elem_idx];
 
 				// Diagonal element can simply be replaced with the factor
-				const auto diag_factor = lu_decomp_value_t{ 1 } / diag_elem;
+				const auto diag_factor = default_floating_type{ 1 } / diag_elem;
 				u_buf[diag_elem_idx]   = diag_factor;
 
 				// Multiply every element to the right of the diagonal element by the factor
@@ -131,26 +131,26 @@ namespace mpp
 				inv_matrix_buf[0] = To{ 1 } / elem;
 			}
 
-			auto det = lu_decomp_value_t{ 1 };
+			auto det = default_floating_type{ 1 };
 
 			if (rows == 2)
 			{
-				const auto element_1 = static_cast<lu_decomp_value_t>(obj(1, 1));
-				const auto element_2 = static_cast<lu_decomp_value_t>(obj(0, 1));
-				const auto element_3 = static_cast<lu_decomp_value_t>(obj(1, 0));
-				const auto element_4 = static_cast<lu_decomp_value_t>(obj(0, 0));
+				const auto element_1 = static_cast<default_floating_type>(obj(1, 1));
+				const auto element_2 = static_cast<default_floating_type>(obj(0, 1));
+				const auto element_3 = static_cast<default_floating_type>(obj(1, 0));
+				const auto element_4 = static_cast<default_floating_type>(obj(0, 0));
 
 				const auto ad = element_4 * element_1;
 				const auto bc = element_2 * element_3;
 
 				det = ad - bc;
 
-				if (accurate_equals(det, lu_decomp_value_t{}))
+				if (accurate_equals(det, default_floating_type{}))
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				const auto multiplier = lu_decomp_value_t{ 1 } / det;
+				const auto multiplier = default_floating_type{ 1 } / det;
 
 				inv_matrix_buf[0] = static_cast<To>(multiplier * element_1);
 				inv_matrix_buf[1] = static_cast<To>(multiplier * element_2 * -1);
@@ -160,21 +160,21 @@ namespace mpp
 
 			if (rows >= 3)
 			{
-				using lu_decomp_matrix_t = matrix<lu_decomp_value_t, RowsExtent, ColumnsExtent>;
+				using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
 				using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
 
 				auto l_buf = lu_decomp_buf_t{};
 				auto u_buf = lu_decomp_buf_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, cols, lu_decomp_value_t{});
+				allocate_1d_buf_if_vector(u_buf, rows, cols, default_floating_type{});
 				std::ranges::copy(obj, u_buf.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, cols, lu_decomp_value_t{});
-				transform_1d_buf_into_identity<lu_decomp_value_t>(l_buf, rows);
+				allocate_1d_buf_if_vector(l_buf, rows, cols, default_floating_type{});
+				transform_1d_buf_into_identity<default_floating_type>(l_buf, rows);
 
-				det = lu_decomp_common<lu_decomp_value_t, true>(rows, cols, l_buf, u_buf);
+				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				if (accurate_equals(det, lu_decomp_value_t{}))
+				if (accurate_equals(det, default_floating_type{}))
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -199,7 +199,7 @@ namespace mpp
 					u_inv_future.wait();
 				}
 
-				mul_square_bufs<To, lu_decomp_value_t>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
+				mul_square_bufs<To, default_floating_type>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
 			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, cols);
@@ -223,9 +223,9 @@ namespace mpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<detail::lu_decomp_value_t, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inv_func<detail::lu_decomp_value_t>(obj);
+			return detail::inv_func<detail::default_floating_type>(obj);
 		}
 
 		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
