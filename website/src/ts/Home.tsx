@@ -81,9 +81,9 @@ export default class Home extends React.Component<unknown, unknown> {
 						algorithms and operations declared outside of the matrix
 						class to allow users to &quot;Pay For What You
 						Use&quot;. The API was also designed to be compatible
-						with standard STL algorithms, which means it strives to
-						meet the C++ Named Requirements for whatever operation
-						it supports{" "}
+						with standard STL algorithms, which means it meets the
+						C++ Named Requirements for whatever operation it
+						supports{" "}
 						<a href="https://en.cppreference.com/w/cpp/named_req">
 							(see all named requirements currently in the
 							Standard)
