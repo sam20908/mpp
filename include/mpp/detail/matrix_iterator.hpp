@@ -45,27 +45,29 @@ namespace mpp::detail
 		using reference         = typename traits::reference;
 		using iterator_category = typename traits::iterator_category;
 
-		explicit matrix_iterator(Iterator current, std::size_t cols) : _current(current), _cols(cols) {}
+		explicit matrix_iterator(Iterator current, std::size_t cols) :
+			_current(current),
+			_cols(cols) {} // @TODO: ISSUE #20
 
-		matrix_iterator() = default;
+		matrix_iterator() = default; // @TODO: ISSUE #20
 
-		[[nodiscard]] auto operator*() -> reference
+		[[nodiscard]] auto operator*() -> reference // @TODO: ISSUE #20
 		{
 			return *_current;
 		}
 
-		[[nodiscard]] auto operator*() const -> reference
+		[[nodiscard]] auto operator*() const -> reference // @TODO: ISSUE #20
 		{
 			return *_current;
 		}
 
-		auto operator++() -> matrix_iterator&
+		auto operator++() -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			++_current;
 			return *this;
 		}
 
-		auto operator++(int) -> matrix_iterator
+		auto operator++(int) -> matrix_iterator // @TODO: ISSUE #20
 		{
 			auto old = matrix_iterator<Iterator>(_current, _cols);
 
@@ -73,29 +75,31 @@ namespace mpp::detail
 			return old;
 		}
 
-		auto operator+=(difference_type n) -> matrix_iterator&
+		auto operator+=(difference_type n) -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			_current += n;
 			return *this;
 		}
 
-		[[nodiscard]] friend auto operator+(const matrix_iterator& iter, difference_type n) -> matrix_iterator
+		[[nodiscard]] friend auto operator+(const matrix_iterator& iter, difference_type n)
+			-> matrix_iterator // @TODO: ISSUE #20
 		{
 			return matrix_iterator(iter._current + n, iter._cols);
 		}
 
-		[[nodiscard]] friend auto operator+(difference_type n, const matrix_iterator& iter) -> matrix_iterator
+		[[nodiscard]] friend auto operator+(difference_type n, const matrix_iterator& iter)
+			-> matrix_iterator // @TODO: ISSUE #20
 		{
 			return matrix_iterator(iter._current + n, iter._cols);
 		}
 
-		auto operator--() -> matrix_iterator&
+		auto operator--() -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			--_current;
 			return *this;
 		}
 
-		auto operator--(int) -> matrix_iterator
+		auto operator--(int) -> matrix_iterator // @TODO: ISSUE #20
 		{
 			auto old = matrix_iterator<Iterator>(_current, _cols);
 
@@ -103,28 +107,29 @@ namespace mpp::detail
 			return old;
 		}
 
-		auto operator-=(difference_type n) -> matrix_iterator&
+		auto operator-=(difference_type n) -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			_current -= n;
 			return *this;
 		}
 
-		[[nodiscard]] friend auto operator-(const matrix_iterator& iter, difference_type n) -> matrix_iterator
+		[[nodiscard]] friend auto operator-(const matrix_iterator& iter, difference_type n)
+			-> matrix_iterator // @TODO: ISSUE #20
 		{
 			return matrix_iterator(iter._current - n, iter._cols);
 		}
 
-		[[nodiscard]] auto operator[](difference_type n) -> reference
+		[[nodiscard]] auto operator[](difference_type n) -> reference // @TODO: ISSUE #20
 		{
 			return *(*this + n);
 		}
 
-		[[nodiscard]] auto operator[](difference_type n) const -> reference
+		[[nodiscard]] auto operator[](difference_type n) const -> reference // @TODO: ISSUE #20
 		{
 			return *(*this + n);
 		}
 
-		[[nodiscard]] auto operator-(const matrix_iterator& right) const -> difference_type
+		[[nodiscard]] auto operator-(const matrix_iterator& right) const -> difference_type // @TODO: ISSUE #20
 		{
 			return _current - right._current;
 		}
@@ -133,7 +138,7 @@ namespace mpp::detail
 		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool = default;
 		[[nodiscard]] auto operator<=>(const matrix_iterator&) const        = default;
 
-		friend void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right)
+		friend void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right) // @TODO: ISSUE #20
 		{
 			using std::swap;
 
@@ -145,13 +150,13 @@ namespace mpp::detail
 		 * Extra functionalities
 		 */
 
-		auto move_forward_rows(difference_type rows) -> matrix_iterator&
+		auto move_forward_rows(difference_type rows) -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			_current += static_cast<difference_type>(_cols) * rows;
 			return *this;
 		}
 
-		auto move_backward_rows(difference_type rows) -> matrix_iterator&
+		auto move_backward_rows(difference_type rows) -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			_current -= static_cast<difference_type>(_cols) * rows;
 			return *this;
