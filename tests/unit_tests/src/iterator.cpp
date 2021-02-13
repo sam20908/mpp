@@ -80,16 +80,8 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
-		EXPECT_LE(begin, cend);
-		EXPECT_LE(cbegin, end);
-
-		EXPECT_EQ(begin, cbegin);
-		EXPECT_EQ(end, cend);
-
 		EXPECT_NE(begin, end);
-		EXPECT_NE(begin, cend);
-		EXPECT_NE(end, begin);
-		EXPECT_NE(end, cbegin);
+		EXPECT_NE(cbegin, cend);
 	}
 
 	TEST(Iterator, StaticIterator_ImmutableMatrix_Comparisons)
@@ -102,16 +94,6 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
-		EXPECT_LE(begin, cend);
-		EXPECT_LE(cbegin, end);
-
-		EXPECT_EQ(begin, cbegin);
-		EXPECT_EQ(end, cend);
-
-		EXPECT_NE(begin, end);
-		EXPECT_NE(begin, cend);
-		EXPECT_NE(end, begin);
-		EXPECT_NE(end, cbegin);
 	}
 
 	TEST(Iterator, StaticIterator_MutableMatrix_Difference)
@@ -124,8 +106,6 @@ namespace
 
 		EXPECT_EQ(end - begin, 2);
 		EXPECT_EQ(cend - cbegin, 2);
-		EXPECT_EQ(begin - cbegin, 0);
-		EXPECT_EQ(end - cend, 0);
 	}
 
 	TEST(Iterator, StaticIterator_ImmutableMatrix_Difference)
@@ -194,16 +174,6 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
-		EXPECT_LE(begin, cend);
-		EXPECT_LE(cbegin, end);
-
-		EXPECT_EQ(begin, cbegin);
-		EXPECT_EQ(end, cend);
-
-		EXPECT_NE(begin, end);
-		EXPECT_NE(begin, cend);
-		EXPECT_NE(end, begin);
-		EXPECT_NE(end, cbegin);
 	}
 
 	TEST(Iterator, DynamicIterator_ImmutableMatrix_Comparisons)
@@ -216,16 +186,6 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
-		EXPECT_LE(begin, cend);
-		EXPECT_LE(cbegin, end);
-
-		EXPECT_EQ(begin, cbegin);
-		EXPECT_EQ(end, cend);
-
-		EXPECT_NE(begin, end);
-		EXPECT_NE(begin, cend);
-		EXPECT_NE(end, begin);
-		EXPECT_NE(end, cbegin);
 	}
 
 	TEST(Iterator, DynamicIterator_MutableMatrix_Difference)
@@ -238,8 +198,6 @@ namespace
 
 		EXPECT_EQ(end - begin, 2);
 		EXPECT_EQ(cend - cbegin, 2);
-		EXPECT_EQ(begin - cbegin, 0);
-		EXPECT_EQ(end - cend, 0);
 	}
 
 	TEST(Iterator, DynamicIterator_ImmutableMatrix_Difference)

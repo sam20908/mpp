@@ -123,21 +123,14 @@ namespace mpp::detail
 			return *(*this + n);
 		}
 
-		template<typename LeftIterator, typename RightIterator>
-		[[nodiscard]] friend auto operator-(const matrix_iterator<LeftIterator>& left,
-			const matrix_iterator<RightIterator>& right) -> decltype(left._current - right._current);
+		[[nodiscard]] auto operator-(const matrix_iterator& right) const -> difference_type
+		{
+			return _current - right._current;
+		}
 
-		template<typename LeftIterator, typename RightIterator>
-		[[nodiscard]] friend auto operator==(const matrix_iterator<LeftIterator>& left,
-			const matrix_iterator<RightIterator>& right) -> bool;
-
-		template<typename LeftIterator, typename RightIterator>
-		[[nodiscard]] friend auto operator!=(const matrix_iterator<LeftIterator>& left,
-			const matrix_iterator<RightIterator>& right) -> bool;
-
-		template<typename LeftIterator, typename RightIterator>
-		[[nodiscard]] friend auto operator<=>(const matrix_iterator<LeftIterator>& left,
-			const matrix_iterator<RightIterator>& right) -> decltype(left._current <=> right._current);
+		[[nodiscard]] auto operator==(const matrix_iterator&) const -> bool = default;
+		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool = default;
+		[[nodiscard]] auto operator<=>(const matrix_iterator&) const        = default;
 
 		friend void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right)
 		{
@@ -163,32 +156,4 @@ namespace mpp::detail
 			return *this;
 		}
 	};
-
-	template<typename LeftIterator, typename RightIterator>
-	[[nodiscard]] auto operator-(const matrix_iterator<LeftIterator>& left, const matrix_iterator<RightIterator>& right)
-		-> decltype(left._current - right._current)
-	{
-		return left._current - right._current;
-	}
-
-	template<typename LeftIterator, typename RightIterator>
-	[[nodiscard]] auto operator==(const matrix_iterator<LeftIterator>& left,
-		const matrix_iterator<RightIterator>& right) -> bool
-	{
-		return left._current == right._current;
-	}
-
-	template<typename LeftIterator, typename RightIterator>
-	[[nodiscard]] auto operator!=(const matrix_iterator<LeftIterator>& left,
-		const matrix_iterator<RightIterator>& right) -> bool
-	{
-		return left._current != right._current;
-	}
-
-	template<typename LeftIterator, typename RightIterator>
-	[[nodiscard]] auto operator<=>(const matrix_iterator<LeftIterator>& left,
-		const matrix_iterator<RightIterator>& right) -> decltype(left._current <=> right._current)
-	{
-		return left._current <=> right._current;
-	}
 } // namespace mpp::detail
