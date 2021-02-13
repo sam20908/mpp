@@ -26,7 +26,6 @@
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
-#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
