@@ -21,10 +21,12 @@
 
 #include <mpp/detail/constraints.hpp>
 #include <mpp/detail/expr_base.hpp>
+#include <mpp/detail/matrix_iterator.hpp>
 #include <mpp/detail/utility.hpp>
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
+#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -143,8 +145,8 @@ namespace mpp::detail
 		using difference_type = typename buffer_type::difference_type;
 		using pointer         = typename buffer_type::pointer;
 		using const_pointer   = typename buffer_type::const_pointer;
-		using iterator        = typename buffer_type::iterator;
-		using const_iterator  = typename buffer_type::const_iterator;
+		using iterator        = matrix_iterator<typename Buffer::iterator>;
+		using const_iterator  = matrix_iterator<typename Buffer::const_iterator>;
 
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
@@ -156,44 +158,44 @@ namespace mpp::detail
 			return _buf.data();
 		}
 
-		[[nodiscard]] auto begin() -> iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto begin() -> iterator // @TODO: ISSUE #20
 		{
-			return _buf.begin();
+			return iterator(_buf.begin(), _cols);
 		}
 
-		[[nodiscard]] auto begin() const -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto begin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cbegin();
+			return const_iterator(_buf.cbegin(), _cols);
 		}
 
-		[[nodiscard]] auto end() -> iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto end() -> iterator // @TODO: ISSUE #20
 		{
-			return _buf.end();
+			return iterator(_buf.end(), _cols);
 		}
 
-		[[nodiscard]] auto end() const -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto end() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cend();
+			return const_iterator(_buf.cend(), _cols);
 		}
 
-		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cbegin();
+			return const_iterator(_buf.cbegin(), _cols);
 		}
 
-		[[nodiscard]] auto cbegin() const -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cbegin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cbegin();
+			return const_iterator(_buf.cbegin(), _cols);
 		}
 
-		[[nodiscard]] auto cend() -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cend() -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cend();
+			return const_iterator(_buf.cend(), _cols);
 		}
 
-		[[nodiscard]] auto cend() const -> const_iterator // @TODO: ISSUE #20, #21
+		[[nodiscard]] auto cend() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return _buf.cend();
+			return const_iterator(_buf.cend(), _cols);
 		}
 
 		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const value_type& // @TODO: ISSUE #20

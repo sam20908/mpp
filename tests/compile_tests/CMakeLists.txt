@@ -46,3 +46,4 @@ endif()
 
 _create_compile_test("deduction_guides")
 _create_compile_test("rule_of_five")
+_create_compile_test("iterator_requirements")
