@@ -151,10 +151,17 @@ namespace mpp::detail
 		 * Extra functionalities
 		 */
 
-		// [[nodiscard]] auto move_forward_rows(difference_type rows)
-		// {
-		// 	_current += _cols * rows;
-		// }
+		auto move_forward_rows(difference_type rows) -> matrix_iterator&
+		{
+			_current += static_cast<difference_type>(_cols) * rows;
+			return *this;
+		}
+
+		auto move_backward_rows(difference_type rows) -> matrix_iterator&
+		{
+			_current -= static_cast<difference_type>(_cols) * rows;
+			return *this;
+		}
 	};
 
 	template<typename LeftIterator, typename RightIterator>

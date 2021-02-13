@@ -142,6 +142,120 @@ namespace
 		EXPECT_EQ(end - cend, 0);
 	}
 
+	TEST(Iterator, DynamicIterator_MutableMatrix_Dereference)
+	{
+		auto matrix = mpp::matrix<int>{ { 1 } };
+
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.begin();
+
+		EXPECT_EQ(*begin, 1);
+		EXPECT_EQ(*cbegin, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_Dereference)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1 } };
+
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.begin();
+
+		EXPECT_EQ(*begin, 1);
+		EXPECT_EQ(*cbegin, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_IndexAccess)
+	{
+		auto matrix       = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+
+		EXPECT_EQ(begin[1], 2);
+		EXPECT_EQ(cbegin[1], 2);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_IndexAccess)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+
+		EXPECT_EQ(begin[1], 2);
+		EXPECT_EQ(cbegin[1], 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_Comparisons)
+	{
+		auto matrix       = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_LE(begin, end);
+		EXPECT_LE(cbegin, cend);
+		EXPECT_LE(begin, cend);
+		EXPECT_LE(cbegin, end);
+
+		EXPECT_EQ(begin, cbegin);
+		EXPECT_EQ(end, cend);
+
+		EXPECT_NE(begin, end);
+		EXPECT_NE(begin, cend);
+		EXPECT_NE(end, begin);
+		EXPECT_NE(end, cbegin);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_Comparisons)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_LE(begin, end);
+		EXPECT_LE(cbegin, cend);
+		EXPECT_LE(begin, cend);
+		EXPECT_LE(cbegin, end);
+
+		EXPECT_EQ(begin, cbegin);
+		EXPECT_EQ(end, cend);
+
+		EXPECT_NE(begin, end);
+		EXPECT_NE(begin, cend);
+		EXPECT_NE(end, begin);
+		EXPECT_NE(end, cbegin);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_Difference)
+	{
+		auto matrix       = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(end - begin, 2);
+		EXPECT_EQ(cend - cbegin, 2);
+		EXPECT_EQ(begin - cbegin, 0);
+		EXPECT_EQ(end - cend, 0);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_Difference)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(end - begin, 2);
+		EXPECT_EQ(cend - cbegin, 2);
+		EXPECT_EQ(begin - cbegin, 0);
+		EXPECT_EQ(end - cend, 0);
+	}
+
 	/**
 	 * Mutating operations
 	 */
@@ -248,6 +362,192 @@ namespace
 		auto begin  = matrix.begin();
 
 		begin[0] = 2;
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, StaticIterator_MutableMatrix_MoveForwardRows)
+	{
+		auto matrix = mpp::matrix<int, 2, 2>{ { 1, 2 }, { 3, 4 } };
+		auto begin  = matrix.begin();
+
+		begin.move_forward_rows(1);
+
+		EXPECT_EQ(*begin, 3);
+	}
+
+	TEST(Iterator, StaticIterator_ImmutableMatrix_MoveForwardRows)
+	{
+		const auto matrix = mpp::matrix<int, 2, 2>{ { 1, 2 }, { 3, 4 } };
+		auto begin        = matrix.begin();
+
+		begin.move_forward_rows(1);
+
+		EXPECT_EQ(*begin, 3);
+	}
+
+	TEST(Iterator, StaticIterator_MutableMatrix_MoveBackwardRows)
+	{
+		auto matrix = mpp::matrix<int, 2, 2>{ { 1, 2 }, { 3, 4 } };
+		auto begin  = matrix.end() - 1;
+
+		begin.move_backward_rows(1);
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, StaticIterator_ImmutableMatrix_MoveBackwardRows)
+	{
+		const auto matrix = mpp::matrix<int, 2, 2>{ { 1, 2 }, { 3, 4 } };
+		auto begin        = matrix.end() - 1;
+
+		begin.move_backward_rows(1);
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_PrefixIncrement)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		auto begin  = matrix.begin();
+		auto cbegin = matrix.begin();
+
+		++begin;
+		++cbegin;
+
+		EXPECT_EQ(*begin, 2);
+		EXPECT_EQ(*cbegin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_PostfixIncrement)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		auto begin      = matrix.begin();
+		auto cbegin     = matrix.begin();
+		auto begin_old  = begin++;
+		auto cbegin_old = cbegin++;
+
+		EXPECT_EQ(*begin_old, 1);
+		EXPECT_EQ(*cbegin_old, 1);
+		EXPECT_EQ(*begin, 2);
+		EXPECT_EQ(*cbegin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_IncrementByPlusEquals)
+	{
+		auto matrix = mpp::matrix<int, 1, 3>{ { 1, 2, 3 } };
+
+		auto begin  = matrix.begin();
+		auto cbegin = matrix.begin();
+
+		begin += 2;
+		cbegin += 2;
+
+		EXPECT_EQ(*begin, 3);
+		EXPECT_EQ(*cbegin, 3);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_PrefixDecrement)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		auto end  = matrix.end();
+		auto cend = matrix.cend();
+
+		--end;
+		--cend;
+
+		EXPECT_EQ(*end, 2);
+		EXPECT_EQ(*cend, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_PostfixDecrement)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		auto end      = matrix.end() - 1;
+		auto cend     = matrix.cend() - 1;
+		auto end_old  = end--;
+		auto cend_old = cend--;
+
+		EXPECT_EQ(*end_old, 2);
+		EXPECT_EQ(*cend_old, 2);
+		EXPECT_EQ(*end, 1);
+		EXPECT_EQ(*cend, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_DecrementByMinusEquals)
+	{
+		auto matrix = mpp::matrix<int, 1, 3>{ { 1, 2, 3 } };
+
+		auto end  = matrix.end();
+		auto cend = matrix.cend();
+
+		end -= 3;
+		cend -= 3;
+
+		EXPECT_EQ(*end, 1);
+		EXPECT_EQ(*cend, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_DereferenceAndWrite)
+	{
+		auto matrix      = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin = matrix.begin();
+
+		*begin = 2;
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_IndexAccessAndWrite)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+		auto begin  = matrix.begin();
+
+		begin[0] = 2;
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_MoveForwardRows)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+		auto begin  = matrix.begin();
+
+		begin.move_forward_rows(1);
+
+		EXPECT_EQ(*begin, 3);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_MoveForwardRows)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+		auto begin        = matrix.begin();
+
+		begin.move_forward_rows(1);
+
+		EXPECT_EQ(*begin, 3);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_MoveBackwardRows)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+		auto begin  = matrix.end() - 1;
+
+		begin.move_backward_rows(1);
+
+		EXPECT_EQ(*begin, 2);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_MoveBackwardRows)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+		auto begin        = matrix.end() - 1;
+
+		begin.move_backward_rows(1);
 
 		EXPECT_EQ(*begin, 2);
 	}
