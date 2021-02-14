@@ -123,5 +123,14 @@ namespace mpp
 
 			base::init_identity(RowsExtent, ColumnsExtent);
 		}
+
+		template<detail::invocable_with_return_type<Value> Callable>
+		explicit matrix(Callable&& callable) // @TODO: ISSUE #20
+		{
+			base::_rows = RowsExtent;
+			base::_cols = ColumnsExtent;
+
+			std::ranges::generate(base::_buf, std::forward<Callable>(callable));
+		}
 	};
 } // namespace mpp

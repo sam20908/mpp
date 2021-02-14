@@ -23,6 +23,7 @@
 #include <mpp/detail/matrix_base.hpp>
 #include <mpp/detail/matrix_def.hpp>
 
+#include <functional>
 #include <initializer_list>
 #include <stdexcept>
 #include <utility>
@@ -73,6 +74,21 @@ namespace mpp
 		matrix(std::size_t rows, std::size_t columns, identity_matrix_tag) // @TODO: ISSUE #20
 		{
 			base::init_identity(rows, columns);
+		}
+
+		template<detail::invocable_with_return_type<Value> Callable>
+		matrix(std::size_t rows, std::size_t columns, Callable&& callable) // @TODO: ISSUE #20
+		{
+			base::_rows = rows;
+			base::_cols = columns;
+
+			detail::reserve_1d_buf_if_vector(base::_buf, rows, columns);
+
+			const auto total_size = rows * columns;
+			for (auto idx = std::size_t{}; idx < total_size; ++idx)
+			{
+				base::_buf.push_back(std::invoke(std::forward<Callable>(callable)));
+			}
 		}
 	};
 } // namespace mpp

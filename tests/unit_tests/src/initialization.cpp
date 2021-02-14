@@ -137,6 +137,23 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyStaticCallable)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto matrix = mpp::matrix<int, 2, 3>{ iota };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
+	}
+
 	// Can't test array size mismatch for fully static matrices because that results in no viable overload, thus compile
 	// error
 
@@ -353,6 +370,23 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
 	}
 
+	TEST(Initialization, FullyDynamicCallable)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto matrix = mpp::matrix<int>{ 2, 3, iota };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
+	}
+
 	TEST(Initialization, FullyDynamicIdentityMatrix_NotSquare_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int>{ 3, 4, mpp::identity_matrix }), std::invalid_argument);
@@ -509,6 +543,23 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, DynamicRowsCallable)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ 2, iota };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}
 
 	TEST(Initialization, DynamicRowsIdentityMatrix_NotSquare_Throw)
@@ -670,6 +721,23 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, DynamicColumnsCallable)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{ 3, iota };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}
 
 	TEST(Initialization, DynamicColumnsIdentityMatrix_NotSquare_Throw)

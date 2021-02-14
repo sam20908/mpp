@@ -41,6 +41,10 @@ namespace mpp::detail
 		{ value /= value };
 	};
 
+	template<typename Callable, typename Return, typename... Args>
+	concept invocable_with_return_type =
+		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+
 	template<typename Range>
 	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
