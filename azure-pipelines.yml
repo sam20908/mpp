@@ -32,7 +32,7 @@ jobs:
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Pylint + LLVM Lit
 
-  - script: python ./tools/pylint_recursive.py . pylintrc
+  - script: python ./tools/pylint_recursive.py pylintrc
     displayName: Validate
 
 - job: BuildAndTestAndBenchmarkUbuntu
