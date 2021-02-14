@@ -20,6 +20,7 @@ import {
 	operations,
 	customize_default_extent,
 	customize_utilities,
+	custom_iterators,
 } from "./ExampleCodes";
 
 import CodeBlock from "./CodeBlock";
@@ -306,6 +307,14 @@ export default class Home extends React.Component<unknown, unknown> {
 						is another example with another utility function:
 					</MDBTypography>
 					<CodeBlock code={customize_utilities} theme={theme} />
+					<MDBTypography tag="p" className="lead mt-5">
+						mpp also uses custom iterators that meets the Standard
+						iterator requirements{" "}
+						<b>(LegacyRandomAccessIterator)</b> with extra
+						functionalities to make nagivating through matrices
+						easier.
+					</MDBTypography>
+					<CodeBlock code={custom_iterators} theme={theme} />
 				</MDBContainer>
 			</div>
 		);

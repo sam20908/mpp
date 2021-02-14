@@ -18,6 +18,8 @@ target_link_libraries(your_target mpp::mpp)
 
 ## Actually Using It!
 
+#### Overview
+
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
 ```cpp
@@ -66,6 +68,8 @@ int main()
 ```
 
 One of the main things to take away is the concept of **"extents"** for dimensions. Matrices default to "dynamic extents", which means the sizes can be provided at runtime and matrices can be (partially) flexible (e.g. you can resize rows and columns of a "fully dynamic" matrix, but a "dynamic rows" matrix can only be resized in rows).
+
+#### Customizations
 
 ##### You can change the extent the library default to WITHOUT MACROS!
 
@@ -132,6 +136,31 @@ int main()
 ```
 
 Learn more about the rationale of using `tag_invoke` in FAQ.
+
+#### Custom Iterators
+
+Custom iterators are used to make nagivating matrices easier. They also meet `LegacyRandomAccessIterator` requirement.
+
+```cpp
+#include <mpp/matrix.hpp>
+
+int main()
+{
+  auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+  auto begin = matrix.begin();
+
+  // Extra functionalities to navigate through the matrix easier
+  // 1. Nagivating by rows
+  begin.move_forward_rows(1);
+  auto val = *begin; // 3
+
+  begin.move_backward_rows(1);
+  ++begin;
+  val = *begin; // 2
+
+  return 0;
+}
+```
 
 You can find more APIs that are not mentioned in this README in the (upcoming) documentation.
 

@@ -113,3 +113,23 @@ int main()
     return 0;
 }
 `;
+
+export const custom_iterators = `#include <mpp/matrix.hpp>
+
+int main()
+{
+    auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+    auto begin = matrix.begin();
+
+    // Extra functionalities to navigate through the matrix easier
+    // 1. Nagivating by rows
+    begin.move_forward_rows(1);
+    auto val = *begin; // 3
+
+    begin.move_backward_rows(1);
+    ++begin;
+    val = *begin; // 2
+
+    return 0;
+}
+`;
