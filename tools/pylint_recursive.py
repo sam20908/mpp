@@ -11,6 +11,7 @@ Originally from https://gist.github.com/MJJoyce/5835693. Edited with the followi
 - Added color output
 - Don't print previous score because we are not using presistent comparison
 - Changed shebang to python3
+- Fixed dividing by 0 when no modules are found
 '''
 
 # pylint: disable=C0301
@@ -33,17 +34,6 @@ CATEGORY_COLORS = {"E": colorama.Fore.LIGHTRED_EX, "F": colorama.Fore.RED,
                    "I": colorama.Style.DIM}
 
 
-def check_if_module_is_skipped(module):
-    """ Checks if module will be skipped by pylint """
-    with open(module, "r") as reader:
-        for line in reader:
-            # Make sure to not skip itself if it's not marked with the appropriate annotation
-            if "# pylint: skip-file" in line and not module == "tools/pylint_recursive.py":
-                return True
-
-    return False
-
-
 def check(cfg_dir, module):
     '''
     apply pylint to the file specified if it is a *.py or *.py.in file
@@ -55,17 +45,17 @@ def check(cfg_dir, module):
         print("CHECKING " + module)
         print("--" * 50)
 
-        # Since pylint does not give any output regarding skipped modules, check them manually
-        is_skipped = check_if_module_is_skipped(module)
-        if is_skipped:
+        current_module_failed = False
+
+        pout = os.popen(f"pylint {cfg_dir} {module}", "r")
+        output = pout.read()
+
+        if output == "":
             print(
                 f"{module} is {colorama.Fore.MAGENTA}skipped by Pylint{colorama.Style.RESET_ALL}\n")
             return
 
-        current_module_failed = False
-
-        pout = os.popen(f"pylint {cfg_dir} {module}", "r")
-        for line in pout:
+        for line in output.split("\n"):
             if "Your code has been rated at" in line:
                 # Since we disabled persistent comparison, grab the current score
                 score = re.findall(r"\d+.\d\d", line)[0]
@@ -117,7 +107,7 @@ if __name__ == "__main__":
     print("==" * 50)
     print("%d modules checked" % COUNT)
     print(
-        f"AVERAGE SCORE = {colorama.Fore.GREEN}%.02f{colorama.Style.RESET_ALL}/10" % (TOTAL / COUNT))
+        f"AVERAGE SCORE = {colorama.Fore.GREEN}%.02f{colorama.Style.RESET_ALL}/10" % (TOTAL / (1 if COUNT == 0 else COUNT)))
 
     if len(FAILED_MODULES) > 0:
         print("==" * 50)
