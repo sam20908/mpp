@@ -138,7 +138,7 @@ namespace mpp::detail
 		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool = default;
 		[[nodiscard]] auto operator<=>(const matrix_iterator&) const        = default;
 
-		friend void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right) // @TODO: ISSUE #20
+		friend inline void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right) // @TODO: ISSUE #20
 		{
 			using std::swap;
 
