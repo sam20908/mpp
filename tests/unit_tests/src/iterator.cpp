@@ -84,6 +84,22 @@ namespace
 		EXPECT_NE(cbegin, cend);
 	}
 
+	TEST(Iterator, StaticIterator_MutableMatrix_Comparisons_Spaceship)
+	{
+		auto matrix       = mpp::matrix<int, 1, 2>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(begin <=> end, std::strong_ordering::less);
+		EXPECT_EQ(cbegin <=> cend, std::strong_ordering::less);
+		EXPECT_EQ(begin <=> begin, std::strong_ordering::equal);
+		EXPECT_EQ(cbegin <=> cbegin, std::strong_ordering::equal);
+		EXPECT_EQ(end <=> end, std::strong_ordering::equal);
+		EXPECT_EQ(cend <=> cend, std::strong_ordering::equal);
+	}
+
 	TEST(Iterator, StaticIterator_ImmutableMatrix_Comparisons)
 	{
 		const auto matrix = mpp::matrix<int, 1, 2>{ { 1, 2 } };
@@ -94,6 +110,24 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
+		EXPECT_NE(begin, end);
+		EXPECT_NE(cbegin, cend);
+	}
+
+	TEST(Iterator, StaticIterator_ImmutableMatrix_Comparisons_Spaceship)
+	{
+		const auto matrix = mpp::matrix<int, 1, 2>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(begin <=> end, std::strong_ordering::less);
+		EXPECT_EQ(cbegin <=> cend, std::strong_ordering::less);
+		EXPECT_EQ(begin <=> begin, std::strong_ordering::equal);
+		EXPECT_EQ(cbegin <=> cbegin, std::strong_ordering::equal);
+		EXPECT_EQ(end <=> end, std::strong_ordering::equal);
+		EXPECT_EQ(cend <=> cend, std::strong_ordering::equal);
 	}
 
 	TEST(Iterator, StaticIterator_MutableMatrix_Difference)
@@ -176,6 +210,22 @@ namespace
 		EXPECT_LE(cbegin, cend);
 	}
 
+	TEST(Iterator, DynamicIterator_MutableMatrix_Comparisons_Spaceship)
+	{
+		auto matrix       = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(begin <=> end, std::strong_ordering::less);
+		EXPECT_EQ(cbegin <=> cend, std::strong_ordering::less);
+		EXPECT_EQ(begin <=> begin, std::strong_ordering::equal);
+		EXPECT_EQ(cbegin <=> cbegin, std::strong_ordering::equal);
+		EXPECT_EQ(end <=> end, std::strong_ordering::equal);
+		EXPECT_EQ(cend <=> cend, std::strong_ordering::equal);
+	}
+
 	TEST(Iterator, DynamicIterator_ImmutableMatrix_Comparisons)
 	{
 		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
@@ -186,6 +236,22 @@ namespace
 
 		EXPECT_LE(begin, end);
 		EXPECT_LE(cbegin, cend);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_Comparisons_Spaceship)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
+		const auto begin  = matrix.begin();
+		const auto cbegin = matrix.cbegin();
+		const auto end    = matrix.end();
+		const auto cend   = matrix.cend();
+
+		EXPECT_EQ(begin <=> end, std::strong_ordering::less);
+		EXPECT_EQ(cbegin <=> cend, std::strong_ordering::less);
+		EXPECT_EQ(begin <=> begin, std::strong_ordering::equal);
+		EXPECT_EQ(cbegin <=> cbegin, std::strong_ordering::equal);
+		EXPECT_EQ(end <=> end, std::strong_ordering::equal);
+		EXPECT_EQ(cend <=> cend, std::strong_ordering::equal);
 	}
 
 	TEST(Iterator, DynamicIterator_MutableMatrix_Difference)

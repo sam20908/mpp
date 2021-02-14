@@ -134,9 +134,9 @@ namespace mpp::detail
 			return _current - right._current;
 		}
 
-		[[nodiscard]] auto operator==(const matrix_iterator&) const -> bool = default;
-		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool = default;
-		[[nodiscard]] auto operator<=>(const matrix_iterator&) const        = default;
+		[[nodiscard]] auto operator==(const matrix_iterator&) const -> bool                  = default;
+		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool                  = default;
+		[[nodiscard]] auto operator<=>(const matrix_iterator&) const -> std::strong_ordering = default;
 
 		friend inline void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right) // @TODO: ISSUE #20
 		{
