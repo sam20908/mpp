@@ -398,7 +398,6 @@ def main():
                 # Manually find the filename that needs to be changed
                 matches = re.search(SOURCE_FILE_REGEX, outs[0])
                 if matches:
-                    print(matches.group(1))
                     files_require_changes.append(matches.group(1))
         except StopIteration:
             break
@@ -428,7 +427,7 @@ def main():
         pool.join()
 
     if len(files_require_changes) > 0:
-        print("==" * 50)
+        print("\n\n" + ("==" * 50))
         print("The following files needs to be formatted:\n")
         print(*files_require_changes, sep="\n")
     else:
