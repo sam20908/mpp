@@ -56,6 +56,17 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ { 7, 3 }, { 8, 8 } }), std::invalid_argument);
 	}
 
+	TEST(Initialization, FullyStatic2DInitializerList_InitializerColumnsMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8 } }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyStatic2DRange_Range2DColumnsMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8 } };
+		EXPECT_THROW((void)(mpp::matrix<int, 2, 3>{ rng_2d }), std::invalid_argument);
+	}
+
 	TEST(Initialization, FullyStatic2DRange_Copy)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -245,6 +256,17 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyDynamic2DInitializerList_InitializerColumnsMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8 } }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyDynamic2DRange_Range2DColumnsMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8 } };
+		EXPECT_THROW((void)(mpp::matrix<int>{ rng_2d }), std::invalid_argument);
+	}
+
 	TEST(Initialization, FullyDynamic2DRange_Copy)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -366,6 +388,17 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), 3);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicRows2DInitializerList_InitializerColumnsMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8 } }), std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicRows2DRange_Range2DColumnsMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8 } };
+		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 3>{ rng_2d }), std::invalid_argument);
 	}
 
 	TEST(Initialization, DymamicRows2DInitializerList_SizeMismatch_Throw)
@@ -515,6 +548,17 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DInitializerList_InitializerColumnsMismatch_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8 } }), std::invalid_argument);
+	}
+
+	TEST(Initialization, DynamicColumns2DRange_Range2DColumnsMismatch_Throw)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8 } };
+		EXPECT_THROW((void)(mpp::matrix<int, 2, std::dynamic_extent>{ rng_2d }), std::invalid_argument);
 	}
 
 	TEST(Initialization, DynamicColumns2DInitializerList_SizeMismatch_Throw)
