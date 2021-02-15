@@ -37,6 +37,8 @@ namespace mpp
 		struct customize_tag
 		{
 		};
+
+		inline constexpr auto customize = customize_tag{};
 	} // namespace customize
 
 	template<typename... Args>
