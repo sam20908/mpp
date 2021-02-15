@@ -44,6 +44,15 @@ int main()
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 
+  const auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+  auto m_2d_range = mpp::matrix{ rng_2d }; // Initialize from a 2D range
+  m_2d_range.rows(); // 2
+  m_2d_range.columns(); // 3
+
+  auto iota = [i = 0] mutable { return i++; };
+  auto m_generated = mpp::matrix<int, 2, 3>{ iota }; // Generates values from callable
+  // Elements are: 0, 1, 2, 3, 4, 5
+
   /**
    * Algorithms
    */
