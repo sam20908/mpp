@@ -59,4 +59,4 @@ namespace mpp_test
 			return _obj(row_idx, col_idx);
 		}
 	};
-} // namespace mpp_test::detail
+} // namespace mpp_test
