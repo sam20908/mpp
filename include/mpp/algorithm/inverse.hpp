@@ -221,6 +221,11 @@ namespace mpp
 
 	struct inverse_t
 	{
+		friend inline void tag_invoke(inverse_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "inverse" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20

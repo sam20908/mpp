@@ -161,7 +161,7 @@ namespace
 	{
 		const auto dummy = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 
-		const auto expr   = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr   = mpp_test::dummy_expr{ dummy };
 		const auto matrix = mpp::matrix<int, 2, 3>{ expr };
 
 		EXPECT_EQ(matrix.rows(), 2);
@@ -176,7 +176,7 @@ namespace
 	TEST(Initialization, FullyStatic_DynamicExprObject_SameSize)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		const auto matrix = mpp::matrix<int, 2, 3>{ expr };
 
@@ -192,7 +192,7 @@ namespace
 	TEST(Initialization, FullyStatic_DynamicExprObject_DifferentSize_Throw)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		EXPECT_THROW((mpp::matrix<int, 3, 3>{ expr }), std::invalid_argument);
 	}
@@ -320,7 +320,7 @@ namespace
 		// exception, therefore no need to write a separate test for that
 
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		const auto matrix = mpp::matrix<int>{ expr };
 
@@ -485,7 +485,7 @@ namespace
 	TEST(Initialization, DynamicRows_ExprObject_SameColumns)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ expr };
 
@@ -501,7 +501,7 @@ namespace
 	TEST(Initialization, DynamicRows_ExprObject_DifferentColumns_Throw)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3 }, { 8, 8 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		EXPECT_THROW((mpp::matrix<int, std::dynamic_extent, 3>{ expr }), std::invalid_argument);
 	}
@@ -663,7 +663,7 @@ namespace
 	TEST(Initialization, DynamicColumns_ExprObject_SameRows)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{ expr };
 
@@ -679,7 +679,7 @@ namespace
 	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
-		const auto expr  = mpp_test::detail::dummy_expr{ dummy };
+		const auto expr  = mpp_test::dummy_expr{ dummy };
 
 		EXPECT_THROW((mpp::matrix<int, 3, std::dynamic_extent>{ expr }), std::invalid_argument);
 	}

@@ -89,6 +89,11 @@ namespace mpp
 
 	struct determinant_t
 	{
+		friend inline void tag_invoke(determinant_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "determinant" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20

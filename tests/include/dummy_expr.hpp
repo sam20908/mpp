@@ -23,7 +23,7 @@
 
 #include <cstddef>
 
-namespace mpp_test::detail
+namespace mpp_test
 {
 	/**
 	 * A dummy expression object for testing purposes

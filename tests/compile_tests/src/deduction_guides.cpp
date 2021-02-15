@@ -32,7 +32,7 @@ int main()
 
 	// Expression object
 	const auto matrix = mpp::matrix<int>{};
-	(void)mpp::matrix{ mpp_test::detail::dummy_expr{ matrix } };
+	(void)mpp::matrix{ mpp_test::dummy_expr{ matrix } };
 
 	// 2D range
 	const auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };

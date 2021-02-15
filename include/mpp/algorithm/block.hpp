@@ -33,6 +33,11 @@ namespace mpp
 {
 	struct block_t
 	{
+		friend inline void tag_invoke(block_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "block" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
