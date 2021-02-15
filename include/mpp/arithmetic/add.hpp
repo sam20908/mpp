@@ -69,18 +69,7 @@ namespace mpp
 	{
 		detail::validate_same_size(left, right);
 
-		// @TODO: Take advantage of std::ranges::transform
-
-		const auto rows = left.rows();
-		const auto cols = left.columns();
-
-		for (auto row = std::size_t{}; row < rows; ++row)
-		{
-			for (auto col = std::size_t{}; col < cols; ++col)
-			{
-				left(row, col) += right(row, col);
-			}
-		}
+		std::ranges::transform(left, right, left.begin(), std::plus{});
 
 		return left;
 	}
