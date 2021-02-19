@@ -106,8 +106,7 @@ namespace mpp::detail
 	{
 		if (left.rows() != right.rows() || left.columns() != right.columns())
 		{
-			throw std::invalid_argument("1. Both objects must have same size or 2. Compatible dimension extents in "
-										"expression template initialization");
+			throw std::invalid_argument("Both matrices must be the same size!");
 		}
 	}
 
