@@ -246,16 +246,6 @@ namespace
 		EXPECT_THROW((void)(mpp::matrix<int, 0, 0>{ mpp::identity_matrix }), std::invalid_argument);
 	}
 
-	TEST(Initialization, FullyStatic_ZeroAndNonZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, 0, 1>{ 0 }), std::invalid_argument);
-	}
-
-	TEST(Initialization, FullyStatic_NonZeroAndZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, 1, 0>{ 0 }), std::invalid_argument);
-	}
-
 	/**
 	 * Fully dynamic matrices
 	 */
@@ -395,16 +385,6 @@ namespace
 	TEST(Initialization, FullyDynamicIdentityMatrix_0x0_Throw)
 	{
 		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 0, mpp::identity_matrix }), std::invalid_argument);
-	}
-
-	TEST(Initialization, FullyDynamic_ZeroAndNonZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int>{ 1, 0, 0 }), std::invalid_argument);
-	}
-
-	TEST(Initialization, FullyDynamic_NonZeroAndZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int>{ 0, 1, 0 }), std::invalid_argument);
 	}
 
 	/**
@@ -572,16 +552,6 @@ namespace
 	{
 		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 0>{ 0, mpp::identity_matrix }),
 			std::invalid_argument);
-	}
-
-	TEST(Initialization, DynamicRows_ZeroAndNonZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 0>{ 1, 0 }), std::invalid_argument);
-	}
-
-	TEST(Initialization, DynamicRows_NonZeroAndZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, std::dynamic_extent, 1>{ 0, 0 }), std::invalid_argument);
 	}
 
 	/**
@@ -752,13 +722,6 @@ namespace
 			std::invalid_argument);
 	}
 
-	TEST(Initialization, DynamicColumns_ZeroAndNonZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, 0, std::dynamic_extent>{ 1, 0 }), std::invalid_argument);
-	}
-
-	TEST(Initialization, DynamicColumns_NonZeroAndZeroSide_Throw)
-	{
-		EXPECT_THROW((void)(mpp::matrix<int, 1, std::dynamic_extent>{ 0, 0 }), std::invalid_argument);
-	}
+	// @TODO: Test copy/move constructing/assignment as well as with custom allocators
+	// @TODO: Test all initialization overloads with custom allocators
 } // namespace

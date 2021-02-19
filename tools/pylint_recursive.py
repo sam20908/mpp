@@ -12,6 +12,7 @@ Originally from https://gist.github.com/MJJoyce/5835693. Edited with the followi
 - Don't print previous score because we are not using presistent comparison
 - Changed shebang to python3
 - Fixed dividing by 0 when no modules are found
+- Fixed error matching only in the beginning
 '''
 
 # pylint: disable=C0301
@@ -69,7 +70,6 @@ def check(cfg_dir, module):
                 if current_module_failed:
                     FAILED_MODULES.append(module)
             else:
-                # NOTE (bugfix): Don't use match because that only matches the beginning of the string
                 groups = re.search(
                     r"^(.*:\d+:\d+:) ([A-Z]+)(\d+): (.*)", line)
 

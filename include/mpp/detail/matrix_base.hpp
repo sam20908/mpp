@@ -22,12 +22,14 @@
 #include <mpp/detail/constraints.hpp>
 #include <mpp/detail/expr_base.hpp>
 #include <mpp/detail/matrix_iterator.hpp>
+#include <mpp/detail/public_tags.hpp>
 #include <mpp/detail/utility.hpp>
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <stdexcept>
 #include <type_traits>
 
 namespace mpp::detail
@@ -35,9 +37,9 @@ namespace mpp::detail
 	/**
 	 * Base matrix class to store internal data and define common member functions
 	 */
-	template<typename Buffer, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	template<typename Buffer, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 	class matrix_base :
-		public expr_base<matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>,
+		public expr_base<matrix_base<Buffer, Value, RowsExtent, ColumnsExtent, Allocator>,
 			typename Buffer::value_type,
 			RowsExtent,
 			ColumnsExtent>,
@@ -48,10 +50,66 @@ namespace mpp::detail
 		std::size_t _rows;
 		std::size_t _cols;
 
-		void init_buf_2d_static(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		// No point adding this to overload resolution since all matrices implement their own default constructor. The
+		// only thing we need this for is static matrices
+		matrix_base() = default;
+
+		explicit matrix_base(std::size_t rows, std::size_t cols, const Value& value, const Allocator& allocator) :
+			_buf{ rows * cols, value, allocator }, // @TODO: ISSUE #20
+			_rows{ rows },
+			_cols{ cols }
 		{
-			_rows = rows;
-			_cols = cols;
+		}
+
+		explicit matrix_base(std::size_t rows, std::size_t cols, identity_matrix_tag, const Allocator& allocator) :
+			_buf{ rows * cols, Value{}, allocator }, // @TODO: ISSUE #20
+			_rows{ rows },
+			_cols{ cols }
+		{
+			if (rows == 0 || cols == 0)
+			{
+				throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
+			}
+
+			if (rows != cols)
+			{
+				throw std::invalid_argument("Identity matrix must be square!");
+			}
+
+			transform_1d_buf_into_identity<Value>(_buf, rows);
+		}
+
+		explicit matrix_base(const Allocator& allocator) :
+			_buf{ allocator }, // @TODO: ISSUE #20
+			_rows{ 0 },
+			_cols{ 0 }
+		{
+		}
+
+		void init_dimension_with_val_static(const Value& value) // @TODO: ISSUE #20
+		{
+			validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
+
+			_rows = RowsExtent;
+			_cols = ColumnsExtent;
+
+			std::ranges::fill(_buf, value);
+		}
+
+		template<typename Range2D>
+		void init_buf_2d_static(Range2D&& rng_2d, bool check_rng_size) // @TODO: ISSUE #20
+		{
+			validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
+
+			const auto [rng_rows, rng_cols] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
+
+			if (check_rng_size && (rng_rows != RowsExtent || rng_cols != ColumnsExtent))
+			{
+				throw std::invalid_argument("Extents of static matrix and dimensions of initializer does not match!");
+			}
+
+			_rows = RowsExtent;
+			_cols = ColumnsExtent;
 
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buf.begin();
@@ -61,7 +119,7 @@ namespace mpp::detail
 				for (auto&& row : rng_2d)
 				{
 					std::ranges::move(row, row_begin);
-					row_begin += cols;
+					row_begin += rng_cols;
 				}
 			}
 			else
@@ -69,12 +127,12 @@ namespace mpp::detail
 				for (auto&& row : rng_2d)
 				{
 					std::ranges::copy(row, row_begin);
-					row_begin += cols;
+					row_begin += rng_cols;
 				}
 			}
 		}
 
-		void init_buf_2d_dynamic(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void init_buf_2d_dynamic_without_check(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -98,15 +156,11 @@ namespace mpp::detail
 			}
 		}
 
-		void init_expr_dynamic(std::size_t rows, std::size_t cols, auto&& expr, bool check_size)
+		void init_expr_dynamic_without_check(std::size_t rows, std::size_t cols,
+			auto&& expr) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
-
-			if (check_size)
-			{
-				validate_same_size(*this, expr);
-			}
 
 			_buf.reserve(rows * cols);
 
@@ -119,33 +173,45 @@ namespace mpp::detail
 			}
 		}
 
-		void init_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		template<typename Callable>
+		void init_buf_from_callable_dynamic(std::size_t rows, std::size_t cols, Callable&& callable)
 		{
-			if (rows == 0 || cols == 0)
-			{
-				throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
-			}
-
-			if (rows != cols)
-			{
-				throw std::invalid_argument("Identity matrix must be square!");
-			}
-
 			_rows = rows;
 			_cols = cols;
 
-			allocate_1d_buf_if_vector(_buf, rows, cols, Value{});
-			transform_1d_buf_into_identity<Value>(_buf, rows);
+			reserve_1d_buf_if_vector(_buf, rows, cols);
+
+			const auto total_size = rows * cols;
+			for (auto idx = std::size_t{}; idx < total_size; ++idx)
+			{
+				_buf.push_back(std::invoke(std::forward<Callable>(callable)));
+			}
+		}
+
+		template<typename Matrix>
+		void forward_matrix_to_this(Matrix&& right) // @TODO: ISSUE #20
+		{
+			_rows = std::forward<Matrix>(right)._rows;
+			_cols = std::forward<Matrix>(right)._cols;
+			_buf  = std::forward<Matrix>(right)._buf;
 		}
 
 	public:
-		using buffer_type     = Buffer;
+		using buffer_type    = Buffer;
+		using allocator_type = Allocator;
+
 		using value_type      = Value;
 		using difference_type = typename buffer_type::difference_type;
 		using pointer         = typename buffer_type::pointer;
 		using const_pointer   = typename buffer_type::const_pointer;
 		using iterator        = matrix_iterator<typename Buffer::iterator>;
 		using const_iterator  = matrix_iterator<typename Buffer::const_iterator>;
+
+		matrix_base(const matrix_base&) = default; // @TODO: ISSUE #20
+		matrix_base(matrix_base&&)      = default; // @TODO: ISSUE #20
+
+		auto operator=(const matrix_base&) -> matrix_base& = default; // @TODO: ISSUE #20
+		auto operator=(matrix_base&&) -> matrix_base& = default;      // @TODO: ISSUE #20
 
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
@@ -232,7 +298,28 @@ namespace mpp::detail
 			return _cols;
 		}
 
-		friend inline void init_matrix_with_1d_rng(matrix_base<Buffer, Value, RowsExtent, ColumnsExtent>& base,
+		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
+		{
+			// Static buffer does not use an allocator
+			if constexpr (!is_vector<Buffer>::value)
+			{
+				throw std::logic_error("Static matrices does not use allocators!");
+			}
+
+			return _buf.get_allocator();
+		}
+
+		void swap(matrix_base& right) // @TODO: ISSUE #20
+		{
+			using std::swap;
+
+			swap(_rows, right._rows);
+			swap(_cols, right._cols);
+			swap(_buf, right._buf);
+		}
+
+		friend inline void init_matrix_with_1d_rng(
+			matrix_base<Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& base,
 			auto&& rng,
 			std::size_t rows,
 			std::size_t cols) // @TODO: ISSUE #20

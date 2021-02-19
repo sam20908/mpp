@@ -22,7 +22,7 @@ from lit.util import executeCommand
 from lit.formats import FileBasedTest
 
 # pylint: disable=W0612,R0201
-# NOTE: Copied from llvm-project!
+# @NOTE: Copied from llvm-project!
 
 
 class ExecutableTest(FileBasedTest):

@@ -65,12 +65,13 @@ namespace mpp::detail
 		}
 	}
 
-	[[nodiscard]] inline auto range_2d_dimensions(auto&& rng_2d)
+	template<typename Range2D>
+	[[nodiscard]] inline auto range_2d_dimensions(Range2D&& rng_2d)
 		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20
 	{
 		const auto begin = std::ranges::begin(rng_2d);
 		const auto rows  = std::ranges::size(rng_2d);
-		const auto cols  = rows > 0 ? std::ranges::size(*begin) : 0;
+		const auto cols  = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
 
 		if (rows > 1)
 		{
@@ -79,9 +80,9 @@ namespace mpp::detail
 
 			for (auto&& row : rng_2d)
 			{
-				if (auto row_cols = std::ranges::size(row); row_cols != cols)
+				if (const auto row_cols = std::ranges::size(std::forward<decltype(row)>(row)); row_cols != cols)
 				{
-					throw std::invalid_argument("2D initializer doesn't have equal row columns!");
+					throw std::invalid_argument("Initializer doesn't have equal row columns!");
 				}
 			}
 		}
@@ -118,7 +119,22 @@ namespace mpp::detail
 		}
 	}
 
-	inline void allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, auto val) // @TODO: ISSUE #20
+	inline void validate_dimensions_for_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	{
+		if (rows == 0 || cols == 0)
+		{
+			throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
+		}
+
+		if (rows != cols)
+		{
+			throw std::invalid_argument("Identity matrix must be square!");
+		}
+	}
+
+	template<typename InitializerValue>
+	inline void
+	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, InitializerValue&& val) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = requires
 		{
@@ -127,7 +143,7 @@ namespace mpp::detail
 
 		if constexpr (is_vec)
 		{
-			buf.resize(rows * cols, val);
+			buf.resize(rows * cols, std::forward<InitializerValue>(val));
 		}
 	}
 
@@ -172,8 +188,8 @@ namespace mpp::detail
 					result += static_cast<To>(l_buf[left_idx]) * static_cast<To>(r_buf[right_idx]);
 				}
 
-				auto idx = idx_2d_to_1d(n, row, col);
-				buf[idx] = result;
+				const auto idx = idx_2d_to_1d(n, row, col);
+				buf[idx]       = result;
 			}
 		}
 	}

@@ -24,20 +24,19 @@
 #include <span>
 #include <type_traits>
 
-template<typename Type>
-constexpr auto has_rule_of_five_v = std::is_default_constructible_v<Type>&& std::is_copy_constructible_v<Type>&&
-	std::is_copy_assignable_v<Type>&& std::is_move_constructible_v<Type>&& std::is_move_assignable_v<Type>;
+template<typename T>
+concept rule_of_five = std::default_initializable<T>&& std::copyable<T>;
 
 int main()
 {
-	static_assert(has_rule_of_five_v<mpp::matrix<int, 1, 1>>, "Fully static matrices should follow rule of five!");
+	static_assert(rule_of_five<mpp::matrix<int, 1, 1>>, "Fully static matrices should follow rule of five!");
 
-	static_assert(has_rule_of_five_v<mpp::matrix<int>>, "Fully dynamic matrices should follow rule of five!");
+	static_assert(rule_of_five<mpp::matrix<int>>, "Fully dynamic matrices should follow rule of five!");
 
-	static_assert(has_rule_of_five_v<mpp::matrix<int, std::dynamic_extent, 1>>,
+	static_assert(rule_of_five<mpp::matrix<int, std::dynamic_extent, 1>>,
 		"Dynamic rows matrices should follow rule of five!");
 
-	static_assert(has_rule_of_five_v<mpp::matrix<int, 1, std::dynamic_extent>>,
+	static_assert(rule_of_five<mpp::matrix<int, 1, std::dynamic_extent>>,
 		"Dynamic columns matrices should follow rule of five!");
 
 	return 0;

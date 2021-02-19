@@ -24,6 +24,8 @@
 #include <mpp/detail/tag_invoke.hpp>
 #include <mpp/utility/config.hpp>
 
+#include <memory>
+
 // @TODO: Make sure to export this when this file becomes a module to allow users to access tags
 #include <mpp/detail/public_tags.hpp>
 
@@ -34,7 +36,8 @@ namespace mpp
 {
 	template<detail::arithmetic Value,
 		std::size_t RowsExtent    = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize),
-		std::size_t ColumnsExtent = detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize)>
+		std::size_t ColumnsExtent = detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize),
+		typename Allocator        = std::allocator<Value>>
 	class matrix;
 
 	/**
