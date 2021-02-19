@@ -38,6 +38,66 @@ namespace
 	 * Fully static matrices
 	 */
 
+	TEST(Initialization, FullyStaticCopyConstruct)
+	{
+		const auto dummy  = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyStaticMoveConstruct)
+	{
+		auto dummy        = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyStaticCopyAssignment)
+	{
+		const auto dummy = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix      = mpp::matrix<int, 2, 3>{};
+
+		matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyStaticMoveAssignment)
+	{
+		auto dummy  = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int, 2, 3>{};
+
+		matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyStatic2DInitializerList)
 	{
 		const auto matrix = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -260,6 +320,66 @@ namespace
 	 * Fully dynamic matrices
 	 */
 
+	TEST(Initialization, FullyDynamicCopyConstruct)
+	{
+		const auto dummy  = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamicMoveConstruct)
+	{
+		auto dummy        = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamicCopyAssignment)
+	{
+		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix      = mpp::matrix<int>{};
+
+		matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamicMoveAssignment)
+	{
+		auto dummy  = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int>{};
+
+		matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyDynamic2DInitializerList)
 	{
 		const auto matrix = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -400,6 +520,66 @@ namespace
 	/**
 	 * Dynamic rows matrices
 	 */
+
+	TEST(Initialization, DynamicRowsCopyConstruct)
+	{
+		const auto dummy  = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicRowsMoveConstruct)
+	{
+		auto dummy        = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicRowsCopyAssignment)
+	{
+		const auto dummy = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix      = mpp::matrix<int, std::dynamic_extent, 3>{};
+
+		matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicRowsMoveAssignment)
+	{
+		auto dummy  = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
+
+		matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
 
 	TEST(Initialization, DymamicRows2DInitializerList)
 	{
@@ -568,6 +748,66 @@ namespace
 	 * Dynamic columns matrices
 	 */
 
+	TEST(Initialization, DynamicColumnsCopyConstruct)
+	{
+		const auto dummy  = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumnsMoveConstruct)
+	{
+		auto dummy        = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumnsCopyAssignment)
+	{
+		const auto dummy = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix      = mpp::matrix<int, 2, std::dynamic_extent>{};
+
+		matrix = dummy;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumnsMoveAssignment)
+	{
+		auto dummy  = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
+
+		matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicColumns2DInitializerList)
 	{
 		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -732,6 +972,5 @@ namespace
 			std::invalid_argument);
 	}
 
-	// @TODO: Test copy/move constructing/assignment as well as with custom allocators
 	// @TODO: Test all initialization overloads with custom allocators
 } // namespace
