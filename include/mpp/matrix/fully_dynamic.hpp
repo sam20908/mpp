@@ -39,9 +39,11 @@ namespace mpp
 			matrix_base<std::vector<Value, Allocator>, Value, std::dynamic_extent, std::dynamic_extent, Allocator>;
 
 	public:
-		matrix() : base(Allocator{}) {} // @TODO: ISSUE #20
+		using allocator_type = Allocator;
 
-		explicit matrix(const Allocator& allocator) : base(allocator) {} // @TODO: ISSUE #20
+		matrix() : base(0, 0, Allocator{}) {} // @TODO: ISSUE #20
+
+		explicit matrix(const Allocator& allocator) : base(0, 0, allocator) {} // @TODO: ISSUE #20
 
 		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d,
 			const Allocator allocator = Allocator{}) :
@@ -94,14 +96,19 @@ namespace mpp
 			:
 			base(allocator)
 		{
-			forward_matrix_to_this(right);
+			base::forward_matrix_to_this(right);
 		}
 
 		matrix(matrix&& right, const Allocator& allocator) // @TODO: ISSUE #20
 			:
 			base(allocator)
 		{
-			forward_matrix_to_this(std::move(right));
+			base::forward_matrix_to_this(std::move(right));
+		}
+
+		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
+		{
+			return base::_buf.get_allocator();
 		}
 	};
 } // namespace mpp

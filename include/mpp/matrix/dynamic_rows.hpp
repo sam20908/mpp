@@ -32,14 +32,17 @@ namespace mpp
 {
 	template<detail::arithmetic Value, std::size_t ColumnsExtent, typename Allocator>
 	class matrix<Value, std::dynamic_extent, ColumnsExtent, Allocator> :
-		public detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, ColumnsExtent, Allocator>
+		public detail::matrix_base<std::vector<Value, Allocator>, Value, std::dynamic_extent, ColumnsExtent, Allocator>
 	{
-		using base = detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, ColumnsExtent, Allocator>;
+		using base =
+			detail::matrix_base<std::vector<Value, Allocator>, Value, std::dynamic_extent, ColumnsExtent, Allocator>;
 
 	public:
-		matrix() : base(Allocator{}) {} // @TODO: ISSUE #20
+		using allocator_type = Allocator;
 
-		explicit matrix(const Allocator& allocator) : base(allocator) {} // @TODO: ISSUE #20
+		matrix() : base(0, ColumnsExtent, Allocator{}) {} // @TODO: ISSUE #20
+
+		explicit matrix(const Allocator& allocator) : base(0, ColumnsExtent, allocator) {} // @TODO: ISSUE #20
 
 		matrix(std::size_t rows, const Allocator& allocator = Allocator{}) :
 			base(rows, ColumnsExtent, Value{}, allocator) // @TODO: ISSUE #20
@@ -108,14 +111,19 @@ namespace mpp
 			:
 			base(allocator)
 		{
-			forward_matrix_to_this(right);
+			base::forward_matrix_to_this(right);
 		}
 
 		matrix(matrix&& right, const Allocator& allocator) // @TODO: ISSUE #20
 			:
 			base(allocator)
 		{
-			forward_matrix_to_this(std::move(right));
+			base::forward_matrix_to_this(std::move(right));
+		}
+
+		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
+		{
+			return base::_buf.get_allocator();
 		}
 	};
 } // namespace mpp

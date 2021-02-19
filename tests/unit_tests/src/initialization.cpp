@@ -22,6 +22,7 @@
 
 #include <mpp/matrix.hpp>
 
+#include "../../include/custom_allocator.hpp"
 #include "../../include/dummy_expr.hpp"
 
 #include <array>
@@ -66,7 +67,7 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, FullyStaticCopyAssignment)
+	TEST(Assignment, FullyStaticCopyAssignment)
 	{
 		const auto dummy = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix      = mpp::matrix<int, 2, 3>{};
@@ -82,7 +83,7 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, FullyStaticMoveAssignment)
+	TEST(Assignment, FullyStaticMoveAssignment)
 	{
 		auto dummy  = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix = mpp::matrix<int, 2, 3>{};
@@ -334,6 +335,27 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyDynamicCopyConstruct_CustomAllocator)
+	{
+		const auto dummy =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ { 7, 3, 1 },
+				{ 8, 8, 2 } };
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ dummy,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyDynamicMoveConstruct)
 	{
 		auto dummy        = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -348,7 +370,29 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, FullyDynamicCopyAssignment)
+	TEST(Initialization, FullyDynamicMoveConstruct_CustomAllocator)
+	{
+		auto dummy =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ { 7, 3, 1 },
+				{ 8, 8, 2 } };
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{
+			std::move(dummy),
+			allocator
+		};
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyDynamicCopyAssignment)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix      = mpp::matrix<int>{};
@@ -364,7 +408,7 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, FullyDynamicMoveAssignment)
+	TEST(Assignment, FullyDynamicMoveAssignment)
 	{
 		auto dummy  = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix = mpp::matrix<int>{};
@@ -389,6 +433,25 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamic2DInitializerList_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{
+			{ { 7, 3, 1 }, { 8, 8, 2 } },
+			allocator
+		};
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -418,6 +481,25 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyDynamic2DRange_Copy_CustomAllocator)
+	{
+		const auto rng_2d    = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ rng_2d,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyDynamic2DRange_Move)
 	{
 		auto rng_2d       = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -428,6 +510,26 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, FullyDynamic2DRange_Move_CustomAllocator)
+	{
+		auto rng_2d          = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{
+			std::move(rng_2d),
+			allocator
+		};
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -453,6 +555,27 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, FullyDynamic_ExprObject_CustomAllocator)
+	{
+		const auto dummy     = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto expr      = mpp_test::dummy_expr{ dummy };
+
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ expr,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyDynamicDefaultConstructor)
 	{
 		const auto matrix = mpp::matrix<int>{};
@@ -464,6 +587,68 @@ namespace
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
 	}
 
+	TEST(Initialization, FullyDynamicDefaultConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{};
+
+		EXPECT_EQ(matrix.rows(), 0);
+		EXPECT_EQ(matrix.columns(), 0);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
+	TEST(Initialization, FullyDynamicConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ allocator };
+
+		EXPECT_EQ(matrix.rows(), 0);
+		EXPECT_EQ(matrix.columns(), 0);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
+	TEST(Initialization, FullyDynamicSizeConstructor)
+	{
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 2, 3 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
+	TEST(Initialization, FullyDynamicSizeConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 2,
+				3,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
 	TEST(Initialization, FullyDynamicValueConstructor)
 	{
 		const auto matrix = mpp::matrix<int>{ 2, 3, 1 };
@@ -473,6 +658,26 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
+	}
+
+	TEST(Initialization, FullyDynamicValueConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 2,
+				3,
+				1,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
 	}
@@ -490,6 +695,26 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
 	}
 
+	TEST(Initialization, FullyDynamicIdentityMatrix_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 3,
+				3,
+				mpp::identity_matrix,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
 	TEST(Initialization, FullyDynamicCallable)
 	{
 		auto iota = [i = 0]() mutable {
@@ -503,6 +728,30 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
+	}
+
+	TEST(Initialization, FullyDynamicCallable_CustomAllocator)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 2,
+				3,
+				iota,
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}
@@ -535,6 +784,24 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicRowsCopyConstruct_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto dummy     = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ dummy, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicRowsMoveConstruct)
 	{
 		auto dummy        = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -549,7 +816,25 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, DynamicRowsCopyAssignment)
+	TEST(Initialization, DynamicRowsMoveConstruct_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		auto dummy           = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ std::move(dummy), allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, DynamicRowsCopyAssignment)
 	{
 		const auto dummy = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix      = mpp::matrix<int, std::dynamic_extent, 3>{};
@@ -565,7 +850,7 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, DynamicRowsMoveAssignment)
+	TEST(Assignment, DynamicRowsMoveAssignment)
 	{
 		auto dummy  = mpp::matrix<int, std::dynamic_extent, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{};
@@ -590,6 +875,24 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DymamicRows2DInitializerList_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ { { 7, 3, 1 }, { 8, 8, 2 } },
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -624,6 +927,24 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicRows2DRange_Copy_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto rng_2d    = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ rng_2d, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicRows2DRange_Copy_SizeMismatch_Throw)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3 }, { 8, 8 } };
@@ -641,6 +962,24 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicRows2DRange_Move_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		auto rng_2d          = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ std::move(rng_2d), allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -668,6 +1007,26 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicRows_ExprObject_SameColumns_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto dummy     = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto expr      = mpp_test::dummy_expr{ dummy };
+
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ expr, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicRows_ExprObject_DifferentColumns_Throw)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3 }, { 8, 8 } };
@@ -689,6 +1048,63 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
+	TEST(Initialization, DynamicRowsDefaultConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{};
+
+		EXPECT_EQ(matrix.rows(), 0);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
+	TEST(Initialization, DynamicRowsConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ allocator };
+
+		EXPECT_EQ(matrix.rows(), 0);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
+	TEST(Initialization, DynamicRowsSizeConstructor)
+	{
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ 2 };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
+	TEST(Initialization, DynamicRowsSizeConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ 2, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
 	TEST(Initialization, DymamicRowsValueConstructor)
 	{
 		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ 2, 1 };
@@ -702,6 +1118,23 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
 	}
 
+	TEST(Initialization, DynamicRowsValueConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ 2, 0, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
+	}
+
 	TEST(Initialization, DynamicRowsIdentityMatrix)
 	{
 		const auto matrix = mpp::matrix<int, std::dynamic_extent, 3>{ 3, mpp::identity_matrix };
@@ -711,6 +1144,24 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
+	TEST(Initialization, DynamicRowsIdentityMatrix_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ 3,
+            mpp::identity_matrix,
+            allocator };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
 	}
@@ -728,6 +1179,27 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
 		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
+	}
+
+	TEST(Initialization, DynamicRowsCallable_CustomAllocator)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, std::dynamic_extent, 3, mpp_test::custom_allocator<int>>{ 2, iota, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}
@@ -762,6 +1234,24 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicColumnsCopyConstruct_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto dummy     = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ dummy, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicColumnsMoveConstruct)
 	{
 		auto dummy        = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -776,7 +1266,25 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, DynamicColumnsCopyAssignment)
+	TEST(Initialization, DynamicColumnsMoveConstruct_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		auto dummy           = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ std::move(dummy), allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, DynamicColumnsCopyAssignment)
 	{
 		const auto dummy = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix      = mpp::matrix<int, 2, std::dynamic_extent>{};
@@ -792,7 +1300,7 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
-	TEST(Initialization, DynamicColumnsMoveAssignment)
+	TEST(Assignment, DynamicColumnsMoveAssignment)
 	{
 		auto dummy  = mpp::matrix<int, 2, std::dynamic_extent>{ { 7, 3, 1 }, { 8, 8, 2 } };
 		auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{};
@@ -817,6 +1325,24 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DInitializerList_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ { { 7, 3, 1 }, { 8, 8, 2 } },
+				allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -852,6 +1378,24 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicColumns2DRange_Copy_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto rng_2d    = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ rng_2d, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicColumns2DRange_Copy_SizeMismatch_Throw)
 	{
 		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 }, { 1, 2, 3 } };
@@ -869,6 +1413,24 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Initialization, DynamicColumns2DRange_Move_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		auto rng_2d          = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ std::move(rng_2d), allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
@@ -896,6 +1458,26 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Initialization, DynamicColumns_ExprObject_SameRows_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto dummy     = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		const auto expr      = mpp_test::dummy_expr{ dummy };
+
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ expr, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, DynamicColumns_ExprObject_DifferentRows_Throw)
 	{
 		const auto dummy = mpp::matrix<int>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -917,6 +1499,34 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(0, 0, 0, 0, 0, 0));
 	}
 
+	TEST(Initialization, DynamicColumnsDefaultConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{};
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 0);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
+	TEST(Initialization, DynamicColumnsConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 0);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+	}
+
 	TEST(Initialization, DynamicColumnsValueConstructor)
 	{
 		const auto matrix = mpp::matrix<int, 2, std::dynamic_extent>{ 3, 1 };
@@ -926,6 +1536,23 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
+	}
+
+	TEST(Initialization, DynamicColumnsValueConstructor_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 3, 1, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(1, 1, 1, 1, 1, 1));
 	}
@@ -943,6 +1570,24 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
 	}
 
+	TEST(Initialization, DynamicColumnsIdentityMatrix_CustomAllocator)
+	{
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix    = mpp::matrix<int, 3, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 3,
+            mpp::identity_matrix,
+            allocator };
+
+		EXPECT_EQ(matrix.rows(), 3);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 3);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
+
+		EXPECT_THAT(matrix, ElementsAre(1, 0, 0, 0, 1, 0, 0, 0, 1));
+	}
+
 	TEST(Initialization, DynamicColumnsCallable)
 	{
 		auto iota = [i = 0]() mutable {
@@ -956,6 +1601,26 @@ namespace
 
 		EXPECT_EQ(matrix.rows_extent(), 2);
 		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
+	}
+
+	TEST(Initialization, DynamicColumnsCallable_CustomAllocator)
+	{
+		auto iota = [i = 0]() mutable {
+			return i++;
+		};
+		const auto allocator = mpp_test::custom_allocator<int>{};
+		const auto matrix =
+			mpp::matrix<int, 2, std::dynamic_extent, mpp_test::custom_allocator<int>>{ 3, iota, allocator };
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_EQ(matrix.get_allocator(), allocator);
 
 		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}

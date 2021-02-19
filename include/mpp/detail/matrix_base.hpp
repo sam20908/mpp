@@ -79,6 +79,13 @@ namespace mpp::detail
 			transform_1d_buf_into_identity<Value>(_buf, rows);
 		}
 
+		explicit matrix_base(std::size_t rows, std::size_t cols, const Allocator& allocator) :
+			_buf{ allocator }, // @TODO: ISSUE #20
+			_rows{ rows },
+			_cols{ cols }
+		{
+		}
+
 		explicit matrix_base(const Allocator& allocator) :
 			_buf{ allocator }, // @TODO: ISSUE #20
 			_rows{ 0 },
@@ -197,8 +204,7 @@ namespace mpp::detail
 		}
 
 	public:
-		using buffer_type    = Buffer;
-		using allocator_type = Allocator;
+		using buffer_type = Buffer;
 
 		using value_type      = Value;
 		using difference_type = typename buffer_type::difference_type;
@@ -296,17 +302,6 @@ namespace mpp::detail
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _cols;
-		}
-
-		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
-		{
-			// Static buffer does not use an allocator
-			if constexpr (!is_vector<Buffer>::value)
-			{
-				throw std::logic_error("Static matrices does not use allocators!");
-			}
-
-			return _buf.get_allocator();
 		}
 
 		void swap(matrix_base& right) // @TODO: ISSUE #20
