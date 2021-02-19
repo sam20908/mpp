@@ -154,6 +154,16 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(0, 1, 2, 3, 4, 5));
 	}
 
+	TEST(Initialization, FullyStatic_ZeroAndNonZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 0, 1>{ 0 }), std::invalid_argument);
+	}
+
+	TEST(Initialization, FullyStatic_NonZeroAndZeroSide_Throw)
+	{
+		EXPECT_THROW((void)(mpp::matrix<int, 1, 0>{ 0 }), std::invalid_argument);
+	}
+
 	// Can't test array size mismatch for fully static matrices because that results in no viable overload, thus compile
 	// error
 
