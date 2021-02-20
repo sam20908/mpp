@@ -203,11 +203,14 @@ namespace mpp::detail
 		using buffer_type = Buffer;
 
 		using value_type      = Value;
-		using difference_type = typename buffer_type::difference_type;
+		using reference       = value_type&;
+		using const_reference = const value_type&;
 		using pointer         = typename buffer_type::pointer;
 		using const_pointer   = typename buffer_type::const_pointer;
 		using iterator        = matrix_iterator<typename Buffer::iterator>;
 		using const_iterator  = matrix_iterator<typename Buffer::const_iterator>;
+		using difference_type = typename buffer_type::difference_type;
+		using size_type       = std::size_t;
 
 		matrix_base(const matrix_base&) = default; // @TODO: ISSUE #20
 		matrix_base(matrix_base&&)      = default; // @TODO: ISSUE #20
@@ -298,6 +301,24 @@ namespace mpp::detail
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
 			return _cols;
+		}
+
+		// Note that size of the buffer isn't an exact representation of the size of the matrix because we store the
+		// matrix in 1D, but due to Standard conformance, we have to provide size() and max_size()
+
+		[[nodiscard]] auto size() -> std::size_t // @TODO: ISSUE #20
+		{
+			return _buf.size();
+		}
+
+		[[nodiscard]] auto max_size() -> std::size_t // @TODO: ISSUE #20
+		{
+			return _buf.max_size();
+		}
+
+		[[nodiscard]] auto empty() -> bool // @TODO: ISSUE #20
+		{
+			return _buf.empty();
 		}
 
 		void swap(matrix_base& right) // @TODO: ISSUE #20

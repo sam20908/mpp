@@ -21,43 +21,27 @@
 
 #include <mpp/matrix.hpp>
 
+#include "../../include/utility_traits.hpp"
+
 #include <concepts>
 #include <memory>
 #include <span>
 
-template<typename T>
-using container_allocator_type = typename T::allocator_type;
-
-template<typename T>
-using container_value_type = typename T::value_type;
-
-template<typename Allocator>
-concept allocator_noexcept_move_constructor = requires(Allocator&& a)
-{
-	{
-		Allocator
-		{
-			std::move(a)
-		}
-	}
-	noexcept;
-};
-
 template<typename T, typename Allocator, typename... SizeParams>
-concept initializable_with_allocator = allocator_noexcept_move_constructor<Allocator>&&
+concept initializable_with_allocator = mpp_test::allocator_noexcept_move_constructor<Allocator>&&
 	std::constructible_from<T, Allocator>&& std::constructible_from<T, SizeParams..., Allocator>&&
 		std::constructible_from<T, T, Allocator>&& std::constructible_from<T, T&&, Allocator>;
 
 template<typename T, typename... SizeParams>
 concept allocator_aware = std::default_initializable<T>&& std::move_constructible<T>&&
-	initializable_with_allocator<T, container_allocator_type<T>, SizeParams...>&& requires(T t, T u)
+	initializable_with_allocator<T, mpp_test::container_allocator_type<T>, SizeParams...>&& requires(T t, T u)
 {
-	typename container_allocator_type<T>;
+	typename mpp_test::container_allocator_type<T>;
 	// @NOTE: Cannot put initializable_with_allocator here because GCC ICEs here
 	{
 		t.get_allocator()
 	}
-	->std::same_as<container_allocator_type<T>>;
+	->std::same_as<mpp_test::container_allocator_type<T>>;
 	{ t.swap(u) };
 };
 

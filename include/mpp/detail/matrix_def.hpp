@@ -22,15 +22,14 @@
 #include <mpp/detail/constraints.hpp>
 #include <mpp/detail/expr_base.hpp>
 #include <mpp/detail/tag_invoke.hpp>
-#include <mpp/utility/config.hpp>
 
-#include <memory>
-
-// @TODO: Make sure to export this when this file becomes a module to allow users to access tags
+// @TODO: Make sure to export these modules for C++20
 #include <mpp/detail/public_tags.hpp>
+#include <mpp/utility/config.hpp>
 
 #include <cstddef>
 #include <initializer_list>
+#include <memory>
 
 namespace mpp
 {
