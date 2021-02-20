@@ -93,6 +93,14 @@ namespace mpp::detail
 		{
 		}
 
+		template<typename Matrix>
+		explicit matrix_base(Matrix&& matrix, const Allocator& allocator) :
+			_buf{ std::forward<Matrix>(matrix)._buf, allocator }, // @TODO: ISSUE #20
+			_rows{ std::forward<Matrix>(matrix)._rows },
+			_cols{ std::forward<Matrix>(matrix)._cols }
+		{
+		}
+
 		void init_dimension_with_val_static(const Value& value) // @TODO: ISSUE #20
 		{
 			_rows = RowsExtent;
@@ -189,14 +197,6 @@ namespace mpp::detail
 			{
 				_buf.push_back(std::invoke(std::forward<Callable>(callable)));
 			}
-		}
-
-		template<typename Matrix>
-		void forward_matrix_to_this(Matrix&& right) // @TODO: ISSUE #20
-		{
-			_rows = std::forward<Matrix>(right)._rows;
-			_cols = std::forward<Matrix>(right)._cols;
-			_buf  = std::forward<Matrix>(right)._buf;
 		}
 
 	public:

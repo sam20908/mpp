@@ -107,18 +107,12 @@ namespace mpp
 			base::init_buf_from_callable_dynamic(RowsExtent, columns, std::forward<Callable>(callable));
 		}
 
-		matrix(const matrix& right, const Allocator& allocator) // @TODO: ISSUE #20
-			:
-			base(allocator)
+		matrix(const matrix& right, const Allocator& allocator) : base(right, allocator) // @TODO: ISSUE #20
 		{
-			base::forward_matrix_to_this(right);
 		}
 
-		matrix(matrix&& right, const Allocator& allocator) // @TODO: ISSUE #20
-			:
-			base(allocator)
+		matrix(matrix&& right, const Allocator& allocator) : base(std::move(right), allocator) // @TODO: ISSUE #20
 		{
-			base::forward_matrix_to_this(std::move(right));
 		}
 
 		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
