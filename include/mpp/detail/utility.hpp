@@ -57,14 +57,6 @@ namespace mpp::detail
 		return row_idx * cols + col_idx;
 	}
 
-	inline void validate_not_dimension_zero_and_non_zero(std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
-	{
-		if ((rows == 0 && columns != 0) || (rows != 0 && columns == 0))
-		{
-			throw std::invalid_argument("Cannot have a dimension of zero and non-zero!");
-		}
-	}
-
 	template<typename Range2D>
 	[[nodiscard]] inline auto range_2d_dimensions(Range2D&& rng_2d)
 		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20

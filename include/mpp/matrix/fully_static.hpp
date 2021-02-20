@@ -97,7 +97,6 @@ namespace mpp
 
 		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
 		{
-			detail::validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
 			detail::validate_dimensions_for_identity(RowsExtent, ColumnsExtent);
 
 			base::_rows = RowsExtent;

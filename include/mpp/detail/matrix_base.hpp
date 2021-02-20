@@ -95,8 +95,6 @@ namespace mpp::detail
 
 		void init_dimension_with_val_static(const Value& value) // @TODO: ISSUE #20
 		{
-			validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
-
 			_rows = RowsExtent;
 			_cols = ColumnsExtent;
 
@@ -106,8 +104,6 @@ namespace mpp::detail
 		template<typename Range2D>
 		void init_buf_2d_static(Range2D&& rng_2d, bool check_rng_size) // @TODO: ISSUE #20
 		{
-			validate_not_dimension_zero_and_non_zero(RowsExtent, ColumnsExtent);
-
 			const auto [rng_rows, rng_cols] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
 
 			if (check_rng_size && (rng_rows != RowsExtent || rng_cols != ColumnsExtent))
