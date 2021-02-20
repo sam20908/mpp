@@ -42,8 +42,6 @@ namespace mpp
 
 		matrix() : base(0, ColumnsExtent, Allocator{}) {} // @TODO: ISSUE #20
 
-		explicit matrix(const Allocator& allocator) : base(0, ColumnsExtent, allocator) {} // @TODO: ISSUE #20
-
 		matrix(std::size_t rows, const Allocator& allocator = Allocator{}) :
 			base(rows, ColumnsExtent, Value{}, allocator) // @TODO: ISSUE #20
 		{

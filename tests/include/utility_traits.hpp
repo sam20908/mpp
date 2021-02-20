@@ -46,16 +46,4 @@ namespace mpp_test
 
 	template<typename T>
 	using container_size_type = typename T::size_type;
-
-	template<typename Allocator>
-	concept allocator_noexcept_move_constructor = requires(Allocator&& a)
-	{
-		{
-			Allocator
-			{
-				std::move(a)
-			}
-		}
-		noexcept;
-	};
 } // namespace mpp_test

@@ -43,8 +43,6 @@ namespace mpp
 
 		matrix() : base(0, 0, Allocator{}) {} // @TODO: ISSUE #20
 
-		explicit matrix(const Allocator& allocator) : base(0, 0, allocator) {} // @TODO: ISSUE #20
-
 		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d,
 			const Allocator allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20

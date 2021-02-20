@@ -27,14 +27,24 @@
 #include <memory>
 #include <span>
 
+/**
+ * @NOTE: it "technically" does not meet all required expressions stated because of how different matrices have
+ * different sets of constructors
+ *
+ * The following expressions are omitted:
+ * - T(allocator)
+ */
+
 template<typename T, typename Allocator, typename... SizeParams>
-concept initializable_with_allocator = mpp_test::allocator_noexcept_move_constructor<Allocator>&&
-	std::constructible_from<T, Allocator>&& std::constructible_from<T, SizeParams..., Allocator>&&
-		std::constructible_from<T, T, Allocator>&& std::constructible_from<T, T&&, Allocator>;
+concept initializable_with_allocator = std::constructible_from<T, SizeParams..., Allocator>&&
+	std::constructible_from<T, T, Allocator>&& std::constructible_from<T, T&&, Allocator>;
 
 template<typename T, typename... SizeParams>
 concept allocator_aware = std::default_initializable<T>&& std::move_constructible<T>&&
-	initializable_with_allocator<T, mpp_test::container_allocator_type<T>, SizeParams...>&& requires(T t, T u)
+	initializable_with_allocator<T, mpp_test::container_allocator_type<T>, SizeParams...>&& requires(T t,
+		T u,
+		const T& v,
+		T&& rv)
 {
 	typename mpp_test::container_allocator_type<T>;
 	// @NOTE: Cannot put initializable_with_allocator here because GCC ICEs here
@@ -42,6 +52,8 @@ concept allocator_aware = std::default_initializable<T>&& std::move_constructibl
 		t.get_allocator()
 	}
 	->std::same_as<mpp_test::container_allocator_type<T>>;
+	{ t = v };
+	{ t = rv };
 	{ t.swap(u) };
 };
 
