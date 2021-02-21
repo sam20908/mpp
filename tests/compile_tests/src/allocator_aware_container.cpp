@@ -32,9 +32,6 @@
  * different sets of constructors
  *
  * This entire test is omitted for static matrices because it does not use an allocator
- *
- * The following expressions are omitted:
- * - T(allocator)
  */
 
 template<typename T, typename Allocator, typename... SizeParams>
