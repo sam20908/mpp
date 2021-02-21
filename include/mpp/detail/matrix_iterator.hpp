@@ -28,7 +28,7 @@ namespace mpp::detail
 	/**
 	 * Custom iterator with additional functionalities
 	 *
-	 * Satisfies LegacyRandomAccessIterator
+	 * Satisfies LegacyContiguousIterator
 	 */
 	template<typename Iterator>
 	class matrix_iterator
@@ -43,7 +43,8 @@ namespace mpp::detail
 		using difference_type   = typename traits::difference_type;
 		using pointer           = typename traits::pointer;
 		using reference         = typename traits::reference;
-		using iterator_category = typename traits::iterator_category;
+		using iterator_category = std::contiguous_iterator_tag; // STL doesn't use contiguous iterator tag explicitly,
+																// but we do meet its requirements
 
 		explicit matrix_iterator(Iterator current, std::size_t cols) :
 			_current(current),
@@ -132,6 +133,16 @@ namespace mpp::detail
 		[[nodiscard]] auto operator-(const matrix_iterator& right) const -> difference_type // @TODO: ISSUE #20
 		{
 			return _current - right._current;
+		}
+
+		[[nodiscard]] auto operator->() -> Iterator // @TODO: ISSUE #20
+		{
+			return _current;
+		}
+
+		[[nodiscard]] auto operator->() const -> Iterator // @TODO: ISSUE #20
+		{
+			return _current;
 		}
 
 		[[nodiscard]] auto operator==(const matrix_iterator&) const -> bool                  = default;

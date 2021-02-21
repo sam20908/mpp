@@ -90,5 +90,18 @@ int main()
 	static_assert(std::random_access_iterator<dynamic_const_iterator>,
 		"Immutable dynamic iterators must meet LegacyRandomAccessIterator!");
 
+	/**
+	 * LegacyContiguousIterator
+	 */
+
+	static_assert(std::contiguous_iterator<static_iterator>,
+		"Mutable static iterators must meet LegacyContiguousIterator!");
+	static_assert(std::contiguous_iterator<static_const_iterator>,
+		"Immutable static iterators must meet LegacyContiguousIterator!");
+	static_assert(std::contiguous_iterator<dynamic_iterator>,
+		"Mutable dynamic iterators must meet LegacyContiguousIterator!");
+	static_assert(std::contiguous_iterator<dynamic_const_iterator>,
+		"Immutable dynamic iterators must meet LegacyContiguousIterator!");
+
 	return 0;
 }

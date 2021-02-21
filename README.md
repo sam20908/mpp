@@ -148,7 +148,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 
 #### Custom Iterators
 
-Custom iterators are used to make nagivating matrices easier. They also meet `LegacyRandomAccessIterator` requirement.
+Custom iterators are used to make nagivating matrices easier. They also meet `LegacyContiguousIterator` requirement.
 
 ```cpp
 #include <mpp/matrix.hpp>

@@ -309,10 +309,9 @@ export default class Home extends React.Component<unknown, unknown> {
 					<CodeBlock code={customize_utilities} theme={theme} />
 					<MDBTypography tag="p" className="lead mt-5">
 						mpp also uses custom iterators that meets the Standard
-						iterator requirements{" "}
-						<b>(LegacyRandomAccessIterator)</b> with extra
-						functionalities to make nagivating through matrices
-						easier.
+						iterator requirements <b>(LegacyContiguousIterator)</b>{" "}
+						with extra functionalities to make nagivating through
+						matrices easier.
 					</MDBTypography>
 					<CodeBlock code={custom_iterators} theme={theme} />
 				</MDBContainer>
