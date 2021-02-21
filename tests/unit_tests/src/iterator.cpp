@@ -22,6 +22,8 @@
 #include <mpp/algorithm/inverse.hpp>
 #include <mpp/matrix.hpp>
 
+#include <vector>
+
 namespace
 {
 	/**
@@ -48,6 +50,36 @@ namespace
 
 		EXPECT_EQ(*begin, 1);
 		EXPECT_EQ(*cbegin, 1);
+	}
+
+	TEST(Iterator, StaticIterator_MutableMatrix_Dereference_ReverseIterator)
+	{
+		auto matrix = mpp::matrix<int, 1, 2>{ { 1, 2 } };
+
+		const auto rbegin  = matrix.rbegin();
+		const auto crbegin = matrix.crbegin();
+		const auto rend    = matrix.rend() - 1;
+		const auto crend   = matrix.crend() - 1;
+
+		EXPECT_EQ(*rbegin, 2);
+		EXPECT_EQ(*crbegin, 2);
+		EXPECT_EQ(*rend, 1);
+		EXPECT_EQ(*crend, 1);
+	}
+
+	TEST(Iterator, StaticIterator_ImmutableMatrix_Dereference_ReverseIterator)
+	{
+		const auto matrix = mpp::matrix<int, 1, 2>{ { 1, 2 } };
+
+		const auto rbegin  = matrix.rbegin();
+		const auto crbegin = matrix.crbegin();
+		const auto rend    = matrix.rend() - 1;
+		const auto crend   = matrix.crend() - 1;
+
+		EXPECT_EQ(*rbegin, 2);
+		EXPECT_EQ(*crbegin, 2);
+		EXPECT_EQ(*rend, 1);
+		EXPECT_EQ(*crend, 1);
 	}
 
 	TEST(Iterator, StaticIterator_MutableMatrix_IndexAccess)
@@ -176,6 +208,36 @@ namespace
 
 		EXPECT_EQ(*begin, 1);
 		EXPECT_EQ(*cbegin, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_MutableMatrix_Dereference_ReverseIterator)
+	{
+		auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		const auto rbegin  = matrix.rbegin();
+		const auto crbegin = matrix.crbegin();
+		const auto rend    = matrix.rend() - 1;
+		const auto crend   = matrix.crend() - 1;
+
+		EXPECT_EQ(*rbegin, 2);
+		EXPECT_EQ(*crbegin, 2);
+		EXPECT_EQ(*rend, 1);
+		EXPECT_EQ(*crend, 1);
+	}
+
+	TEST(Iterator, DynamicIterator_ImmutableMatrix_Dereference_ReverseIterator)
+	{
+		const auto matrix = mpp::matrix<int>{ { 1, 2 } };
+
+		const auto rbegin  = matrix.rbegin();
+		const auto crbegin = matrix.crbegin();
+		const auto rend    = matrix.rend() - 1;
+		const auto crend   = matrix.crend() - 1;
+
+		EXPECT_EQ(*rbegin, 2);
+		EXPECT_EQ(*crbegin, 2);
+		EXPECT_EQ(*rend, 1);
+		EXPECT_EQ(*crend, 1);
 	}
 
 	TEST(Iterator, DynamicIterator_MutableMatrix_IndexAccess)

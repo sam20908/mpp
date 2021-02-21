@@ -256,8 +256,8 @@ namespace mpp::detail
 		using const_pointer          = typename buffer_type::const_pointer;
 		using iterator               = matrix_iterator<typename Buffer::iterator>;
 		using const_iterator         = matrix_iterator<typename Buffer::const_iterator>;
-		using reverse_iterator       = std::reverse_iterator<matrix_iterator<typename Buffer::reverse_iterator>>;
-		using const_reverse_iterator = std::reverse_iterator<matrix_iterator<typename Buffer::const_reverse_iterator>>;
+		using reverse_iterator       = matrix_iterator<typename Buffer::reverse_iterator>;
+		using const_reverse_iterator = matrix_iterator<typename Buffer::const_reverse_iterator>;
 		using difference_type        = typename buffer_type::difference_type;
 		using size_type              = std::size_t;
 
@@ -299,22 +299,22 @@ namespace mpp::detail
 
 		[[nodiscard]] auto rbegin() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(iterator(_buf.begin(), _cols));
+			return reverse_iterator(_buf.rbegin(), _cols);
 		}
 
 		[[nodiscard]] auto rbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(const_iterator(_buf.cbegin(), _cols));
+			return const_reverse_iterator(_buf.crbegin(), _cols);
 		}
 
 		[[nodiscard]] auto rend() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(iterator(_buf.end(), _cols));
+			return reverse_iterator(_buf.rend(), _cols);
 		}
 
 		[[nodiscard]] auto rend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(const_iterator(_buf.cend(), _cols));
+			return const_reverse_iterator(_buf.crend(), _cols);
 		}
 
 		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20
@@ -339,22 +339,22 @@ namespace mpp::detail
 
 		[[nodiscard]] auto crbegin() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(iterator(_buf.cbegin(), _cols));
+			return const_reverse_iterator(_buf.crbegin(), _cols);
 		}
 
 		[[nodiscard]] auto crbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(const_iterator(_buf.cbegin(), _cols));
+			return const_reverse_iterator(_buf.crbegin(), _cols);
 		}
 
 		[[nodiscard]] auto crend() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(iterator(_buf.cend(), _cols));
+			return const_reverse_iterator(_buf.crend(), _cols);
 		}
 
 		[[nodiscard]] auto crend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return std::reverse_iterator(const_iterator(_buf.cend(), _cols));
+			return const_reverse_iterator(_buf.crend(), _cols);
 		}
 
 		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const_reference // @TODO: ISSUE #20
