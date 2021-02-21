@@ -216,7 +216,7 @@ Example:
 ```
 # Assuming you are in the build folder
 
-> ctest -R unit_test
+> ctest -R unit_tests
 
 UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
 UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
@@ -228,7 +228,7 @@ Added 0 tests to meet fixture requirements
 Checking test dependency graph...
 Checking test dependency graph end
 test 2
-    Start 2: unit_test
+    Start 2: unit_tests
 
 2: Test command: /home/sames/.local/bin/lit "."
 2: Test timeout computed to be: 10000000
@@ -243,10 +243,10 @@ test 2
 2:
 2: Testing Time: 0.10s
 2:   Passed: 68
-1/1 Test #2: unit_test ........................   Passed    0.23 sec
+1/1 Test #2: unit_tests ........................   Passed    0.23 sec
 
 The following tests passed:
-        unit_test
+        unit_tests
 ```
 
 If you want to run subset of tests by regular expression, you can `cd` into `build/bin/tests/unit_tests` and pass a regular expression into `--filter=` when running `lit .`
@@ -275,6 +275,8 @@ Testing Time: 0.09s
   Excluded:  9
   Passed  : 59
 ```
+
+See all available command line options for LLVM Lit here: https://llvm.org/docs/CommandGuide/lit.html
 
 ### Compile Tests
 
