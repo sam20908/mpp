@@ -369,4 +369,6 @@ namespace
 
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
+
+	// @TODO: Add tests for other member functions
 } // namespace
