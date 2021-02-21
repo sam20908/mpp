@@ -42,6 +42,12 @@ namespace mpp_test
 	using container_const_iterator = typename T::const_iterator;
 
 	template<typename T>
+	using container_reverse_iterator = typename T::reverse_iterator;
+
+	template<typename T>
+	using container_const_reverse_iterator = typename T::const_reverse_iterator;
+
+	template<typename T>
 	using container_difference_type = typename T::difference_type;
 
 	template<typename T>

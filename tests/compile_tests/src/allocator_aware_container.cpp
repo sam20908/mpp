@@ -31,13 +31,16 @@
  * @NOTE: it "technically" does not meet all required expressions stated because of how different matrices have
  * different sets of constructors
  *
+ * This entire test is omitted for static matrices because it does not use an allocator
+ *
  * The following expressions are omitted:
  * - T(allocator)
  */
 
 template<typename T, typename Allocator, typename... SizeParams>
-concept initializable_with_allocator = std::constructible_from<T, SizeParams..., Allocator>&&
-	std::constructible_from<T, T, Allocator>&& std::constructible_from<T, T&&, Allocator>;
+concept initializable_with_allocator =
+	std::constructible_from<T, Allocator>&& std::constructible_from<T, SizeParams..., Allocator>&&
+		std::constructible_from<T, T, Allocator>&& std::constructible_from<T, T&&, Allocator>;
 
 template<typename T, typename... SizeParams>
 concept allocator_aware = std::default_initializable<T>&& std::move_constructible<T>&&
@@ -59,8 +62,6 @@ concept allocator_aware = std::default_initializable<T>&& std::move_constructibl
 
 int main()
 {
-	// No need to check static matrices since they don't use allocators (objects are allocated on the stack)
-
 	using fully_dynamic_matrix   = mpp::matrix<int>;
 	using dynamic_rows_matrix    = mpp::matrix<int, std::dynamic_extent, 1>;
 	using dynamic_columns_matrix = mpp::matrix<int, 1, std::dynamic_extent>;

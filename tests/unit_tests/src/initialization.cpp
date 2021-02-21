@@ -99,6 +99,54 @@ namespace
 		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
 	}
 
+	TEST(Assignment, FullyStatic2DInitializerList)
+	{
+		auto init_2d = std::initializer_list<std::initializer_list<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix  = mpp::matrix<int, 2, 3>{};
+
+		matrix = init_2d;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyStatic2DRange_Copy)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix       = mpp::matrix<int, 2, 3>{};
+
+		matrix = rng_2d;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyStatic2DRange_Move)
+	{
+		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int, 2, 3>{};
+
+		matrix = std::move(rng_2d);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), 2);
+		EXPECT_EQ(matrix.columns_extent(), 3);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
 	TEST(Initialization, FullyStatic2DInitializerList)
 	{
 		const auto matrix = mpp::matrix<int, 2, 3>{ { 7, 3, 1 }, { 8, 8, 2 } };
@@ -404,6 +452,54 @@ namespace
 		auto matrix = mpp::matrix<int>{};
 
 		matrix = std::move(dummy);
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyDynamic2DInitializerList)
+	{
+		auto init_2d = std::initializer_list<std::initializer_list<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix  = mpp::matrix<int>{ 2, 3 };
+
+		matrix = init_2d;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyDynamic2DRange_Copy)
+	{
+		const auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix       = mpp::matrix<int>{ 2, 3 };
+
+		matrix = rng_2d;
+
+		EXPECT_EQ(matrix.rows(), 2);
+		EXPECT_EQ(matrix.columns(), 3);
+
+		EXPECT_EQ(matrix.rows_extent(), std::dynamic_extent);
+		EXPECT_EQ(matrix.columns_extent(), std::dynamic_extent);
+
+		EXPECT_THAT(matrix, ElementsAre(7, 3, 1, 8, 8, 2));
+	}
+
+	TEST(Assignment, FullyDynamic2DRange_Move)
+	{
+		auto rng_2d = std::vector<std::vector<int>>{ { 7, 3, 1 }, { 8, 8, 2 } };
+		auto matrix = mpp::matrix<int>{ 2, 3 };
+
+		matrix = std::move(rng_2d);
 
 		EXPECT_EQ(matrix.rows(), 2);
 		EXPECT_EQ(matrix.columns(), 3);

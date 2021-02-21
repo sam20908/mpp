@@ -28,6 +28,23 @@
 #include <memory>
 #include <span>
 
+/**
+ * @NOTE: it "technically" does not meet all required expressions stated because of how different matrices have
+ * different sets of constructors and how it has to be treated in matrix form
+ *
+ * Also, the Standardese explicitly states that std::array is excluded from SequenceContainer, therefore fully static
+ * matrices are also excluded from SequenceContainer
+ *
+ * The following expressions are omitted:
+ * - T(n, t)
+ * - T(begin, end)
+ * - t.emplace(pos, args)
+ * - t.insert(pos, val) and all other overloads
+ * - t.erase(pos, val) and all other overloads
+ * - t.assign(begin, end)
+ * - t.assign(n, t)
+ */
+
 template<typename T>
 concept container = requires(T t, T u, const T ct, T&& rt)
 {
@@ -88,6 +105,58 @@ concept container = requires(T t, T u, const T ct, T&& rt)
 	->std::convertible_to<bool>;
 };
 
+template<typename T>
+concept sequence_container = requires(T t,
+	const T ct,
+	typename mpp_test::container_iterator<T> begin,
+	typename mpp_test::container_iterator<T> end,
+	std::initializer_list<std::initializer_list<typename T::value_type>> init_2d)
+{
+	// @NOTE: Inconvenient to test reference convertibility of base class to derived class
+	{ t = init_2d };
+	{
+		t.front()
+	}
+	->std::same_as<typename mpp_test::container_reference<T>>;
+	{
+		ct.front()
+	}
+	->std::same_as<typename mpp_test::container_const_reference<T>>;
+	{
+		t.back()
+	}
+	->std::same_as<typename mpp_test::container_reference<T>>;
+	{
+		ct.back()
+	}
+	->std::same_as<typename mpp_test::container_const_reference<T>>;
+	{ t.clear() };
+	{ t.assign(init_2d) };
+};
+
+template<typename T>
+concept reversible_container = requires(T t)
+{
+	typename mpp_test::container_reverse_iterator<T>;
+	typename mpp_test::container_const_reverse_iterator<T>;
+	{
+		t.rbegin()
+	}
+	->std::same_as<typename mpp_test::container_reverse_iterator<T>>;
+	{
+		t.rend()
+	}
+	->std::same_as<typename mpp_test::container_reverse_iterator<T>>;
+	{
+		t.crbegin()
+	}
+	->std::same_as<typename mpp_test::container_const_reverse_iterator<T>>;
+	{
+		t.crend()
+	}
+	->std::same_as<typename mpp_test::container_const_reverse_iterator<T>>;
+};
+
 int main()
 {
 	using fully_static    = mpp::matrix<int, 1, 1>;
@@ -99,6 +168,15 @@ int main()
 	static_assert(container<fully_dynamic>, "Fully dynamic matrices must meet Container!");
 	static_assert(container<dynamic_rows>, "Dynamic row matrices must meet Container!");
 	static_assert(container<dynamic_columns>, "Dynamic column matrices must meet Container!");
+
+	static_assert(sequence_container<fully_dynamic>, "Fully dynamic matrices must meet SequenceContainer!");
+	static_assert(sequence_container<dynamic_rows>, "Dynamic row matrices must meet SequenceContainer!");
+	static_assert(sequence_container<dynamic_columns>, "Dynamic column matrices must meet SequenceContainer!");
+
+	static_assert(reversible_container<fully_static>, "Fully static matrices must meet ReversibleContainer!");
+	static_assert(reversible_container<fully_dynamic>, "Fully dynamic matrices must meet ReversibleContainer!");
+	static_assert(reversible_container<dynamic_rows>, "Dynamic row matrices must meet ReversibleContainer!");
+	static_assert(reversible_container<dynamic_columns>, "Dynamic column matrices must meet ReversibleContainer!");
 
 	return 0;
 }

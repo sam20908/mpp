@@ -42,6 +42,8 @@ namespace mpp
 			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>;
 
 	public:
+		using base::operator=;
+
 		matrix()
 		{
 			base::init_dimension_with_val_static(Value{});
