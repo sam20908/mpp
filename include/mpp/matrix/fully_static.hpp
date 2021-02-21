@@ -36,7 +36,7 @@ namespace mpp
 			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>
 	{
 		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents, it's
-		// picked up by other specializations, meaning we can avoid conditional inheritance of a base class
+		// picked up by other specializations
 
 		using base = detail::
 			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>;
