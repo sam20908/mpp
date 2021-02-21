@@ -58,9 +58,9 @@ find_program(LLVM_LIT_EXEC NAMES lit llvm-lit llvm-lit-*)
 
 if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
     enable_testing()
-    add_subdirectory("tests")
+    add_subdirectory("external/tests")
 endif()
 
 if(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS)
-    add_subdirectory("benchmarks")
+    add_subdirectory("external/benchmarks")
 endif()

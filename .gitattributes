@@ -1,8 +1,1 @@
-# Configured CMake files are coded in CMake
-CMakeLists.txt.in linguist-language=CMake
-
-# Ignore website folder from language statistics
-website/* linguist-documentation
-
-# Scripts inside tools are modified Third-Party scripts
-tools/* linguist-vendored
+external/* linguist-documentation
