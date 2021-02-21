@@ -157,6 +157,10 @@ concept reversible_container = requires(T t)
 	->std::same_as<typename mpp_test::container_const_reverse_iterator<T>>;
 };
 
+template<typename T>
+concept contiguous_container =
+	container<T>&& std::contiguous_iterator<typename T::iterator>&& std::contiguous_iterator<typename T::iterator>;
+
 int main()
 {
 	using fully_static    = mpp::matrix<int, 1, 1>;
@@ -177,6 +181,11 @@ int main()
 	static_assert(reversible_container<fully_dynamic>, "Fully dynamic matrices must meet ReversibleContainer!");
 	static_assert(reversible_container<dynamic_rows>, "Dynamic row matrices must meet ReversibleContainer!");
 	static_assert(reversible_container<dynamic_columns>, "Dynamic column matrices must meet ReversibleContainer!");
+
+	static_assert(contiguous_container<fully_static>, "Fully static matrices must meet ContiguousContainer!");
+	static_assert(contiguous_container<fully_dynamic>, "Fully dynamic matrices must meet ContiguousContainer!");
+	static_assert(contiguous_container<dynamic_rows>, "Dynamic row matrices must meet ContiguousContainer!");
+	static_assert(contiguous_container<dynamic_columns>, "Dynamic column matrices must meet ContiguousContainer!");
 
 	return 0;
 }
