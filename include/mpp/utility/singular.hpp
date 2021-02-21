@@ -30,12 +30,17 @@ namespace mpp
 {
 	struct singular_t
 	{
+		friend inline void tag_invoke(singular_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "singular" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> bool // @TODO: ISSUE #20
 		{
-			return detail::accurate_equals(detail::det_lu_decomp<detail::lu_decomp_value_t>(obj),
-				detail::lu_decomp_value_t{ 0 });
+			return detail::accurate_equals(detail::det_lu_decomp<detail::default_floating_type>(obj),
+				detail::default_floating_type{});
 		}
 
 		template<typename... Args>

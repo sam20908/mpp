@@ -58,6 +58,22 @@ namespace mpp
 	}
 
 	template<typename Value,
+		std::size_t LeftRowsExtent,
+		std::size_t LeftColumnsExtent,
+		std::size_t RightRowsExtent,
+		std::size_t RightColumnsExtent>
+	inline auto operator+=(matrix<Value, LeftRowsExtent, LeftColumnsExtent>& left,
+		const matrix<Value, RightRowsExtent, RightColumnsExtent>& right)
+		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
+	{
+		detail::validate_same_size(left, right);
+
+		std::ranges::transform(left, right, left.begin(), std::plus{});
+
+		return left;
+	}
+
+	template<typename Value,
 		typename Expr,
 		std::size_t LeftRowsExtent,
 		std::size_t LeftColumnsExtent,
@@ -68,8 +84,6 @@ namespace mpp
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
 		detail::validate_same_size(left, right);
-
-		// @TODO: Take advantage of std::ranges::transform
 
 		const auto rows = left.rows();
 		const auto cols = left.columns();

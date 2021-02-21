@@ -17,12 +17,12 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
+from lit.formats import GoogleTest
+from lit import TestingConfig
 
-from os.path import join
 
+config: TestingConfig
 
-config.source_dir = '@COMPILE_TESTS_SOURCE_DIR@'
-config.binary_dir = '@COMPILE_TESTS_BINARY_DIR@'
-
-lit_config.load_config(config, join(config.source_dir, 'lit.site.cfg.py'))
+config.name = 'Unit Test'
+config.test_format = GoogleTest('@UNIT_TESTS_OUTPUT_DIR@',
+                                '@UNIT_TESTS_EXECUTABLE_SUFFIX@')

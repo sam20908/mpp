@@ -17,12 +17,11 @@
  * under the License.
  */
 
-// RUN: cd %binary_dir
-// RUN: cmake -DTEST_NAME=deduction_guides -DTEST_SOURCE=%s -B build/deduction_guides
-// RUN: cmake --build build/deduction_guides --target deduction_guides
+// RUN: %build_and_run
 
 #include <mpp/matrix.hpp>
 
+#include "../../include/custom_allocator.hpp"
 #include "../../include/dummy_expr.hpp"
 
 #include <vector>
@@ -33,12 +32,19 @@ int main()
 	(void)mpp::matrix{ { 7, 3, 1 }, { 8, 8, 2 }, { 5, 8, 2 } };
 
 	// Expression object
-	auto matrix = mpp::matrix<int>{};
-	(void)mpp::matrix{ mpp_test::detail::dummy_expr{ matrix } };
+	const auto matrix = mpp::matrix<int>{};
+	(void)mpp::matrix{ mpp_test::dummy_expr{ matrix } };
 
 	// 2D range
-	auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
+	const auto rng_2d = std::vector{ std::vector{ 1, 2, 3 }, std::vector{ 1, 2, 3 } };
 	(void)mpp::matrix{ rng_2d };
+
+	// Copy/move constructors with allocators
+	const auto allocator = mpp_test::custom_allocator<int>{};
+	const auto matrix1 = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{};
+	auto matrix2       = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent, mpp_test::custom_allocator<int>>{};
+	(void)mpp::matrix{ matrix1, allocator };
+	(void)mpp::matrix{ std::move(matrix2), allocator };
 
 	return 0;
 }

@@ -23,73 +23,97 @@
 #include <mpp/detail/matrix_base.hpp>
 #include <mpp/detail/matrix_def.hpp>
 
+#include <functional>
 #include <initializer_list>
 #include <stdexcept>
 #include <utility>
 
 namespace mpp
 {
-	template<detail::arithmetic Value, std::size_t ColumnsExtent>
-	class matrix<Value, std::dynamic_extent, ColumnsExtent> :
-		public detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, ColumnsExtent>
+	template<detail::arithmetic Value, std::size_t ColumnsExtent, typename Allocator>
+	class matrix<Value, std::dynamic_extent, ColumnsExtent, Allocator> :
+		public detail::
+			matrix_dynamic_base<std::vector<Value, Allocator>, Value, std::dynamic_extent, ColumnsExtent, Allocator>
 	{
-		using base = detail::matrix_base<std::vector<Value>, Value, std::dynamic_extent, ColumnsExtent>;
+		using base = detail::
+			matrix_dynamic_base<std::vector<Value, Allocator>, Value, std::dynamic_extent, ColumnsExtent, Allocator>;
 
 	public:
-		using base::base;
+		using base::operator=;
 
-		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
+		matrix() : base(0, ColumnsExtent, Allocator{}) {} // @TODO: ISSUE #20
+
+		explicit matrix(const Allocator& allocator) : base(0, ColumnsExtent, allocator) {} // @TODO: ISSUE #20
+
+		matrix(const matrix& right, const Allocator& allocator) : base(right, allocator) // @TODO: ISSUE #20
+		{
+		}
+
+		matrix(matrix&& right, const Allocator& allocator) : base(std::move(right), allocator) // @TODO: ISSUE #20
+		{
+		}
+
+		matrix(std::size_t rows, const Allocator& allocator = Allocator{}) :
+			base(rows, ColumnsExtent, Value{}, allocator) // @TODO: ISSUE #20
+		{
+		}
+
+		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d,
+			const Allocator& allocator = Allocator{}) :
+			base(allocator) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
 
 			if (cols != ColumnsExtent)
 			{
-				throw std::invalid_argument("2D initializer's columns does not match the provided column extent!");
+				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}
 
-			base::init_buf_2d_dynamic(init_2d, rows, ColumnsExtent);
+			base::init_buf_2d_dynamic_without_check(init_2d, rows, ColumnsExtent);
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
-		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
+		explicit matrix(Range2D&& rng_2d, const Allocator& allocator = Allocator{}) :
+			base(allocator) // @TODO: ISSUE #20
 		{
 			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
 
 			if (cols != ColumnsExtent)
 			{
-				throw std::invalid_argument("2D initializer's columns does not match the provided column extent!");
+				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}
 
-			base::init_buf_2d_dynamic(std::forward<Range2D>(rng_2d), rows, ColumnsExtent);
+			base::init_buf_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), rows, ColumnsExtent);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
-		explicit matrix(
-			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
+		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr,
+			const Allocator& allocator = Allocator{}) :
+			base(allocator) // @TODO: ISSUE #20
 		{
-			base::init_expr_dynamic(expr.rows(), ColumnsExtent, expr, true);
+			if (ColumnsExtent != expr.columns())
+			{
+				throw std::invalid_argument("Columns of expression object doesn't match provided columns extent!");
+			}
+
+			base::init_expr_dynamic_without_check(expr.rows(), ColumnsExtent, expr);
 		}
 
-		explicit matrix(std::size_t rows) // @TODO: ISSUE #20
+		matrix(std::size_t rows, const Value& value, const Allocator& allocator = Allocator{}) :
+			base(rows, ColumnsExtent, value, allocator) // @TODO: ISSUE #20
 		{
-			base::_rows = rows;
-			base::_cols = ColumnsExtent;
-
-			// @TODO: ISSUE #129
-			detail::allocate_1d_buf_if_vector(base::_buf, rows, ColumnsExtent, Value{ 0 });
 		}
 
-		matrix(std::size_t rows, Value value) // @TODO: ISSUE #20
+		matrix(std::size_t rows, identity_matrix_tag, const Allocator& allocator = Allocator{}) :
+			base(rows, ColumnsExtent, identity_matrix_tag{}, allocator) // @TODO: ISSUE #20
 		{
-			base::_rows = rows;
-			base::_cols = ColumnsExtent;
-
-			detail::allocate_1d_buf_if_vector(base::_buf, rows, ColumnsExtent, value);
 		}
 
-		matrix(std::size_t rows, identity_matrix_tag) // @TODO: ISSUE #20
+		template<detail::invocable_with_return_type<Value> Callable>
+		matrix(std::size_t rows, Callable&& callable, const Allocator& allocator = Allocator{}) :
+			base(allocator) // @TODO: ISSUE #20
 		{
-			base::init_identity(rows, ColumnsExtent);
+			base::init_buf_from_callable_dynamic(rows, ColumnsExtent, std::forward<Callable>(callable));
 		}
 	};
 } // namespace mpp

@@ -25,23 +25,35 @@ set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
 set(COMPILE_TESTS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(COMPILE_TESTS_BINARY_DIR "${TEST_OUTPUT_DIR}/compile_tests")
 
+set(ADDED_COMPILE_TESTS)
+
 function(_create_compile_test TEST_NAME)
     add_custom_target("${TEST_NAME}_compile_test"
         COMMAND ${LLVM_LIT_EXEC} --filter ${TEST_NAME} .
         WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
+
+    set(ADDED_COMPILE_TESTS "${ADDED_COMPILE_TESTS}${TEST_NAME}\|" PARENT_SCOPE)
 endfunction()
 
-add_custom_target("compile_test"
-    COMMAND ${LLVM_LIT_EXEC} .
-    WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
-
-configure_file("lit.site.cfg.py.in" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
+configure_file("lit.site.cfg.in.py" "${COMPILE_TESTS_BINARY_DIR}/lit.site.cfg.py")
 configure_file("CMakeLists.txt.in" "${COMPILE_TESTS_BINARY_DIR}/CMakeLists.txt" @ONLY)
 
+_create_compile_test("deduction_guides")
+_create_compile_test("rule_of_five")
+_create_compile_test("iterator_requirements")
+_create_compile_test("container_requirements")
+_create_compile_test("allocator_aware_container")
+
+# These below so that after the compile tests are added, the filter string is formed
+
+string(REGEX REPLACE "\\|$" "" ADDED_COMPILE_TESTS_PROPER ${ADDED_COMPILE_TESTS})
+
 if(LLVM_LIT_EXEC)
-    add_test(NAME "compile_test" 
-        COMMAND ${LLVM_LIT_EXEC} .
+    add_test(NAME "compile_tests" 
+        COMMAND ${LLVM_LIT_EXEC} . --filter=${ADDED_COMPILE_TESTS_PROPER}
         WORKING_DIRECTORY "${COMPILE_TESTS_BINARY_DIR}")
 endif()
 
-_create_compile_test("deduction_guides")
+add_custom_target("compile_tests"
+    COMMAND ctest -R compile_tests -V
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")

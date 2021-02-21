@@ -18,13 +18,12 @@
 cmake_minimum_required(VERSION 3.15)
 project("temp_test")
 
-set(INCLUDE_HEADERS "@COMPILE_TESTS_SOURCE_DIR@/../include/dummy_expr.hpp")
-
 add_executable(${TEST_NAME} "${TEST_SOURCE}" "${INCLUDE_HEADERS}")
 set_target_properties(${TEST_NAME} PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF)
+target_include_directories(${TEST_NAME} PRIVATE "@COMPILE_TESTS_SOURCE_DIR@")
 
 add_custom_command(TARGET ${TEST_NAME} POST_BUILD
     COMMAND $<TARGET_FILE:${TEST_NAME}>)
@@ -33,8 +32,10 @@ add_subdirectory("@PROJECT_ROOT@" "build_mpp")
 
 target_link_libraries(${TEST_NAME} PRIVATE mpp::mpp)
 
+file(WRITE "build/current_compiler.txt" "${CMAKE_C_COMPILER},${CMAKE_CXX_COMPILER}")
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
 else()
-    target_compile_options(${TEST_NAME} PRIVATE /W4 /WX)
+    target_compile_options(${TEST_NAME} PRIVATE /W4 /WX /permissive-)
 endif()

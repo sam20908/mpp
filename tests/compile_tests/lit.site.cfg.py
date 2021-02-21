@@ -17,21 +17,83 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
+# pylint: disable=line-too-long
 
 
+from os import getenv, pathsep
+from os.path import dirname, exists
 from lit.formats import ShTest
-from os.path import dirname
+from lit import LitConfig, TestingConfig
+
+
+lit_config: LitConfig
+config: TestingConfig
+
+
+def get_multi_command_separator():
+    """ Returns the separator used to execute multiple commands for the current terminal """
+    if lit_config.isWindows:
+        is_powershell = len(getenv('PSModulePath', '').split(pathsep)) >= 3
+
+        # With powershell, we can use ;
+        # With others, we can use &&
+        if is_powershell:
+            return ';'
+
+        return '&&'
+
+    # Both MacOS and Linux uses &&
+    return '&&'
+
+
+def get_compilers_from_cache():
+    """ Gets cached compilers from CMake cache """
+
+    if exists('build/current_compiler.txt'):
+        with open('build/current_compiler.txt', 'r') as compiler_reader:
+            line = compiler_reader.readline()
+            [cache_c_compiler_, cache_cxx_compiler_] = line.split(',')
+
+            return (True, cache_c_compiler_, cache_cxx_compiler_)
+    else:
+        return (False, '', '')
 
 
 has_binary_dir = hasattr(config, 'binary_dir')
 has_source_dir = hasattr(config, 'source_dir')
-if not has_binary_dir or not has_source_dir:
+has_c_compiler = hasattr(config, 'c_compiler')
+has_cxx_compiler = hasattr(config, 'cxx_compiler')
+if not has_binary_dir or not has_source_dir or not has_c_compiler or not has_cxx_compiler:
     # The user probably tried to run lit in this directory, which means we can't
     # access some of the properties defined by the lit.site.cfg.py file in the
     # binary dir
     lit_config.fatal(
         'Lit must be ran in <build directory>/bin/tests/compile_tests!')
+
+c_compiler = config.c_compiler
+cxx_compiler = config.cxx_compiler
+lit_config.note('C compiler is ' + c_compiler +
+                ' (propagated from mpp CMakeLists)')
+lit_config.note('CXX compiler is ' + cxx_compiler +
+                ' (propagated from mpp CMakeLists)')
+
+(cache_exists, cache_c_compiler, cache_cxx_compiler) = get_compilers_from_cache()
+
+if cache_exists:
+    lit_config.note('Existing cache has C compiler: ' + cache_c_compiler)
+    lit_config.note('Existing cache has CXX compiler: ' + cache_cxx_compiler)
+
+    if cache_c_compiler != c_compiler or cache_cxx_compiler != cxx_compiler:
+        # There is a conflict between the existing cache and the configuration. Error
+        # the user about it
+        lit_config.error(
+            'There will be conflicting compilers when configuring for compile tests! Remove the build folder to avoid conflict')
+    else:
+        lit_config.note(
+            'No conflicts between compilers from existing cache and propagated compilers from mpp CMakeLists')
+else:
+    lit_config.note(
+        'No CMake cache generated yet. Generating CMake cache for compile tests')
 
 config.name = 'Compile Test'
 config.suffixes = ['.cpp']
@@ -39,5 +101,10 @@ config.test_format = ShTest()
 config.test_source_root = dirname(__file__)
 config.test_exec_root = config.binary_dir
 
-config.excludes = ['__pycache__', 'build']
-config.substitutions.append(('%binary_dir', config.binary_dir))
+CD_BINARY_CMD = 'cd {binary_dir}'.format(binary_dir=config.binary_dir)
+CMAKE_CONFIGURE_CMD = 'cmake -DTEST_NAME=%basename_t -DTEST_SOURCE=%s -B build/%basename_t -DCMAKE_C_COMPILER={c_compiler} -DCMAKE_CXX_COMPILER={cxx_compiler}'.format(
+    c_compiler=c_compiler, cxx_compiler=cxx_compiler)
+CMAKE_BUILD_CMD = 'cmake --build build/%basename_t --target %basename_t'
+
+config.substitutions.append(('%build_and_run', '{cd_binary} {separator} {cmake_configure} {separator} {cmake_build}'.format(
+    cd_binary=CD_BINARY_CMD, separator=get_multi_command_separator(), cmake_configure=CMAKE_CONFIGURE_CMD, cmake_build=CMAKE_BUILD_CMD)))

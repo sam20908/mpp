@@ -23,7 +23,7 @@
 
 #include <cstddef>
 
-namespace mpp_test::detail
+namespace mpp_test
 {
 	/**
 	 * A dummy expression object for testing purposes
@@ -59,4 +59,4 @@ namespace mpp_test::detail
 			return _obj(row_idx, col_idx);
 		}
 	};
-} // namespace mpp_test::detail
+} // namespace mpp_test

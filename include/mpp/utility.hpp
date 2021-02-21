@@ -19,7 +19,9 @@
 
 #pragma once
 
+// Don't include config.hpp because that is only for user customizations
+
 #include <mpp/utility/cast.hpp>
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/singular.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/utility/type.hpp>

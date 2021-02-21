@@ -17,37 +17,27 @@
  * under the License.
  */
 
-#pragma once
+// RUN: %build_and_run
 
-#include <concepts>
-#include <ranges>
+#include <mpp/matrix.hpp>
+
+#include <span>
 #include <type_traits>
 
-namespace mpp::detail
+template<typename T>
+concept rule_of_five = std::default_initializable<T>&& std::copyable<T>;
+
+int main()
 {
-	template<typename Value>
-	concept arithmetic = requires(Value&& value)
-	{
-		// +, -, *, and /
-		{ value + value };
-		{ value - value };
-		{ value * value };
-		{ value / value };
+	static_assert(rule_of_five<mpp::matrix<int, 1, 1>>, "Fully static matrices should follow rule of five!");
 
-		// +=, -=, *=, and /=
-		{ value += value };
-		{ value -= value };
-		{ value *= value };
-		{ value /= value };
-	};
+	static_assert(rule_of_five<mpp::matrix<int>>, "Fully dynamic matrices should follow rule of five!");
 
-	template<typename Callable, typename Return, typename... Args>
-	concept invocable_with_return_type =
-		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+	static_assert(rule_of_five<mpp::matrix<int, std::dynamic_extent, 1>>,
+		"Dynamic rows matrices should follow rule of five!");
 
-	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
+	static_assert(rule_of_five<mpp::matrix<int, 1, std::dynamic_extent>>,
+		"Dynamic columns matrices should follow rule of five!");
 
-	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
-} // namespace mpp::detail
+	return 0;
+}

@@ -17,23 +17,17 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
-
-from lit.Test import FAIL, UNSUPPORTED, PASS
-from lit.util import executeCommand
-from lit.formats import FileBasedTest
+from os.path import join
+from lit import LitConfig, TestingConfig
 
 
-# Check exit code of a simple executable with no input
-# NOTE: Copied from llvm-project!
-class ExecutableTest(FileBasedTest):
-    def execute(self, test, litConfig):
-        if test.config.unsupported:
-            return UNSUPPORTED
+lit_config: LitConfig
+config: TestingConfig
 
-        out, err, exitCode = executeCommand(test.getSourcePath())
 
-        if not exitCode:
-            return PASS, out
+config.source_dir = '@COMPILE_TESTS_SOURCE_DIR@'
+config.binary_dir = '@COMPILE_TESTS_BINARY_DIR@'
+config.c_compiler = '@CMAKE_C_COMPILER@'
+config.cxx_compiler = '@CMAKE_CXX_COMPILER@'
 
-        return FAIL, out+err
+lit_config.load_config(config, join(config.source_dir, 'lit.site.cfg.py'))

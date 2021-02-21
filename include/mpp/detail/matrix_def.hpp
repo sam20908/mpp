@@ -22,20 +22,21 @@
 #include <mpp/detail/constraints.hpp>
 #include <mpp/detail/expr_base.hpp>
 #include <mpp/detail/tag_invoke.hpp>
-#include <mpp/utility/config.hpp>
 
-// @TODO: Make sure to export this when this file becomes a module to allow users to access tags
+// @TODO: Make sure to export these modules for C++20
 #include <mpp/detail/public_tags.hpp>
+#include <mpp/utility/config.hpp>
 
 #include <cstddef>
 #include <initializer_list>
+#include <memory>
 
 namespace mpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize_tag{}),
-		std::size_t ColumnsExtent =
-			detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize_tag{})>
+		std::size_t RowsExtent    = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize),
+		std::size_t ColumnsExtent = detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize),
+		typename Allocator        = std::allocator<Value>>
 	class matrix;
 
 	/**
@@ -47,11 +48,19 @@ namespace mpp
 
 	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
 	// clang-format off
-	template<detail::range_2d_arithmetic Range2D>
+	template<typename Range2D>
 	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
 	// clang-format on
 
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)
 		-> matrix<Value, RowsExtent, ColumnsExtent>;
+
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+	matrix(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>&, const Allocator&)
+		-> matrix<Value, RowsExtent, ColumnsExtent, Allocator>;
+
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+	matrix(matrix<Value, RowsExtent, ColumnsExtent, Allocator>&&, const Allocator&)
+		-> matrix<Value, RowsExtent, ColumnsExtent, Allocator>;
 } // namespace mpp

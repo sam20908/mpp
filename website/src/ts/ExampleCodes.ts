@@ -16,14 +16,21 @@ export const operations = `#include <mpp/matrix.h>
 #include <mpp/operations.hpp> // +, -, *, and /
 #include <mpp/algorithms.hpp> // determinant, inverse, transpose, block, and etc...
 #include <utility> // std::type_identity
+#include <vector>
 
 int main()
 {
-    auto m = mpp::matrix{
+    auto m_2d_initializer = mpp::matrix{
         { 1, 2, 3 },
         { 1, 2, 3 },
         { 1, 2, 3 }
     }; // Uses 2D initializer list initializer. Defaults to dynamic matrix
+
+    const auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+    auto m_2d_range = mpp::matrix{ rng_2d }; // Initialize from a 2D range
+
+    auto iota = [i = 0] mutable { return i++; };
+    auto m_generated = mpp::matrix<int, 2, 3>{ iota }; // Generates values from callable
 
     // Remember that math operations are expression templates, so the results are not evaluated immediately
     auto expr = m + m - m * 2 + m / 3;
@@ -44,16 +51,18 @@ int main()
     return 0;
 }`;
 
-export const customize_default_extent = `#include <mpp/utility/config.hpp>
+export const customize_default_extent = `// Import appropriate tags for customization
+#include <mpp/utility/config.hpp>
 
-// It's very important to do this before including matrix.hpp, otherwise the customization
-// is not going to be detected
 namespace mpp::customize
 {
-    // Customization for default extent for matrix class has to take place here because
-    // the library looks for customizations via ADL, and customize_tag is declared in this
-    // scope
-    // Also, customizing extents means tag_invoke MUST be constexpr!
+    /**
+     * Customizations has to take place BEFORE ANY INSTANTIATIONS!
+     * (it will NOT be detected in time after).
+     * 
+     * The namespace mpp::customize is where the user can freely open to customize.
+     */
+
     [[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
     {
         return 10;
@@ -104,9 +113,29 @@ namespace ns
 
 int main()
 {
-    auto v = ns::vec;
+    auto v = ns::vec{};
     auto t = mpp::type(v); // vec_types::vec
     auto d = mpp::determinant(v); // 2000
+
+    return 0;
+}
+`;
+
+export const custom_iterators = `#include <mpp/matrix.hpp>
+
+int main()
+{
+    auto matrix = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+    auto begin = matrix.begin();
+
+    // Extra functionalities to navigate through the matrix easier
+    // 1. Nagivating by rows
+    begin.move_forward_rows(1);
+    auto val = *begin; // 3
+
+    begin.move_backward_rows(1);
+    ++begin;
+    val = *begin; // 2
 
     return 0;
 }

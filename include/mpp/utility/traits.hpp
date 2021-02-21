@@ -19,35 +19,29 @@
 
 #pragma once
 
+#include "../detail/constraints.hpp"
+
+#include <complex>
 #include <concepts>
-#include <ranges>
-#include <type_traits>
+#include <cstddef>
 
-namespace mpp::detail
+namespace mpp
 {
-	template<typename Value>
-	concept arithmetic = requires(Value&& value)
+	template<detail::arithmetic Type>
+	struct traits
 	{
-		// +, -, *, and /
-		{ value + value };
-		{ value - value };
-		{ value * value };
-		{ value / value };
+		using real_type      = Type;
+		using imaginary_type = Type;
 
-		// +=, -=, *=, and /=
-		{ value += value };
-		{ value -= value };
-		{ value *= value };
-		{ value /= value };
+		static constexpr auto is_complex = false;
 	};
 
-	template<typename Callable, typename Return, typename... Args>
-	concept invocable_with_return_type =
-		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+	template<typename Type>
+	struct traits<std::complex<Type>>
+	{
+		using real_type      = Type;
+		using imaginary_type = Type;
 
-	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
-
-	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
-} // namespace mpp::detail
+		static constexpr auto is_complex = true;
+	};
+} // namespace mpp

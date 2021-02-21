@@ -30,106 +30,91 @@
 
 namespace mpp
 {
-	template<detail::arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	template<detail::arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 	class matrix :
-		public detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>
+		public detail::
+			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>
 	{
 		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents, it's
 		// picked up by other specializations
 
-		static_assert(!detail::dimension_not_zero_and_non_zero(RowsExtent, ColumnsExtent),
-			"Cannot have one side being zero and other side being non-zero!");
-
-		using base =
-			detail::matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent>;
+		using base = detail::
+			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>;
 
 	public:
-		using base::base;
+		using base::operator=;
+
+		matrix()
+		{
+			base::init_dimension_with_val_static(Value{});
+		}
 
 		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
-
-			if (rows != RowsExtent || cols != ColumnsExtent)
-			{
-				throw std::invalid_argument("2D initializer's dimensions does not match the provided extents!");
-			}
-
-			base::init_buf_2d_static(init_2d, rows, cols);
+			base::init_buf_2d_static(init_2d, true);
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
 		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
-
-			if (rows != RowsExtent || cols != ColumnsExtent)
-			{
-				throw std::invalid_argument("2D initializer's dimensions does not match the provided extents!");
-			}
-
-			base::init_buf_2d_static(std::forward<Range2D>(rng_2d), rows, cols);
+			base::init_buf_2d_static(std::forward<Range2D>(rng_2d), true);
 		}
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20
 		{
-			// We can ignore checking for same dimensions because the dimensions of the parameter uses the
-			// extent template parameters, which means they'll always be the same
+			base::init_buf_2d_static(arr_2d, false);
+		}
 
-			base::init_buf_2d_static(arr_2d, RowsExtent, ColumnsExtent);
+		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& arr_2d) // @TODO: ISSUE #20
+		{
+			base::init_buf_2d_static(std::move(arr_2d), false);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
-			// This is not made into a spearate method because it only occurs here
-
-			if constexpr (RowsExtent != ExprRowsExtent || ColumnsExtent != ExprColumnsExtent)
+			if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
 			{
-				if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
-				{
-					throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
-				}
+				throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
 			}
 
 			base::_rows = expr.rows();
 			base::_cols = expr.columns();
-			auto idx    = std::size_t{ 0 };
+			auto idx    = std::size_t{};
 
-			for (auto row = std::size_t{ 0 }; row < base::_rows; ++row)
+			for (auto row = std::size_t{}; row < base::_rows; ++row)
 			{
-				for (auto col = std::size_t{ 0 }; col < base::_cols; ++col)
+				for (auto col = std::size_t{}; col < base::_cols; ++col)
 				{
 					base::_buf[idx++] = expr(row, col);
 				}
 			}
 		}
 
-		matrix() // @TODO: ISSUE #20
+		explicit matrix(const Value& value) // @TODO: ISSUE #20
 		{
-			base::_rows = RowsExtent;
-			base::_cols = ColumnsExtent;
-
-			// @TODO: ISSUE #129
-			std::ranges::fill(base::_buf, Value{ 0 });
-		}
-
-		explicit matrix(Value value) // @TODO: ISSUE #20
-		{
-			base::_rows = RowsExtent;
-			base::_cols = ColumnsExtent;
-
-			// Static buffers are default initialized to zero, so avoid doing more work if the value is 0
-			if (value != Value{ 0 })
-			{
-				std::ranges::fill(base::_buf, value);
-			}
+			base::init_dimension_with_val_static(value);
 		}
 
 		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
 		{
-			base::init_identity(RowsExtent, ColumnsExtent);
+			detail::validate_dimensions_for_identity(RowsExtent, ColumnsExtent);
+
+			base::_rows = RowsExtent;
+			base::_cols = ColumnsExtent;
+
+			std::ranges::fill(base::_buf, Value{});
+			detail::transform_1d_buf_into_identity<Value>(base::_buf, RowsExtent);
+		}
+
+		template<detail::invocable_with_return_type<Value> Callable>
+		explicit matrix(Callable&& callable) // @TODO: ISSUE #20
+		{
+			base::_rows = RowsExtent;
+			base::_cols = ColumnsExtent;
+
+			std::ranges::generate(base::_buf, std::forward<Callable>(callable));
 		}
 	};
 } // namespace mpp

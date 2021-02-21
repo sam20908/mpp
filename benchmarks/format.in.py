@@ -17,20 +17,26 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file
+from lit.Test import FAIL, UNSUPPORTED, PASS
+from lit.util import executeCommand
+from lit.formats import FileBasedTest
 
-import sys
-sys.path.append('@BENCHMARKS_BINARY_DIR@')
-
-from format import ExecutableTest
+# pylint: disable=W0612,R0201
+# @NOTE: Copied from llvm-project!
 
 
-config.name = 'Benchmark'
-config.test_source_root = '@BENCHMARKS_BINARY_DIR@'
+class ExecutableTest(FileBasedTest):
+    """ Test format that runs executables and check their exit code """
 
-if lit_config.isWindows:
-  config.suffixes = ['.exe']
-else:
-  config.suffixes = ['']
+    def execute(self, test, _):
+        """ Executes current executable passed by test runner """
 
-config.test_format = ExecutableTest()
+        if test.config.unsupported:
+            return UNSUPPORTED
+
+        out, err, exit_code = executeCommand(test.getSourcePath())
+
+        if not exit_code:
+            return PASS, out
+
+        return FAIL, out+err

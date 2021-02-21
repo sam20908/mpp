@@ -29,13 +29,18 @@ namespace mpp
 {
 	struct cast_t
 	{
+		friend inline void tag_invoke(cast_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "cast" is required for custom types!)");
+		}
+
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto
 		tag_invoke(cast_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			detail::init_matrix_with_1d_rng_copy(casted, obj, obj.rows(), obj.columns());
+			init_matrix_with_1d_rng(casted, obj, obj.rows(), obj.columns());
 
 			return casted;
 		}

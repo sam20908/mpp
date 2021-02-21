@@ -28,6 +28,11 @@ namespace mpp
 {
 	struct square_t
 	{
+		friend inline void tag_invoke(square_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "square" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> bool // @TODO: ISSUE #20

@@ -43,9 +43,9 @@ namespace mpp
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
 				const auto left_cols = left.columns();
-				auto result          = value_type{ 0 };
+				auto result          = value_type{};
 
-				for (auto index = std::size_t{ 0 }; index < left_cols; ++index)
+				for (auto index = std::size_t{}; index < left_cols; ++index)
 				{
 					result += left(row_idx, index) * right(index, col_idx);
 				}

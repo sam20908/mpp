@@ -89,6 +89,11 @@ namespace
 		return dumb_class2{};
 	}
 
+	[[nodiscard]] constexpr auto tag_invoke(mpp::singular_t, dumb_class) -> bool
+	{
+		return true;
+	}
+
 	TEST(Customization, DefaultExtents)
 	{
 		const auto matrix = mpp::matrix<int>{};
@@ -138,5 +143,11 @@ namespace
 		EXPECT_EQ(mpp::transpose(dummy), dumb_class2{});
 	}
 
-	// @TODO: Add customization test for singular and (upcoming) equal CPOs
+	TEST(Customization, Singular)
+	{
+		const auto dummy = dumb_class{};
+		EXPECT_TRUE(mpp::singular(dummy));
+	}
+
+	// @TODO: Add customization test for upcoming equal CPOs
 } // namespace

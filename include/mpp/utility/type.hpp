@@ -37,6 +37,11 @@ namespace mpp
 
 	struct type_t
 	{
+		friend inline void tag_invoke(type_t, ...) // @TODO: ISSUE #20
+		{
+			static_assert(R"(Custom overload of "type" is required for custom types!)");
+		}
+
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(type_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix_type // @TODO: ISSUE #20

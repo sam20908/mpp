@@ -1,19 +1,38 @@
 name: CI
 
 jobs:
-- job: FormatValidation
-  displayName: Format Validation
+- job: LibraryFormatValidation
+  displayName: Library Code Format Validation
   pool:
     vmImage: ubuntu-20.04
 
   steps:
   - checkout: self
-    submodules: true
+    submodules: false
 
-  - script: curl https://raw.githubusercontent.com/Sarcasm/run-clang-format/master/run-clang-format.py --output run-clang-format.py
-    displayName: Download run-clang-format.py
+  - script: |
+      sudo apt-get update
+      sudo apt-get install clang-format-11
+    displayName: Install Clang-Format 11
 
-  - script: python ./run-clang-format.py -r include tests benchmarks --style file
+  - script: python ./tools/run_clang_format.py -r include tests benchmarks --style file --clang-format-executable=clang-format-11
+    displayName: Validate
+
+- job: PythonInfrastructureFormatValidation
+  displayName: Python Infrastructure Code Format Validation
+  pool:
+    vmImage: ubuntu-20.04
+
+  steps:
+  - checkout: self
+    submodules: false
+
+  - script: |
+      pip3 install pylint lit --no-warn-script-location
+      echo '##vso[task.prependpath]$(HOME)/.local/bin'
+    displayName: Install Pylint + LLVM Lit
+
+  - script: python ./tools/pylint_recursive.py pylintrc
     displayName: Validate
 
 - job: BuildAndTestAndBenchmarkUbuntu
@@ -39,7 +58,7 @@ jobs:
       vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
   - script: |
-      pip3 install lit
+      pip3 install lit --no-warn-script-location
       echo '##vso[task.prependpath]$(HOME)/.local/bin'
     displayName: Install Python LLVM Lit
 
@@ -60,23 +79,15 @@ jobs:
     displayName: Install GCC Gcovr
 
   - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
-    displayName: Configure For Tests in Debug Configuration
+    displayName: Configure For Tests and Code Coverage in Debug Configuration
 
-  - script: cmake --build build --config Debug --target mpp_code_coverage
-    displayName: Generate Code Coverage in Debug Configuration
-    continueOnError: true
-
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: build/mpp_code_coverage.xml
-      pathToSources: $(Build.SourcesDirectory)
-    displayName: Publish Code Coverage
+  - script: cmake --build build --config Debug --target unit_tests
+    displayName: Build Unit Tests
 
   - script: |
       cd build/bin/tests
       lit compile_tests unit_tests --xunit-xml-output results.xml
-    continueOnError: true
+    continueOnError: true # Tests might fail, but we still want the results
     displayName: Run Tests
 
   - task: PublishTestResults@2
@@ -85,11 +96,21 @@ jobs:
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_CODE_COVERAGE=FALSE -DMPP_BUILD_TESTS=FALSE -B build
+  - script: cmake --build build --config Debug --target mpp_code_coverage
+    displayName: Generate Code Coverage
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: cobertura
+      summaryFileLocation: build/mpp_code_coverage.xml
+      pathToSources: $(Build.SourcesDirectory)
+    displayName: Publish Code Coverage
+
+  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
     displayName: Configure For Benchmarks in Release Configuration
 
-  - script: cmake --build build --config Release --target benchmark
-    displayName: Build Benchmarks in Release Configuration
+  - script: cmake --build build --config Release --target benchmarks
+    displayName: Build Benchmarks
 
   - script: |
       cd build/bin/benchmarks
