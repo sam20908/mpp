@@ -9,9 +9,9 @@ import NavigationBar from "./ts/NavigationBar";
 import Home from "./ts/Home";
 
 ReactDOM.render(
-	<React.StrictMode>
-		<NavigationBar />
-		<Home />
-	</React.StrictMode>,
-	document.getElementById("root")
+  <React.StrictMode>
+    <NavigationBar />
+    <Home />
+  </React.StrictMode>,
+  document.getElementById("root")
 );

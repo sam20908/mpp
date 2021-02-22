@@ -15,22 +15,22 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v2
         with:
-          path: '**/node_modules'
+          path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install All Dependencies
         run: |
-          cd website
+          cd external/website
           yarn install
 
       - name: Lint Source Files
         run: |
-          cd website
+          cd external/website
           yarn lint
-      
+
       - name: Build Website For Production
         run: |
-          cd website
+          cd external/website
           yarn build
 
       - name: Deploy to GitHub Pages

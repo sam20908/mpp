@@ -148,7 +148,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 
 #### Custom Iterators
 
-Custom iterators are used to make nagivating matrices easier. They also meet `LegacyContiguousIterator` requirement.
+Custom iterators are used to make navigating matrices easier. They also meet `LegacyContiguousIterator` requirement.
 
 ```cpp
 #include <mpp/matrix.hpp>
@@ -173,128 +173,7 @@ int main()
 
 You can find more APIs that are not mentioned in this README in the (upcoming) documentation.
 
-# About Built-In Suites
-
-## Using Built-In Tests:
-
-CMake option `MPP_BUILD_TESTS` builds all tests by default. You can toggle unit tests and compile tests via their corresponding options.
-
--   `MPP_BUILD_UNIT_TESTS` for unit tests.
--   `MPP_BUILD_COMPILE_TESTS` for compile tests.
-
-It has the following dependencies:
-
--   `gtest` installed via `vcpkg` submodule for unit tests.
--   LLVM Lit Test Runner `lit` installed and found in **PATH**. **It is only required for **_compile tests_**!**
-
-## Using Built-In Benchmarks:
-
-CMake option `MPP_BUILD_BENCHMARKS` builds benchmarks that run against various algorithms.
-
-It has the following dependencies:
-
--   `benchmark` installed via `vcpkg` submodule for runtime benchmarks.
-
-## Using Code Coverage:
-
-CMake option `MPP_CODE_COVERAGE` defines the target `mpp_code_coverage`, which will output `mpp_code_coverage.xml` in the build folder. It has the following conditions to be met.
-
--   The current compiler is `gcc`.
--   `gcov` and `gcovr` installed and found in **PATH**.
--   Requires unit tests to be enabled.
-
-## Executing the Tests and Benchmarks
-
-#### Psst: if you want the nice features of having Lit targets, then you need to have LLVM Lit installed and found in PATH!
-
-### Unit Tests
-
-Different categories of unit tests are built into their own executables, so it makes failing tests easier to debug. A CTest target `unit_tests` is defined, which invokes the Lit configuration of unit tests.
-
-Example:
-
-```
-# Assuming you are in the build folder
-
-> ctest -R unit_tests
-
-UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
-UpdateCTestConfiguration  from :/home/sames/Projects/matrixpp_actual_code/mpp/build/DartConfiguration.tcl
-Test project /home/sames/Projects/matrixpp_actual_code/matrixpp/build
-Constructing a list of tests
-Done constructing a list of tests
-Updating test list for fixtures
-Added 0 tests to meet fixture requirements
-Checking test dependency graph...
-Checking test dependency graph end
-test 2
-    Start 2: unit_tests
-
-2: Test command: /home/sames/.local/bin/lit "."
-2: Test timeout computed to be: 10000000
-2: -- Testing: 68 tests, 8 workers --
-
-# Bunch more tests here...
-
-2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_NonZeroAndZeroSide_Throw (65 of 68)
-2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_DynamicExprObject_DifferentSize_Throw (66 of 68)
-2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_ZeroAndNonZeroSide_Throw (67 of 68)
-2: PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_StaticExprObject (68 of 68)
-2:
-2: Testing Time: 0.10s
-2:   Passed: 68
-1/1 Test #2: unit_tests ........................   Passed    0.23 sec
-
-The following tests passed:
-        unit_tests
-```
-
-If you want to run subset of tests by regular expression, you can `cd` into `build/bin/tests/unit_tests` and pass a regular expression into `--filter=` when running `lit .`
-
-Example:
-
-```
-# Assuming you are in "build/bin/tests/unit_tests"
-
-> lit . --filter=Initialization
-
-PASS: Unit Test :: /initialization_unit_test/Initialization.DynamicColumns2DInitializerList_SizeMismatch_Throw (1 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRows2DInitializerList_SizeMismatch_Throw (2 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRowsValueConstructor (3 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.DynamicColumns2DInitializerList (4 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.DymamicRows2DInitializerList (5 of 59)
-
-# Bunch more initialization tests here...
-
-PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_NonZeroAndZeroSide_Throw (56 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_ZeroAndNonZeroSide_Throw (57 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_DynamicExprObject_SameSize (58 of 59)
-PASS: Unit Test :: /initialization_unit_test/Initialization.FullyStatic_StaticExprObject (59 of 59)
-
-Testing Time: 0.09s
-  Excluded:  9
-  Passed  : 59
-```
-
-See all available command line options for LLVM Lit here: https://llvm.org/docs/CommandGuide/lit.html
-
-### Compile Tests
-
-It's very much the same as unit tests, except that LLVM Lit is required to run any compile test. There is also a corresponding CTest target called `compile_tests` which just runs the compile tests through Lit.
-
-Because it uses a separate CMakeLists to compile the tests, the Lit configuration propagates the compiler used to build mpp to also build the compile tests. This avoids issues of both mpp and the compile tests having different compilers (e.g. compile tests being "faulty" because it picked a non-conforming compiler unlike mpp).
-
-However, the Lit configuration checks the compiler stored in the cache before it attempts to compile the tests. It will produce an error when the compilers in the cache are different than the propagated compilers (just like what CMake does).
-
-### Benchmarks
-
-Pretty much the same as unit tests. Different benchmarks of algorithms, and etc get built into their own executable, and a corresponding CTest target `benchmarks` invokes all benchmarks through Lit.
-
 ## FAQ
-
-#### Why LLVM Lit?
-
-LLVM Lit Test Infrastructure helps developing test suites and benchmarks easily. It also allows combination of tests and benchmarks to be run at the same time given its flexibility. mpp's CMake scripts are also designed to integrate tests with LLVM Lit to help debug tests.
 
 #### Why `tag_invoke` for customization?
 
@@ -329,7 +208,3 @@ struct determinant_t
 ```
 
 The `friend` specifier makes the default `tag_invoke` in the same namespace scope as `determinant_t`, and it all works out because `tag_invoke(*this)` uses ADL to find the default overload of `tag_invoke`, and it'll also pick up other overloads because it performed an unqualified call.
-
-#### Why store the website code in the "website" folder?
-
-It has been painful to work between different branches for the library and the website in the same workspace. It is also NOT an optimal solution by just checking out different branches in different locations. I have decided to at least give it a dedicated folder, isolated from library code. This way, updating library code and website is a lot less painful.
