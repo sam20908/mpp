@@ -19,37 +19,32 @@
 
 #pragma once
 
-#include <iterator>
+template<typename T>
+using container_allocator_type = typename T::allocator_type;
 
-namespace mpp_test
-{
-	template<typename T>
-	using container_allocator_type = typename T::allocator_type;
+template<typename T>
+using container_value_type = typename T::value_type;
 
-	template<typename T>
-	using container_value_type = typename T::value_type;
+template<typename T>
+using container_reference = typename T::reference;
 
-	template<typename T>
-	using container_reference = typename T::reference;
+template<typename T>
+using container_const_reference = typename T::const_reference;
 
-	template<typename T>
-	using container_const_reference = typename T::const_reference;
+template<typename T>
+using container_iterator = typename T::iterator;
 
-	template<typename T>
-	using container_iterator = typename T::iterator;
+template<typename T>
+using container_const_iterator = typename T::const_iterator;
 
-	template<typename T>
-	using container_const_iterator = typename T::const_iterator;
+template<typename T>
+using container_reverse_iterator = typename T::reverse_iterator;
 
-	template<typename T>
-	using container_reverse_iterator = typename T::reverse_iterator;
+template<typename T>
+using container_const_reverse_iterator = typename T::const_reverse_iterator;
 
-	template<typename T>
-	using container_const_reverse_iterator = typename T::const_reverse_iterator;
+template<typename T>
+using container_difference_type = typename T::difference_type;
 
-	template<typename T>
-	using container_difference_type = typename T::difference_type;
-
-	template<typename T>
-	using container_size_type = typename T::size_type;
-} // namespace mpp_test
+template<typename T>
+using container_size_type = typename T::size_type;

@@ -18,23 +18,6 @@ jobs:
   - script: python ./external/tools/run_clang_format.py -r include external --style file --clang-format-executable=clang-format-11
     displayName: Validate
 
-- job: PythonInfrastructureFormatValidation
-  displayName: Python Infrastructure Code Format Validation
-  pool:
-    vmImage: ubuntu-20.04
-
-  steps:
-  - checkout: self
-    submodules: false
-
-  - script: |
-      pip3 install pylint lit --no-warn-script-location
-      echo '##vso[task.prependpath]$(HOME)/.local/bin'
-    displayName: Install Pylint + LLVM Lit
-
-  - script: python ./external/tools/pylint_recursive.py ./external/pylintrc
-    displayName: Validate
-
 - job: BuildAndTestAndBenchmarkUbuntu
   displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
@@ -81,13 +64,12 @@ jobs:
   - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
     displayName: Configure For Tests and Code Coverage in Debug Configuration
 
-  - script: cmake --build build --config Debug --target unit_tests
-    displayName: Build Unit Tests
+  - script: cmake --build build --config Debug --target tests
+    displayName: Build Tests
 
   - script: |
       cd build/bin/tests
-      lit compile_tests unit_tests --xunit-xml-output results.xml
-    continueOnError: true # Tests might fail, but we still want the results
+      lit . --xunit-xml-output results.xml --ignore-fail
     displayName: Run Tests
 
   - task: PublishTestResults@2
@@ -95,27 +77,29 @@ jobs:
       testResultsFormat: JUnit
       testResultsFiles: '**/results.xml' 
     displayName: Publish Tests Results
+  
+  # @TODO: Implement code coverage and enable this step
+  # - script: cmake --build build --config Debug --target mpp_code_coverage
+  #   displayName: Generate Code Coverage
 
-  - script: cmake --build build --config Debug --target mpp_code_coverage
-    displayName: Generate Code Coverage
+  # - task: PublishCodeCoverageResults@1
+  #   inputs:
+  #     codeCoverageTool: cobertura
+  #     summaryFileLocation: build/mpp_code_coverage.xml
+  #     pathToSources: $(Build.SourcesDirectory)
+  #   displayName: Publish Code Coverage
 
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: build/mpp_code_coverage.xml
-      pathToSources: $(Build.SourcesDirectory)
-    displayName: Publish Code Coverage
+  # @TODO: Implement benchmarks and enable this step
+  # - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
+  #   displayName: Configure For Benchmarks in Release Configuration
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
-    displayName: Configure For Benchmarks in Release Configuration
+  # - script: cmake --build build --config Release --target benchmarks
+  #   displayName: Build Benchmarks
 
-  - script: cmake --build build --config Release --target benchmarks
-    displayName: Build Benchmarks
-
-  - script: |
-      cd build/bin/benchmarks
-      lit . -a
-    displayName: Run All Benchmarks
+  # - script: |
+  #     cd build/bin/benchmarks
+  #     lit . -a
+  #   displayName: Run All Benchmarks
 
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)

@@ -12,8 +12,6 @@ Taken from https://github.com/Sarcasm/run-clang-format with the following change
 - Display which files need to be formatted
 """
 
-# pylint: skip-file (for ease of porting)
-
 from __future__ import print_function, unicode_literals
 
 import argparse

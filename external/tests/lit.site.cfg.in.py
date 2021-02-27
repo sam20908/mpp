@@ -17,17 +17,15 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from os.path import join
 from lit import LitConfig, TestingConfig
+from lit.formats import ExecutableTest
 
+config.name = 'Test'
+config.test_source_root = '@TESTS_BINARY_DIR@'
 
-lit_config: LitConfig
-config: TestingConfig
+if lit_config.isWindows:
+    config.suffixes = ['.exe']
+else:
+    config.suffixes = ['']
 
-
-config.source_dir = '@COMPILE_TESTS_SOURCE_DIR@'
-config.binary_dir = '@COMPILE_TESTS_BINARY_DIR@'
-config.c_compiler = '@CMAKE_C_COMPILER@'
-config.cxx_compiler = '@CMAKE_CXX_COMPILER@'
-
-lit_config.load_config(config, join(config.source_dir, 'lit.site.cfg.py'))
+config.test_format = ExecutableTest()

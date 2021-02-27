@@ -17,15 +17,21 @@
  * under the License.
  */
 
-/**
- * Since linking GTest::gtest_main somehow creates another test
- * for lit, we define the main function manually
- */
+#pragma once
 
-#include <gtest/gtest.h>
+#include <limits>
+#include <type_traits>
 
-int main(int argc, char** argv)
+// @NOTE TO SELF: Copied from detail/utility.hpp
+template<typename T>
+constexpr auto accurate_equals(T left, T right) -> bool
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	if constexpr (std::is_floating_point_v<T>)
+	{
+		return std::abs(left - right) < std::numeric_limits<T>::epsilon();
+	}
+	else
+	{
+		return left == right;
+	}
 }

@@ -48,7 +48,10 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
-option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the test suites" OFF)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
+
+option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the tests" OFF)
 option(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS "Builds the benchmarks" OFF)
 
 # There are several LLVM Lit distributions: Python's Lit package and
@@ -62,5 +65,5 @@ if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
 endif()
 
 if(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS)
-    add_subdirectory("external/benchmarks")
+    # add_subdirectory("external/benchmarks")
 endif()

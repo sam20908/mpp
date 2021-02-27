@@ -17,22 +17,11 @@ specific language governing permissions and limitations
 under the License.
 """
 
-# pylint: skip-file (due to how LLVM works, importing is messed up...)
-
 from lit import LitConfig, TestingConfig
+from lit.formats import ExecutableTest
 
-import sys
-# This has to happen before importing the test format
-sys.path.append('@RUNTIME_BENCHMARKS_BINARY_DIR@')
-
-from format import ExecutableTest
-
-
-lit_config: LitConfig
-config: TestingConfig
-
-config.name = 'Runtime Benchmark'
-config.test_source_root = '@RUNTIME_BENCHMARKS_BINARY_DIR@'
+config.name = 'Test'
+config.test_source_root = '@BENCHMARKS_BINARY_DIR@'
 
 if lit_config.isWindows:
     config.suffixes = ['.exe']
