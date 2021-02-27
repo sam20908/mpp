@@ -41,7 +41,7 @@ jobs:
           vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
       - script: |
-          pip3 install lit==12.0.0rc1 --no-warn-script-location
+          pip3 install lit --no-warn-script-location
           echo '##vso[task.prependpath]$(HOME)/.local/bin'
         displayName: Install Python LLVM Lit
 
@@ -69,7 +69,8 @@ jobs:
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml --ignore-fail
+          lit . --xunit-xml-output results.xml
+        continueOnError: true # Tests might fail, but we still want the results
         displayName: Run Tests
 
       - task: PublishTestResults@2
