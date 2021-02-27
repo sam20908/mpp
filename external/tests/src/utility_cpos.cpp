@@ -22,7 +22,7 @@
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
-#include "../include/ut.hpp"
+#include "../../thirdparty/ut.hpp"
 #include "../include/utility.hpp"
 
 #include <cstddef>

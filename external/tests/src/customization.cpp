@@ -36,7 +36,7 @@ namespace mpp::customize
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
-#include "../include/ut.hpp"
+#include "../../thirdparty/ut.hpp"
 
 // @TODO: Add customization test for upcoming equal CPOs
 

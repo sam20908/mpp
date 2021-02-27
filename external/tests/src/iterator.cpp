@@ -19,7 +19,7 @@
 
 #include <mpp/matrix.hpp>
 
-#include "../include/ut.hpp"
+#include "../../thirdparty/ut.hpp"
 
 using namespace boost::ut::literals;
 using namespace boost::ut::operators::terse;

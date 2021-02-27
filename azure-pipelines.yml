@@ -1,106 +1,105 @@
 name: CI
 
 jobs:
-- job: LibraryFormatValidation
-  displayName: Library Code Format Validation
-  pool:
-    vmImage: ubuntu-20.04
+  - job: LibraryFormatValidation
+    displayName: Library Code Format Validation
+    pool:
+      vmImage: ubuntu-20.04
 
-  steps:
-  - checkout: self
-    submodules: false
+    steps:
+      - checkout: self
+        submodules: false
 
-  - script: |
-      sudo apt-get update
-      sudo apt-get install clang-format-11
-    displayName: Install Clang-Format 11
+      - script: |
+          sudo apt-get update
+          sudo apt-get install clang-format-11
+        displayName: Install Clang-Format 11
 
-  - script: python ./external/tools/run_clang_format.py -r include external --style file --clang-format-executable=clang-format-11
-    displayName: Validate
+      - script: python ./external/tools/run_clang_format.py -r include external/tests external/benchmarks --style file --clang-format-executable=clang-format-11
+        displayName: Validate
 
-- job: BuildAndTestAndBenchmarkUbuntu
-  displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
+  - job: BuildAndTestAndBenchmarkUbuntu
+    displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
 
-  pool:
-    vmImage: ubuntu-20.04
+    pool:
+      vmImage: ubuntu-20.04
 
-  steps:
-  - checkout: self
-    submodules: true
+    steps:
+      - checkout: self
+        submodules: true
 
-  - task: Cache@2
-    displayName: Cache vcpkg
-    inputs:
-      key: $(Build.SourcesDirectory)/external/vcpkg-dependencies.txt | "$(Agent.OS)"
-      path: '$(Build.SourcesDirectory)/vcpkg'
+      - task: Cache@2
+        displayName: Cache vcpkg
+        inputs:
+          key: $(Build.SourcesDirectory)/external/vcpkg-dependencies.txt | "$(Agent.OS)"
+          path: "$(Build.SourcesDirectory)/vcpkg"
 
-  - task: run-vcpkg@0
-    displayName: Run vcpkg
-    inputs:
-      vcpkgArguments: '@$(Build.SourcesDirectory)/external/vcpkg-dependencies.txt'
-      vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
+      - task: run-vcpkg@0
+        displayName: Run vcpkg
+        inputs:
+          vcpkgArguments: "@$(Build.SourcesDirectory)/external/vcpkg-dependencies.txt"
+          vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
-  - script: |
-      pip3 install lit --no-warn-script-location
-      echo '##vso[task.prependpath]$(HOME)/.local/bin'
-    displayName: Install Python LLVM Lit
+      - script: |
+          pip3 install lit==12.0.0rc1 --no-warn-script-location
+          echo '##vso[task.prependpath]$(HOME)/.local/bin'
+        displayName: Install Python LLVM Lit
 
-  - script: |
-      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
-      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+      - script: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
 
-      sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
-      sudo update-alternatives --set cc /usr/bin/gcc
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
+          sudo update-alternatives --set cc /usr/bin/gcc
 
-      sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
-      sudo update-alternatives --set c++ /usr/bin/g++
-    displayName: Use GCC 10 by default
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
+          sudo update-alternatives --set c++ /usr/bin/g++
+        displayName: Use GCC 10 by default
 
-  - script: |
-      sudo apt-get update
-      sudo apt-get install gcovr
-    displayName: Install GCC Gcovr
+      - script: |
+          sudo apt-get update
+          sudo apt-get install gcovr
+        displayName: Install GCC Gcovr
 
-  - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
-    displayName: Configure For Tests and Code Coverage in Debug Configuration
+      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
+        displayName: Configure For Tests and Code Coverage in Debug Configuration
 
-  - script: cmake --build build --config Debug --target tests
-    displayName: Build Tests
+      - script: cmake --build build --config Debug --target tests
+        displayName: Build Tests
 
-  - script: |
-      cd build/bin/tests
-      lit . --xunit-xml-output results.xml --ignore-fail
-    displayName: Run Tests
+      - script: |
+          cd build/bin/tests
+          lit . --xunit-xml-output results.xml --ignore-fail
+        displayName: Run Tests
 
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: JUnit
-      testResultsFiles: '**/results.xml' 
-    displayName: Publish Tests Results
-  
-  # @TODO: Implement code coverage and enable this step
-  # - script: cmake --build build --config Debug --target mpp_code_coverage
-  #   displayName: Generate Code Coverage
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: "**/results.xml"
+        displayName: Publish Tests Results
 
-  # - task: PublishCodeCoverageResults@1
-  #   inputs:
-  #     codeCoverageTool: cobertura
-  #     summaryFileLocation: build/mpp_code_coverage.xml
-  #     pathToSources: $(Build.SourcesDirectory)
-  #   displayName: Publish Code Coverage
+    # @TODO: Implement code coverage and enable this step
+    # - script: cmake --build build --config Debug --target mpp_code_coverage
+    #   displayName: Generate Code Coverage
 
-  # @TODO: Implement benchmarks and enable this step
-  # - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
-  #   displayName: Configure For Benchmarks in Release Configuration
+    # - task: PublishCodeCoverageResults@1
+    #   inputs:
+    #     codeCoverageTool: cobertura
+    #     summaryFileLocation: build/mpp_code_coverage.xml
+    #     pathToSources: $(Build.SourcesDirectory)
+    #   displayName: Publish Code Coverage
 
-  # - script: cmake --build build --config Release --target benchmarks
-  #   displayName: Build Benchmarks
+    # @TODO: Implement benchmarks and enable this step
+    # - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
+    #   displayName: Configure For Benchmarks in Release Configuration
 
-  # - script: |
-  #     cd build/bin/benchmarks
-  #     lit . -a
-  #   displayName: Run All Benchmarks
+    # - script: cmake --build build --config Release --target benchmarks
+    #   displayName: Build Benchmarks
 
+    # - script: |
+    #     cd build/bin/benchmarks
+    #     lit . -a
+    #   displayName: Run All Benchmarks
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
 
@@ -144,16 +143,16 @@ jobs:
 #   - task: PublishTestResults@2
 #     inputs:
 #       testResultsFormat: JUnit
-#       testResultsFiles: '**/results.xml' 
+#       testResultsFiles: '**/results.xml'
 #     displayName: Publish Lit Test Results
 
-  # - script: cmake --build build --config Release
-  #   displayName: Build in Release Configuration
+# - script: cmake --build build --config Release
+#   displayName: Build in Release Configuration
 
-  # - script: |
-  #     cd build/bin/benchmarks/Release
-  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
-  #   displayName: Run All Benchmarks
+# - script: |
+#     cd build/bin/benchmarks/Release
+#     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+#   displayName: Run All Benchmarks
 
 # - job: BuildAndTestMacOS
 #   displayName: Build / Test / Benchmark (MacOS)
@@ -198,13 +197,13 @@ jobs:
 #   - task: PublishTestResults@2
 #     inputs:
 #       testResultsFormat: JUnit
-#       testResultsFiles: '**/results.xml' 
+#       testResultsFiles: '**/results.xml'
 #     displayName: Publish Lit Test Results
 
-  # - script: cmake --build build --config Release
-  #   displayName: Build in Release Configuration
+# - script: cmake --build build --config Release
+#   displayName: Build in Release Configuration
 
-  # - script: |
-  #     cd build/bin/benchmarks/Release
-  #     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
-  #   displayName: Run All Benchmarks
+# - script: |
+#     cd build/bin/benchmarks/Release
+#     ./all_benchmarks --benchmark_format=console --benchmark_out_format=json --benchmark_out=results.json
+#   displayName: Run All Benchmarks
