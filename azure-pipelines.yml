@@ -26,19 +26,6 @@ jobs:
 
     steps:
       - checkout: self
-        submodules: true
-
-      - task: Cache@2
-        displayName: Cache vcpkg
-        inputs:
-          key: $(Build.SourcesDirectory)/external/vcpkg-dependencies.txt | "$(Agent.OS)"
-          path: "$(Build.SourcesDirectory)/vcpkg"
-
-      - task: run-vcpkg@0
-        displayName: Run vcpkg
-        inputs:
-          vcpkgArguments: "@$(Build.SourcesDirectory)/external/vcpkg-dependencies.txt"
-          vcpkgDirectory: $(Build.SourcesDirectory)/vcpkg
 
       - script: |
           pip3 install lit==12.0.0rc1 --no-warn-script-location
@@ -56,12 +43,13 @@ jobs:
           sudo update-alternatives --set c++ /usr/bin/g++
         displayName: Use GCC 10 by default
 
-      - script: |
-          sudo apt-get update
-          sudo apt-get install gcovr
-        displayName: Install GCC Gcovr
+        # @TODO: Implement code coverage and enable this step (occurs below)
+      #- script: |
+          #sudo apt-get update
+          #sudo apt-get install gcovr
+        #displayName: Install GCC Gcovr
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
+      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -B build
         displayName: Configure For Tests and Code Coverage in Debug Configuration
 
       - script: cmake --build build --config Debug --target tests
@@ -90,17 +78,16 @@ jobs:
     #     pathToSources: $(Build.SourcesDirectory)
     #   displayName: Publish Code Coverage
 
-    # @TODO: Implement benchmarks and enable this step
-    # - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DMPP_BUILD_TESTS=FALSE -B build
-    #   displayName: Configure For Benchmarks in Release Configuration
+     - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -B build
+       displayName: Configure For Benchmarks in Release Configuration
 
-    # - script: cmake --build build --config Release --target benchmarks
-    #   displayName: Build Benchmarks
+     - script: cmake --build build --config Release --target benchmarks
+       displayName: Build Benchmarks
 
-    # - script: |
-    #     cd build/bin/benchmarks
-    #     lit . -a
-    #   displayName: Run All Benchmarks
+     - script: |
+         cd build/bin/benchmarks
+         ./initialization # @TODO: Find a way to invoke multiple executables in the same directory as we're not using LLVM Lit for benchmarks
+       displayName: Run All Benchmarks
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
 

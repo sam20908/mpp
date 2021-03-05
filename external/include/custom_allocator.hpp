@@ -24,51 +24,48 @@
 #include <limits>
 #include <memory>
 
-namespace mpp_test
+/**
+ * Taken from https://en.cppreference.com/w/cpp/named_req/Allocator#Allocator_completeness_requirements with
+ * modifications
+ */
+
+template<class T>
+struct custom_allocator
 {
-	/**
-	 * Taken from https://en.cppreference.com/w/cpp/named_req/Allocator#Allocator_completeness_requirements with
-	 * modifications
-	 */
+	typedef T value_type;
 
-	template<class T>
-	struct custom_allocator
+	custom_allocator() = default;
+	template<class U>
+	constexpr custom_allocator(const custom_allocator<U>&) noexcept
 	{
-		typedef T value_type;
+	}
 
-		custom_allocator() = default;
-		template<class U>
-		constexpr custom_allocator(const custom_allocator<U>&) noexcept
-		{
-		}
-
-		[[nodiscard]] T* allocate(std::size_t n)
-		{
-			if (n > std::numeric_limits<std::size_t>::max() / sizeof(T))
-				throw std::bad_alloc();
-
-			if (auto p = static_cast<T*>(std::malloc(n * sizeof(T))))
-			{
-				return p;
-			}
-
+	[[nodiscard]] T* allocate(std::size_t n)
+	{
+		if (n > std::numeric_limits<std::size_t>::max() / sizeof(T))
 			throw std::bad_alloc();
-		}
 
-		void deallocate(T* p, std::size_t) noexcept
+		if (auto p = static_cast<T*>(std::malloc(n * sizeof(T))))
 		{
-			std::free(p);
+			return p;
 		}
-	};
 
-	template<class T, class U>
-	bool operator==(const custom_allocator<T>&, const custom_allocator<U>&)
-	{
-		return true;
+		throw std::bad_alloc();
 	}
-	template<class T, class U>
-	bool operator!=(const custom_allocator<T>&, const custom_allocator<U>&)
+
+	void deallocate(T* p, std::size_t) noexcept
 	{
-		return false;
+		std::free(p);
 	}
-} // namespace mpp_test
+};
+
+template<class T, class U>
+bool operator==(const custom_allocator<T>&, const custom_allocator<U>&)
+{
+	return true;
+}
+template<class T, class U>
+bool operator!=(const custom_allocator<T>&, const custom_allocator<U>&)
+{
+	return false;
+}

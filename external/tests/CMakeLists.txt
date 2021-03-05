@@ -32,7 +32,7 @@ function(_create_test TEST_FILENAME)
     set(TEST_SOURCE "src/${TEST_FILENAME}.cpp")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
-    _setup_target(${TEST_NAME} "${TESTS_BINARY_DIR}" "${TESTS_LIBRARIES}")
+    _setup_target(${TEST_NAME} "${TESTS_BINARY_DIR}")
     _turn_on_warnings(${TEST_NAME})
 
     add_dependencies("tests" ${TEST_NAME})

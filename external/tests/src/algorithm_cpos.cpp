@@ -20,9 +20,9 @@
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
+#include "../../include/data_parser.hpp"
+#include "../../include/utility.hpp"
 #include "../../thirdparty/ut.hpp"
-#include "../include/data_parser.hpp"
-#include "../include/utility.hpp"
 
 #include <filesystem>
 #include <functional>
@@ -35,6 +35,8 @@ using namespace boost::ut::bdd;
 using namespace boost::ut;
 
 using value_type = double;
+
+// @TODO: DRY the two matrices element compare wise (dependent on #130?)
 
 auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
 {
@@ -133,12 +135,53 @@ void test_transformation(const std::string& filename, const auto& transform_fn, 
 	};
 }
 
+template<std::size_t RowsExtent,
+	std::size_t ColumnsExtent,
+	std::size_t ResultRowsExtent,
+	std::size_t ResultColumnsExtent>
+void test_block_helper(const auto& results, const auto& data, auto... dimension_args)
+{
+	const auto matrix = mpp::matrix<value_type, RowsExtent, ColumnsExtent>{ dimension_args..., data };
+
+	for (const auto& result : results)
+	{
+		const auto row_start_idx = std::get<0>(result);
+		const auto col_start_idx = std::get<1>(result);
+		const auto row_end_idx   = std::get<2>(result);
+		const auto col_end_idx   = std::get<3>(result);
+		const auto cropped       = mpp::block(matrix, row_start_idx, col_start_idx, row_end_idx, col_end_idx);
+		const auto result_matrix = mpp::matrix<value_type>{ std::get<4>(result) };
+
+		expect(cropped.rows() == result_matrix.rows());
+		expect(cropped.columns() == result_matrix.columns());
+
+		const auto all_elems_equal =
+			std::ranges::equal(result_matrix, cropped, [](const auto& left, const auto& right) {
+				return accurate_equals(left, right);
+			});
+
+		expect(all_elems_equal);
+	}
+}
+
+template<typename Tag = decltype(tag(""))>
+void test_block(const std::string& filename, Tag test_tag = tag("execute"))
+{
+	const auto [data, results, file_exists] = parse_data_file_matrix_block_double(get_actual_filepath(filename));
+
+	skip_test_if_file_not_exists(file_exists, test_tag);
+
+	test_tag / test(filename) = [&]() {
+		test_block_helper<std::dynamic_extent, std::dynamic_extent, std::dynamic_extent, std::dynamic_extent>(results,
+			data);
+	};
+}
+
 int main()
 {
 	cfg<override> = { .tag = { "execute" } };
 
 	// @TODO: Several tests are skipped due to #163
-	// @TODO: Add test cases for block
 
 	feature("algorithm CPOs") = []() {
 		given("determinant CPO") = []() {
@@ -164,6 +207,10 @@ int main()
 			test_transformation<2, 2>("test_data/2x2_inv.txt", inverse_fn);
 
 			test_transformation<10, 10>("test_data/10x10_inv.txt", inverse_fn, tag("skip"));
+		};
+
+		given("block CPO") = []() {
+			test_block("test_data/4x4_block.txt");
 		};
 	};
 

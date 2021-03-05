@@ -17,7 +17,6 @@ specific language governing permissions and limitations
 under the License.
 """
 
-from lit import LitConfig, TestingConfig
 from lit.formats import ExecutableTest
 
 config.name = 'Test'

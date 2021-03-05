@@ -15,10 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.15)
 
-function(_setup_target target binary_dir libraries)
-    target_link_libraries(${target} PRIVATE ${libraries})
+project(mpp CXX)
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
+
+function(_setup_target target binary_dir)
+    target_link_libraries(${target} PRIVATE ${PROJECT_NAME}::${PROJECT_NAME})
 
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${binary_dir}"
@@ -37,22 +40,14 @@ function(_turn_on_warnings target)
     endif()
 endfunction()
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
-
-project("mpp")
-string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
-
 add_library(${PROJECT_NAME} INTERFACE)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
+# @TODO: Don't make this required due to #172
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
-
-option(${PROJECT_NAME_UPPER}_BUILD_TESTS "Builds the tests" OFF)
-option(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS "Builds the benchmarks" OFF)
 
 # There are several LLVM Lit distributions: Python's Lit package and
 # LLVM Lit build from source, which also has version suffixes we need
@@ -65,5 +60,5 @@ if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
 endif()
 
 if(${PROJECT_NAME_UPPER}_BUILD_BENCHMARKS)
-    # add_subdirectory("external/benchmarks")
+    add_subdirectory("external/benchmarks")
 endif()
