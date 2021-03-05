@@ -65,15 +65,15 @@ jobs:
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
 
-     - script: cmake --build build --config Debug --target mpp_code_coverage
-       displayName: Generate Code Coverage
+      - script: cmake --build build --config Debug --target mpp_code_coverage
+        displayName: Generate Code Coverage
 
-     - task: PublishCodeCoverageResults@1
-       inputs:
-         codeCoverageTool: cobertura
-         summaryFileLocation: build/mpp_code_coverage.xml
-         pathToSources: $(Build.SourcesDirectory)
-       displayName: Publish Code Coverage
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: cobertura
+          summaryFileLocation: build/mpp_code_coverage.xml
+          pathToSources: $(Build.SourcesDirectory)
+        displayName: Publish Code Coverage
 
       - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -B build
         displayName: Configure For Benchmarks in Release Configuration
