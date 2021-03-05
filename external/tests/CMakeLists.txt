@@ -45,6 +45,16 @@ _create_test("utility_cpos")
 _create_test("iterator")
 _create_test("algorithm_cpos")
 
+if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
+    include("../thirdparty/CodeCoverage.cmake")
+    append_coverage_compiler_flags()
+    setup_target_for_coverage_gcovr_xml(
+        NAME ${PROJECT_NAME}_code_coverage
+        EXECUTABLE "" # Invoke nothing to avoid test failure workarounds (which would have return code of NOT 0)
+        EXCLUDE "${PROJECT_SOURCE_DIR}/tests/*"
+        DEPENDENCIES "tests")
+endif()
+
 if(LLVM_LIT_EXEC)
     add_test(NAME "tests" 
         COMMAND ${LLVM_LIT_EXEC} .
