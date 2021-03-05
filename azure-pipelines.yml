@@ -78,16 +78,16 @@ jobs:
     #     pathToSources: $(Build.SourcesDirectory)
     #   displayName: Publish Code Coverage
 
-     - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -B build
-       displayName: Configure For Benchmarks in Release Configuration
+      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -B build
+        displayName: Configure For Benchmarks in Release Configuration
 
-     - script: cmake --build build --config Release --target benchmarks
-       displayName: Build Benchmarks
+      - script: cmake --build build --config Release --target benchmarks
+        displayName: Build Benchmarks
 
-     - script: |
-         cd build/bin/benchmarks
-         ./initialization # @TODO: Find a way to invoke multiple executables in the same directory as we're not using LLVM Lit for benchmarks
-       displayName: Run All Benchmarks
+      - script: |
+          cd build/bin/benchmarks
+          ./initialization # @TODO: Find a way to invoke multiple executables in the same directory as we're not using LLVM Lit for benchmarks
+        displayName: Run All Benchmarks
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
 
