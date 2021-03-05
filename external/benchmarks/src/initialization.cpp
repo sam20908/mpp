@@ -25,7 +25,7 @@
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
 void benchmark_initialization(std::string_view name, auto... args)
 {
-    // Using scope resolution operator to workaround ambiguity
+	// Using scope resolution operator to workaround ambiguity
 	benchmark::benchmark{ name } = [&]() {
 		auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ args... };
 		benchmark::do_not_optimize(matrix);

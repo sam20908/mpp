@@ -22,8 +22,8 @@
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
-#include "../../thirdparty/ut.hpp"
 #include "../../include/utility.hpp"
+#include "../../thirdparty/ut.hpp"
 
 #include <cstddef>
 #include <span>
