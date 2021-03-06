@@ -45,6 +45,9 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
+file(GLOB_RECURSE INCLUDE_HEADERS CONFIGURE_DEPENDS "include/*")
+target_sources(${PROJECT_NAME} INTERFACE ${INCLUDE_HEADERS})
+
 # @TODO: Don't make this required due to #172
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
