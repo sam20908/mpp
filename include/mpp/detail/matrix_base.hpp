@@ -27,7 +27,6 @@
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
-#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -267,8 +266,6 @@ namespace mpp::detail
 
 		auto operator=(const matrix_base&) -> matrix_base& = default; // @TODO: ISSUE #20
 		auto operator=(matrix_base&&) -> matrix_base& = default;      // @TODO: ISSUE #20
-
-		auto operator<=>(const matrix_base&) const -> std::strong_ordering = default; // @TODO: ISSUE #20
 
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
