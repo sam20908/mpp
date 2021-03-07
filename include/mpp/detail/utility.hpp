@@ -127,15 +127,7 @@ namespace mpp::detail
 	inline void
 	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, InitializerValue&& val) // @TODO: ISSUE #20
 	{
-		// @TODO: Remove this workaround once MSVC supports requires clauses (#188)
-#ifdef _MSC_VER
-        constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
-#else
-		constexpr auto is_vec = requires
-		{
-			buf.reserve(0);
-		};
-#endif
+		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
 
 		if constexpr (is_vec)
 		{
@@ -145,15 +137,7 @@ namespace mpp::detail
 
 	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 	{
-	// @TODO: Remove this workaround once MSVC supports requires clauses (#188)
-#ifdef _MSC_VER
-        constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
-#else
-		constexpr auto is_vec = requires
-		{
-			buf.reserve(0);
-		};
-#endif
+		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
 
 		if constexpr (is_vec)
 		{

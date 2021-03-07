@@ -151,7 +151,8 @@ namespace mpp::detail
 			}
 		}
 
-		void init_buf_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void
+		init_buf_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -483,7 +484,7 @@ namespace mpp::detail
 
 					for (auto&& val : rng)
 					{
-					    base._buf.push_back(std::move(static_cast<Value>(val)));
+						base._buf.push_back(std::move(static_cast<Value>(val)));
 					}
 				}
 				else
@@ -492,19 +493,19 @@ namespace mpp::detail
 
 					for (auto&& val : rng)
 					{
-					    base._buf[idx++] = std::move(static_cast<Value>(val));
+						base._buf[idx++] = std::move(static_cast<Value>(val));
 					}
 				}
 			}
 			else
 			{
-                if constexpr (is_vector<Buffer>::value)
+				if constexpr (is_vector<Buffer>::value)
 				{
 					base._buf.reserve(std::ranges::size(rng));
 
 					for (const auto& val : rng)
 					{
-					    base._buf.push_back(static_cast<Value>(val));
+						base._buf.push_back(static_cast<Value>(val));
 					}
 				}
 				else
@@ -513,7 +514,7 @@ namespace mpp::detail
 
 					for (const auto& val : rng)
 					{
-					    base._buf[idx++] = static_cast<Value>(val);
+						base._buf[idx++] = static_cast<Value>(val);
 					}
 				}
 			}
