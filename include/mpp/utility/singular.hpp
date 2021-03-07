@@ -40,7 +40,7 @@ namespace mpp
 			-> bool // @TODO: ISSUE #20
 		{
 			return detail::accurate_equals(detail::det_lu_decomp<detail::default_floating_type>(obj),
-				detail::default_floating_type{});
+					   detail::default_floating_type{}) == 0;
 		}
 
 		template<typename... Args>

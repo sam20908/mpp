@@ -25,6 +25,7 @@
 #include "../../include/utility.hpp"
 #include "../../thirdparty/ut.hpp"
 
+#include <compare>
 #include <cstddef>
 #include <span>
 #include <utility>
@@ -86,6 +87,22 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 	expect(all_elem_equal);
 }
 
+void test_size_compare(auto&& left_matrix_creator,
+	auto&& right_matrix_creator,
+	std::partial_ordering row_ordering,
+	std::partial_ordering column_ordering,
+	bool equal_in_rows,
+	bool equal_in_columns)
+{
+	const auto left  = left_matrix_creator();
+	const auto right = right_matrix_creator();
+	const auto [compare_row_ordering, compare_column_ordering] =
+		mpp::size_compare(left, right, equal_in_rows, equal_in_columns);
+
+	expect(row_ordering == compare_row_ordering);
+	expect(column_ordering == compare_column_ordering);
+}
+
 int main()
 {
 	feature("utility CPOs") = []() {
@@ -128,6 +145,55 @@ int main()
 			test_cast<float, std::dynamic_extent, std::dynamic_extent>(rng_2d);
 			test_cast<float, std::dynamic_extent, 3>(rng_2d);
 			test_cast<float, 2, std::dynamic_extent>(rng_2d);
+		};
+
+		scenario("comparison CPOs") = []() {
+			when("using size_compare CPO") = []() {
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					std::partial_ordering::equivalent,
+					std::partial_ordering::equivalent,
+					true,
+					true);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+					},
+					std::partial_ordering::unordered,
+					std::partial_ordering::unordered,
+					false,
+					false);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 3 };
+					},
+					std::partial_ordering::unordered,
+					std::partial_ordering::less,
+					false,
+					true);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 2, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+					},
+					std::partial_ordering::greater,
+					std::partial_ordering::unordered,
+					true,
+					false);
+			};
 		};
 	};
 
