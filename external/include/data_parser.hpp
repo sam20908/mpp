@@ -18,13 +18,15 @@
  */
 
 #pragma once
+
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <vector>
 
-inline auto parse_data_file_double_det(const std::string& filename)
+inline auto parse_data_file_double_det(const std::filesystem::path& filename)
 	-> std::tuple<std::vector<std::vector<double>>, double, bool>
 {
 	auto file   = std::ifstream{ filename };
@@ -65,7 +67,7 @@ inline auto parse_data_file_double_det(const std::string& filename)
 	return { data, result, file.is_open() };
 }
 
-inline auto parse_data_file_matrix_transformation_double(const std::string& filename)
+inline auto parse_data_file_matrix_transformation_double(const std::filesystem::path& filename)
 	-> std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>, bool>
 {
 	auto file   = std::ifstream{ filename };
@@ -116,7 +118,7 @@ inline auto parse_data_file_matrix_transformation_double(const std::string& file
 	return { data, result, file.is_open() };
 }
 
-inline auto parse_data_file_matrix_block_double(const std::string& filename)
+inline auto parse_data_file_matrix_block_double(const std::filesystem::path& filename)
 	-> std::tuple<std::vector<std::vector<double>>,
 		std::vector<std::tuple<std::size_t, std::size_t, std::size_t, std::size_t, std::vector<std::vector<double>>>>,
 		bool>

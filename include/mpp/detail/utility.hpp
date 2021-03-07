@@ -94,7 +94,7 @@ namespace mpp::detail
 		}
 	}
 
-	inline void validate_same_size(auto&& left, auto&& right) // @TODO: ISSUE #20
+	inline void validate_same_size(const auto& left, const auto& right) // @TODO: ISSUE #20
 	{
 		if (left.rows() != right.rows() || left.columns() != right.columns())
 		{
@@ -102,7 +102,7 @@ namespace mpp::detail
 		}
 	}
 
-	inline void validate_matrices_multipliable(auto&& left, auto&& right) // @TODO: ISSUE #20
+	inline void validate_matrices_multipliable(const auto& left, const auto& right) // @TODO: ISSUE #20
 	{
 		if (left.columns() != right.rows())
 		{
@@ -127,10 +127,15 @@ namespace mpp::detail
 	inline void
 	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, InitializerValue&& val) // @TODO: ISSUE #20
 	{
+		// @TODO: Remove this workaround once MSVC supports requires clauses (#188)
+#ifdef _MSC_VER
+        constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
+#else
 		constexpr auto is_vec = requires
 		{
 			buf.reserve(0);
 		};
+#endif
 
 		if constexpr (is_vec)
 		{
@@ -140,10 +145,15 @@ namespace mpp::detail
 
 	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 	{
+	// @TODO: Remove this workaround once MSVC supports requires clauses (#188)
+#ifdef _MSC_VER
+        constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
+#else
 		constexpr auto is_vec = requires
 		{
 			buf.reserve(0);
 		};
+#endif
 
 		if constexpr (is_vec)
 		{
