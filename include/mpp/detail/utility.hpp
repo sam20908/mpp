@@ -186,30 +186,6 @@ namespace mpp::detail
 		}
 	}
 
-	template<typename T>
-	constexpr auto accurate_equals(T left, T right) // @TODO: ISSUE #184
-	{
-		// Don't use decltype(auto) for return types because it can add unnecessary qualifiers to the ordering types
-
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			const auto is_equivalent = std::abs(left - right) < std::numeric_limits<T>::epsilon();
-
-			if (is_equivalent)
-			{
-				// Floating point spaceship is guaranteed to be std::partial_ordering [expr.spaceship#4.3], so we use
-				// the same ordering type to indicate equivalence
-				return std::partial_ordering::equivalent;
-			}
-
-			return left <=> right;
-		}
-		else
-		{
-			return left <=> right;
-		}
-	}
-
 	template<typename To, bool FillLBuf>
 	inline auto lu_decomp_common(std::size_t rows, std::size_t cols, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
 	{
