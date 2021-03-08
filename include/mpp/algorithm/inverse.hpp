@@ -22,6 +22,7 @@
 #include <mpp/detail/algo_types.hpp>
 #include <mpp/detail/tag_invoke.hpp>
 #include <mpp/detail/utility.hpp>
+#include <mpp/utility/comparator.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
