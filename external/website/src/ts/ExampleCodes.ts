@@ -83,8 +83,7 @@ int main()
     auto c = m.columns_extent(); // 10
 
     return 0;
-}
-`;
+}`;
 
 export const customize_utilities = `#include <mpp/matrix.hpp>
 
@@ -118,8 +117,7 @@ int main()
     auto d = mpp::determinant(v); // 2000
 
     return 0;
-}
-`;
+}`;
 
 export const custom_iterators = `#include <mpp/matrix.hpp>
 
@@ -138,8 +136,7 @@ int main()
     val = *begin; // 2
 
     return 0;
-}
-`;
+}`;
 
 export const comparisons = `#include <mpp/matrix.hpp>
 #include <mpp/utility/comparator.hpp> // mpp::compare_three_way_equivalent
@@ -182,5 +179,4 @@ int main()
     // ordering_2 -> std::partial_ordering::equivalent
 
     return 0;
-}
-`;
+}`;
