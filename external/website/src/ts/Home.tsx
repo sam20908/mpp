@@ -21,6 +21,7 @@ import {
   customize_default_extent,
   customize_utilities,
   custom_iterators,
+  comparisons,
 } from "./ExampleCodes";
 
 import CodeBlock from "./CodeBlock";
@@ -259,6 +260,10 @@ export default class Home extends React.Component<unknown, unknown> {
             functionalities to make nagivating through matrices easier.
           </MDBTypography>
           <CodeBlock code={custom_iterators} theme={theme} />
+          <MDBTypography tag="p" className="lead mt-5">
+            There are utility methods to compare matrices:
+          </MDBTypography>
+          <CodeBlock code={comparisons} theme={theme} />
         </MDBContainer>
       </div>
     );

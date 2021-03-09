@@ -78,6 +78,58 @@ int main()
 
 One of the main things to take away is the concept of **"extents"** for dimensions. Matrices default to "dynamic extents", which means the sizes can be provided at runtime and matrices can be (partially) flexible (e.g. you can resize rows and columns of a "fully dynamic" matrix, but a "dynamic rows" matrix can only be resized in rows).
 
+#### Comparisons
+
+**Note: comparisons only work for matrices of the same value type!**
+
+Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
+
+```cpp
+
+#include <mpp/matrix.hpp>
+#include <mpp/utility/comparator.hpp> // mpp::compare_three_way_equivalent
+#include <mpp/utility/comparison.hpp>
+
+int main()
+{
+  // Note that you can't compare matrices of different value types because it complicates things A LOT
+
+  // Size for both of these dynamic matrices are deduced as 2x2
+  const auto left = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+  const auto right = mpp::matrix<int>{ { 1, 2 }, { 3, 5 } };
+
+  /**
+   * Comparing dimensions
+   */
+
+  const auto [row_order_1, column_order_1] = mpp::size_compare(left, right, true, true); // Compare both rows and columns
+  // row_order_1 -> std::partial_ordering::equivalent
+  // column_order_1 -> std::partial_ordering::equivalent
+
+  const auto [row_order_2, column_order_2] = mpp::size_compare(left, right, true, false); // Compare only rows
+  // row_order_2 -> std::partial_ordering::equivalent
+  // column_order_2 -> std::partial_ordering::unordered <- unordered is used to indicate "not compared"
+
+  /**
+   * Comparing elements
+   *
+   * Note that the ordering type may change depending on the spaceship return type for the value types
+   */
+
+  const auto ordering_1 = mpp::elements_compare(left, right);
+  // ordering_1 -> std::strong_ordering::less
+
+  // 41.F / 99.F is recurring 0.41
+  const auto left = mpp::matrix<float>{ { 41.F / 99.F } };
+  const auto right = mpp::matrix<float>{ { 41.F / 99.F } };
+  const auto ordering_2 = mpp::elements_compare(left, right, mpp::compare_three_way_equivalent);
+  // mpp::compare_three_way_equivalent is exposed to the public as a comparator that handles floating points
+  // ordering_2 -> std::partial_ordering::equivalent
+
+  return 0;
+}
+```
+
 #### Customizations
 
 ##### You can change the extent the library default to WITHOUT MACROS!

@@ -22,6 +22,7 @@
 #include <mpp/detail/algo_types.hpp>
 #include <mpp/detail/tag_invoke.hpp>
 #include <mpp/detail/utility.hpp>
+#include <mpp/utility/comparator.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
@@ -123,7 +124,7 @@ namespace mpp
 			{
 				const auto elem = static_cast<To>(obj(0, 0));
 
-				if (accurate_equals(elem, To{}))
+				if (compare_three_way_equivalent(elem, To{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -145,7 +146,7 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (accurate_equals(det, default_floating_type{}))
+				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -174,7 +175,7 @@ namespace mpp
 
 				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				if (accurate_equals(det, default_floating_type{}))
+				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}

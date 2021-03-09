@@ -20,6 +20,7 @@
 #pragma once
 
 #include <cmath>
+#include <compare>
 #include <cstddef>
 #include <limits>
 #include <span>
@@ -182,19 +183,6 @@ namespace mpp::detail
 				const auto idx = idx_2d_to_1d(n, row, col);
 				buf[idx]       = result;
 			}
-		}
-	}
-
-	template<typename T>
-	constexpr auto accurate_equals(T left, T right) -> bool
-	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			return std::abs(left - right) < std::numeric_limits<T>::epsilon();
-		}
-		else
-		{
-			return left == right;
 		}
 	}
 

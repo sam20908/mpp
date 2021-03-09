@@ -25,6 +25,7 @@
 #include "../../include/utility.hpp"
 #include "../../thirdparty/ut.hpp"
 
+#include <compare>
 #include <cstddef>
 #include <span>
 #include <utility>
@@ -75,7 +76,7 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 	{
 		for (auto col = std::size_t{}; col < matrix.columns(); ++col)
 		{
-			if (!accurate_equals(static_cast<To>(matrix(row, col)), casted(row, col)))
+			if (mpp::compare_three_way_equivalent(static_cast<To>(matrix(row, col)), casted(row, col)) != 0)
 			{
 				all_elem_equal = false;
 				break; // No point in testing further elements
@@ -84,6 +85,35 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 	}
 
 	expect(all_elem_equal);
+}
+
+void test_size_compare(auto&& left_matrix_creator,
+	auto&& right_matrix_creator,
+	std::partial_ordering row_ordering,
+	std::partial_ordering column_ordering,
+	bool equal_in_rows,
+	bool equal_in_columns)
+{
+	const auto left  = left_matrix_creator();
+	const auto right = right_matrix_creator();
+	const auto [compare_row_ordering, compare_column_ordering] =
+		mpp::size_compare(left, right, equal_in_rows, equal_in_columns);
+
+	expect(row_ordering == compare_row_ordering);
+	expect(column_ordering == compare_column_ordering);
+}
+
+template<typename CompareThreeWay = std::compare_three_way>
+void test_elements_compare(auto&& left_matrix_creator,
+	auto&& right_matrix_creator,
+	auto ordering,
+	CompareThreeWay compare_three_way_fn = {})
+{
+	const auto left             = left_matrix_creator();
+	const auto right            = right_matrix_creator();
+	const auto compare_ordering = mpp::elements_compare(left, right, compare_three_way_fn);
+
+	expect(compare_ordering == ordering);
 }
 
 int main()
@@ -128,6 +158,91 @@ int main()
 			test_cast<float, std::dynamic_extent, std::dynamic_extent>(rng_2d);
 			test_cast<float, std::dynamic_extent, 3>(rng_2d);
 			test_cast<float, 2, std::dynamic_extent>(rng_2d);
+		};
+
+		scenario("comparison CPOs") = []() {
+			when("using size_compare CPO") = []() {
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					std::partial_ordering::equivalent,
+					std::partial_ordering::equivalent,
+					true,
+					true);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+					},
+					std::partial_ordering::unordered,
+					std::partial_ordering::unordered,
+					false,
+					false);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 3 };
+					},
+					std::partial_ordering::unordered,
+					std::partial_ordering::less,
+					false,
+					true);
+				test_size_compare(
+					[]() {
+						return mpp::matrix<int, 2, 1>{};
+					},
+					[]() {
+						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+					},
+					std::partial_ordering::greater,
+					std::partial_ordering::unordered,
+					true,
+					false);
+			};
+
+			when("using elements_cmopare CPO") = []() {
+				// test_elements_compare(
+				// 	[]() {
+				// 		return mpp::matrix<int, 1, 1>{ 0 };
+				// 	},
+				// 	[]() {
+				// 		return mpp::matrix<int, 1, 1>{ 1 };
+				// 	},
+				// 	std::strong_ordering::less);
+				// test_elements_compare(
+				// 	[]() {
+				// 		return mpp::matrix<int, 2, 3>{ { 1, 2, 3 }, { 5, 6, 8 } };
+				// 	},
+				// 	[]() {
+				// 		return mpp::matrix{ { 1, 2, 3 }, { 5, 6, 7 } };
+				// 	},
+				// 	std::strong_ordering::greater);
+				// test_elements_compare(
+				// 	[]() {
+				// 		return mpp::matrix<int>{};
+				// 	},
+				// 	[]() {
+				// 		return mpp::matrix<int>{};
+				// 	},
+				// 	std::strong_ordering::equivalent);
+				test_elements_compare(
+					[]() {
+						return mpp::matrix<float>{ 1, 1, 5.F / 3.F };
+					},
+					[]() {
+						return mpp::matrix<float>{ 1, 1, 1.F };
+					},
+					std::partial_ordering::greater,
+					mpp::compare_three_way_equivalent);
+			};
 		};
 	};
 
