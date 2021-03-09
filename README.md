@@ -92,41 +92,41 @@ Normally with C++20, we could simply provide a `operator<=>` and let the compile
 
 int main()
 {
-    // Note that you can't compare matrices of different value types because it complicates things A LOT
+  // Note that you can't compare matrices of different value types because it complicates things A LOT
 
-    // Size for both of these dynamic matrices are deduced as 2x2
-    const auto left = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
-    const auto right = mpp::matrix<int>{ { 1, 2 }, { 3, 5 } };
+  // Size for both of these dynamic matrices are deduced as 2x2
+  const auto left = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
+  const auto right = mpp::matrix<int>{ { 1, 2 }, { 3, 5 } };
 
-    /**
-     * Comparing dimensions
-     */
+  /**
+   * Comparing dimensions
+   */
 
-    const auto [row_order_1, column_order_1] = mpp::size_compare(left, right, true, true); // Compare both rows and columns
-    // row_order_1 -> std::partial_ordering::equivalent
-    // column_order_1 -> std::partial_ordering::equivalent
+  const auto [row_order_1, column_order_1] = mpp::size_compare(left, right, true, true); // Compare both rows and columns
+  // row_order_1 -> std::partial_ordering::equivalent
+  // column_order_1 -> std::partial_ordering::equivalent
 
-    const auto [row_order_2, column_order_2] = mpp::size_compare(left, right, true, false); // Compare only rows
-    // row_order_2 -> std::partial_ordering::equivalent
-    // column_order_2 -> std::partial_ordering::unordered <- unordered is used to indicate "not compared"
+  const auto [row_order_2, column_order_2] = mpp::size_compare(left, right, true, false); // Compare only rows
+  // row_order_2 -> std::partial_ordering::equivalent
+  // column_order_2 -> std::partial_ordering::unordered <- unordered is used to indicate "not compared"
 
-    /**
-     * Comparing elements
-     *
-     * Note that the ordering type may change depending on the spaceship return type for the value types
-     */
+  /**
+   * Comparing elements
+   *
+   * Note that the ordering type may change depending on the spaceship return type for the value types
+   */
 
-    const auto ordering_1 = mpp::elements_compare(left, right);
-    // ordering_1 -> std::strong_ordering::less
+  const auto ordering_1 = mpp::elements_compare(left, right);
+  // ordering_1 -> std::strong_ordering::less
 
-    // 41.F / 99.F is recurring 0.41
-    const auto left = mpp::matrix<float>{ { 41.F / 99.F } };
-    const auto right = mpp::matrix<float>{ { 41.F / 99.F } };
-    const auto ordering_2 = mpp::elements_compare(left, right, mpp::compare_three_way_equivalent);
-    // mpp::compare_three_way_equivalent is exposed to the public as a comparator that handles floating points
-    // ordering_2 -> std::partial_ordering::equivalent
+  // 41.F / 99.F is recurring 0.41
+  const auto left = mpp::matrix<float>{ { 41.F / 99.F } };
+  const auto right = mpp::matrix<float>{ { 41.F / 99.F } };
+  const auto ordering_2 = mpp::elements_compare(left, right, mpp::compare_three_way_equivalent);
+  // mpp::compare_three_way_equivalent is exposed to the public as a comparator that handles floating points
+  // ordering_2 -> std::partial_ordering::equivalent
 
-    return 0;
+  return 0;
 }
 ```
 
