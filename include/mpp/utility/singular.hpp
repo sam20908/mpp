@@ -20,7 +20,7 @@
 #pragma once
 
 #include <mpp/algorithm/determinant.hpp>
-#include <mpp/detail/tag_invoke.hpp>
+#include <mpp/detail/cpo_base.hpp>
 #include <mpp/detail/utility.hpp>
 #include <mpp/utility/comparator.hpp>
 #include <mpp/matrix.hpp>
@@ -29,26 +29,14 @@
 
 namespace mpp
 {
-	struct singular_t
+	struct singular_t : public detail::cpo_base<singular_t>
 	{
-		friend inline void tag_invoke(singular_t, ...) // @TODO: ISSUE #20
-		{
-			static_assert(R"(Custom overload of "singular" is required for custom types!)");
-		}
-
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> bool // @TODO: ISSUE #20
 		{
 			return compare_three_way_equivalent(detail::det_lu_decomp<detail::default_floating_type>(obj),
 					   detail::default_floating_type{}) == 0;
-		}
-
-		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<singular_t, Args...> // @TODO: ISSUE #20
-		{
-			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
 	};
 

@@ -19,21 +19,16 @@
 
 #pragma once
 
+#include <mpp/detail/cpo_base.hpp>
 #include <mpp/detail/matrix_base.hpp>
-#include <mpp/detail/tag_invoke.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
 
 namespace mpp
 {
-	struct cast_t
+	struct cast_t : public detail::cpo_base<cast_t>
 	{
-		friend inline void tag_invoke(cast_t, ...) // @TODO: ISSUE #20
-		{
-			static_assert(R"(Custom overload of "cast" is required for custom types!)");
-		}
-
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto
 		tag_invoke(cast_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
@@ -43,13 +38,6 @@ namespace mpp
 			init_matrix_with_1d_rng(casted, obj, obj.rows(), obj.columns());
 
 			return casted;
-		}
-
-		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<cast_t, Args...> // @TODO: ISSUE #20
-		{
-			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
 	};
 

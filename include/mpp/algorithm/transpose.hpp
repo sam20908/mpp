@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <mpp/detail/cpo_base.hpp>
 #include <mpp/detail/matrix_base.hpp>
 #include <mpp/detail/utility.hpp>
 #include <mpp/matrix.hpp>
@@ -27,13 +28,8 @@
 
 namespace mpp
 {
-	struct transpose_t
+	struct transpose_t : public detail::cpo_base<transpose_t>
 	{
-		friend inline void tag_invoke(transpose_t, ...) // @TODO: ISSUE #20
-		{
-			static_assert(R"(Custom overload of "transpose" is required for custom types!)");
-		}
-
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
@@ -62,13 +58,6 @@ namespace mpp
 			init_matrix_with_1d_rng(transposed, std::move(transposed_buf), cols, rows);
 
 			return transposed;
-		}
-
-		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<transpose_t, Args...> // @TODO: ISSUE #20
-		{
-			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
 	};
 
