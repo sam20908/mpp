@@ -20,7 +20,7 @@
 #pragma once
 
 #include <mpp/detail/algo_types.hpp>
-#include <mpp/detail/tag_invoke.hpp>
+#include <mpp/detail/cpo_base.hpp>
 #include <mpp/detail/utility.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
@@ -87,13 +87,8 @@ namespace mpp
 		}
 	} // namespace detail
 
-	struct determinant_t
+	struct determinant_t : public detail::cpo_base<determinant_t>
 	{
-		friend inline void tag_invoke(determinant_t, ...) // @TODO: ISSUE #20
-		{
-			static_assert(R"(Custom overload of "determinant" is required for custom types!)");
-		}
-
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20
@@ -107,13 +102,6 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
 			return detail::det_func<To>(obj);
-		}
-
-		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<determinant_t, Args...> // @TODO: ISSUE #20
-		{
-			return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 		}
 	};
 

@@ -19,22 +19,19 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/matrix.hpp>
+#include "tag_invoke.hpp"
 
-#include <cstddef>
-
-namespace mpp
+namespace mpp::detail
 {
-	struct square_t : public detail::cpo_base<square_t>
+	template<typename CPO>
+	struct cpo_base
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool // @TODO: ISSUE #20
+		template<typename... Args>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			-> detail::tag_invoke_impl::tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
 		{
-			return obj.rows() == obj.columns();
+			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
+			return detail::tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
 		}
 	};
-
-	inline constexpr auto square = square_t{};
-} // namespace mpp
+} // namespace mpp::detail

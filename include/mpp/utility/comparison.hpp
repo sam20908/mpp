@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include <mpp/detail/cpo_base.hpp>
+#include <mpp/detail/utility.hpp>
 #include <mpp/matrix.hpp>
-
-#include "mpp/detail/utility.hpp"
 
 #include <compare>
 #include <cstddef>
@@ -33,13 +33,8 @@ namespace mpp
 {
 	namespace detail
 	{
-		struct size_compare_t
+		struct size_compare_t : public cpo_base<size_compare_t>
 		{
-			friend inline void tag_invoke(size_compare_t, ...) // @TODO: ISSUE #20
-			{
-				static_assert(R"(Custom overload of "size_compare" is required for custom types!)");
-			}
-
 			template<typename LeftValue,
 				typename RightValue,
 				std::size_t LeftRowsExtent,
@@ -55,22 +50,10 @@ namespace mpp
 				return std::pair{ compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
 					compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered };
 			}
-
-			template<typename... Args>
-			[[nodiscard]] auto operator()(Args&&... args) const
-				-> detail::tag_invoke_impl::tag_invoke_result_t<size_compare_t, Args...> // @TODO: ISSUE #20
-			{
-				return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
-			}
 		};
 
-		struct elements_compare_t
+		struct elements_compare_t : public cpo_base<elements_compare_t>
 		{
-			// friend inline void tag_invoke(elements_compare_t, ...) // @TODO: ISSUE #20
-			// {
-			// 	static_assert(R"(Custom overload of "elements_compare" is required for custom types!)");
-			// }
-
 			template<typename Value,
 				std::size_t LeftRowsExtent,
 				std::size_t LeftColumnsExtent,
@@ -107,13 +90,6 @@ namespace mpp
 				}
 
 				return ordering_type::equivalent;
-			}
-
-			template<typename... Args>
-			[[nodiscard]] auto operator()(Args&&... args) const
-				-> detail::tag_invoke_impl::tag_invoke_result_t<elements_compare_t, Args...> // @TODO: ISSUE #20
-			{
-				return detail::tag_invoke_cpo(*this, std::forward<Args>(args)...);
 			}
 		};
 
