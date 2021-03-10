@@ -456,11 +456,15 @@ namespace mpp::detail
 
 		void swap(matrix_base& right) // @TODO: ISSUE #20
 		{
-			using std::swap;
+			// Don't swap with the same object
+			if (&right != this)
+			{
+				using std::swap;
 
-			swap(_rows, right._rows);
-			swap(_cols, right._cols);
-			swap(_buf, right._buf);
+				swap(_rows, right._rows);
+				swap(_cols, right._cols);
+				swap(_buf, right._buf);
+			}
 		}
 
 		friend inline void init_matrix_with_1d_rng(
