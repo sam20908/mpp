@@ -1,8 +1,8 @@
 name: CI
 
 jobs:
-  - job: LibraryFormatValidation
-    displayName: Library Code Format Validation
+  - job: FormatValidation
+    displayName: Format Validation
     pool:
       vmImage: ubuntu-20.04
 
@@ -21,8 +21,8 @@ jobs:
       - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/benchmarks --style file --clang-format-executable=clang-format-11
         displayName: Validate
 
-  - job: BuildAndTestAndBenchmarkUbuntu
-    displayName: Build / Test / Benchmark / Code Coverage (Ubuntu)
+  - job: Ubuntu
+    displayName: Ubuntu GCC 10.2
 
     pool:
       vmImage: ubuntu-20.04
@@ -31,7 +31,7 @@ jobs:
       - checkout: self
 
       - script: |
-          pip3 install lit==12.0.0rc1 --no-warn-script-location
+          pip3 install lit==12.0.0rc1 --no-warn-script-location # @TODO: Don't install release candidate once LLVM 12 officially releases
           echo '##vso[task.prependpath]$(HOME)/.local/bin'
         displayName: Install Python LLVM Lit
 
