@@ -46,9 +46,3 @@ compile_commands.json
 
 # JetBrain IDE cache
 .idea/
-
-# Node modules
-external/website/node_modules/
-
-# ESLint cache
-external/website/.eslintcache
