@@ -25,14 +25,13 @@
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
-#include <array>
 #include <cmath>
 
 namespace mpp
 {
 	namespace detail
 	{
-		inline static constexpr auto dummy_empty_l_buf = std::array<char, 0>{};
+		inline static constexpr auto dummy_variable = ' ';
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
@@ -68,7 +67,7 @@ namespace mpp
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomp_common<default_floating_type, false>(rows, cols, dummy_empty_l_buf, u_buf);
+			const auto det = lu_decomp_common<default_floating_type, false>(rows, cols, dummy_variable, u_buf);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));
