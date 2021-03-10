@@ -4,9 +4,7 @@ A C++20 and later matrix library
 
 ![Build Status](https://img.shields.io/azure-devops/build/samestimable2016/mpp/3/main?label=%F0%9F%94%A8%20Build%20Status) ![Test Results](https://img.shields.io/azure-devops/tests/samestimable2016/mpp/3/main?label=%F0%9F%A7%AA%20Test%20Results) ![Code Coverage](https://img.shields.io/azure-devops/coverage/samestimable2016/mpp/3/main?label=%F0%9F%93%B6%20Code%20Coverage) ![GitHub Pages](https://img.shields.io/github/deployments/sam20908/mpp/github-pages?label=%F0%9F%9A%80%20GitHub%20Pages)
 
-# How to use?
-
-## Including the Project:
+## How to Include:
 
 All you need to do is just add it as a subdirectory and link the target (see below):
 
@@ -16,9 +14,9 @@ add_subdirectory("mpp")
 target_link_libraries(your_target mpp::mpp)
 ```
 
-## Actually Using It!
+---
 
-#### Overview
+## Overview
 
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
@@ -33,6 +31,13 @@ int main()
    * Creating matrices
    *
    * Extents determine if a matrix is fixed or (partially) flexible
+   *
+   * The following conditions will make the matrix static:
+   * - Explicitly passing sizes different than std::dynamic_extent to the template parameters
+   * - Deduction guides with 2D std::array will deduce the extents, e.g.:
+   *
+   * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
+   * - mpp::matrix{ arr_2d }; // Deduces to mpp::matrix<int, 2, 3>
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
   auto m_fully_dynamic = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{};
@@ -41,6 +46,7 @@ int main()
 
   // Initialize using 2D initializer list
   auto m_init_2d_list = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
+  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 
@@ -63,7 +69,7 @@ int main()
    * Utilities
    */
   auto type = mpp::type(m_fully_static); // mpp::matrix_type::fully_static
-  auto singular = mpp::singular(m_fully_static); // true (because matrices default initialize elements)
+  auto singular = mpp::singular(m_fully_static); // true (because matrices default initialize elements to 0, and matrices with 0's are singular)
 
   /**
    * Lazy evaluated math expressions
@@ -132,10 +138,9 @@ int main()
 
 #### Customizations
 
-##### You can change the extent the library default to WITHOUT MACROS!
+Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize` namespace
 
 ```cpp
-// Import appropriate tags for customization
 #include <mpp/utility/config.hpp>
 
 namespace mpp::customize
@@ -225,38 +230,10 @@ int main()
 
 You can find more APIs that are not mentioned in this README in the (upcoming) documentation.
 
+---
+
 ## FAQ
 
 #### Why `tag_invoke` for customization?
 
-`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`, which helps the user to overload by the _type_ of the customization point objects (it is always "the name you want to overload" + `_t`), and not having to remember unique names to overload.
-
-This was inspired from `<ranges>`, which has the customization point objects automatically perform the "two step":
-
-```cpp
-/**
- * Somewhere in the determinant implemetation WITHOUT customization point objects.
- * We have to "remember" to make an UNQUALIFIED call, only them customizations are picked up.
- */
-using mpp::determinant;
-determinant(obj); // Unqualified call, able to pick up overloads (customizations).
-```
-
-With `tag_invoke`, we can avoid doing `using ...`, and instead provide default implementations. Consider the following:
-
-```cpp
-struct determinant_t
-{
-  friend inline auto tag_invoke(determinant_t)
-  {
-    // Default implementation of the algorithm...
-  }
-
-  auto operator()() const
-  {
-    return tag_invoke(*this);
-  }
-};
-```
-
-The `friend` specifier makes the default `tag_invoke` in the same namespace scope as `determinant_t`, and it all works out because `tag_invoke(*this)` uses ADL to find the default overload of `tag_invoke`, and it'll also pick up other overloads because it performed an unqualified call.
+`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`. With customization by overload resolution, name clashes are reduced down to bare minimum.
