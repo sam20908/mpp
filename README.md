@@ -6,7 +6,7 @@ A C++20 and later matrix library
 
 ## How to Include:
 
-All you need to do is just add it as a subdirectory and link the target (see below):
+All you need to do is just add it as a subdirectory and link the target:
 
 ```cmake
 add_subdirectory("mpp")
