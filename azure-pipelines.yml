@@ -136,7 +136,7 @@ jobs:
       - script: call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat"
         displayName: Activate Developer Command Prompt For x64
 
-      - script: clang --version
+      - script: cl
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
 
