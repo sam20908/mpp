@@ -22,9 +22,25 @@
 
 #include "../../include/data_parser.hpp"
 #include "../../include/utility.hpp"
-#include "../../thirdparty/ut.hpp"
+
+// clang-format off
+/**
+ * @TODO: Remove this whole clang-format off section once
+ * https://github.com/microsoft/vscode-cpptools/issues/7150 is resolved
+ * 
+ * The reason why we need this is because for some reason, Boost-ext/UT
+ * causes std::filesystem to not be recognized as an existing namespace
+ * if it's included BEFORE <filesystem>. The link above tracks the issue
+ * in the VSCode cpptools repository
+ * 
+ * The project will still compile, just that this allows EDG to have
+ * proper intellisense
+ */
 
 #include <filesystem>
+#include "../../thirdparty/ut.hpp"
+// clang-format on
+
 #include <functional>
 #include <string>
 #include <utility>
