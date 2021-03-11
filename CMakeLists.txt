@@ -45,9 +45,13 @@ function(_turn_on_warnings target)
                 -Wno-c++98-compat
                 -Wno-c++98-c++11-c++14-compat
                 -Wno-c++98-compat-pedantic
+                -Wno-newline-eof # @FIXME: Fix this warning later, just get Windows Clang to compile
+                
+                # Boost-ext/UT warnings disabled
+                -Wno-ctad-maybe-unsupported
                 -Wno-missing-variable-declarations
-                -Wno-newline-eof)
-                # @FIXME: Fix ^ that warning later, just get Windows Clang to compile
+                -Wno-exit-time-destructors
+                -Wno-global-constructors)
         endif()
     else()
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
