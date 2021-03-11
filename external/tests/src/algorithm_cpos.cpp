@@ -56,7 +56,10 @@ auto skip_test_if_file_not_exists(bool file_exists, Tag& test_tag)
 template<typename Tag = decltype(tag(""))>
 void test_det(const std::string& filename, Tag test_tag = tag("execute"))
 {
-	const auto [data, result, file_exists] = parse_data_file_double_det(get_actual_filepath(filename));
+	const auto result_tuple = parse_data_file_double_det(get_actual_filepath(filename));
+	const auto& data        = std::get<0>(result_tuple);
+	const auto& result      = std::get<1>(result_tuple);
+	const auto& file_exists = std::get<2>(result_tuple);
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
@@ -93,44 +96,23 @@ void test_transformation_helper(const auto& transform_fn, const auto& result, co
 
 template<std::size_t RowsExtent,
 	std::size_t ColumnsExtent,
-	typename ResultExtentsGetter = decltype([](std::size_t left, std::size_t right) {
-		return std::pair{ left, right };
-	}),
-	typename Tag                 = decltype(tag(""))>
+	std::size_t ResultRowsExtent,
+	std::size_t ResultColumnsExtent,
+	typename Tag = decltype(tag(""))>
 void test_transformation(const std::string& filename, const auto& transform_fn, Tag test_tag = tag("execute"))
 {
-	const auto [data, result, file_exists] =
-		parse_data_file_matrix_transformation_double(get_actual_filepath(filename));
+	// @FIXME: Find a way to avoid reparse the same file when calling this with different extents but with the same
+	// filename
+	const auto result_tuple = parse_data_file_matrix_transformation_double(get_actual_filepath(filename));
+	const auto& data        = std::get<0>(result_tuple);
+	const auto& results     = std::get<1>(result_tuple);
+	const auto& file_exists = std::get<2>(result_tuple);
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
 	test_tag / test(filename) = [&]() {
-		constexpr auto result_rows_extent = ResultExtentsGetter{}(RowsExtent, ColumnsExtent).first;
-		constexpr auto result_cols_extent = ResultExtentsGetter{}(RowsExtent, ColumnsExtent).second;
-
-		test_transformation_helper<RowsExtent, ColumnsExtent, result_rows_extent, result_cols_extent>(transform_fn,
-			result,
-			data);
-
-		test_transformation_helper<std::dynamic_extent, std::dynamic_extent, std::dynamic_extent, std::dynamic_extent>(
-			transform_fn,
-			result,
-			data);
-
-		constexpr auto result_rows_extent_2 = ResultExtentsGetter{}(std::dynamic_extent, ColumnsExtent).first;
-		constexpr auto result_cols_extent_2 = ResultExtentsGetter{}(std::dynamic_extent, ColumnsExtent).second;
-
-		test_transformation_helper<std::dynamic_extent, ColumnsExtent, result_rows_extent_2, result_cols_extent_2>(
-			transform_fn,
-			result,
-			data);
-
-		constexpr auto result_rows_extent_3 = ResultExtentsGetter{}(RowsExtent, std::dynamic_extent).first;
-		constexpr auto result_cols_extent_3 = ResultExtentsGetter{}(RowsExtent, std::dynamic_extent).second;
-
-		test_transformation_helper<RowsExtent, std::dynamic_extent, result_rows_extent_3, result_cols_extent_3>(
-			transform_fn,
-			result,
+		test_transformation_helper<RowsExtent, ColumnsExtent, ResultRowsExtent, ResultColumnsExtent>(transform_fn,
+			results,
 			data);
 	};
 }
@@ -167,7 +149,12 @@ void test_block_helper(const auto& results, const auto& data, auto... dimension_
 template<typename Tag = decltype(tag(""))>
 void test_block(const std::string& filename, Tag test_tag = tag("execute"))
 {
-	const auto [data, results, file_exists] = parse_data_file_matrix_block_double(get_actual_filepath(filename));
+	// @FIXME: Find a way to avoid reparse the same file when calling this with different extents but with the same
+	// filename
+	const auto result_tuple = parse_data_file_matrix_block_double(get_actual_filepath(filename));
+	const auto& data        = std::get<0>(result_tuple);
+	const auto& results     = std::get<1>(result_tuple);
+	const auto& file_exists = std::get<2>(result_tuple);
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
@@ -193,20 +180,16 @@ int main()
 		};
 
 		given("transpose CPO") = []() {
-			using flip_extent_fn = decltype([](std::size_t left, std::size_t right) {
-				return std::pair{ right, left };
-			});
-
-			test_transformation<25, 25, flip_extent_fn>("test_data/25x25_transpose.txt", mpp::transpose);
-			test_transformation<50, 2, flip_extent_fn>("test_data/50x2_transpose.txt", mpp::transpose);
+			test_transformation<25, 25, 25, 25>("test_data/25x25_transpose.txt", mpp::transpose);
+			test_transformation<50, 2, 2, 50>("test_data/50x2_transpose.txt", mpp::transpose);
 		};
 
 		given("inverse CPO") = []() {
 			auto inverse_fn = std::bind_front(mpp::inverse, std::type_identity<value_type>{});
 
-			test_transformation<2, 2>("test_data/2x2_inv.txt", inverse_fn);
+			test_transformation<2, 2, 2, 2>("test_data/2x2_inv.txt", inverse_fn);
 
-			test_transformation<10, 10>("test_data/10x10_inv.txt", inverse_fn, tag("skip"));
+			test_transformation<10, 10, 10, 10>("test_data/10x10_inv.txt", inverse_fn, tag("skip"));
 		};
 
 		given("block CPO") = []() {

@@ -79,7 +79,10 @@ namespace mpp
 
 				const auto end = left.cend();
 
-				for (auto left_it = left.cbegin(), right_it = right.cbegin(); left_it != end; ++left_it, ++right_it)
+				auto left_it  = left.cbegin();
+				auto right_it = right.cbegin();
+
+				for (; left_it != end; ++left_it, ++right_it)
 				{
 					const auto ordering = compare_three_way_fn(*left_it, *right_it);
 
