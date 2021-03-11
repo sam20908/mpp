@@ -21,7 +21,7 @@ jobs:
       - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/benchmarks --style file --clang-format-executable=clang-format-11
         displayName: Validate
 
-  - job: Ubuntu
+  - job: UbuntuGCC10Point2
     displayName: Ubuntu GCC 10.2
 
     pool:
@@ -36,22 +36,11 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
-
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100
-          sudo update-alternatives --set cc /usr/bin/gcc
-
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100
-          sudo update-alternatives --set c++ /usr/bin/g++
-        displayName: Use GCC 10 by default
-
-      - script: |
           sudo apt-get update
           sudo apt-get install gcovr
         displayName: Install GCC Gcovr
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -B build
+      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -DCMAKE_C_COMPILER=/usr/bin/gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
         displayName: Configure For Tests and Code Coverage in Debug Configuration
 
       - script: cmake --build build --config Debug --target tests
@@ -79,7 +68,55 @@ jobs:
           pathToSources: $(Build.SourcesDirectory)
         displayName: Publish Code Coverage
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -B build
+      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_C_COMPILER=/usr/bin/gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
+        displayName: Configure For Benchmarks in Release Configuration
+
+      - script: cmake --build build --config Release --target benchmarks
+        displayName: Build Benchmarks
+
+      - script: |
+          cd build/bin/benchmarks
+          ./initialization_benchmark # @TODO: Find a way to invoke multiple executables in this directory as we're not using LLVM Lit for benchmarks (#174)
+        displayName: Run All Benchmarks
+
+  - job: UbuntuClang11Point0Point1
+    displayName: Ubuntu Clang 11.0.1
+
+    pool:
+      vmImage: ubuntu-20.04
+
+    steps:
+      - checkout: self
+
+      - script: |
+          pip3 install lit==12.0.0rc1 --no-warn-script-location # @TODO: Don't install release candidate once LLVM 12 officially releases
+          echo '##vso[task.prependpath]$(HOME)/.local/bin'
+        displayName: Install Python LLVM Lit
+
+      - script: |
+          sudo apt-get update
+          sudo apt-get install clang-11 clang++-11
+        displayName: Install Clang 11
+
+      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_C_COMPILER=/usr/bin/clang-11 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
+        displayName: Configure For Tests in Debug Configuration
+
+      - script: cmake --build build --config Debug --target tests
+        displayName: Build Tests
+
+      - script: |
+          cd build/bin/tests
+          lit . --xunit-xml-output results.xml
+        continueOnError: true # Tests might fail, but we still want the results
+        displayName: Run Tests
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: "**/results.xml"
+        displayName: Publish Tests Results
+
+      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_C_COMPILER=/usr/bin/clang-11 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
         displayName: Configure For Benchmarks in Release Configuration
 
       - script: cmake --build build --config Release --target benchmarks
