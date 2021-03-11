@@ -130,7 +130,7 @@ jobs:
     displayName: Windows Clang 11
 
     steps:
-      - script: \%comspec\% /c "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+      - script: "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
         displayName: Activate the Developer Command Prmopt
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
