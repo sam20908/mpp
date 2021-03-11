@@ -209,30 +209,30 @@ int main()
 			};
 
 			when("using elements_cmopare CPO") = []() {
-				// test_elements_compare(
-				// 	[]() {
-				// 		return mpp::matrix<int, 1, 1>{ 0 };
-				// 	},
-				// 	[]() {
-				// 		return mpp::matrix<int, 1, 1>{ 1 };
-				// 	},
-				// 	std::strong_ordering::less);
-				// test_elements_compare(
-				// 	[]() {
-				// 		return mpp::matrix<int, 2, 3>{ { 1, 2, 3 }, { 5, 6, 8 } };
-				// 	},
-				// 	[]() {
-				// 		return mpp::matrix{ { 1, 2, 3 }, { 5, 6, 7 } };
-				// 	},
-				// 	std::strong_ordering::greater);
-				// test_elements_compare(
-				// 	[]() {
-				// 		return mpp::matrix<int>{};
-				// 	},
-				// 	[]() {
-				// 		return mpp::matrix<int>{};
-				// 	},
-				// 	std::strong_ordering::equivalent);
+				test_elements_compare(
+					[]() {
+						return mpp::matrix<int, 1, 1>{ 0 };
+					},
+					[]() {
+						return mpp::matrix<int, 1, 1>{ 1 };
+					},
+					std::strong_ordering::less);
+				test_elements_compare(
+					[]() {
+						return mpp::matrix<int, 2, 3>{ { 1, 2, 3 }, { 5, 6, 8 } };
+					},
+					[]() {
+						return mpp::matrix{ { 1, 2, 3 }, { 5, 6, 7 } };
+					},
+					std::strong_ordering::greater);
+				test_elements_compare(
+					[]() {
+						return mpp::matrix<int>{};
+					},
+					[]() {
+						return mpp::matrix<int>{};
+					},
+					std::strong_ordering::equivalent);
 				test_elements_compare(
 					[]() {
 						return mpp::matrix<float>{ 1, 1, 5.F / 3.F };

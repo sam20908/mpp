@@ -16,7 +16,6 @@
 # under the License.
 
 set(TESTS_BINARY_DIR "${CMAKE_BINARY_DIR}/bin/tests")
-set(TESTS_LIBRARIES ${PROJECT_NAME}::${PROJECT_NAME})
 
 if(LLVM_LIT_EXEC)
     message(STATUS "LLVM Lit found! LLVM Lit configuration for tests will be created")
