@@ -143,7 +143,7 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -B build
+          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -B build
           cmake --build build --config Debug --target tests
         displayName: Configure and Build Tests in Debug Configuration
 
@@ -162,7 +162,7 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -B build
+          cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -B build
         displayName: Configure and Build Benchmarks in Release Configuration
 
       - script: |
