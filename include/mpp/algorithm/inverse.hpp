@@ -90,12 +90,12 @@ namespace mpp
 						auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
 						const auto diag_row_elem = u_buf[diag_row_idx];
 
-						const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
-						const auto elem     = u_buf[elem_idx];
-						const auto factor   = elem_before_factor * -1;
+						const auto cur_elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+						const auto elem         = u_buf[cur_elem_idx];
+						const auto factor       = elem_before_factor * -1;
 
 						const auto new_elem = factor * diag_row_elem + elem;
-						u_buf[elem_idx]     = new_elem;
+						u_buf[cur_elem_idx] = new_elem;
 					}
 				}
 			}

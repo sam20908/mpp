@@ -45,7 +45,9 @@ function(_turn_on_warnings target)
                 -Wno-c++98-compat
                 -Wno-c++98-c++11-c++14-compat
                 -Wno-c++98-compat-pedantic
-                -Wno-missing-variable-declarations)
+                -Wno-missing-variable-declarations
+                -Wno-newline-eof)
+                # @FIXME: Fix ^ that warning later, just get Windows Clang to compile
         endif()
     else()
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
