@@ -83,7 +83,7 @@ jobs:
     displayName: Ubuntu Clang 11
 
     pool:
-      vmImage: windows-latest
+      vmImage: ubuntu-20.04
 
     steps:
       - checkout: self
@@ -128,6 +128,9 @@ jobs:
         displayName: Run All Benchmarks
   - job: WindowsClang
     displayName: Windows Clang 11
+
+    pool:
+      vmImage: windows-latest
 
     steps:
       - script: |
