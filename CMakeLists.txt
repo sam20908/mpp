@@ -41,7 +41,9 @@ function(_turn_on_warnings target)
         endif()
 
         if(MSVC)
-            target_compile_options(${target} PRIVATE -Wno-c++98-c++11-c++14-compat)
+            target_compile_options(${target} PRIVATE
+                -Wno-c++98-compat
+                -Wno-c++98-c++11-c++14-compat)
         endif()
     else()
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
