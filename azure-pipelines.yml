@@ -22,7 +22,7 @@ jobs:
         displayName: Validate
 
   - job: UbuntuGCC10Point2
-    displayName: Ubuntu GCC 10.2
+    displayName: Ubuntu GCC 10
 
     pool:
       vmImage: ubuntu-20.04
@@ -80,7 +80,7 @@ jobs:
         displayName: Run All Benchmarks
 
   - job: UbuntuClang11Point0Point1
-    displayName: Ubuntu Clang 11.0.1
+    displayName: Ubuntu Clang 11
 
     pool:
       vmImage: ubuntu-20.04
