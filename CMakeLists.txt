@@ -34,7 +34,11 @@ endfunction()
 function(_turn_on_warnings target)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
-            -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            target_compile_options(${target} PRIVATE -pedantic-errors)
+        endif()
     else()
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
     endif()
