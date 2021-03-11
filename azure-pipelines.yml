@@ -133,7 +133,7 @@ jobs:
       vmImage: windows-latest
 
     steps:
-      - script: call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat"
+      - script: call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         displayName: Activate Developer Command Prompt For x64
 
       - script: cl
