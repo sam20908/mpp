@@ -120,11 +120,16 @@ namespace mpp
 			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
 			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{});
 
+			using default_floating_type_ordering_type =
+				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
+
 			if (rows == 1)
 			{
 				const auto elem = static_cast<To>(obj(0, 0));
 
-				if (floating_point_compare_three_way(elem, To{}) == 0)
+				using to_ordering_type = std::compare_three_way_result_t<To, To>;
+
+				if (floating_point_compare_three_way(elem, To{}) == to_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -146,7 +151,8 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (floating_point_compare_three_way(det, default_floating_type{}) == 0)
+				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -175,9 +181,8 @@ namespace mpp
 
 				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				using ordering_type = std::compare_three_way_result_t<default_floating_type, default_floating_type>;
-
-				if (floating_point_compare_three_way(det, default_floating_type{}) == ordering_type::equivalent)
+				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
