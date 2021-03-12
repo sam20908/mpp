@@ -167,7 +167,7 @@ jobs:
 
       - script: |
           cd build/bin/benchmarks
-          .\initialization_benchmark # @TODO: Find a way to invoke multiple executables in this directory as we're not using LLVM Lit for benchmarks (#174)
+          .\initialization_benchmark.exe # @TODO: Find a way to invoke multiple executables in this directory as we're not using LLVM Lit for benchmarks (#174)
         displayName: Run All Benchmarks
 # - job: BuildAndTestWindows
 #   displayName: Build / Test / Benchmark (Windows)
