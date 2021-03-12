@@ -28,15 +28,10 @@
 // clang-format off
 /**
  * @TODO: Remove this whole clang-format off section once
- * https://github.com/microsoft/vscode-cpptools/issues/7150 is resolved
+ * https://github.com/boost-ext/ut/issues/432 is resolved
  * 
- * The reason why we need this is because for some reason, Boost-ext/UT
- * causes std::filesystem to not be recognized as an existing namespace
- * if it's included BEFORE <filesystem>. The link above tracks the issue
- * in the VSCode cpptools repository
- * 
- * The project will still compile, just that this allows EDG to have
- * proper intellisense
+ * ut.hpp actually has a bug in its headers when __cpp_modules is defined due
+ * to how it's closing its namespaces
  */
 
 #include <filesystem>
