@@ -23,11 +23,9 @@
 #include <mpp/detail/utility.hpp>
 #include <mpp/matrix.hpp>
 
+#include <algorithm>
 #include <compare>
 #include <cstddef>
-#include <span>
-#include <type_traits>
-#include <utility>
 
 namespace mpp
 {
@@ -54,45 +52,23 @@ namespace mpp
 
 		struct elements_compare_t : public cpo_base<elements_compare_t>
 		{
-			template<typename Value,
+			template<typename LeftValue,
+				typename RightValue,
 				std::size_t LeftRowsExtent,
 				std::size_t LeftColumnsExtent,
 				std::size_t RightRowsExtent,
 				std::size_t RightColumnsExtent,
 				typename CompareThreeway = std::compare_three_way>
 			[[nodiscard]] friend inline auto tag_invoke(elements_compare_t,
-				const matrix<Value, LeftRowsExtent, LeftColumnsExtent>& left,
-				const matrix<Value, RightRowsExtent, RightColumnsExtent>& right,
+				const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent>& left,
+				const matrix<RightValue, RightRowsExtent, RightColumnsExtent>& right,
 				CompareThreeway compare_three_way_fn = {}) // @TODO: ISSUE #20
 			{
-				const auto left_size  = left.size();
-				const auto right_size = right.size();
-
-				using ordering_type = std::compare_three_way_result_t<Value, Value>;
-
-				if (left_size != right_size)
-				{
-					return ordering_type{ left_size <=> right_size };
-				}
-
-				// We can't just use <=> because of two different types of matrices to compare
-
-				const auto end = left.cend();
-
-				auto left_it  = left.cbegin();
-				auto right_it = right.cbegin();
-
-				for (; left_it != end; ++left_it, ++right_it)
-				{
-					const auto ordering = compare_three_way_fn(*left_it, *right_it);
-
-					if (ordering != ordering_type::equivalent)
-					{
-						return ordering;
-					}
-				}
-
-				return ordering_type::equivalent;
+				return std::lexicographical_compare_three_way(left.begin(),
+					left.end(),
+					right.begin(),
+					right.end(),
+					compare_three_way_fn);
 			}
 		};
 

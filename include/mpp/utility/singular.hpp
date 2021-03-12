@@ -39,7 +39,7 @@ namespace mpp
 			using ordering_type =
 				std::compare_three_way_result_t<detail::default_floating_type, detail::default_floating_type>;
 
-			return compare_three_way_equivalent(detail::det_lu_decomp<detail::default_floating_type>(obj),
+			return floating_point_compare_three_way(detail::det_lu_decomp<detail::default_floating_type>(obj),
 					   detail::default_floating_type{}) == ordering_type::equivalent;
 		}
 	};

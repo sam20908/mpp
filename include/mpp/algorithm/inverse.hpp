@@ -124,7 +124,7 @@ namespace mpp
 			{
 				const auto elem = static_cast<To>(obj(0, 0));
 
-				if (compare_three_way_equivalent(elem, To{}) == 0)
+				if (floating_point_compare_three_way(elem, To{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -146,7 +146,7 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
+				if (floating_point_compare_three_way(det, default_floating_type{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -175,7 +175,7 @@ namespace mpp
 
 				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
+				if (floating_point_compare_three_way(det, default_floating_type{}) == 0)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}

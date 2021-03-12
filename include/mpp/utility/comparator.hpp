@@ -28,26 +28,30 @@
 namespace mpp
 {
 	// Implement this as a lambda to avoid the need of LIFTING this for passing to parameters
-	inline constexpr auto compare_three_way_equivalent = []<typename T>(const T& left,
-															 const T& right) -> std::compare_three_way_result_t<T, T> {
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			// @FIXME: Implement our own constexpr version of abs because std::abs is not constexpr
-			// @FIXME: Use adaptive epsilon (#163)
-			const auto is_equivalent = std::abs(left - right) < std::numeric_limits<T>::epsilon();
+	inline constexpr auto floating_point_compare_three_way =
+		[]<typename T, typename U>(const T& left, const U& right) -> std::compare_three_way_result_t<T, U> {
+		using ordering_type = std::compare_three_way_result_t<T, U>;
+		using common_type   = std::common_type_t<T, U>;
 
-			if (is_equivalent)
+		const auto left_casted  = static_cast<common_type>(left);
+		const auto right_casted = static_cast<common_type>(right);
+
+		// @FIXME: Implement our own constexpr version of abs because std::abs is not constexpr
+		// @FIXME: Use adaptive epsilon (#163)
+		const auto is_equivalent = std::abs(left_casted - right_casted) < std::numeric_limits<common_type>::epsilon();
+
+		if (is_equivalent)
+		{
+			if constexpr (std::is_floating_point_v<common_type>)
 			{
 				// Floating point spaceship is guaranteed to be std::partial_ordering [expr.spaceship#4.3], so we use
 				// the same ordering type to indicate equivalence
 				return std::partial_ordering::equivalent;
 			}
 
-			return left <=> right;
+			return ordering_type::equivalent;
 		}
-		else
-		{
-			return left <=> right;
-		}
+
+		return left_casted <=> right_casted;
 	};
 } // namespace mpp

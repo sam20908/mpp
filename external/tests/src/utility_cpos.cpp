@@ -65,7 +65,6 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 {
 	const auto matrix   = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d };
 	const auto casted   = mpp::cast(std::type_identity<To>{}, matrix);
-	auto all_elem_equal = true;
 
 	expect(matrix.rows() == casted.rows());
 	expect(matrix.columns() == casted.columns());
@@ -74,20 +73,7 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 
 	using ordered_type = std::compare_three_way_result_t<To, To>;
 
-	for (auto row = std::size_t{}; row < matrix.rows(); ++row)
-	{
-		for (auto col = std::size_t{}; col < matrix.columns(); ++col)
-		{
-			if (mpp::compare_three_way_equivalent(static_cast<To>(matrix(row, col)), casted(row, col)) !=
-				ordered_type::equivalent)
-			{
-				all_elem_equal = false;
-				break; // No point in testing further elements
-			}
-		}
-	}
-
-	expect(all_elem_equal);
+	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare_three_way) == ordered_type::equivalent);
 }
 
 void test_size_compare(auto&& left_matrix_creator,
@@ -244,7 +230,7 @@ int main()
 						return mpp::matrix<float>{ 1, 1, 1.F };
 					},
 					std::partial_ordering::greater,
-					mpp::compare_three_way_equivalent);
+					mpp::floating_point_compare_three_way);
 			};
 		};
 	};
