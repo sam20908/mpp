@@ -54,7 +54,7 @@ using value_type = double;
 
 // @TODO: DRY the two matrices element compare wise (dependent on #130?)
 
-auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
+static auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
 {
 	return std::filesystem::path(TEST_DATA_PATH) / filename;
 }
