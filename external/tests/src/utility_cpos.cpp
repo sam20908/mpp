@@ -72,11 +72,14 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 	expect(matrix.rows_extent() == casted.rows_extent());
 	expect(matrix.columns_extent() == casted.columns_extent());
 
+	using ordered_type = std::compare_three_way_result_t<To, To>;
+
 	for (auto row = std::size_t{}; row < matrix.rows(); ++row)
 	{
 		for (auto col = std::size_t{}; col < matrix.columns(); ++col)
 		{
-			if (mpp::compare_three_way_equivalent(static_cast<To>(matrix(row, col)), casted(row, col)) != 0)
+			if (mpp::compare_three_way_equivalent(static_cast<To>(matrix(row, col)), casted(row, col)) !=
+				ordered_type::equivalent)
 			{
 				all_elem_equal = false;
 				break; // No point in testing further elements
