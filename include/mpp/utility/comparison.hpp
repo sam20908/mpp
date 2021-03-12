@@ -86,7 +86,7 @@ namespace mpp
 				{
 					const auto ordering = compare_three_way_fn(*left_it, *right_it);
 
-					if (ordering != 0)
+					if (ordering != ordering_type::equivalent)
 					{
 						return ordering;
 					}

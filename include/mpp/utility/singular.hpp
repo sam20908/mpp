@@ -35,8 +35,11 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> bool // @TODO: ISSUE #20
 		{
+			using ordering_type =
+				std::compare_three_way_result_t<detail::default_floating_type, detail::default_floating_type>;
+
 			return compare_three_way_equivalent(detail::det_lu_decomp<detail::default_floating_type>(obj),
-					   detail::default_floating_type{}) == 0;
+					   detail::default_floating_type{}) == ordering_type::equivalent;
 		}
 	};
 
