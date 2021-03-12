@@ -51,7 +51,8 @@ function(_turn_on_warnings target)
                 -Wno-ctad-maybe-unsupported
                 -Wno-missing-variable-declarations
                 -Wno-exit-time-destructors
-                -Wno-global-constructors)
+                -Wno-global-constructors
+                -Wno-undef)
         endif()
     else()
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
