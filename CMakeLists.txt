@@ -44,6 +44,8 @@ function(_turn_on_warnings target)
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
         # Clang-cl's /W4 is the same as -Wall -Wextra
+        # -Wall in Clang-cl turns into -Weverything because it's emulating
+        # MSVC's CLI, but we can specify MSVC's /W4 command to workaround this issue
         target_compile_options(${target} PRIVATE /W4 -Wpedantic -Wconversion
             -Wsign-conversion -Wnon-virtual-dtor -Werror)
     endif()
