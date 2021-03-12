@@ -63,8 +63,8 @@ void test_singular(auto val, bool is_singular, auto... dimension_args)
 template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
 void test_cast(const std::vector<std::vector<int>>& rng_2d)
 {
-	const auto matrix   = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d };
-	const auto casted   = mpp::cast(std::type_identity<To>{}, matrix);
+	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d };
+	const auto casted = mpp::cast(std::type_identity<To>{}, matrix);
 
 	expect(matrix.rows() == casted.rows());
 	expect(matrix.columns() == casted.columns());
