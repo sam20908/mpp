@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#include <mpp/utility/comparator.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
@@ -41,6 +43,7 @@
 #include "../../thirdparty/ut.hpp"
 // clang-format on
 
+#include <compare>
 #include <functional>
 #include <string>
 #include <utility>
@@ -83,7 +86,10 @@ void test_det(const std::string& filename, Tag test_tag = tag("execute"))
 		const auto matrix = mpp::matrix<value_type>{ data };
 		const auto det    = mpp::determinant(std::type_identity<value_type>{}, matrix);
 
-		expect(accurate_equals(det, static_cast<value_type>(result)));
+		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
+
+		expect(
+			mpp::floating_point_compare_three_way(det, static_cast<value_type>(result)) == ordering_type::equivalent);
 	};
 }
 
@@ -102,12 +108,10 @@ void test_transformation_helper(const auto& transform_fn, const auto& result, co
 	expect(result_matrix.rows_extent() == transformed.rows_extent());
 	expect(result_matrix.columns_extent() == transformed.columns_extent());
 
-	const auto all_elems_equal =
-		std::ranges::equal(result_matrix, transformed, [](const auto& left, const auto& right) {
-			return accurate_equals(left, right);
-		});
+	using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-	expect(all_elems_equal);
+	expect(
+		mpp::elements_compare(matrix, transformed, mpp::floating_point_compare_three_way) == ordering_type::equivalent);
 }
 
 template<std::size_t RowsExtent,
@@ -153,12 +157,10 @@ void test_block_helper(const auto& results, const auto& data, auto... dimension_
 		expect(cropped.rows() == result_matrix.rows());
 		expect(cropped.columns() == result_matrix.columns());
 
-		const auto all_elems_equal =
-			std::ranges::equal(result_matrix, cropped, [](const auto& left, const auto& right) {
-				return accurate_equals(left, right);
-			});
+		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-		expect(all_elems_equal);
+		expect(mpp::elements_compare(result_matrix, cropped, mpp::floating_point_compare_three_way) ==
+			   ordering_type::equivalent);
 	}
 }
 
