@@ -25,6 +25,7 @@
 #include <mpp/utility/comparator.hpp>
 #include <mpp/matrix.hpp>
 
+#include <compare>
 #include <cstddef>
 
 namespace mpp
