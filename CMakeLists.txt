@@ -32,29 +32,23 @@ function(_setup_target target binary_dir)
 endfunction()
 
 function(_turn_on_warnings target)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
+            -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
             -Wsign-conversion -Wnon-virtual-dtor -Werror)
+    endif()
 
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            target_compile_options(${target} PRIVATE -pedantic-errors)
-        endif()
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
+        # Clang-cl's /W4 is the same as -Wall -Wextra
+        target_compile_options(${target} PRIVATE /W4 -Wpedantic -Wconversion
+            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+    endif()
 
-        # if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
-        #     target_compile_options(${target} PRIVATE
-        #         -Wno-c++98-compat
-        #         -Wno-c++98-c++11-c++14-compat
-        #         -Wno-c++98-compat-pedantic
-        #         -Wno-newline-eof # @FIXME: Fix this warning later, just get Windows Clang to compile
-                
-        #         # Boost-ext/UT warnings disabled
-        #         -Wno-ctad-maybe-unsupported
-        #         -Wno-missing-variable-declarations
-        #         -Wno-exit-time-destructors
-        #         -Wno-global-constructors
-        #         -Wno-undef)
-        # endif()
-    else()
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
     endif()
 endfunction()
