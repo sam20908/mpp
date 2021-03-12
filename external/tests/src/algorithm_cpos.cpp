@@ -110,8 +110,8 @@ void test_transformation_helper(const auto& transform_fn, const auto& result, co
 
 	using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-	expect(
-		mpp::elements_compare(matrix, transformed, mpp::floating_point_compare_three_way) == ordering_type::equivalent);
+	expect(mpp::elements_compare(result_matrix, transformed, mpp::floating_point_compare_three_way) ==
+		   ordering_type::equivalent);
 }
 
 template<std::size_t RowsExtent,
