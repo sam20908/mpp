@@ -34,12 +34,12 @@ endfunction()
 function(_turn_on_warnings target)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
-            -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
+            -Wsign-conversion -Wnon-virtual-dtor -Wshadow -Werror -pedantic-errors)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
-            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+            -Wsign-conversion -Wnon-virtual-dtor -Wshadow -Werror)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
@@ -47,7 +47,7 @@ function(_turn_on_warnings target)
         # -Wall in Clang-cl turns into -Weverything because it's emulating
         # MSVC's CLI, but we can specify MSVC's /W4 command to workaround this issue
         target_compile_options(${target} PRIVATE /W4 -Wpedantic -Wconversion
-            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+            -Wsign-conversion -Wnon-virtual-dtor -Wshadow -Werror)
     endif()
 
     if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
