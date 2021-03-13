@@ -53,7 +53,7 @@ namespace mpp::detail
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
 		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
-		// spot This also assumes that the storage of row-major
+		// spot. This also assumes that the storage of row-major
 
 		return row_idx * cols + col_idx;
 	}
