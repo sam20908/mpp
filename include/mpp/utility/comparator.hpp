@@ -27,6 +27,20 @@
 
 namespace mpp
 {
+	namespace detail
+	{
+		template<typename T>
+		constexpr auto constexpr_abs(T t) -> T
+		{
+			if (std::is_constant_evaluated())
+			{
+				return t < 0 ? -t : t;
+			}
+
+			return std::abs(t);
+		}
+	} // namespace detail
+
 	// Implement this as a lambda to avoid the need of LIFTING this for passing to parameters
 	inline constexpr auto compare_three_way_equivalent = []<typename T>(const T& left,
 															 const T& right) -> std::compare_three_way_result_t<T, T> {
@@ -34,7 +48,7 @@ namespace mpp
 		{
 			// @FIXME: Implement our own constexpr version of abs because std::abs is not constexpr
 			// @FIXME: Use adaptive epsilon (#163)
-			const auto is_equivalent = std::abs(left - right) < std::numeric_limits<T>::epsilon();
+			const auto is_equivalent = detail::constexpr_abs(left - right) < std::numeric_limits<T>::epsilon();
 
 			if (is_equivalent)
 			{
