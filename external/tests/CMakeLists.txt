@@ -17,12 +17,8 @@
 
 set(TESTS_BINARY_DIR "${CMAKE_BINARY_DIR}/bin/tests")
 
-if(LLVM_LIT_EXEC)
-    message(STATUS "LLVM Lit found! LLVM Lit configuration for tests will be created")
-    configure_file("lit.site.cfg.in.py" "${TESTS_BINARY_DIR}/lit.site.cfg.py")
-else()
-    message(STATUS "LLVM Lit not found! LLVM Lit configuration for tests will not be created")
-endif()
+# Copy the LLVM configuration file anyways as it's optional that people use Lit
+configure_file("lit.site.cfg.in.py" "${TESTS_BINARY_DIR}/lit.site.cfg.py")
 
 add_custom_target("tests")
 
@@ -52,10 +48,4 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
         EXECUTABLE "" # Invoke nothing to avoid test failure workarounds (which would have return code of NOT 0)
         EXCLUDE "${PROJECT_SOURCE_DIR}/external/*"
         DEPENDENCIES "tests")
-endif()
-
-if(LLVM_LIT_EXEC)
-    add_test(NAME "tests" 
-        COMMAND ${LLVM_LIT_EXEC} .
-        WORKING_DIRECTORY "${TESTS_BINARY_DIR}")
 endif()

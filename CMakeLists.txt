@@ -52,12 +52,6 @@ target_sources(${PROJECT_NAME} INTERFACE ${INCLUDE_HEADERS})
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
 
-# There are several LLVM Lit distributions: Python's Lit package and
-# LLVM Lit build from source, which also has version suffixes we need
-# to account for
-find_program(LLVM_LIT_EXEC NAMES lit llvm-lit llvm-lit-*)
-
 if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
-    enable_testing()
     add_subdirectory("external/tests")
 endif()
