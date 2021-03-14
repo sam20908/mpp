@@ -18,7 +18,7 @@ jobs:
           sudo apt-get install clang-format-11
         displayName: Install Clang-Format 11
 
-      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include--style file --clang-format-executable=clang-format-11
+      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include --style file --clang-format-executable=clang-format-11
         displayName: Validate
 
   - job: UbuntuGCC10Point2
