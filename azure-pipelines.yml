@@ -18,10 +18,10 @@ jobs:
           sudo apt-get install clang-format-11
         displayName: Install Clang-Format 11
 
-      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/benchmarks --style file --clang-format-executable=clang-format-11
+      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include --style file --clang-format-executable=clang-format-11
         displayName: Validate
 
-  - job: UbuntuGCC10Point2
+  - job: UbuntuGCC
     displayName: Ubuntu GCC 10
 
     pool:
@@ -30,8 +30,9 @@ jobs:
     steps:
       - checkout: self
 
+      # @TODO: Don't install release candidate once LLVM 12 officially releases
       - script: |
-          pip3 install lit==12.0.0rc1 --no-warn-script-location # @TODO: Don't install release candidate once LLVM 12 officially releases
+          pip3 install lit==12.0.0rc1 --no-warn-script-location
           echo '##vso[task.prependpath]$(HOME)/.local/bin'
         displayName: Install Python LLVM Lit
 
@@ -68,18 +69,7 @@ jobs:
           pathToSources: $(Build.SourcesDirectory)
         displayName: Publish Code Coverage
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_C_COMPILER=/usr/bin/gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
-        displayName: Configure For Benchmarks in Release Configuration
-
-      - script: cmake --build build --config Release --target benchmarks
-        displayName: Build Benchmarks
-
-      - script: |
-          cd build/bin/benchmarks
-          ./initialization_benchmark # @TODO: Find a way to invoke multiple executables in this directory as we're not using LLVM Lit for benchmarks (#174)
-        displayName: Run All Benchmarks
-
-  - job: UbuntuClang11Point0Point1
+  - job: UbuntuClang
     displayName: Ubuntu Clang 11
 
     pool:
@@ -117,16 +107,6 @@ jobs:
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Release -DMPP_BUILD_BENCHMARKS=TRUE -DCMAKE_C_COMPILER=/usr/bin/clang-11 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
-        displayName: Configure For Benchmarks in Release Configuration
-
-      - script: cmake --build build --config Release --target benchmarks
-        displayName: Build Benchmarks
-
-      - script: |
-          cd build/bin/benchmarks
-          ./initialization_benchmark # @TODO: Find a way to invoke multiple executables in this directory as we're not using LLVM Lit for benchmarks (#174)
-        displayName: Run All Benchmarks
   - job: WindowsClang
     displayName: Windows Clang 11
 
@@ -134,6 +114,8 @@ jobs:
       vmImage: windows-latest
 
     steps:
+      - checkout: self
+
       # @TODO: Don't install release candidate once LLVM 12 officially releases
       - script: |
           pip install lit==12.0.0rc1 --no-warn-script-location
