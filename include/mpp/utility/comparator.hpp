@@ -46,7 +46,6 @@ namespace mpp
 															 const T& right) -> std::compare_three_way_result_t<T, T> {
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			// @FIXME: Implement our own constexpr version of abs because std::abs is not constexpr
 			// @FIXME: Use adaptive epsilon (#163)
 			const auto is_equivalent = detail::constexpr_abs(left - right) < std::numeric_limits<T>::epsilon();
 
