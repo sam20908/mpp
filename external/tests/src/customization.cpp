@@ -38,8 +38,6 @@ namespace mpp::customize
 
 #include "../../thirdparty/ut.hpp"
 
-// @TODO: Add customization test for upcoming equal CPOs
-
 namespace ns
 {
 	struct dumb_class
@@ -89,6 +87,16 @@ namespace ns
 	{
 		return dumb_class2{};
 	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::size_compare_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::elements_compare_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 } // namespace ns
 
 template<typename CPO>
@@ -116,6 +124,8 @@ int main()
 			expect(type<invoke_result_t<mpp::determinant_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
 		};
 	};
 
