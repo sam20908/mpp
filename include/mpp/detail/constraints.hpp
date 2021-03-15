@@ -28,13 +28,10 @@ namespace mpp::detail
 	template<typename Value>
 	concept arithmetic = requires(Value&& value)
 	{
-		// +, -, *, and /
 		{ value + value };
 		{ value - value };
 		{ value * value };
 		{ value / value };
-
-		// +=, -=, *=, and /=
 		{ value += value };
 		{ value -= value };
 		{ value *= value };
@@ -46,8 +43,8 @@ namespace mpp::detail
 		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
 
 	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
+	using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
 	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
+	concept range_2d_with_type = std::same_as<range_2d_value_t<Range>, Value>;
 } // namespace mpp::detail

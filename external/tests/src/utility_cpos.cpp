@@ -73,7 +73,7 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 
 	using ordered_type = std::compare_three_way_result_t<To, To>;
 
-	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare_three_way) == ordered_type::equivalent);
+	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare) == ordered_type::equivalent);
 }
 
 void test_size_compare(const auto& left_matrix_creator,
@@ -230,7 +230,7 @@ int main()
 						return mpp::matrix<float>{ 1, 1, 1.F };
 					},
 					std::partial_ordering::greater,
-					mpp::floating_point_compare_three_way);
+					mpp::floating_point_compare);
 			};
 		};
 	};

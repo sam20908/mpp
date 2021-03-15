@@ -84,7 +84,7 @@ void test_det(const std::string& filename, Tag test_tag = tag("execute"))
 		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
 		expect(
-			mpp::floating_point_compare_three_way(det, static_cast<value_type>(result)) == ordering_type::equivalent);
+			mpp::floating_point_compare(det, static_cast<value_type>(result)) == ordering_type::equivalent);
 	};
 }
 
@@ -105,7 +105,7 @@ void test_transformation_helper(const auto& transform_fn, const auto& result, co
 
 	using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-	expect(mpp::elements_compare(result_matrix, transformed, mpp::floating_point_compare_three_way) ==
+	expect(mpp::elements_compare(result_matrix, transformed, mpp::floating_point_compare) ==
 		   ordering_type::equivalent);
 }
 
@@ -154,7 +154,7 @@ void test_block_helper(const auto& results, const auto& data, auto... dimension_
 
 		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-		expect(mpp::elements_compare(result_matrix, cropped, mpp::floating_point_compare_three_way) ==
+		expect(mpp::elements_compare(result_matrix, cropped, mpp::floating_point_compare) ==
 			   ordering_type::equivalent);
 	}
 }

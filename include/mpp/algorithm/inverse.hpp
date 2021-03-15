@@ -129,7 +129,7 @@ namespace mpp
 
 				using to_ordering_type = std::compare_three_way_result_t<To, To>;
 
-				if (floating_point_compare_three_way(elem, To{}) == to_ordering_type::equivalent)
+				if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -151,7 +151,7 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
@@ -181,7 +181,7 @@ namespace mpp
 
 				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");

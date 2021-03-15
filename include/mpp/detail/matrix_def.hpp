@@ -49,7 +49,7 @@ namespace mpp
 	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
 	// clang-format off
 	template<typename Range2D>
-	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
+	matrix(Range2D&&) -> matrix<detail::range_2d_value_t<Range2D>>;
 	// clang-format on
 
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
