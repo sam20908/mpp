@@ -43,7 +43,7 @@ namespace mpp
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
 				const auto left_columns = left.columns();
-				auto result          = value_type{};
+				auto result             = value_type{};
 
 				for (auto index = std::size_t{}; index < left_columns; ++index)
 				{

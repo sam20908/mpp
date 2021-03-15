@@ -105,7 +105,7 @@ namespace mpp
 		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
+			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
 			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;

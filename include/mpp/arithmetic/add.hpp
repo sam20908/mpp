@@ -85,7 +85,7 @@ namespace mpp
 	{
 		detail::validate_same_size(left, right);
 
-		const auto rows = left.rows();
+		const auto rows    = left.rows();
 		const auto columns = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)

@@ -37,7 +37,7 @@ namespace mpp
 		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
+			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
 			// Handle special cases - avoid computing LU Decomposition

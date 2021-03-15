@@ -47,9 +47,9 @@ namespace mpp
 
 			// Out of bounds checks
 
-			const auto rows  = obj.rows();
-			const auto columns  = obj.columns();
-			const auto begin = obj.begin();
+			const auto rows    = obj.rows();
+			const auto columns = obj.columns();
+			const auto begin   = obj.begin();
 
 			if (top_row_idx >= rows)
 			{
@@ -87,7 +87,7 @@ namespace mpp
 			auto block_buf               = block_buf_t{};
 			auto block_buf_back_inserter = std::back_inserter(block_buf);
 
-			const auto block_rows = bottom_row_idx - top_row_idx + 1;
+			const auto block_rows    = bottom_row_idx - top_row_idx + 1;
 			const auto block_columns = bottom_column_idx - top_column_idx + 1;
 			block_buf.reserve(block_rows * block_columns);
 

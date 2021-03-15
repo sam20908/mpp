@@ -49,7 +49,8 @@ namespace mpp::detail
 	 * Helper functions
 	 */
 
-	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t columns, std::size_t row_idx, std::size_t col_idx) -> std::size_t
+	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t columns, std::size_t row_idx, std::size_t col_idx)
+		-> std::size_t
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
 		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
@@ -62,9 +63,9 @@ namespace mpp::detail
 	[[nodiscard]] inline auto range_2d_dimensions(Range2D&& rng_2d)
 		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20
 	{
-		const auto begin = std::ranges::begin(rng_2d);
-		const auto rows  = std::ranges::size(rng_2d);
-		const auto columns  = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
+		const auto begin   = std::ranges::begin(rng_2d);
+		const auto rows    = std::ranges::size(rng_2d);
+		const auto columns = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
 
 		if (rows > 1)
 		{
@@ -73,7 +74,8 @@ namespace mpp::detail
 
 			for (auto&& row : rng_2d)
 			{
-				if (const auto row_columns = std::ranges::size(std::forward<decltype(row)>(row)); row_columns != columns)
+				if (const auto row_columns = std::ranges::size(std::forward<decltype(row)>(row));
+					row_columns != columns)
 				{
 					throw std::invalid_argument("Initializer doesn't have equal row columns!");
 				}
@@ -125,8 +127,10 @@ namespace mpp::detail
 	}
 
 	template<typename InitializerValue>
-	inline void
-	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t columns, InitializerValue&& val) // @TODO: ISSUE #20
+	inline void allocate_1d_buf_if_vector(auto& buf,
+		std::size_t rows,
+		std::size_t columns,
+		InitializerValue&& val) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
 
@@ -181,7 +185,8 @@ namespace mpp::detail
 	}
 
 	template<typename To, bool FillLBuf>
-	inline auto lu_decomp_common(std::size_t rows, std::size_t columns, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
+	inline auto lu_decomp_common(std::size_t rows, std::size_t columns, auto& l_buf, auto& u_buf)
+		-> To // @TODO: ISSUE #20
 	{
 		// Things this function expects from l_buf and u_buf:
 		// 1. l_buf is already an identity buffer

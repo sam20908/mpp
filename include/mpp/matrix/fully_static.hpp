@@ -79,9 +79,9 @@ namespace mpp
 				throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
 			}
 
-			base::_rows = expr.rows();
+			base::_rows    = expr.rows();
 			base::_columns = expr.columns();
-			auto idx    = std::size_t{};
+			auto idx       = std::size_t{};
 
 			for (auto row = std::size_t{}; row < base::_rows; ++row)
 			{
@@ -101,7 +101,7 @@ namespace mpp
 		{
 			detail::validate_dimensions_for_identity(RowsExtent, ColumnsExtent);
 
-			base::_rows = RowsExtent;
+			base::_rows    = RowsExtent;
 			base::_columns = ColumnsExtent;
 
 			std::ranges::fill(base::_buf, Value{});
@@ -111,7 +111,7 @@ namespace mpp
 		template<detail::invocable_with_return_type<Value> Callable>
 		explicit matrix(Callable&& callable) // @TODO: ISSUE #20
 		{
-			base::_rows = RowsExtent;
+			base::_rows    = RowsExtent;
 			base::_columns = ColumnsExtent;
 
 			std::ranges::generate(base::_buf, std::forward<Callable>(callable));
