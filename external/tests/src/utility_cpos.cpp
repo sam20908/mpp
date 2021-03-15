@@ -76,8 +76,8 @@ void test_cast(const std::vector<std::vector<int>>& rng_2d)
 	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare_three_way) == ordered_type::equivalent);
 }
 
-void test_size_compare(auto&& left_matrix_creator,
-	auto&& right_matrix_creator,
+void test_size_compare(const auto& left_matrix_creator,
+	const auto& right_matrix_creator,
 	std::partial_ordering row_ordering,
 	std::partial_ordering column_ordering,
 	bool equal_in_rows,
