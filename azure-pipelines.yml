@@ -107,6 +107,40 @@ jobs:
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
 
+  - job: WindowsMSVC
+    displayName: Windows MSVC 19.28 (VS 16.9.0)
+
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+
+      # @TODO: Don't install release candidate once LLVM 12 officially releases
+      - script: |
+          pip install lit==12.0.0rc1 --no-warn-script-location
+          echo '##vso[task.prependpath]$(HOME)/.local/bin'
+        displayName: Install Python LLVM Lit
+
+      - script: |
+          call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+
+          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -B build
+          cmake --build build --config Debug --target tests
+        displayName: Configure and Build Tests in Debug Configuration
+
+      - script: |
+          cd build/bin/tests
+          lit . --xunit-xml-output results.xml
+        continueOnError: true # Tests might fail, but we still want the results
+        displayName: Run Tests
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: "**/results.xml"
+        displayName: Publish Tests Results
+
   - job: WindowsClang
     displayName: Windows Clang 11
 
@@ -125,7 +159,7 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -G Ninja -B build
+          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -G Ninja -B build
           cmake --build build --config Debug --target tests
         displayName: Configure and Build Tests in Debug Configuration
 
