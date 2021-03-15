@@ -100,7 +100,7 @@ namespace ns
 } // namespace ns
 
 template<typename CPO>
-using invoke_result_t = mpp::detail::tag_invoke_impl::tag_invoke_result_t<CPO, ns::dumb_class>;
+using invoke_result_t = mpp::detail::tag_invoke_result_t<CPO, ns::dumb_class>;
 
 int main()
 {

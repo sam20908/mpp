@@ -27,11 +27,10 @@ namespace mpp::detail
 	struct cpo_base
 	{
 		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(Args&&... args) const -> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
 		{
 			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
-			return detail::tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
+			return tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
 		}
 	};
 } // namespace mpp::detail
