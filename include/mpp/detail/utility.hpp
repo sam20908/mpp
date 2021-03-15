@@ -59,8 +59,7 @@ namespace mpp::detail
 		return row_idx * columns + col_idx;
 	}
 
-	template<typename Range2D>
-	[[nodiscard]] inline auto range_2d_dimensions(Range2D&& rng_2d)
+	[[nodiscard]] inline auto range_2d_dimensions(const auto& rng_2d)
 		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20
 	{
 		const auto begin   = std::ranges::begin(rng_2d);
@@ -72,10 +71,9 @@ namespace mpp::detail
 			// We only need to check for equal row columns when the rows is 2+ because 1 row means there's no other row
 			// to check and 0 rows is self explanatory
 
-			for (auto&& row : rng_2d)
+			for (const auto& row : rng_2d)
 			{
-				if (const auto row_columns = std::ranges::size(std::forward<decltype(row)>(row));
-					row_columns != columns)
+				if (const auto row_columns = std::ranges::size(row); row_columns != columns)
 				{
 					throw std::invalid_argument("Initializer doesn't have equal row columns!");
 				}
@@ -127,70 +125,71 @@ namespace mpp::detail
 	}
 
 	template<typename InitializerValue>
-	inline void allocate_1d_buf_if_vector(auto& buf,
+	inline void allocate_1d_buffer_if_vector(auto& buffer,
 		std::size_t rows,
 		std::size_t columns,
 		InitializerValue&& val) // @TODO: ISSUE #20
 	{
-		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
+		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buffer)>>::value;
 
 		if constexpr (is_vec)
 		{
-			buf.resize(rows * columns, std::forward<InitializerValue>(val));
+			buffer.resize(rows * columns, std::forward<InitializerValue>(val));
 		}
 	}
 
-	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
+	inline void reserve_1d_buffer_if_vector(auto& buffer, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 	{
-		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
+		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buffer)>>::value;
 
 		if constexpr (is_vec)
 		{
-			buf.reserve(rows * columns);
+			buffer.reserve(rows * columns);
 		}
 	}
 
 	template<typename Value>
-	inline void transform_1d_buf_into_identity(auto& buf, std::size_t n) // @TODO: ISSUE #20
+	inline void transform_1d_buffer_into_identity(auto& buffer, std::size_t n) // @TODO: ISSUE #20
 	{
-		// This assumes that the buffer is already filled with zeroes
+		// This assumes that the bufferfer is already filled with zeroes
 
 		for (auto idx = std::size_t{}; idx < n; ++idx)
 		{
-			buf[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
+			buffer[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
 		}
 	}
 
 	template<typename To, typename From>
-	inline void mul_square_bufs(auto& buf, auto&& l_buf, auto&& r_buf, std::size_t n) // @TODO: ISSUE #20
+	inline void
+	mul_square_buffers(auto& buffer, const auto& left_bufferfer, const auto& right_bufferfer, std::size_t n) // @TODO: ISSUE #20
 	{
 		for (auto row = std::size_t{}; row < n; ++row)
 		{
-			for (auto col = std::size_t{}; col < n; ++col)
+			for (auto column = std::size_t{}; column < n; ++column)
 			{
 				auto result = To{};
 
 				for (auto elem = std::size_t{}; elem < n; ++elem)
 				{
 					const auto left_idx  = idx_2d_to_1d(n, row, elem);
-					const auto right_idx = idx_2d_to_1d(n, elem, col);
+					const auto right_idx = idx_2d_to_1d(n, elem, column);
 
-					result += static_cast<To>(l_buf[left_idx]) * static_cast<To>(r_buf[right_idx]);
+					result += static_cast<To>(left_bufferfer[left_idx]) * static_cast<To>(right_bufferfer[right_idx]);
 				}
 
-				const auto idx = idx_2d_to_1d(n, row, col);
-				buf[idx]       = result;
+				const auto result_element_index = idx_2d_to_1d(n, row, column);
+				buffer[result_element_index]    = result;
 			}
 		}
 	}
 
 	template<typename To, bool FillLBuf>
-	inline auto lu_decomp_common(std::size_t rows, std::size_t columns, auto& l_buf, auto& u_buf)
+	inline auto lu_decomp_common(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
 		-> To // @TODO: ISSUE #20
 	{
-		// Things this function expects from l_buf and u_buf:
-		// 1. l_buf is already an identity buffer
-		// 2. u_buf has the original values
+		// Things this function expects from l_buffer and u_buffer:
+		// 1. l_buffer is already an identity bufferfer
+		// 2. u_buffer has the original values
 
 		auto det = To{ 1 };
 
@@ -207,29 +206,29 @@ namespace mpp::detail
 				auto factor_row_idx = idx_2d_to_1d(columns, col, col);
 
 				const auto elem_idx = idx_2d_to_1d(columns, row, col);
-				const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
+				const auto factor   = u_buffer[elem_idx] / u_buffer[factor_row_idx] * -1;
 
 				for (auto idx = begin_idx; idx < end_idx; ++idx)
 				{
-					u_buf[idx] += factor * u_buf[factor_row_idx++];
+					u_buffer[idx] += factor * u_buffer[factor_row_idx++];
 				}
 
 				// Handle cases where we don't need to store the factors in a separate buffer (plain determinant
-				// algorithm for example). This allows passing empty buffer as l_buf for optimization
+				// algorithm for example). This allows passing empty buffer as l_buffer for optimization
 				if constexpr (FillLBuf)
 				{
 					// L stores the opposite (opposite sign) of the factors used for U in the corresponding
 					// location. But, to help optimize the calculation of inv(L), we can just leave the sign because
 					// all the diagnoal elements below the diagonal element by 1 are the opposite sign, and it's
 					// relatively easy to fix the values of other factors
-					l_buf[elem_idx] = factor;
+					l_buffer[elem_idx] = factor;
 				}
 
 				++begin_idx;
 			}
 
 			const auto diag_elem_idx = idx_2d_to_1d(columns, row, row);
-			det *= u_buf[diag_elem_idx];
+			det *= u_buffer[diag_elem_idx];
 		}
 
 		return det;

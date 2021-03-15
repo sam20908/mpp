@@ -69,7 +69,7 @@ namespace mpp
 				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}
 
-			base::init_buf_2d_dynamic_without_check(init_2d, rows, ColumnsExtent);
+			base::init_buffer_2d_dynamic_without_check(init_2d, rows, ColumnsExtent);
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
@@ -83,7 +83,7 @@ namespace mpp
 				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}
 
-			base::init_buf_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), rows, ColumnsExtent);
+			base::init_buffer_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), rows, ColumnsExtent);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -113,7 +113,7 @@ namespace mpp
 		matrix(std::size_t rows, Callable&& callable, const Allocator& allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20
 		{
-			base::init_buf_from_callable_dynamic(rows, ColumnsExtent, std::forward<Callable>(callable));
+			base::init_buffer_from_callable_dynamic(rows, ColumnsExtent, std::forward<Callable>(callable));
 		}
 	};
 } // namespace mpp

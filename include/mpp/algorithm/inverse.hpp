@@ -34,7 +34,7 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline void forward_substitution(auto& l_buf, std::size_t columns) // @TODO: ISSUE #20
+		inline void forward_substitution(auto& l_buffer, std::size_t columns) // @TODO: ISSUE #20
 		{
 			for (auto col = std::size_t{ 1 }; col < columns; ++col)
 			{
@@ -43,35 +43,35 @@ namespace mpp
 
 				for (auto row = col + 1; row < columns; ++row)
 				{
-					const auto factor = l_buf[idx_2d_to_1d(columns, row, row - 1)] * -1;
+					const auto factor = l_buffer[idx_2d_to_1d(columns, row, row - 1)] * -1;
 
 					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
 					{
-						const auto elem_above = l_buf[idx_2d_to_1d(columns, col, col_2)];
+						const auto elem_above = l_buffer[idx_2d_to_1d(columns, col, col_2)];
 						const auto elem_idx   = idx_2d_to_1d(columns, row, col_2);
 
-						l_buf[elem_idx] -= factor * elem_above;
+						l_buffer[elem_idx] -= factor * elem_above;
 					}
 				}
 			}
 		}
 
-		inline void back_substitution(auto& u_buf, std::size_t columns) // @TODO: ISSUE #20
+		inline void back_substitution(auto& u_buffer, std::size_t columns) // @TODO: ISSUE #20
 		{
 			for (auto col = columns; col > 0; --col)
 			{
 				const auto col_idx   = col - 1;
 				auto diag_elem_idx   = idx_2d_to_1d(columns, col_idx, col_idx);
-				const auto diag_elem = u_buf[diag_elem_idx];
+				const auto diag_elem = u_buffer[diag_elem_idx];
 
 				// Diagonal element can simply be replaced with the factor
 				const auto diag_factor = default_floating_type{ 1 } / diag_elem;
-				u_buf[diag_elem_idx]   = diag_factor;
+				u_buffer[diag_elem_idx]   = diag_factor;
 
 				// Multiply every element to the right of the diagonal element by the factor
 				for (auto idx = columns - col; idx > 0; --idx)
 				{
-					u_buf[++diag_elem_idx] *= diag_factor;
+					u_buffer[++diag_elem_idx] *= diag_factor;
 				}
 
 				for (auto row = col_idx; row > 0; --row)
@@ -80,22 +80,22 @@ namespace mpp
 					// (this works because) the augmented matrix would have zeroes above the diagonal element
 					const auto row_idx            = row - 1;
 					const auto elem_idx           = idx_2d_to_1d(columns, row_idx, col_idx);
-					const auto elem_before_factor = u_buf[elem_idx];
-					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
+					const auto elem_before_factor = u_buffer[elem_idx];
+					u_buffer[elem_idx]               = elem_before_factor * diag_factor * -1;
 
 					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
 					for (auto col_2 = columns; col_2 > col; --col_2)
 					{
 						const auto col_2_idx     = col_2 - 1;
 						auto diag_row_idx        = idx_2d_to_1d(columns, col_idx, col_2_idx);
-						const auto diag_row_elem = u_buf[diag_row_idx];
+						const auto diag_row_elem = u_buffer[diag_row_idx];
 
 						const auto cur_elem_idx = idx_2d_to_1d(columns, row_idx, col_2_idx);
-						const auto elem         = u_buf[cur_elem_idx];
+						const auto elem         = u_buffer[cur_elem_idx];
 						const auto factor       = elem_before_factor * -1;
 
 						const auto new_elem = factor * diag_row_elem + elem;
-						u_buf[cur_elem_idx] = new_elem;
+						u_buffer[cur_elem_idx] = new_elem;
 					}
 				}
 			}
@@ -117,8 +117,8 @@ namespace mpp
 				return inv_matrix;
 			}
 
-			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			allocate_1d_buf_if_vector(inv_matrix_buf, rows, columns, To{});
+			auto inv_matrix_buffer = typename inv_matrix_t::buffer_type{};
+			allocate_1d_buffer_if_vector(inv_matrix_buffer, rows, columns, To{});
 
 			using default_floating_type_ordering_type =
 				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
@@ -134,7 +134,7 @@ namespace mpp
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				inv_matrix_buf[0] = To{ 1 } / elem;
+				inv_matrix_buffer[0] = To{ 1 } / elem;
 			}
 
 			auto det = default_floating_type{ 1 };
@@ -159,27 +159,27 @@ namespace mpp
 
 				const auto multiplier = default_floating_type{ 1 } / det;
 
-				inv_matrix_buf[0] = static_cast<To>(multiplier * element_1);
-				inv_matrix_buf[1] = static_cast<To>(multiplier * element_2 * -1);
-				inv_matrix_buf[2] = static_cast<To>(multiplier * element_3 * -1);
-				inv_matrix_buf[3] = static_cast<To>(multiplier * element_4);
+				inv_matrix_buffer[0] = static_cast<To>(multiplier * element_1);
+				inv_matrix_buffer[1] = static_cast<To>(multiplier * element_2 * -1);
+				inv_matrix_buffer[2] = static_cast<To>(multiplier * element_3 * -1);
+				inv_matrix_buffer[3] = static_cast<To>(multiplier * element_4);
 			}
 
 			if (rows >= 3)
 			{
 				using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
-				using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
+				using lu_decomp_buffer_t    = typename lu_decomp_matrix_t::buffer_type;
 
-				auto l_buf = lu_decomp_buf_t{};
-				auto u_buf = lu_decomp_buf_t{};
+				auto l_buffer = lu_decomp_buffer_t{};
+				auto u_buffer = lu_decomp_buffer_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, columns, default_floating_type{});
-				std::ranges::copy(obj, u_buf.begin());
+				allocate_1d_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+				std::ranges::copy(obj, u_buffer.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, columns, default_floating_type{});
-				transform_1d_buf_into_identity<default_floating_type>(l_buf, rows);
+				allocate_1d_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
+				transform_1d_buffer_into_identity<default_floating_type>(l_buffer, rows);
 
-				det = lu_decomp_common<default_floating_type, true>(rows, columns, l_buf, u_buf);
+				det = lu_decomp_common<default_floating_type, true>(rows, columns, l_buffer, u_buffer);
 
 				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
@@ -189,28 +189,28 @@ namespace mpp
 
 				if (std::is_constant_evaluated())
 				{
-					forward_substitution(l_buf, columns);
-					back_substitution(u_buf, columns);
+					forward_substitution(l_buffer, columns);
+					back_substitution(u_buffer, columns);
 				}
 				else
 				{
 					// Compute inv(L) and inv(U) in parallel because they don't share data
 
-					auto l_inv_future = std::async(std::launch::async, [&l_buf, columns]() {
-						forward_substitution(l_buf, columns);
+					auto l_inv_future = std::async(std::launch::async, [&l_buffer, columns]() {
+						forward_substitution(l_buffer, columns);
 					});
-					auto u_inv_future = std::async(std::launch::async, [&u_buf, columns]() {
-						back_substitution(u_buf, columns);
+					auto u_inv_future = std::async(std::launch::async, [&u_buffer, columns]() {
+						back_substitution(u_buffer, columns);
 					});
 
 					l_inv_future.wait();
 					u_inv_future.wait();
 				}
 
-				mul_square_bufs<To, default_floating_type>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
+				mul_square_buffers<To, default_floating_type>(inv_matrix_buffer, std::move(u_buffer), std::move(l_buffer), rows);
 			}
 
-			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, columns);
+			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buffer), rows, columns);
 			return inv_matrix;
 		}
 

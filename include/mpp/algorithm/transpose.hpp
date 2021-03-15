@@ -39,10 +39,10 @@ namespace mpp
 			const auto data    = obj.data();
 
 			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
-			using transposed_buf_t = typename transposed_t::buffer_type;
+			using transposed_buffer_t = typename transposed_t::buffer_type;
 			auto transposed        = transposed_t{};
-			auto transposed_buf    = transposed_buf_t{};
-			detail::allocate_1d_buf_if_vector(transposed_buf, columns, rows, Value{});
+			auto transposed_buffer    = transposed_buffer_t{};
+			detail::allocate_1d_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
 			for (auto col = std::size_t{}; col < columns; ++col)
 			{
@@ -51,11 +51,11 @@ namespace mpp
 					auto normal_idx     = detail::idx_2d_to_1d(columns, row, col);
 					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
 
-					transposed_buf[transposed_idx] = data[normal_idx];
+					transposed_buffer[transposed_idx] = data[normal_idx];
 				}
 			}
 
-			init_matrix_with_1d_rng(transposed, std::move(transposed_buf), columns, rows);
+			init_matrix_with_1d_rng(transposed, std::move(transposed_buffer), columns, rows);
 
 			return transposed;
 		}

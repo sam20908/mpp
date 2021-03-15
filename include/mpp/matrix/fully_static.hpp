@@ -51,23 +51,23 @@ namespace mpp
 
 		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
 		{
-			base::init_buf_2d_static(init_2d, true);
+			base::init_buffer_2d_static(init_2d, true);
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
 		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
 		{
-			base::init_buf_2d_static(std::forward<Range2D>(rng_2d), true);
+			base::init_buffer_2d_static(std::forward<Range2D>(rng_2d), true);
 		}
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20
 		{
-			base::init_buf_2d_static(arr_2d, false);
+			base::init_buffer_2d_static(arr_2d, false);
 		}
 
 		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& arr_2d) // @TODO: ISSUE #20
 		{
-			base::init_buf_2d_static(std::move(arr_2d), false);
+			base::init_buffer_2d_static(std::move(arr_2d), false);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -87,7 +87,7 @@ namespace mpp
 			{
 				for (auto col = std::size_t{}; col < base::_columns; ++col)
 				{
-					base::_buf[idx++] = expr(row, col);
+					base::_buffer[idx++] = expr(row, col);
 				}
 			}
 		}
@@ -104,8 +104,8 @@ namespace mpp
 			base::_rows    = RowsExtent;
 			base::_columns = ColumnsExtent;
 
-			std::ranges::fill(base::_buf, Value{});
-			detail::transform_1d_buf_into_identity<Value>(base::_buf, RowsExtent);
+			std::ranges::fill(base::_buffer, Value{});
+			detail::transform_1d_buffer_into_identity<Value>(base::_buffer, RowsExtent);
 		}
 
 		template<detail::invocable_with_return_type<Value> Callable>
@@ -114,7 +114,7 @@ namespace mpp
 			base::_rows    = RowsExtent;
 			base::_columns = ColumnsExtent;
 
-			std::ranges::generate(base::_buf, std::forward<Callable>(callable));
+			std::ranges::generate(base::_buffer, std::forward<Callable>(callable));
 		}
 	};
 } // namespace mpp

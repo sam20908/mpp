@@ -58,16 +58,16 @@ namespace mpp
 			}
 
 			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
-			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
+			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
-			auto u_buf = lu_decomp_buf_t{};
+			auto u_buffer = lu_decomp_buffer_t{};
 
-			allocate_1d_buf_if_vector(u_buf, rows, columns, default_floating_type{});
-			std::ranges::copy(obj, u_buf.begin());
+			allocate_1d_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+			std::ranges::copy(obj, u_buffer.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomp_common<default_floating_type, false>(rows, columns, dummy_variable, u_buf);
+			const auto det = lu_decomp_common<default_floating_type, false>(rows, columns, dummy_variable, u_buffer);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));

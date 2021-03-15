@@ -80,26 +80,26 @@ namespace mpp
 			}
 
 			using block_matrix_t = matrix<Value, std::dynamic_extent, std::dynamic_extent>;
-			using block_buf_t    = typename block_matrix_t::buffer_type;
+			using block_buffer_t    = typename block_matrix_t::buffer_type;
 			using diff_t         = typename block_matrix_t::difference_type;
 
 			auto block_matrix            = block_matrix_t{};
-			auto block_buf               = block_buf_t{};
-			auto block_buf_back_inserter = std::back_inserter(block_buf);
+			auto block_buffer               = block_buffer_t{};
+			auto block_buffer_back_inserter = std::back_inserter(block_buffer);
 
 			const auto block_rows    = bottom_row_idx - top_row_idx + 1;
 			const auto block_columns = bottom_column_idx - top_column_idx + 1;
-			block_buf.reserve(block_rows * block_columns);
+			block_buffer.reserve(block_rows * block_columns);
 
 			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
 			{
 				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(columns, row, top_column_idx));
 				auto row_begin     = std::next(begin, row_begin_idx);
 
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), block_buf_back_inserter);
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), block_buffer_back_inserter);
 			}
 
-			init_matrix_with_1d_rng(block_matrix, std::move(block_buf), block_rows, block_columns);
+			init_matrix_with_1d_rng(block_matrix, std::move(block_buffer), block_rows, block_columns);
 
 			return block_matrix;
 		}
