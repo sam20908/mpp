@@ -22,7 +22,6 @@
 #include <mpp/algorithm/determinant.hpp>
 #include <mpp/detail/cpo_base.hpp>
 #include <mpp/detail/utility.hpp>
-#include <mpp/utility/comparator.hpp>
 #include <mpp/matrix.hpp>
 
 #include <compare>

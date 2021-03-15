@@ -17,7 +17,6 @@
  * under the License.
  */
 
-#include <mpp/utility/comparator.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
