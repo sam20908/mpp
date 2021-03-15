@@ -30,7 +30,7 @@ namespace mpp::customize_extents
 	{
 		return 10;
 	}
-} // namespace mpp::customize
+} // namespace mpp::customize_extents
 
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
