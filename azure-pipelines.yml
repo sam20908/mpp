@@ -41,7 +41,7 @@ jobs:
           sudo apt-get install gcovr
         displayName: Install GCC Gcovr
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
+      - script: cmake -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
         displayName: Configure For Tests and Code Coverage in Debug Configuration
 
       - script: cmake --build build --config Debug --target tests
@@ -89,7 +89,7 @@ jobs:
           sudo apt-get install clang-11 clang++-11
         displayName: Install Clang 11
 
-      - script: cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
+      - script: cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
         displayName: Configure For Tests in Debug Configuration
 
       - script: cmake --build build --config Debug --target tests
@@ -125,7 +125,7 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -B build
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -B build
           cmake --build build --config Debug --target tests
         displayName: Configure and Build Tests in Debug Configuration
 
@@ -159,7 +159,7 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -G Ninja -B build
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -G Ninja -B build
           cmake --build build --config Debug --target tests
         displayName: Configure and Build Tests in Debug Configuration
 
