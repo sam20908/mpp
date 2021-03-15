@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#include <mpp/utility/comparator.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
@@ -26,21 +28,17 @@
 // clang-format off
 /**
  * @TODO: Remove this whole clang-format off section once
- * https://github.com/microsoft/vscode-cpptools/issues/7150 is resolved
+ * https://github.com/boost-ext/ut/issues/432 is resolved
  * 
- * The reason why we need this is because for some reason, Boost-ext/UT
- * causes std::filesystem to not be recognized as an existing namespace
- * if it's included BEFORE <filesystem>. The link above tracks the issue
- * in the VSCode cpptools repository
- * 
- * The project will still compile, just that this allows EDG to have
- * proper intellisense
+ * ut.hpp actually has a bug in its headers when __cpp_modules is defined due
+ * to how it's closing its namespaces
  */
 
 #include <filesystem>
 #include "../../thirdparty/ut.hpp"
 // clang-format on
 
+#include <compare>
 #include <functional>
 #include <string>
 #include <utility>
@@ -54,7 +52,7 @@ using value_type = double;
 
 // @TODO: DRY the two matrices element compare wise (dependent on #130?)
 
-auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
+static auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
 {
 	return std::filesystem::path(TEST_DATA_PATH) / filename;
 }
@@ -83,7 +81,10 @@ void test_det(const std::string& filename, Tag test_tag = tag("execute"))
 		const auto matrix = mpp::matrix<value_type>{ data };
 		const auto det    = mpp::determinant(std::type_identity<value_type>{}, matrix);
 
-		expect(accurate_equals(det, static_cast<value_type>(result)));
+		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
+
+		expect(
+			mpp::floating_point_compare_three_way(det, static_cast<value_type>(result)) == ordering_type::equivalent);
 	};
 }
 
@@ -102,12 +103,10 @@ void test_transformation_helper(const auto& transform_fn, const auto& result, co
 	expect(result_matrix.rows_extent() == transformed.rows_extent());
 	expect(result_matrix.columns_extent() == transformed.columns_extent());
 
-	const auto all_elems_equal =
-		std::ranges::equal(result_matrix, transformed, [](const auto& left, const auto& right) {
-			return accurate_equals(left, right);
-		});
+	using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-	expect(all_elems_equal);
+	expect(mpp::elements_compare(result_matrix, transformed, mpp::floating_point_compare_three_way) ==
+		   ordering_type::equivalent);
 }
 
 template<std::size_t RowsExtent,
@@ -153,12 +152,10 @@ void test_block_helper(const auto& results, const auto& data, auto... dimension_
 		expect(cropped.rows() == result_matrix.rows());
 		expect(cropped.columns() == result_matrix.columns());
 
-		const auto all_elems_equal =
-			std::ranges::equal(result_matrix, cropped, [](const auto& left, const auto& right) {
-				return accurate_equals(left, right);
-			});
+		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
 
-		expect(all_elems_equal);
+		expect(mpp::elements_compare(result_matrix, cropped, mpp::floating_point_compare_three_way) ==
+			   ordering_type::equivalent);
 	}
 }
 

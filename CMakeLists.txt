@@ -32,10 +32,25 @@ function(_setup_target target binary_dir)
 endfunction()
 
 function(_turn_on_warnings target)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
             -Wsign-conversion -Wnon-virtual-dtor -Werror -pedantic-errors)
-    else()
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT MSVC)
+        target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Wconversion
+            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
+        # Clang-cl's /W4 is the same as -Wall -Wextra
+        # -Wall in Clang-cl turns into -Weverything because it's emulating
+        # MSVC's CLI, but we can specify MSVC's /W4 command to workaround this issue
+        target_compile_options(${target} PRIVATE /W4 -Wpedantic -Wconversion
+            -Wsign-conversion -Wnon-virtual-dtor -Werror)
+    endif()
+
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND MSVC)
         target_compile_options(${target} PRIVATE /W4 /WX /permissive-)
     endif()
 endfunction()

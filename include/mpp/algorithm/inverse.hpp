@@ -90,12 +90,12 @@ namespace mpp
 						auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
 						const auto diag_row_elem = u_buf[diag_row_idx];
 
-						const auto elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
-						const auto elem     = u_buf[elem_idx];
-						const auto factor   = elem_before_factor * -1;
+						const auto cur_elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+						const auto elem         = u_buf[cur_elem_idx];
+						const auto factor       = elem_before_factor * -1;
 
 						const auto new_elem = factor * diag_row_elem + elem;
-						u_buf[elem_idx]     = new_elem;
+						u_buf[cur_elem_idx] = new_elem;
 					}
 				}
 			}
@@ -120,11 +120,16 @@ namespace mpp
 			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
 			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{});
 
+			using default_floating_type_ordering_type =
+				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
+
 			if (rows == 1)
 			{
 				const auto elem = static_cast<To>(obj(0, 0));
 
-				if (compare_three_way_equivalent(elem, To{}) == 0)
+				using to_ordering_type = std::compare_three_way_result_t<To, To>;
+
+				if (floating_point_compare_three_way(elem, To{}) == to_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -146,7 +151,8 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
+				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
@@ -175,7 +181,8 @@ namespace mpp
 
 				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
 
-				if (compare_three_way_equivalent(det, default_floating_type{}) == 0)
+				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}

@@ -151,7 +151,8 @@ namespace mpp::detail
 			}
 		}
 
-		void init_buf_2d_dynamic_without_check(auto&& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		void
+		init_buf_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -215,7 +216,7 @@ namespace mpp::detail
 		}
 
 		void init_expr_dynamic_without_check(std::size_t rows, std::size_t cols,
-			auto&& expr) // @TODO: ISSUE #20
+			const auto& expr) // @TODO: ISSUE #20
 		{
 			_rows = rows;
 			_cols = cols;
@@ -469,7 +470,7 @@ namespace mpp::detail
 
 		friend inline void init_matrix_with_1d_rng(
 			matrix_base<Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& base,
-			auto&& rng,
+			const auto& rng,
 			std::size_t rows,
 			std::size_t cols) // @TODO: ISSUE #20
 		{
@@ -478,26 +479,47 @@ namespace mpp::detail
 
 			reserve_1d_buf_if_vector(base._buf, rows, cols);
 
+			// @FIXME: Probably not optimal. Look at this again later
 			if constexpr (std::is_rvalue_reference_v<decltype(rng)>)
 			{
 				if constexpr (is_vector<Buffer>::value)
 				{
-					std::ranges::move(rng, std::back_inserter(base._buf));
+					base._buf.reserve(std::ranges::size(rng));
+
+					for (auto&& val : rng)
+					{
+						base._buf.push_back(std::move(static_cast<Value>(val)));
+					}
 				}
 				else
 				{
-					std::ranges::move(rng, base._buf.begin());
+					auto idx = std::size_t{};
+
+					for (auto&& val : rng)
+					{
+						base._buf[idx++] = std::move(static_cast<Value>(val));
+					}
 				}
 			}
 			else
 			{
 				if constexpr (is_vector<Buffer>::value)
 				{
-					std::ranges::copy(rng, std::back_inserter(base._buf));
+					base._buf.reserve(std::ranges::size(rng));
+
+					for (const auto& val : rng)
+					{
+						base._buf.push_back(static_cast<Value>(val));
+					}
 				}
 				else
 				{
-					std::ranges::copy(rng, base._buf.begin());
+					auto idx = std::size_t{};
+
+					for (const auto& val : rng)
+					{
+						base._buf[idx++] = static_cast<Value>(val);
+					}
 				}
 			}
 		}
