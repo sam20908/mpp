@@ -45,7 +45,7 @@ namespace mpp::detail
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
 		std::size_t _result_rows;
-		std::size_t _result_cols;
+		std::size_t _result_columns;
 
 	public:
 		using value_type = typename Left::value_type;
@@ -53,12 +53,12 @@ namespace mpp::detail
 		expr_binary_op(const Left& left,
 			const Right& right,
 			std::size_t result_rows,
-			std::size_t result_cols) // @TODO: ISSUE #20
+			std::size_t result_columns) // @TODO: ISSUE #20
 			:
 			_left(left),
 			_right(right),
 			_result_rows(result_rows),
-			_result_cols(result_cols)
+			_result_columns(result_columns)
 		{
 		}
 
@@ -69,12 +69,12 @@ namespace mpp::detail
 
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _result_cols;
+			return _result_columns;
 		}
 
 		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_idx >= _result_rows || col_idx >= _result_cols)
+			if (row_idx >= _result_rows || col_idx >= _result_columns)
 			{
 				throw std::out_of_range("Access out of range!");
 			}

@@ -35,27 +35,27 @@ namespace mpp
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
 		{
 			const auto rows = obj.rows();
-			const auto cols = obj.columns();
+			const auto columns = obj.columns();
 			const auto data = obj.data();
 
 			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
 			using transposed_buf_t = typename transposed_t::buffer_type;
 			auto transposed        = transposed_t{};
 			auto transposed_buf    = transposed_buf_t{};
-			detail::allocate_1d_buf_if_vector(transposed_buf, cols, rows, Value{});
+			detail::allocate_1d_buf_if_vector(transposed_buf, columns, rows, Value{});
 
-			for (auto col = std::size_t{}; col < cols; ++col)
+			for (auto col = std::size_t{}; col < columns; ++col)
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
+					auto normal_idx     = detail::idx_2d_to_1d(columns, row, col);
 					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
 
 					transposed_buf[transposed_idx] = data[normal_idx];
 				}
 			}
 
-			init_matrix_with_1d_rng(transposed, std::move(transposed_buf), cols, rows);
+			init_matrix_with_1d_rng(transposed, std::move(transposed_buf), columns, rows);
 
 			return transposed;
 		}

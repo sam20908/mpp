@@ -63,17 +63,17 @@ namespace mpp
 			const Allocator allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20
 		{
-			const auto [rows, cols] = detail::range_2d_dimensions(init_2d);
+			const auto [rows, columns] = detail::range_2d_dimensions(init_2d);
 
-			base::init_buf_2d_dynamic_without_check(init_2d, rows, cols);
+			base::init_buf_2d_dynamic_without_check(init_2d, rows, columns);
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
 		explicit matrix(Range2D&& rng_2d, const Allocator allocator = Allocator{}) : base(allocator) // @TODO: ISSUE #20
 		{
-			const auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
+			const auto [rows, columns] = detail::range_2d_dimensions(rng_2d);
 
-			base::init_buf_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), rows, cols);
+			base::init_buf_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), rows, columns);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>

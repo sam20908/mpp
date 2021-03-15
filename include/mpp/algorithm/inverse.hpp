@@ -34,21 +34,21 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline void forward_substitution(auto& l_buf, std::size_t cols) // @TODO: ISSUE #20
+		inline void forward_substitution(auto& l_buf, std::size_t columns) // @TODO: ISSUE #20
 		{
-			for (auto col = std::size_t{ 1 }; col < cols; ++col)
+			for (auto col = std::size_t{ 1 }; col < columns; ++col)
 			{
 				// Optimized version of forward-substitution which skips making diagnoal 1's because L would've already
 				// had 1's along the diagonal
 
-				for (auto row = col + 1; row < cols; ++row)
+				for (auto row = col + 1; row < columns; ++row)
 				{
-					const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
+					const auto factor = l_buf[idx_2d_to_1d(columns, row, row - 1)] * -1;
 
 					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
 					{
-						const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
-						const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
+						const auto elem_above = l_buf[idx_2d_to_1d(columns, col, col_2)];
+						const auto elem_idx   = idx_2d_to_1d(columns, row, col_2);
 
 						l_buf[elem_idx] -= factor * elem_above;
 					}
@@ -56,12 +56,12 @@ namespace mpp
 			}
 		}
 
-		inline void back_substitution(auto& u_buf, std::size_t cols) // @TODO: ISSUE #20
+		inline void back_substitution(auto& u_buf, std::size_t columns) // @TODO: ISSUE #20
 		{
-			for (auto col = cols; col > 0; --col)
+			for (auto col = columns; col > 0; --col)
 			{
 				const auto col_idx   = col - 1;
-				auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
+				auto diag_elem_idx   = idx_2d_to_1d(columns, col_idx, col_idx);
 				const auto diag_elem = u_buf[diag_elem_idx];
 
 				// Diagonal element can simply be replaced with the factor
@@ -69,7 +69,7 @@ namespace mpp
 				u_buf[diag_elem_idx]   = diag_factor;
 
 				// Multiply every element to the right of the diagonal element by the factor
-				for (auto idx = cols - col; idx > 0; --idx)
+				for (auto idx = columns - col; idx > 0; --idx)
 				{
 					u_buf[++diag_elem_idx] *= diag_factor;
 				}
@@ -79,18 +79,18 @@ namespace mpp
 					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
 					// (this works because) the augmented matrix would have zeroes above the diagonal element
 					const auto row_idx            = row - 1;
-					const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
+					const auto elem_idx           = idx_2d_to_1d(columns, row_idx, col_idx);
 					const auto elem_before_factor = u_buf[elem_idx];
 					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
 
 					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
-					for (auto col_2 = cols; col_2 > col; --col_2)
+					for (auto col_2 = columns; col_2 > col; --col_2)
 					{
 						const auto col_2_idx     = col_2 - 1;
-						auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
+						auto diag_row_idx        = idx_2d_to_1d(columns, col_idx, col_2_idx);
 						const auto diag_row_elem = u_buf[diag_row_idx];
 
-						const auto cur_elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
+						const auto cur_elem_idx = idx_2d_to_1d(columns, row_idx, col_2_idx);
 						const auto elem         = u_buf[cur_elem_idx];
 						const auto factor       = elem_before_factor * -1;
 
@@ -106,7 +106,7 @@ namespace mpp
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			const auto rows = obj.rows();
-			const auto cols = obj.columns();
+			const auto columns = obj.columns();
 
 			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
 			auto inv_matrix    = inv_matrix_t{};
@@ -118,7 +118,7 @@ namespace mpp
 			}
 
 			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{});
+			allocate_1d_buf_if_vector(inv_matrix_buf, rows, columns, To{});
 
 			using default_floating_type_ordering_type =
 				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
@@ -173,13 +173,13 @@ namespace mpp
 				auto l_buf = lu_decomp_buf_t{};
 				auto u_buf = lu_decomp_buf_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, cols, default_floating_type{});
+				allocate_1d_buf_if_vector(u_buf, rows, columns, default_floating_type{});
 				std::ranges::copy(obj, u_buf.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, cols, default_floating_type{});
+				allocate_1d_buf_if_vector(l_buf, rows, columns, default_floating_type{});
 				transform_1d_buf_into_identity<default_floating_type>(l_buf, rows);
 
-				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
+				det = lu_decomp_common<default_floating_type, true>(rows, columns, l_buf, u_buf);
 
 				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
@@ -189,18 +189,18 @@ namespace mpp
 
 				if (std::is_constant_evaluated())
 				{
-					forward_substitution(l_buf, cols);
-					back_substitution(u_buf, cols);
+					forward_substitution(l_buf, columns);
+					back_substitution(u_buf, columns);
 				}
 				else
 				{
 					// Compute inv(L) and inv(U) in parallel because they don't share data
 
-					auto l_inv_future = std::async(std::launch::async, [&l_buf, cols]() {
-						forward_substitution(l_buf, cols);
+					auto l_inv_future = std::async(std::launch::async, [&l_buf, columns]() {
+						forward_substitution(l_buf, columns);
 					});
-					auto u_inv_future = std::async(std::launch::async, [&u_buf, cols]() {
-						back_substitution(u_buf, cols);
+					auto u_inv_future = std::async(std::launch::async, [&u_buf, columns]() {
+						back_substitution(u_buf, columns);
 					});
 
 					l_inv_future.wait();
@@ -210,7 +210,7 @@ namespace mpp
 				mul_square_bufs<To, default_floating_type>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
 			}
 
-			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, cols);
+			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, columns);
 			return inv_matrix;
 		}
 

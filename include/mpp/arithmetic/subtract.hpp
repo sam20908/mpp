@@ -86,11 +86,11 @@ namespace mpp
 		detail::validate_same_size(left, right);
 
 		const auto rows = left.rows();
-		const auto cols = left.columns();
+		const auto columns = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)
 		{
-			for (auto col = std::size_t{ 0 }; col < cols; ++col)
+			for (auto col = std::size_t{ 0 }; col < columns; ++col)
 			{
 				left(row, col) -= right(row, col);
 			}

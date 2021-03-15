@@ -48,14 +48,14 @@ namespace mpp
 			// Out of bounds checks
 
 			const auto rows  = obj.rows();
-			const auto cols  = obj.columns();
+			const auto columns  = obj.columns();
 			const auto begin = obj.begin();
 
 			if (top_row_idx >= rows)
 			{
 				throw std::invalid_argument("Top row index out of bounds!");
 			}
-			else if (top_column_idx >= cols)
+			else if (top_column_idx >= columns)
 			{
 				throw std::invalid_argument("Top column index out of bounds!");
 			}
@@ -63,7 +63,7 @@ namespace mpp
 			{
 				throw std::invalid_argument("Bottom row index out of bounds!");
 			}
-			else if (bottom_column_idx >= cols)
+			else if (bottom_column_idx >= columns)
 			{
 				throw std::invalid_argument("Bottom column index out of bounds!");
 			}
@@ -88,18 +88,18 @@ namespace mpp
 			auto block_buf_back_inserter = std::back_inserter(block_buf);
 
 			const auto block_rows = bottom_row_idx - top_row_idx + 1;
-			const auto block_cols = bottom_column_idx - top_column_idx + 1;
-			block_buf.reserve(block_rows * block_cols);
+			const auto block_columns = bottom_column_idx - top_column_idx + 1;
+			block_buf.reserve(block_rows * block_columns);
 
 			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
 			{
-				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(cols, row, top_column_idx));
+				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(columns, row, top_column_idx));
 				auto row_begin     = std::next(begin, row_begin_idx);
 
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), block_buf_back_inserter);
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), block_buf_back_inserter);
 			}
 
-			init_matrix_with_1d_rng(block_matrix, std::move(block_buf), block_rows, block_cols);
+			init_matrix_with_1d_rng(block_matrix, std::move(block_buf), block_rows, block_columns);
 
 			return block_matrix;
 		}

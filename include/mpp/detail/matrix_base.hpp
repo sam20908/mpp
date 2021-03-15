@@ -48,30 +48,30 @@ namespace mpp::detail
 	protected:
 		Buffer _buf; // Don't default initailize because custom types might not be DefaultConstructible
 		std::size_t _rows;
-		std::size_t _cols;
+		std::size_t _columns;
 
 		// No point adding this to overload resolution since all matrices implement their own default constructor. The
 		// only thing we need this for is static matrices
 		matrix_base() = default;
 
-		matrix_base(std::size_t rows, std::size_t cols, const Value& value, const Allocator& allocator) :
-			_buf{ rows * cols, value, allocator }, // @TODO: ISSUE #20
+		matrix_base(std::size_t rows, std::size_t columns, const Value& value, const Allocator& allocator) :
+			_buf{ rows * columns, value, allocator }, // @TODO: ISSUE #20
 			_rows{ rows },
-			_cols{ cols }
+			_columns{ columns }
 		{
 		}
 
-		matrix_base(std::size_t rows, std::size_t cols, identity_matrix_tag, const Allocator& allocator) :
-			_buf{ rows * cols, Value{}, allocator }, // @TODO: ISSUE #20
+		matrix_base(std::size_t rows, std::size_t columns, identity_matrix_tag, const Allocator& allocator) :
+			_buf{ rows * columns, Value{}, allocator }, // @TODO: ISSUE #20
 			_rows{ rows },
-			_cols{ cols }
+			_columns{ columns }
 		{
-			if (rows == 0 || cols == 0)
+			if (rows == 0 || columns == 0)
 			{
 				throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
 			}
 
-			if (rows != cols)
+			if (rows != columns)
 			{
 				throw std::invalid_argument("Identity matrix must be square!");
 			}
@@ -79,17 +79,17 @@ namespace mpp::detail
 			transform_1d_buf_into_identity<Value>(_buf, rows);
 		}
 
-		matrix_base(std::size_t rows, std::size_t cols, const Allocator& allocator) :
+		matrix_base(std::size_t rows, std::size_t columns, const Allocator& allocator) :
 			_buf{ allocator }, // @TODO: ISSUE #20
 			_rows{ rows },
-			_cols{ cols }
+			_columns{ columns }
 		{
 		}
 
 		explicit matrix_base(const Allocator& allocator) :
 			_buf{ allocator }, // @TODO: ISSUE #20
 			_rows{ 0 },
-			_cols{ 0 }
+			_columns{ 0 }
 		{
 		}
 
@@ -97,7 +97,7 @@ namespace mpp::detail
 			const Allocator& allocator) :
 			_buf{ right._buf, allocator }, // @TODO: ISSUE #20
 			_rows{ right._rows },
-			_cols{ right._cols }
+			_columns{ right._columns }
 		{
 		}
 
@@ -105,14 +105,14 @@ namespace mpp::detail
 			const Allocator& allocator) :
 			_buf{ std::move(right._buf), allocator }, // @TODO: ISSUE #20
 			_rows{ std::move(right._rows) },
-			_cols{ std::move(right._cols) }
+			_columns{ std::move(right._columns) }
 		{
 		}
 
 		void init_dimension_with_val_static(const Value& value) // @TODO: ISSUE #20
 		{
-			_rows = RowsExtent;
-			_cols = ColumnsExtent;
+			_rows    = RowsExtent;
+			_columns = ColumnsExtent;
 
 			std::ranges::fill(_buf, value);
 		}
@@ -120,15 +120,15 @@ namespace mpp::detail
 		template<typename Range2D>
 		void init_buf_2d_static(Range2D&& rng_2d, bool check_rng_size) // @TODO: ISSUE #20
 		{
-			const auto [rng_rows, rng_cols] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
+			const auto [rng_rows, rng_columns] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
 
-			if (check_rng_size && (rng_rows != RowsExtent || rng_cols != ColumnsExtent))
+			if (check_rng_size && (rng_rows != RowsExtent || rng_columns != ColumnsExtent))
 			{
 				throw std::invalid_argument("Extents of static matrix and dimensions of initializer does not match!");
 			}
 
-			_rows = RowsExtent;
-			_cols = ColumnsExtent;
+			_rows    = RowsExtent;
+			_columns = ColumnsExtent;
 
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buf.begin();
@@ -138,7 +138,7 @@ namespace mpp::detail
 				for (auto&& row : rng_2d)
 				{
 					std::ranges::move(row, row_begin);
-					row_begin += static_cast<difference_type>(rng_cols);
+					row_begin += static_cast<difference_type>(rng_columns);
 				}
 			}
 			else
@@ -146,17 +146,17 @@ namespace mpp::detail
 				for (auto&& row : rng_2d)
 				{
 					std::ranges::copy(row, row_begin);
-					row_begin += static_cast<difference_type>(rng_cols);
+					row_begin += static_cast<difference_type>(rng_columns);
 				}
 			}
 		}
 
 		void
-		init_buf_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+		init_buf_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 		{
-			_rows = rows;
-			_cols = cols;
-			_buf.reserve(rows * cols);
+			_rows    = rows;
+			_columns = columns;
+			_buf.reserve(rows * columns);
 
 			const auto buf_back_inserter = std::back_inserter(_buf);
 
@@ -185,11 +185,11 @@ namespace mpp::detail
 			}
 			else
 			{
-				// Since this method is called only after construction, it is safe to use initialized _rows and _cols
+				// Since this method is called only after construction, it is safe to use initialized _rows and _columns
 
-				const auto [rng_rows, rng_cols] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
+				const auto [rng_rows, rng_columns] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
 
-				if (check_rng_size && (rng_rows != _rows || rng_cols != _cols))
+				if (check_rng_size && (rng_rows != _rows || rng_columns != _columns))
 				{
 					throw std::invalid_argument("Dimensions of matrix and dimensions of initializer does not match!");
 				}
@@ -201,7 +201,7 @@ namespace mpp::detail
 					for (auto&& row : rng_2d)
 					{
 						std::ranges::move(row, begin);
-						begin += static_cast<difference_type>(_cols);
+						begin += static_cast<difference_type>(_columns);
 					}
 				}
 				else
@@ -209,23 +209,24 @@ namespace mpp::detail
 					for (auto&& row : rng_2d)
 					{
 						std::ranges::copy(row, begin);
-						begin += static_cast<difference_type>(_cols);
+						begin += static_cast<difference_type>(_columns);
 					}
 				}
 			}
 		}
 
-		void init_expr_dynamic_without_check(std::size_t rows, std::size_t cols,
+		void init_expr_dynamic_without_check(std::size_t rows,
+			std::size_t columns,
 			const auto& expr) // @TODO: ISSUE #20
 		{
-			_rows = rows;
-			_cols = cols;
+			_rows    = rows;
+			_columns = columns;
 
-			_buf.reserve(rows * cols);
+			_buf.reserve(rows * columns);
 
 			for (auto row = std::size_t{}; row < _rows; ++row)
 			{
-				for (auto col = std::size_t{}; col < _cols; ++col)
+				for (auto col = std::size_t{}; col < _columns; ++col)
 				{
 					_buf.push_back(expr(row, col));
 				}
@@ -233,14 +234,15 @@ namespace mpp::detail
 		}
 
 		template<typename Callable>
-		void init_buf_from_callable_dynamic(std::size_t rows, std::size_t cols, Callable&& callable) // @TODO: ISSUE #20
+		void
+		init_buf_from_callable_dynamic(std::size_t rows, std::size_t columns, Callable&& callable) // @TODO: ISSUE #20
 		{
-			_rows = rows;
-			_cols = cols;
+			_rows    = rows;
+			_columns = columns;
 
-			reserve_1d_buf_if_vector(_buf, rows, cols);
+			reserve_1d_buf_if_vector(_buf, rows, columns);
 
-			const auto total_size = rows * cols;
+			const auto total_size = rows * columns;
 			for (auto idx = std::size_t{}; idx < total_size; ++idx)
 			{
 				_buf.push_back(std::invoke(std::forward<Callable>(callable)));
@@ -280,87 +282,87 @@ namespace mpp::detail
 
 		[[nodiscard]] auto begin() -> iterator // @TODO: ISSUE #20
 		{
-			return iterator(_buf.begin(), _cols);
+			return iterator(_buf.begin(), _columns);
 		}
 
 		[[nodiscard]] auto begin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cbegin(), _cols);
+			return const_iterator(_buf.cbegin(), _columns);
 		}
 
 		[[nodiscard]] auto end() -> iterator // @TODO: ISSUE #20
 		{
-			return iterator(_buf.end(), _cols);
+			return iterator(_buf.end(), _columns);
 		}
 
 		[[nodiscard]] auto end() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cend(), _cols);
+			return const_iterator(_buf.cend(), _columns);
 		}
 
 		[[nodiscard]] auto rbegin() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return reverse_iterator(_buf.rbegin(), _cols);
+			return reverse_iterator(_buf.rbegin(), _columns);
 		}
 
 		[[nodiscard]] auto rbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crbegin(), _cols);
+			return const_reverse_iterator(_buf.crbegin(), _columns);
 		}
 
 		[[nodiscard]] auto rend() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return reverse_iterator(_buf.rend(), _cols);
+			return reverse_iterator(_buf.rend(), _columns);
 		}
 
 		[[nodiscard]] auto rend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crend(), _cols);
+			return const_reverse_iterator(_buf.crend(), _columns);
 		}
 
 		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cbegin(), _cols);
+			return const_iterator(_buf.cbegin(), _columns);
 		}
 
 		[[nodiscard]] auto cbegin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cbegin(), _cols);
+			return const_iterator(_buf.cbegin(), _columns);
 		}
 
 		[[nodiscard]] auto cend() -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cend(), _cols);
+			return const_iterator(_buf.cend(), _columns);
 		}
 
 		[[nodiscard]] auto cend() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buf.cend(), _cols);
+			return const_iterator(_buf.cend(), _columns);
 		}
 
 		[[nodiscard]] auto crbegin() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crbegin(), _cols);
+			return const_reverse_iterator(_buf.crbegin(), _columns);
 		}
 
 		[[nodiscard]] auto crbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crbegin(), _cols);
+			return const_reverse_iterator(_buf.crbegin(), _columns);
 		}
 
 		[[nodiscard]] auto crend() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crend(), _cols);
+			return const_reverse_iterator(_buf.crend(), _columns);
 		}
 
 		[[nodiscard]] auto crend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buf.crend(), _cols);
+			return const_reverse_iterator(_buf.crend(), _columns);
 		}
 
 		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const_reference // @TODO: ISSUE #20
 		{
-			if (row_idx >= _rows || col_idx >= _cols)
+			if (row_idx >= _rows || col_idx >= _columns)
 			{
 				throw std::out_of_range("Access out of bounds!");
 			}
@@ -370,7 +372,7 @@ namespace mpp::detail
 
 		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) -> reference // @TODO: ISSUE #20
 		{
-			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_columns, row_idx, col_idx);
 
 			return _buf[idx];
 		}
@@ -378,7 +380,7 @@ namespace mpp::detail
 		[[nodiscard]] auto operator()(std::size_t row_idx,
 			std::size_t col_idx) const -> const_reference // @TODO: ISSUE #20
 		{
-			const auto idx = idx_2d_to_1d(_cols, row_idx, col_idx);
+			const auto idx = idx_2d_to_1d(_columns, row_idx, col_idx);
 
 			return _buf[idx];
 		}
@@ -390,7 +392,7 @@ namespace mpp::detail
 
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _cols;
+			return _columns;
 		}
 
 		[[nodiscard]] auto front() -> reference // @TODO: ISSUE #20
@@ -463,7 +465,7 @@ namespace mpp::detail
 				using std::swap;
 
 				swap(_rows, right._rows);
-				swap(_cols, right._cols);
+				swap(_columns, right._columns);
 				swap(_buf, right._buf);
 			}
 		}
@@ -472,12 +474,12 @@ namespace mpp::detail
 			matrix_base<Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& base,
 			const auto& rng,
 			std::size_t rows,
-			std::size_t cols) // @TODO: ISSUE #20
+			std::size_t columns) // @TODO: ISSUE #20
 		{
-			base._rows = rows;
-			base._cols = cols;
+			base._rows    = rows;
+			base._columns = columns;
 
-			reserve_1d_buf_if_vector(base._buf, rows, cols);
+			reserve_1d_buf_if_vector(base._buf, rows, columns);
 
 			// @FIXME: Probably not optimal. Look at this again later
 			if constexpr (std::is_rvalue_reference_v<decltype(rng)>)
@@ -536,23 +538,23 @@ namespace mpp::detail
 
 	protected:
 		explicit matrix_dynamic_base(std::size_t rows,
-			std::size_t cols,
+			std::size_t columns,
 			const Value& value,
 			const Allocator& allocator) :
-			base(rows, cols, value, allocator) // @TODO: ISSUE #20
+			base(rows, columns, value, allocator) // @TODO: ISSUE #20
 		{
 		}
 
 		explicit matrix_dynamic_base(std::size_t rows,
-			std::size_t cols,
+			std::size_t columns,
 			identity_matrix_tag,
 			const Allocator& allocator) :
-			base(rows, cols, identity_matrix_tag{}, allocator) // @TODO: ISSUE #20
+			base(rows, columns, identity_matrix_tag{}, allocator) // @TODO: ISSUE #20
 		{
 		}
 
-		explicit matrix_dynamic_base(std::size_t rows, std::size_t cols, const Allocator& allocator) :
-			base(rows, cols, Value{}, allocator) // @TODO: ISSUE #20
+		explicit matrix_dynamic_base(std::size_t rows, std::size_t columns, const Allocator& allocator) :
+			base(rows, columns, Value{}, allocator) // @TODO: ISSUE #20
 		{
 		}
 
@@ -580,8 +582,8 @@ namespace mpp::detail
 
 		void clear() // @TODO: ISSUE #20
 		{
-			base::_rows = 0;
-			base::_cols = 0;
+			base::_rows    = 0;
+			base::_columns = 0;
 			base::_buf.clear();
 		}
 	};

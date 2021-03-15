@@ -49,13 +49,13 @@ namespace mpp::detail
 	 * Helper functions
 	 */
 
-	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t cols, std::size_t row_idx, std::size_t col_idx) -> std::size_t
+	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t columns, std::size_t row_idx, std::size_t col_idx) -> std::size_t
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
 		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
 		// spot. This also assumes that the storage of row-major
 
-		return row_idx * cols + col_idx;
+		return row_idx * columns + col_idx;
 	}
 
 	template<typename Range2D>
@@ -64,7 +64,7 @@ namespace mpp::detail
 	{
 		const auto begin = std::ranges::begin(rng_2d);
 		const auto rows  = std::ranges::size(rng_2d);
-		const auto cols  = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
+		const auto columns  = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
 
 		if (rows > 1)
 		{
@@ -73,14 +73,14 @@ namespace mpp::detail
 
 			for (auto&& row : rng_2d)
 			{
-				if (const auto row_cols = std::ranges::size(std::forward<decltype(row)>(row)); row_cols != cols)
+				if (const auto row_columns = std::ranges::size(std::forward<decltype(row)>(row)); row_columns != columns)
 				{
 					throw std::invalid_argument("Initializer doesn't have equal row columns!");
 				}
 			}
 		}
 
-		return { rows, cols };
+		return { rows, columns };
 	}
 
 	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) -> std::size_t
@@ -111,14 +111,14 @@ namespace mpp::detail
 		}
 	}
 
-	inline void validate_dimensions_for_identity(std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	inline void validate_dimensions_for_identity(std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 	{
-		if (rows == 0 || cols == 0)
+		if (rows == 0 || columns == 0)
 		{
 			throw std::invalid_argument("Identity matrix cannot have a rank of 0!");
 		}
 
-		if (rows != cols)
+		if (rows != columns)
 		{
 			throw std::invalid_argument("Identity matrix must be square!");
 		}
@@ -126,23 +126,23 @@ namespace mpp::detail
 
 	template<typename InitializerValue>
 	inline void
-	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols, InitializerValue&& val) // @TODO: ISSUE #20
+	allocate_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t columns, InitializerValue&& val) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
 
 		if constexpr (is_vec)
 		{
-			buf.resize(rows * cols, std::forward<InitializerValue>(val));
+			buf.resize(rows * columns, std::forward<InitializerValue>(val));
 		}
 	}
 
-	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
+	inline void reserve_1d_buf_if_vector(auto& buf, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = is_vector<std::remove_cvref_t<decltype(buf)>>::value;
 
 		if constexpr (is_vec)
 		{
-			buf.reserve(rows * cols);
+			buf.reserve(rows * columns);
 		}
 	}
 
@@ -181,7 +181,7 @@ namespace mpp::detail
 	}
 
 	template<typename To, bool FillLBuf>
-	inline auto lu_decomp_common(std::size_t rows, std::size_t cols, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
+	inline auto lu_decomp_common(std::size_t rows, std::size_t columns, auto& l_buf, auto& u_buf) -> To // @TODO: ISSUE #20
 	{
 		// Things this function expects from l_buf and u_buf:
 		// 1. l_buf is already an identity buffer
@@ -192,16 +192,16 @@ namespace mpp::detail
 		// Compute the determinant while also compute LU Decomposition
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
-			auto begin_idx     = idx_2d_to_1d(cols, row, std::size_t{});
-			const auto end_idx = idx_2d_to_1d(cols, row, cols);
+			auto begin_idx     = idx_2d_to_1d(columns, row, std::size_t{});
+			const auto end_idx = idx_2d_to_1d(columns, row, columns);
 
 			for (auto col = std::size_t{}; col < row; ++col)
 			{
 				// This allows us to keep track of the row of the factor later on without having to manually
 				// calculate from indexes
-				auto factor_row_idx = idx_2d_to_1d(cols, col, col);
+				auto factor_row_idx = idx_2d_to_1d(columns, col, col);
 
-				const auto elem_idx = idx_2d_to_1d(cols, row, col);
+				const auto elem_idx = idx_2d_to_1d(columns, row, col);
 				const auto factor   = u_buf[elem_idx] / u_buf[factor_row_idx] * -1;
 
 				for (auto idx = begin_idx; idx < end_idx; ++idx)
@@ -223,7 +223,7 @@ namespace mpp::detail
 				++begin_idx;
 			}
 
-			const auto diag_elem_idx = idx_2d_to_1d(cols, row, row);
+			const auto diag_elem_idx = idx_2d_to_1d(columns, row, row);
 			det *= u_buf[diag_elem_idx];
 		}
 

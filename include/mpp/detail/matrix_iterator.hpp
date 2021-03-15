@@ -34,7 +34,7 @@ namespace mpp::detail
 	class matrix_iterator
 	{
 		Iterator _current;
-		std::size_t _cols;
+		std::size_t _columns;
 
 		using traits = std::iterator_traits<Iterator>;
 
@@ -46,9 +46,9 @@ namespace mpp::detail
 		using iterator_category = std::contiguous_iterator_tag; // STL doesn't use contiguous iterator tag explicitly,
 																// but we do meet its requirements
 
-		explicit matrix_iterator(Iterator current, std::size_t cols) :
+		explicit matrix_iterator(Iterator current, std::size_t columns) :
 			_current(current),
-			_cols(cols) {} // @TODO: ISSUE #20
+			_columns(columns) {} // @TODO: ISSUE #20
 
 		matrix_iterator() = default; // @TODO: ISSUE #20
 
@@ -70,7 +70,7 @@ namespace mpp::detail
 
 		auto operator++(int) -> matrix_iterator // @TODO: ISSUE #20
 		{
-			auto old = matrix_iterator<Iterator>(_current, _cols);
+			auto old = matrix_iterator<Iterator>(_current, _columns);
 
 			++_current;
 			return old;
@@ -85,13 +85,13 @@ namespace mpp::detail
 		[[nodiscard]] friend auto operator+(const matrix_iterator& iter, difference_type n)
 			-> matrix_iterator // @TODO: ISSUE #20
 		{
-			return matrix_iterator(iter._current + n, iter._cols);
+			return matrix_iterator(iter._current + n, iter._columns);
 		}
 
 		[[nodiscard]] friend auto operator+(difference_type n, const matrix_iterator& iter)
 			-> matrix_iterator // @TODO: ISSUE #20
 		{
-			return matrix_iterator(iter._current + n, iter._cols);
+			return matrix_iterator(iter._current + n, iter._columns);
 		}
 
 		auto operator--() -> matrix_iterator& // @TODO: ISSUE #20
@@ -102,7 +102,7 @@ namespace mpp::detail
 
 		auto operator--(int) -> matrix_iterator // @TODO: ISSUE #20
 		{
-			auto old = matrix_iterator<Iterator>(_current, _cols);
+			auto old = matrix_iterator<Iterator>(_current, _columns);
 
 			--_current;
 			return old;
@@ -117,7 +117,7 @@ namespace mpp::detail
 		[[nodiscard]] friend auto operator-(const matrix_iterator& iter, difference_type n)
 			-> matrix_iterator // @TODO: ISSUE #20
 		{
-			return matrix_iterator(iter._current - n, iter._cols);
+			return matrix_iterator(iter._current - n, iter._columns);
 		}
 
 		[[nodiscard]] auto operator[](difference_type n) -> reference // @TODO: ISSUE #20
@@ -154,7 +154,7 @@ namespace mpp::detail
 			using std::swap;
 
 			swap(left._current, right._current);
-			swap(left._cols, right._cols);
+			swap(left._columns, right._columns);
 		}
 
 		/**
@@ -163,13 +163,13 @@ namespace mpp::detail
 
 		auto move_forward_rows(difference_type rows) -> matrix_iterator& // @TODO: ISSUE #20
 		{
-			_current += static_cast<difference_type>(_cols) * rows;
+			_current += static_cast<difference_type>(_columns) * rows;
 			return *this;
 		}
 
 		auto move_backward_rows(difference_type rows) -> matrix_iterator& // @TODO: ISSUE #20
 		{
-			_current -= static_cast<difference_type>(_cols) * rows;
+			_current -= static_cast<difference_type>(_columns) * rows;
 			return *this;
 		}
 	};

@@ -62,9 +62,9 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(init_2d);
+			auto [rows, columns] = detail::range_2d_dimensions(init_2d);
 
-			if (cols != ColumnsExtent)
+			if (columns != ColumnsExtent)
 			{
 				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}
@@ -76,9 +76,9 @@ namespace mpp
 		explicit matrix(Range2D&& rng_2d, const Allocator& allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20
 		{
-			auto [rows, cols] = detail::range_2d_dimensions(rng_2d);
+			auto [rows, columns] = detail::range_2d_dimensions(rng_2d);
 
-			if (cols != ColumnsExtent)
+			if (columns != ColumnsExtent)
 			{
 				throw std::invalid_argument("Initializer's columns does not match the provided column extent!");
 			}

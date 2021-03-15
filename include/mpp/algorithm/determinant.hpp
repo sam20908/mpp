@@ -38,7 +38,7 @@ namespace mpp
 			-> To // @TODO: ISSUE #20
 		{
 			const auto rows = obj.rows();
-			const auto cols = obj.columns();
+			const auto columns = obj.columns();
 
 			// Handle special cases - avoid computing LU Decomposition
 			if (rows == 0)
@@ -62,12 +62,12 @@ namespace mpp
 
 			auto u_buf = lu_decomp_buf_t{};
 
-			allocate_1d_buf_if_vector(u_buf, rows, cols, default_floating_type{});
+			allocate_1d_buf_if_vector(u_buf, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buf.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomp_common<default_floating_type, false>(rows, cols, dummy_variable, u_buf);
+			const auto det = lu_decomp_common<default_floating_type, false>(rows, columns, dummy_variable, u_buf);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));
