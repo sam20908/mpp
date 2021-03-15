@@ -22,34 +22,33 @@
 #include <cstddef>
 #include <span>
 
-namespace mpp
+namespace mpp::customize_extents
 {
-	struct matrix_rows_extent_tag
+	struct rows_extent_tag
 	{
 	};
 
-	struct matrix_columns_extent_tag
+	struct columns_extent_tag
 	{
 	};
 
-	namespace customize
+	struct customize_tag
 	{
-		struct customize_tag
-		{
-		};
+	};
 
-		inline constexpr auto customize = customize_tag{};
-	} // namespace customize
+	inline constexpr auto customize      = customize_tag{};
+	inline constexpr auto rows_extent    = rows_extent_tag{};
+	inline constexpr auto columns_extent = columns_extent_tag{};
 
 	template<typename... Args>
-	[[nodiscard]] constexpr auto tag_invoke(matrix_rows_extent_tag, Args&&...) -> std::size_t
+	[[nodiscard]] constexpr auto tag_invoke(rows_extent_tag, Args&&...) -> std::size_t
 	{
 		return std::dynamic_extent;
 	}
 
 	template<typename... Args>
-	[[nodiscard]] constexpr auto tag_invoke(matrix_columns_extent_tag, Args&&...) -> std::size_t
+	[[nodiscard]] constexpr auto tag_invoke(columns_extent_tag, Args&&...) -> std::size_t
 	{
 		return std::dynamic_extent;
 	}
-} // namespace mpp
+} // namespace mpp::customize_extents

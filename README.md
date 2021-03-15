@@ -146,23 +146,21 @@ int main()
 Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize` namespace
 
 ```cpp
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/config_extents.hpp>
 
-namespace mpp::customize
+namespace mpp::customize_extents
 {
   /**
-   * Customizations has to take place BEFORE ANY INSTANTIATIONS!
+   * Customization of extents has to take place BEFORE ANY INSTANTIATIONS!
    * (it will NOT be detected in time after).
-   *
-   * The namespace mpp::customize is where the user can freely open to customize.
    */
 
-  [[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+  [[nodiscard]] constexpr std::size_t tag_invoke(rows_extent_tag, customize_tag)
   {
     return 10;
   }
 
-  [[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
+  [[nodiscard]] constexpr std::size_t tag_invoke(columns_extent_tag, customize_tag)
   {
     return 10;
   }

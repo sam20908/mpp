@@ -19,7 +19,7 @@
 
 #pragma once
 
-// Don't include config.hpp because that is only for user customizations
+// Don't include config_extents.hpp because that is only for user customizations
 
 #include <mpp/utility/cast.hpp>
 #include <mpp/utility/comparison.hpp>

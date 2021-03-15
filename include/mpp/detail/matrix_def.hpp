@@ -25,7 +25,7 @@
 
 // @TODO: Make sure to export these modules for C++20
 #include <mpp/detail/public_tags.hpp>
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/config_extents.hpp>
 
 #include <cstddef>
 #include <initializer_list>
@@ -34,9 +34,11 @@
 namespace mpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent    = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize),
-		std::size_t ColumnsExtent = detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize),
-		typename Allocator        = std::allocator<Value>>
+		std::size_t RowsExtent =
+			detail::tag_invoke_cpo_constexpr(customize_extents::rows_extent, customize_extents::customize),
+		std::size_t ColumnsExtent =
+			detail::tag_invoke_cpo_constexpr(customize_extents::columns_extent, customize_extents::customize),
+		typename Allocator = std::allocator<Value>>
 	class matrix;
 
 	/**

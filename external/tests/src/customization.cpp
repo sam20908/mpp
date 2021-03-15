@@ -17,16 +17,16 @@
  * under the License.
  */
 
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/config_extents.hpp>
 
-namespace mpp::customize
+namespace mpp::customize_extents
 {
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+	[[nodiscard]] constexpr std::size_t tag_invoke(rows_extent_tag, customize_tag)
 	{
 		return 10;
 	}
 
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
+	[[nodiscard]] constexpr std::size_t tag_invoke(columns_extent_tag, customize_tag)
 	{
 		return 10;
 	}
