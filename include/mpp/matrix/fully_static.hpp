@@ -81,13 +81,13 @@ namespace mpp
 
 			base::_rows    = expr.rows();
 			base::_columns = expr.columns();
-			auto idx       = std::size_t{};
+			auto index       = std::size_t{};
 
 			for (auto row = std::size_t{}; row < base::_rows; ++row)
 			{
 				for (auto col = std::size_t{}; col < base::_columns; ++col)
 				{
-					base::_buffer[idx++] = expr(row, col);
+					base::_buffer[index++] = expr(row, col);
 				}
 			}
 		}

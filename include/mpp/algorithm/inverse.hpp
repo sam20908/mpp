@@ -43,14 +43,14 @@ namespace mpp
 
 				for (auto row = col + 1; row < columns; ++row)
 				{
-					const auto factor = l_buffer[idx_2d_to_1d(columns, row, row - 1)] * -1;
+					const auto factor = l_buffer[index_2d_to_1d(columns, row, row - 1)] * -1;
 
 					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
 					{
-						const auto elem_above = l_buffer[idx_2d_to_1d(columns, col, col_2)];
-						const auto elem_idx   = idx_2d_to_1d(columns, row, col_2);
+						const auto elem_above = l_buffer[index_2d_to_1d(columns, col, col_2)];
+						const auto elem_index   = index_2d_to_1d(columns, row, col_2);
 
-						l_buffer[elem_idx] -= factor * elem_above;
+						l_buffer[elem_index] -= factor * elem_above;
 					}
 				}
 			}
@@ -60,42 +60,42 @@ namespace mpp
 		{
 			for (auto col = columns; col > 0; --col)
 			{
-				const auto col_idx   = col - 1;
-				auto diag_elem_idx   = idx_2d_to_1d(columns, col_idx, col_idx);
-				const auto diag_elem = u_buffer[diag_elem_idx];
+				const auto col_index   = col - 1;
+				auto diag_elem_index   = index_2d_to_1d(columns, col_index, col_index);
+				const auto diag_elem = u_buffer[diag_elem_index];
 
 				// Diagonal element can simply be replaced with the factor
 				const auto diag_factor = default_floating_type{ 1 } / diag_elem;
-				u_buffer[diag_elem_idx]   = diag_factor;
+				u_buffer[diag_elem_index]   = diag_factor;
 
 				// Multiply every element to the right of the diagonal element by the factor
-				for (auto idx = columns - col; idx > 0; --idx)
+				for (auto index = columns - col; index > 0; --index)
 				{
-					u_buffer[++diag_elem_idx] *= diag_factor;
+					u_buffer[++diag_elem_index] *= diag_factor;
 				}
 
-				for (auto row = col_idx; row > 0; --row)
+				for (auto row = col_index; row > 0; --row)
 				{
 					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
 					// (this works because) the augmented matrix would have zeroes above the diagonal element
-					const auto row_idx            = row - 1;
-					const auto elem_idx           = idx_2d_to_1d(columns, row_idx, col_idx);
-					const auto elem_before_factor = u_buffer[elem_idx];
-					u_buffer[elem_idx]               = elem_before_factor * diag_factor * -1;
+					const auto row_index            = row - 1;
+					const auto elem_index           = index_2d_to_1d(columns, row_index, col_index);
+					const auto elem_before_factor = u_buffer[elem_index];
+					u_buffer[elem_index]               = elem_before_factor * diag_factor * -1;
 
 					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
 					for (auto col_2 = columns; col_2 > col; --col_2)
 					{
-						const auto col_2_idx     = col_2 - 1;
-						auto diag_row_idx        = idx_2d_to_1d(columns, col_idx, col_2_idx);
-						const auto diag_row_elem = u_buffer[diag_row_idx];
+						const auto col_2_index     = col_2 - 1;
+						auto diag_row_index        = index_2d_to_1d(columns, col_index, col_2_index);
+						const auto diag_row_elem = u_buffer[diag_row_index];
 
-						const auto cur_elem_idx = idx_2d_to_1d(columns, row_idx, col_2_idx);
-						const auto elem         = u_buffer[cur_elem_idx];
+						const auto cur_elem_index = index_2d_to_1d(columns, row_index, col_2_index);
+						const auto elem         = u_buffer[cur_elem_index];
 						const auto factor       = elem_before_factor * -1;
 
 						const auto new_elem = factor * diag_row_elem + elem;
-						u_buffer[cur_elem_idx] = new_elem;
+						u_buffer[cur_elem_index] = new_elem;
 					}
 				}
 			}

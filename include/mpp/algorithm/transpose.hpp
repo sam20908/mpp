@@ -48,10 +48,10 @@ namespace mpp
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_idx     = detail::idx_2d_to_1d(columns, row, col);
-					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
+					auto normal_index     = detail::index_2d_to_1d(columns, row, col);
+					auto transposed_index = detail::index_2d_to_1d(rows, col, row);
 
-					transposed_buffer[transposed_idx] = data[normal_idx];
+					transposed_buffer[transposed_index] = data[normal_index];
 				}
 			}
 

@@ -34,11 +34,11 @@ namespace mpp
 	namespace detail
 	{
 		using mul_constant_op_t = decltype(
-			[](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) -> decltype(left(row_idx, col_idx) *
+			[](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) -> decltype(left(row_index, col_index) *
 																								right) {
-				return left(row_idx, col_idx) * right;
+				return left(row_index, col_index) * right;
 			});
-		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) ->
+		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) ->
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
@@ -47,7 +47,7 @@ namespace mpp
 
 				for (auto index = std::size_t{}; index < left_columns; ++index)
 				{
-					result += left(row_idx, index) * right(index, col_idx);
+					result += left(row_index, index) * right(index, col_index);
 				}
 
 				return result;

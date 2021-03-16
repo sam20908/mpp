@@ -59,19 +59,19 @@ namespace mpp::detail
 			return ColumnsExtent;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_idx >= rows() || col_idx >= columns())
+			if (row_index >= rows() || col_index >= columns())
 			{
 				throw std::out_of_range("Access out of range!");
 			}
 
-			return expr_obj().at(row_idx, col_idx);
+			return expr_obj().at(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			return expr_obj()(row_idx, col_idx);
+			return expr_obj()(row_index, col_index);
 		}
 	};
 } // namespace mpp::detail

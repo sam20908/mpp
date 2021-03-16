@@ -49,14 +49,14 @@ namespace mpp::detail
 	 * Helper functions
 	 */
 
-	[[nodiscard]] constexpr auto idx_2d_to_1d(std::size_t columns, std::size_t row_idx, std::size_t col_idx)
+	[[nodiscard]] constexpr auto index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t col_index)
 		-> std::size_t
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
 		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
 		// spot. This also assumes that the storage of row-major
 
-		return row_idx * columns + col_idx;
+		return row_index * columns + col_index;
 	}
 
 	[[nodiscard]] inline auto range_2d_dimensions(const auto& range_2d)
@@ -153,9 +153,9 @@ namespace mpp::detail
 	{
 		// This assumes that the bufferfer is already filled with zeroes
 
-		for (auto idx = std::size_t{}; idx < n; ++idx)
+		for (auto index = std::size_t{}; index < n; ++index)
 		{
-			buffer[idx_2d_to_1d(n, idx, idx)] = Value{ 1 };
+			buffer[index_2d_to_1d(n, index, index)] = Value{ 1 };
 		}
 	}
 
@@ -171,13 +171,13 @@ namespace mpp::detail
 
 				for (auto elem = std::size_t{}; elem < n; ++elem)
 				{
-					const auto left_idx  = idx_2d_to_1d(n, row, elem);
-					const auto right_idx = idx_2d_to_1d(n, elem, column);
+					const auto left_index  = index_2d_to_1d(n, row, elem);
+					const auto right_index = index_2d_to_1d(n, elem, column);
 
-					result += static_cast<To>(left_bufferfer[left_idx]) * static_cast<To>(right_bufferfer[right_idx]);
+					result += static_cast<To>(left_bufferfer[left_index]) * static_cast<To>(right_bufferfer[right_index]);
 				}
 
-				const auto result_element_index = idx_2d_to_1d(n, row, column);
+				const auto result_element_index = index_2d_to_1d(n, row, column);
 				buffer[result_element_index]    = result;
 			}
 		}
@@ -196,21 +196,21 @@ namespace mpp::detail
 		// Compute the determinant while also compute LU Decomposition
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
-			auto begin_idx     = idx_2d_to_1d(columns, row, std::size_t{});
-			const auto end_idx = idx_2d_to_1d(columns, row, columns);
+			auto begin_index     = index_2d_to_1d(columns, row, std::size_t{});
+			const auto end_index = index_2d_to_1d(columns, row, columns);
 
 			for (auto col = std::size_t{}; col < row; ++col)
 			{
 				// This allows us to keep track of the row of the factor later on without having to manually
 				// calculate from indexes
-				auto factor_row_idx = idx_2d_to_1d(columns, col, col);
+				auto factor_row_index = index_2d_to_1d(columns, col, col);
 
-				const auto elem_idx = idx_2d_to_1d(columns, row, col);
-				const auto factor   = u_buffer[elem_idx] / u_buffer[factor_row_idx] * -1;
+				const auto elem_index = index_2d_to_1d(columns, row, col);
+				const auto factor   = u_buffer[elem_index] / u_buffer[factor_row_index] * -1;
 
-				for (auto idx = begin_idx; idx < end_idx; ++idx)
+				for (auto index = begin_index; index < end_index; ++index)
 				{
-					u_buffer[idx] += factor * u_buffer[factor_row_idx++];
+					u_buffer[index] += factor * u_buffer[factor_row_index++];
 				}
 
 				// Handle cases where we don't need to store the factors in a separate buffer (plain determinant
@@ -221,14 +221,14 @@ namespace mpp::detail
 					// location. But, to help optimize the calculation of inv(L), we can just leave the sign because
 					// all the diagnoal elements below the diagonal element by 1 are the opposite sign, and it's
 					// relatively easy to fix the values of other factors
-					l_buffer[elem_idx] = factor;
+					l_buffer[elem_index] = factor;
 				}
 
-				++begin_idx;
+				++begin_index;
 			}
 
-			const auto diag_elem_idx = idx_2d_to_1d(columns, row, row);
-			det *= u_buffer[diag_elem_idx];
+			const auto diag_elem_index = index_2d_to_1d(columns, row, row);
+			det *= u_buffer[diag_elem_index];
 		}
 
 		return det;

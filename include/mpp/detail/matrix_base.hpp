@@ -243,7 +243,7 @@ namespace mpp::detail
 			reserve_1d_buffer_if_vector(_buffer, rows, columns);
 
 			const auto total_size = rows * columns;
-			for (auto idx = std::size_t{}; idx < total_size; ++idx)
+			for (auto index = std::size_t{}; index < total_size; ++index)
 			{
 				_buffer.push_back(std::invoke(std::forward<Callable>(callable)));
 			}
@@ -360,29 +360,29 @@ namespace mpp::detail
 			return const_reverse_iterator(_buffer.crend(), _columns);
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> const_reference // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> const_reference // @TODO: ISSUE #20
 		{
-			if (row_idx >= _rows || col_idx >= _columns)
+			if (row_index >= _rows || col_index >= _columns)
 			{
 				throw std::out_of_range("Access out of bounds!");
 			}
 
-			return operator()(row_idx, col_idx);
+			return operator()(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) -> reference // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) -> reference // @TODO: ISSUE #20
 		{
-			const auto idx = idx_2d_to_1d(_columns, row_idx, col_idx);
+			const auto index = index_2d_to_1d(_columns, row_index, col_index);
 
-			return _buffer[idx];
+			return _buffer[index];
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx,
-			std::size_t col_idx) const -> const_reference // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index,
+			std::size_t col_index) const -> const_reference // @TODO: ISSUE #20
 		{
-			const auto idx = idx_2d_to_1d(_columns, row_idx, col_idx);
+			const auto index = index_2d_to_1d(_columns, row_index, col_index);
 
-			return _buffer[idx];
+			return _buffer[index];
 		}
 
 		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
@@ -495,11 +495,11 @@ namespace mpp::detail
 				}
 				else
 				{
-					auto idx = std::size_t{};
+					auto index = std::size_t{};
 
 					for (auto&& val : range)
 					{
-						base._buffer[idx++] = std::move(static_cast<Value>(val));
+						base._buffer[index++] = std::move(static_cast<Value>(val));
 					}
 				}
 			}
@@ -516,11 +516,11 @@ namespace mpp::detail
 				}
 				else
 				{
-					auto idx = std::size_t{};
+					auto index = std::size_t{};
 
 					for (const auto& val : range)
 					{
-						base._buffer[idx++] = static_cast<Value>(val);
+						base._buffer[index++] = static_cast<Value>(val);
 					}
 				}
 			}

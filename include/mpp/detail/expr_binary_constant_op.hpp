@@ -72,19 +72,19 @@ namespace mpp::detail
 			return _result_columns;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_idx >= _result_rows || col_idx >= _result_columns)
+			if (row_index >= _result_rows || col_index >= _result_columns)
 			{
 				throw std::out_of_range("Access out of range!");
 			}
 
-			return operator()(row_idx, col_idx);
+			return operator()(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			return _op(_obj, _constant, row_idx, col_idx);
+			return _op(_obj, _constant, row_index, col_index);
 		}
 	};
 } // namespace mpp::detail

@@ -36,10 +36,10 @@ namespace mpp
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			std::size_t top_row_idx,
-			std::size_t top_column_idx,
-			std::size_t bottom_row_idx,
-			std::size_t bottom_column_idx)
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index)
 			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
 		{
 			// The result matrix is always dynamic because function parameters are always treated as runtime
@@ -51,30 +51,30 @@ namespace mpp
 			const auto columns = obj.columns();
 			const auto begin   = obj.begin();
 
-			if (top_row_idx >= rows)
+			if (top_row_index >= rows)
 			{
 				throw std::invalid_argument("Top row index out of bounds!");
 			}
-			else if (top_column_idx >= columns)
+			else if (top_column_index >= columns)
 			{
 				throw std::invalid_argument("Top column index out of bounds!");
 			}
-			else if (bottom_row_idx >= rows)
+			else if (bottom_row_index >= rows)
 			{
 				throw std::invalid_argument("Bottom row index out of bounds!");
 			}
-			else if (bottom_column_idx >= columns)
+			else if (bottom_column_index >= columns)
 			{
 				throw std::invalid_argument("Bottom column index out of bounds!");
 			}
 
 			// Overlapping checks
 
-			if (top_row_idx > bottom_row_idx)
+			if (top_row_index > bottom_row_index)
 			{
 				throw std::invalid_argument("Top row index bigger than bottom row index!");
 			}
-			else if (top_column_idx > bottom_column_idx)
+			else if (top_column_index > bottom_column_index)
 			{
 				throw std::invalid_argument("Top column index bigger than bottom column index!");
 			}
@@ -87,14 +87,14 @@ namespace mpp
 			auto block_buffer               = block_buffer_t{};
 			auto block_buffer_back_inserter = std::back_inserter(block_buffer);
 
-			const auto block_rows    = bottom_row_idx - top_row_idx + 1;
-			const auto block_columns = bottom_column_idx - top_column_idx + 1;
+			const auto block_rows    = bottom_row_index - top_row_index + 1;
+			const auto block_columns = bottom_column_index - top_column_index + 1;
 			block_buffer.reserve(block_rows * block_columns);
 
-			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
+			for (auto row = top_row_index; row <= bottom_row_index; ++row)
 			{
-				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(columns, row, top_column_idx));
-				auto row_begin     = std::next(begin, row_begin_idx);
+				auto row_begin_index = static_cast<diff_t>(detail::index_2d_to_1d(columns, row, top_column_index));
+				auto row_begin     = std::next(begin, row_begin_index);
 
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), block_buffer_back_inserter);
 			}
