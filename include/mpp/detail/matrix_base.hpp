@@ -118,11 +118,11 @@ namespace mpp::detail
 		}
 
 		template<typename Range2D>
-		void init_buffer_2d_static(Range2D&& rng_2d, bool check_rng_size) // @TODO: ISSUE #20
+		void init_buffer_2d_static(Range2D&& range_2d, bool check_range_size) // @TODO: ISSUE #20
 		{
-			const auto [rng_rows, rng_columns] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
+			const auto [range_rows, range_columns] = range_2d_dimensions(std::forward<Range2D>(range_2d));
 
-			if (check_rng_size && (rng_rows != RowsExtent || rng_columns != ColumnsExtent))
+			if (check_range_size && (range_rows != RowsExtent || range_columns != ColumnsExtent))
 			{
 				throw std::invalid_argument("Extents of static matrix and dimensions of initializer does not match!");
 			}
@@ -133,26 +133,26 @@ namespace mpp::detail
 			// Keeps track of the beginning of the current row in the 1D buffer where it's empty
 			auto row_begin = _buffer.begin();
 
-			if constexpr (std::is_rvalue_reference_v<decltype(rng_2d)>)
+			if constexpr (std::is_rvalue_reference_v<decltype(range_2d)>)
 			{
-				for (auto&& row : rng_2d)
+				for (auto&& row : range_2d)
 				{
 					std::ranges::move(row, row_begin);
-					row_begin += static_cast<difference_type>(rng_columns);
+					row_begin += static_cast<difference_type>(range_columns);
 				}
 			}
 			else
 			{
-				for (auto&& row : rng_2d)
+				for (auto&& row : range_2d)
 				{
 					std::ranges::copy(row, row_begin);
-					row_begin += static_cast<difference_type>(rng_columns);
+					row_begin += static_cast<difference_type>(range_columns);
 				}
 			}
 		}
 
 		void
-		init_buffer_2d_dynamic_without_check(const auto& rng_2d, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
+		init_buffer_2d_dynamic_without_check(const auto& range_2d, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 		{
 			_rows    = rows;
 			_columns = columns;
@@ -160,16 +160,16 @@ namespace mpp::detail
 
 			const auto buffer_back_inserter = std::back_inserter(_buffer);
 
-			if constexpr (std::is_rvalue_reference_v<decltype(rng_2d)>)
+			if constexpr (std::is_rvalue_reference_v<decltype(range_2d)>)
 			{
-				for (auto&& row : rng_2d)
+				for (auto&& row : range_2d)
 				{
 					std::ranges::move(row, buffer_back_inserter);
 				}
 			}
 			else
 			{
-				for (auto&& row : rng_2d)
+				for (auto&& row : range_2d)
 				{
 					std::ranges::copy(row, buffer_back_inserter);
 				}
@@ -177,28 +177,28 @@ namespace mpp::detail
 		}
 
 		template<typename Range2D>
-		void assign_buffer_2d(Range2D&& rng_2d, bool check_rng_size) // @TODO: ISSUE #20
+		void assign_buffer_2d(Range2D&& range_2d, bool check_range_size) // @TODO: ISSUE #20
 		{
 			if constexpr (!is_vector<Buffer>::value)
 			{
-				init_buffer_2d_static(std::forward<Range2D>(rng_2d), check_rng_size);
+				init_buffer_2d_static(std::forward<Range2D>(range_2d), check_range_size);
 			}
 			else
 			{
 				// Since this method is called only after construction, it is safe to use initialized _rows and _columns
 
-				const auto [rng_rows, rng_columns] = range_2d_dimensions(std::forward<Range2D>(rng_2d));
+				const auto [range_rows, range_columns] = range_2d_dimensions(std::forward<Range2D>(range_2d));
 
-				if (check_rng_size && (rng_rows != _rows || rng_columns != _columns))
+				if (check_range_size && (range_rows != _rows || range_columns != _columns))
 				{
 					throw std::invalid_argument("Dimensions of matrix and dimensions of initializer does not match!");
 				}
 
 				auto begin = _buffer.begin();
 
-				if constexpr (std::is_rvalue_reference_v<decltype(rng_2d)>)
+				if constexpr (std::is_rvalue_reference_v<decltype(range_2d)>)
 				{
-					for (auto&& row : rng_2d)
+					for (auto&& row : range_2d)
 					{
 						std::ranges::move(row, begin);
 						begin += static_cast<difference_type>(_columns);
@@ -206,7 +206,7 @@ namespace mpp::detail
 				}
 				else
 				{
-					for (auto&& row : rng_2d)
+					for (auto&& row : range_2d)
 					{
 						std::ranges::copy(row, begin);
 						begin += static_cast<difference_type>(_columns);
@@ -439,9 +439,9 @@ namespace mpp::detail
 		}
 
 		template<range_2d_with_type<Value> Range2D>
-		void assign(Range2D&& rng_2d) // @TODO: ISSUE #20
+		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			assign_buffer_2d(std::forward<Range2D>(rng_2d), true);
+			assign_buffer_2d(std::forward<Range2D>(range_2d), true);
 		}
 
 		auto operator=(std::initializer_list<std::initializer_list<Value>> init_2d) -> matrix_base& // @TODO: ISSUE #20
@@ -451,9 +451,9 @@ namespace mpp::detail
 		}
 
 		template<range_2d_with_type<Value> Range2D>
-		auto operator=(Range2D&& rng_2d) -> matrix_base& // @TODO: ISSUE #20
+		auto operator=(Range2D&& range_2d) -> matrix_base& // @TODO: ISSUE #20
 		{
-			assign_buffer_2d(std::forward<Range2D>(rng_2d), true);
+			assign_buffer_2d(std::forward<Range2D>(range_2d), true);
 			return *this;
 		}
 
@@ -470,9 +470,9 @@ namespace mpp::detail
 			}
 		}
 
-		friend inline void init_matrix_with_1d_rng(
+		friend inline void init_matrix_with_1d_range(
 			matrix_base<Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& base,
-			const auto& rng,
+			const auto& range,
 			std::size_t rows,
 			std::size_t columns) // @TODO: ISSUE #20
 		{
@@ -482,13 +482,13 @@ namespace mpp::detail
 			reserve_1d_buffer_if_vector(base._buffer, rows, columns);
 
 			// @FIXME: Probably not optimal. Look at this again later
-			if constexpr (std::is_rvalue_reference_v<decltype(rng)>)
+			if constexpr (std::is_rvalue_reference_v<decltype(range)>)
 			{
 				if constexpr (is_vector<Buffer>::value)
 				{
-					base._buffer.reserve(std::ranges::size(rng));
+					base._buffer.reserve(std::ranges::size(range));
 
-					for (auto&& val : rng)
+					for (auto&& val : range)
 					{
 						base._buffer.push_back(std::move(static_cast<Value>(val)));
 					}
@@ -497,7 +497,7 @@ namespace mpp::detail
 				{
 					auto idx = std::size_t{};
 
-					for (auto&& val : rng)
+					for (auto&& val : range)
 					{
 						base._buffer[idx++] = std::move(static_cast<Value>(val));
 					}
@@ -507,9 +507,9 @@ namespace mpp::detail
 			{
 				if constexpr (is_vector<Buffer>::value)
 				{
-					base._buffer.reserve(std::ranges::size(rng));
+					base._buffer.reserve(std::ranges::size(range));
 
-					for (const auto& val : rng)
+					for (const auto& val : range)
 					{
 						base._buffer.push_back(static_cast<Value>(val));
 					}
@@ -518,7 +518,7 @@ namespace mpp::detail
 				{
 					auto idx = std::size_t{};
 
-					for (const auto& val : rng)
+					for (const auto& val : range)
 					{
 						base._buffer[idx++] = static_cast<Value>(val);
 					}

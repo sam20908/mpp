@@ -55,9 +55,9 @@ namespace mpp
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
-		explicit matrix(Range2D&& rng_2d) // @TODO: ISSUE #20
+		explicit matrix(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::init_buffer_2d_static(std::forward<Range2D>(rng_2d), true);
+			base::init_buffer_2d_static(std::forward<Range2D>(range_2d), true);
 		}
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20

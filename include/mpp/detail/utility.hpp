@@ -59,11 +59,11 @@ namespace mpp::detail
 		return row_idx * columns + col_idx;
 	}
 
-	[[nodiscard]] inline auto range_2d_dimensions(const auto& rng_2d)
+	[[nodiscard]] inline auto range_2d_dimensions(const auto& range_2d)
 		-> std::pair<std::size_t, std::size_t> // @TODO: ISSUE #20
 	{
-		const auto begin   = std::ranges::begin(rng_2d);
-		const auto rows    = std::ranges::size(rng_2d);
+		const auto begin   = std::ranges::begin(range_2d);
+		const auto rows    = std::ranges::size(range_2d);
 		const auto columns = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
 
 		if (rows > 1)
@@ -71,7 +71,7 @@ namespace mpp::detail
 			// We only need to check for equal row columns when the rows is 2+ because 1 row means there's no other row
 			// to check and 0 rows is self explanatory
 
-			for (const auto& row : rng_2d)
+			for (const auto& row : range_2d)
 			{
 				if (const auto row_columns = std::ranges::size(row); row_columns != columns)
 				{

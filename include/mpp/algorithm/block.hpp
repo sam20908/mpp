@@ -99,7 +99,7 @@ namespace mpp
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), block_buffer_back_inserter);
 			}
 
-			init_matrix_with_1d_rng(block_matrix, std::move(block_buffer), block_rows, block_columns);
+			init_matrix_with_1d_range(block_matrix, std::move(block_buffer), block_rows, block_columns);
 
 			return block_matrix;
 		}

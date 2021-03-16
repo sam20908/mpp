@@ -61,9 +61,9 @@ void test_singular(auto val, bool is_singular, auto... dimension_args)
 }
 
 template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_cast(const std::vector<std::vector<int>>& rng_2d)
+void test_cast(const std::vector<std::vector<int>>& range_2d)
 {
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d };
+	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d };
 	const auto casted = mpp::cast(std::type_identity<To>{}, matrix);
 
 	expect(matrix.rows() == casted.rows());
@@ -141,12 +141,12 @@ int main()
 		};
 
 		scenario("using cast CPO") = []() {
-			auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+			auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-			test_cast<float, 2, 3>(rng_2d);
-			test_cast<float, std::dynamic_extent, std::dynamic_extent>(rng_2d);
-			test_cast<float, std::dynamic_extent, 3>(rng_2d);
-			test_cast<float, 2, std::dynamic_extent>(rng_2d);
+			test_cast<float, 2, 3>(range_2d);
+			test_cast<float, std::dynamic_extent, std::dynamic_extent>(range_2d);
+			test_cast<float, std::dynamic_extent, 3>(range_2d);
+			test_cast<float, 2, std::dynamic_extent>(range_2d);
 		};
 
 		scenario("comparison CPOs") = []() {

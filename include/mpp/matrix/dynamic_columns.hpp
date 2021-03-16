@@ -73,17 +73,17 @@ namespace mpp
 		}
 
 		template<detail::range_2d_with_type<Value> Range2D>
-		explicit matrix(Range2D&& rng_2d, const Allocator& allocator = Allocator{}) :
+		explicit matrix(Range2D&& range_2d, const Allocator& allocator = Allocator{}) :
 			base(allocator) // @TODO: ISSUE #20
 		{
-			auto [rows, columns] = detail::range_2d_dimensions(rng_2d);
+			auto [rows, columns] = detail::range_2d_dimensions(range_2d);
 
 			if (rows != RowsExtent)
 			{
 				throw std::invalid_argument("Initializer's rows does not match the provided row extent!");
 			}
 
-			base::init_buffer_2d_dynamic_without_check(std::forward<Range2D>(rng_2d), RowsExtent, columns);
+			base::init_buffer_2d_dynamic_without_check(std::forward<Range2D>(range_2d), RowsExtent, columns);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>

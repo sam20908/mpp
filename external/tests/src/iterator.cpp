@@ -27,9 +27,9 @@ using namespace boost::ut::bdd;
 using namespace boost::ut;
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_iter_semantics(const auto& rng_2d, auto... dimension_args)
+void test_iter_semantics(const auto& range_2d, auto... dimension_args)
 {
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d, dimension_args... };
+	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d, dimension_args... };
 
 	auto begin  = matrix.begin();
 	auto cbegin = matrix.cbegin();
@@ -75,9 +75,9 @@ void test_iter_semantics(const auto& rng_2d, auto... dimension_args)
 }
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_iter_semantics_write(const auto& rng_2d, auto... dimension_args)
+void test_iter_semantics_write(const auto& range_2d, auto... dimension_args)
 {
-	auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d, dimension_args... };
+	auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d, dimension_args... };
 
 	auto begin  = matrix.begin();
 	auto end    = matrix.end() - 1;
@@ -119,18 +119,18 @@ int main()
 		};
 
 		given("it should have the right iterator semantics") = []() {
-			// @NOTE: Every test is referencing the below rng_2d for convenience
-			const auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+			// @NOTE: Every test is referencing the below range_2d for convenience
+			const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-			test_iter_semantics<2, 3>(rng_2d);
-			test_iter_semantics<std::dynamic_extent, std::dynamic_extent>(rng_2d);
-			test_iter_semantics<std::dynamic_extent, 3>(rng_2d);
-			test_iter_semantics<2, std::dynamic_extent>(rng_2d);
+			test_iter_semantics<2, 3>(range_2d);
+			test_iter_semantics<std::dynamic_extent, std::dynamic_extent>(range_2d);
+			test_iter_semantics<std::dynamic_extent, 3>(range_2d);
+			test_iter_semantics<2, std::dynamic_extent>(range_2d);
 
-			test_iter_semantics_write<2, 3>(rng_2d);
-			test_iter_semantics_write<std::dynamic_extent, std::dynamic_extent>(rng_2d);
-			test_iter_semantics_write<std::dynamic_extent, 3>(rng_2d);
-			test_iter_semantics_write<2, std::dynamic_extent>(rng_2d);
+			test_iter_semantics_write<2, 3>(range_2d);
+			test_iter_semantics_write<std::dynamic_extent, std::dynamic_extent>(range_2d);
+			test_iter_semantics_write<std::dynamic_extent, 3>(range_2d);
+			test_iter_semantics_write<2, std::dynamic_extent>(range_2d);
 		};
 	};
 

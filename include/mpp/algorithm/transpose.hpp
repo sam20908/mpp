@@ -55,7 +55,7 @@ namespace mpp
 				}
 			}
 
-			init_matrix_with_1d_rng(transposed, std::move(transposed_buffer), columns, rows);
+			init_matrix_with_1d_range(transposed, std::move(transposed_buffer), columns, rows);
 
 			return transposed;
 		}

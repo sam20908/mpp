@@ -210,7 +210,7 @@ namespace mpp
 				mul_square_buffers<To, default_floating_type>(inv_matrix_buffer, std::move(u_buffer), std::move(l_buffer), rows);
 			}
 
-			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buffer), rows, columns);
+			init_matrix_with_1d_range(inv_matrix, std::move(inv_matrix_buffer), rows, columns);
 			return inv_matrix;
 		}
 
