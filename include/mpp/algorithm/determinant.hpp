@@ -74,7 +74,7 @@ namespace mpp
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto det_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		[[nodiscard]] inline auto determinant_common(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
 		{
 			if (!square(obj))
@@ -92,7 +92,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20
 		{
-			return detail::det_func<Value>(obj);
+			return detail::determinant_common<Value>(obj);
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -100,7 +100,7 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_func<To>(obj);
+			return detail::determinant_common<To>(obj);
 		}
 	};
 
