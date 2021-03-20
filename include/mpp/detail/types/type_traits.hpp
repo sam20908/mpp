@@ -33,4 +33,4 @@ namespace mpp::detail
 	struct is_vector<std::vector<T>> : std::true_type
 	{
 	};
-}
+} // namespace mpp::detail
