@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "tag_invoke.hpp"
+#include <mpp/detail/utility/tag_invoke.hpp>
 
 namespace mpp::detail
 {
