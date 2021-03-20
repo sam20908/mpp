@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/detail/expr_base.hpp>
+#include <mpp/detail/expr/expr_base.hpp>
 
 #include <cstddef>
 #include <stdexcept>
