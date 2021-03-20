@@ -19,32 +19,18 @@
 
 #pragma once
 
-#include <concepts>
-#include <ranges>
 #include <type_traits>
+#include <vector>
 
 namespace mpp::detail
 {
-	template<typename Value>
-	concept arithmetic = requires(Value&& value)
+	template<typename T>
+	struct is_vector : std::false_type
 	{
-		{ value + value };
-		{ value - value };
-		{ value * value };
-		{ value / value };
-		{ value += value };
-		{ value -= value };
-		{ value *= value };
-		{ value /= value };
 	};
 
-	template<typename Callable, typename Return, typename... Args>
-	concept invocable_with_return_type =
-		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
-
-	template<typename Range>
-	using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
-
-	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_value_t<Range>, Value>;
-} // namespace mpp::detail
+	template<typename T>
+	struct is_vector<std::vector<T>> : std::true_type
+	{
+	};
+}

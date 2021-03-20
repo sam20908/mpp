@@ -60,33 +60,17 @@ void test_singular(auto val, bool is_singular, auto... dimension_args)
 	expect(mpp::singular(matrix) == is_singular);
 }
 
-template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_cast(const std::vector<std::vector<int>>& range_2d)
-{
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d };
-	const auto casted = mpp::cast(std::type_identity<To>{}, matrix);
-
-	expect(matrix.rows() == casted.rows());
-	expect(matrix.columns() == casted.columns());
-	expect(matrix.rows_extent() == casted.rows_extent());
-	expect(matrix.columns_extent() == casted.columns_extent());
-
-	using ordered_type = std::compare_three_way_result_t<To, To>;
-
-	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare) == ordered_type::equivalent);
-}
-
 void test_size_compare(const auto& left_matrix_creator,
 	const auto& right_matrix_creator,
 	std::partial_ordering row_ordering,
 	std::partial_ordering column_ordering,
-	bool equal_in_rows,
-	bool equal_in_columns)
+	bool compare_rows,
+	bool compare_columns)
 {
 	const auto left  = left_matrix_creator();
 	const auto right = right_matrix_creator();
 	const auto [compare_row_ordering, compare_column_ordering] =
-		mpp::size_compare(left, right, equal_in_rows, equal_in_columns);
+		mpp::size_compare(left, right, compare_rows, compare_columns);
 
 	expect(row_ordering == compare_row_ordering);
 	expect(column_ordering == compare_column_ordering);
@@ -140,15 +124,6 @@ int main()
 			};
 		};
 
-		scenario("using cast CPO") = []() {
-			auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-			test_cast<float, 2, 3>(range_2d);
-			test_cast<float, std::dynamic_extent, std::dynamic_extent>(range_2d);
-			test_cast<float, std::dynamic_extent, 3>(range_2d);
-			test_cast<float, 2, std::dynamic_extent>(range_2d);
-		};
-
 		scenario("comparison CPOs") = []() {
 			when("using size_compare CPO") = []() {
 				test_size_compare(
@@ -197,7 +172,7 @@ int main()
 					false);
 			};
 
-			when("using elements_cmopare CPO") = []() {
+			when("using elements_compare CPO") = []() {
 				test_elements_compare(
 					[]() {
 						return mpp::matrix<int, 1, 1>{ 0 };

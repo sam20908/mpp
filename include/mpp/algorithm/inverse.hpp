@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/algo_types.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
@@ -34,73 +35,6 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline void forward_substitution(auto& l_buffer, std::size_t columns) // @TODO: ISSUE #20
-		{
-			for (auto col = std::size_t{ 1 }; col < columns; ++col)
-			{
-				// Optimized version of forward-substitution which skips making diagnoal 1's because L would've already
-				// had 1's along the diagonal
-
-				for (auto row = col + 1; row < columns; ++row)
-				{
-					const auto factor = l_buffer[index_2d_to_1d(columns, row, row - 1)] * -1;
-
-					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
-					{
-						const auto elem_above = l_buffer[index_2d_to_1d(columns, col, col_2)];
-						const auto elem_index = index_2d_to_1d(columns, row, col_2);
-
-						l_buffer[elem_index] -= factor * elem_above;
-					}
-				}
-			}
-		}
-
-		inline void back_substitution(auto& u_buffer, std::size_t columns) // @TODO: ISSUE #20
-		{
-			for (auto col = columns; col > 0; --col)
-			{
-				const auto col_index = col - 1;
-				auto diag_elem_index = index_2d_to_1d(columns, col_index, col_index);
-				const auto diag_elem = u_buffer[diag_elem_index];
-
-				// Diagonal element can simply be replaced with the factor
-				const auto diag_factor    = default_floating_type{ 1 } / diag_elem;
-				u_buffer[diag_elem_index] = diag_factor;
-
-				// Multiply every element to the right of the diagonal element by the factor
-				for (auto index = columns - col; index > 0; --index)
-				{
-					u_buffer[++diag_elem_index] *= diag_factor;
-				}
-
-				for (auto row = col_index; row > 0; --row)
-				{
-					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
-					// (this works because) the augmented matrix would have zeroes above the diagonal element
-					const auto row_index          = row - 1;
-					const auto elem_index         = index_2d_to_1d(columns, row_index, col_index);
-					const auto elem_before_factor = u_buffer[elem_index];
-					u_buffer[elem_index]          = elem_before_factor * diag_factor * -1;
-
-					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
-					for (auto col_2 = columns; col_2 > col; --col_2)
-					{
-						const auto col_2_index   = col_2 - 1;
-						auto diag_row_index      = index_2d_to_1d(columns, col_index, col_2_index);
-						const auto diag_row_elem = u_buffer[diag_row_index];
-
-						const auto cur_elem_index = index_2d_to_1d(columns, row_index, col_2_index);
-						const auto elem           = u_buffer[cur_elem_index];
-						const auto factor         = elem_before_factor * -1;
-
-						const auto new_elem      = factor * diag_row_elem + elem;
-						u_buffer[cur_elem_index] = new_elem;
-					}
-				}
-			}
-		}
-
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
@@ -118,7 +52,7 @@ namespace mpp
 			}
 
 			auto inverse_matrix_buffer = typename inverse_matrix_t::buffer_type{};
-			allocate_1d_buffer_if_vector(inverse_matrix_buffer, rows, columns, To{});
+			allocate_buffer_if_vector(inverse_matrix_buffer, rows, columns, To{});
 
 			using default_floating_type_ordering_type =
 				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
@@ -173,13 +107,16 @@ namespace mpp
 				auto l_buffer = lu_decomp_buffer_t{};
 				auto u_buffer = lu_decomp_buffer_t{};
 
-				allocate_1d_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 				std::ranges::copy(obj, u_buffer.begin());
 
-				allocate_1d_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
-				transform_1d_buffer_into_identity<default_floating_type>(l_buffer, rows);
+				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
+				make_identity_buffer(l_buffer, rows, default_floating_type{});
 
-				det = lu_decomp_common<default_floating_type, true>(rows, columns, l_buffer, u_buffer);
+				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
+					columns,
+					l_buffer,
+					u_buffer);
 
 				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
@@ -189,28 +126,31 @@ namespace mpp
 
 				if (std::is_constant_evaluated())
 				{
-					forward_substitution(l_buffer, columns);
-					back_substitution(u_buffer, columns);
+					forward_substitution_in_place(l_buffer, columns);
+					back_substitution_in_place(u_buffer, columns);
 				}
 				else
 				{
 					// Compute inv(L) and inv(U) in parallel because they don't share data
 
 					auto l_inverse_future = std::async(std::launch::async, [&l_buffer, columns]() {
-						forward_substitution(l_buffer, columns);
+						forward_substitution_in_place(l_buffer, columns);
 					});
 					auto u_inverse_future = std::async(std::launch::async, [&u_buffer, columns]() {
-						back_substitution(u_buffer, columns);
+						back_substitution_in_place(u_buffer, columns);
 					});
 
 					l_inverse_future.wait();
 					u_inverse_future.wait();
 				}
 
-				mul_square_buffers<To, default_floating_type>(inverse_matrix_buffer,
+				matrix_multiplication_on_buffers<To, default_floating_type>(inverse_matrix_buffer,
 					std::move(u_buffer),
 					std::move(l_buffer),
-					rows);
+					rows,
+					columns,
+					rows,
+					columns);
 			}
 
 			init_matrix_with_1d_range(inverse_matrix, std::move(inverse_matrix_buffer), rows, columns);

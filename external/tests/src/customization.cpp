@@ -53,11 +53,6 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::cast_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
 	[[nodiscard]] constexpr auto tag_invoke(mpp::square_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
@@ -117,7 +112,6 @@ int main()
 
 		when("I check against the CPOs' return types") = []() {
 			expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::cast_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::square_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);

@@ -20,8 +20,9 @@
 #pragma once
 
 #include <mpp/algorithm/determinant.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
 #include <compare>

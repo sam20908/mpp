@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <mpp/detail/constraints.hpp>
-#include <mpp/detail/expr_base.hpp>
-#include <mpp/detail/tag_invoke.hpp>
+#include <mpp/detail/expr/expr_base.hpp>
+#include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/tag_invoke.hpp>
 
 // @TODO: Make sure to export these modules for C++20
-#include <mpp/detail/public_tags.hpp>
+#include <mpp/detail/matrix/public_tags.hpp>
 #include <mpp/utility/config_extents.hpp>
 
 #include <cstddef>

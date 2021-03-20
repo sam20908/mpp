@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "../detail/constraints.hpp"
+#include <mpp/detail/types/constraints.hpp>
 
 #include <complex>
 #include <concepts>

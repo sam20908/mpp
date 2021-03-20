@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>

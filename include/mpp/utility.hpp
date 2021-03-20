@@ -21,7 +21,6 @@
 
 // Don't include config_extents.hpp because that is only for user customizations
 
-#include <mpp/utility/cast.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/utility/singular.hpp>
 #include <mpp/utility/square.hpp>

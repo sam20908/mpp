@@ -19,93 +19,192 @@
 
 #pragma once
 
-#include <mpp/detail/constraints.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/detail/matrix_def.hpp>
+#include <mpp/detail/matrix/matrix_base.hpp>
+#include <mpp/detail/matrix/matrix_def.hpp>
+#include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/exception_messages.hpp>
+#include <mpp/detail/utility/validators.hpp>
 
+#include <concepts>
 #include <initializer_list>
-#include <stdexcept>
+#include <ranges>
+#include <type_traits>
 #include <utility>
-
 
 namespace mpp
 {
 	template<detail::arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 	class matrix :
-		public detail::
-			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>
+		public detail::matrix_base<matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
+			std::array<Value, RowsExtent * ColumnsExtent>,
+			Value,
+			RowsExtent,
+			ColumnsExtent,
+			Allocator>
 	{
-		// When the user doesn't provide any other dimension extents or the extents have partial dynamic extents, it's
-		// picked up by other specializations
+		using base = detail::matrix_base<matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
+			std::array<Value, RowsExtent * ColumnsExtent>,
+			Value,
+			RowsExtent,
+			ColumnsExtent,
+			Allocator>;
 
-		using base = detail::
-			matrix_base<std::array<Value, RowsExtent * ColumnsExtent>, Value, RowsExtent, ColumnsExtent, Allocator>;
+		void fill_buffer_with_value(const Value& value) // @TODO: ISSUE #20
+		{
+			std::ranges::fill(base::_buffer, value);
+		}
+
+		template<bool CheckRangeSize, typename RangeValue>
+		void assign_helper(auto&& range_2d) // @TODO: ISSUE #20
+		{
+			// This checks if the dimensions of the range is equal to the extents
+
+			auto begin      = base::_buffer.begin();
+			const auto rows = std::ranges::size(range_2d);
+
+			constexpr auto is_moved_from             = std::is_rvalue_reference_v<decltype(range_2d)>;
+			constexpr auto range_has_same_value_type = std::is_same_v<std::remove_cvref_t<Value>, RangeValue>;
+
+			if constexpr (CheckRangeSize)
+			{
+				if (rows != RowsExtent)
+				{
+					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+				}
+			}
+
+			if constexpr (is_moved_from)
+			{
+				for (auto&& row : range_2d)
+				{
+					const auto current_columns = std::ranges::size(std::move(row));
+
+					if constexpr (CheckRangeSize)
+					{
+						if (current_columns != ColumnsExtent)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (range_has_same_value_type)
+					{
+						std::ranges::move(std::move(row), begin);
+						begin += ColumnsExtent;
+					}
+					else
+					{
+						std::ranges::transform(std::move(row), begin, [](auto&& row_value) {
+							return static_cast<Value>(std::move(row_value));
+						});
+
+						begin += ColumnsExtent;
+					}
+				}
+			}
+			else
+			{
+				for (const auto& row : range_2d)
+				{
+					const auto current_columns = std::ranges::size(row);
+
+					if constexpr (CheckRangeSize)
+					{
+						if (current_columns != ColumnsExtent)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (range_has_same_value_type)
+					{
+						std::ranges::copy(row, begin);
+						begin += ColumnsExtent;
+					}
+					else
+					{
+						std::ranges::transform(row, begin, [](const auto& row_value) {
+							return static_cast<Value>(row_value);
+						});
+
+						begin += ColumnsExtent;
+					}
+				}
+			}
+
+			base::_rows    = RowsExtent;
+			base::_columns = ColumnsExtent;
+		}
 
 	public:
 		using base::operator=;
 
 		matrix()
 		{
-			base::init_dimension_with_val_static(Value{});
+			fill_buffer_with_value(Value{});
 		}
 
-		explicit matrix(std::initializer_list<std::initializer_list<Value>> init_2d) // @TODO: ISSUE #20
+		template<std::convertible_to<Value> InitializerListValue>
+		explicit matrix(
+			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::init_buffer_2d_static(init_2d, true);
+			assign_helper<true, InitializerListValue>(initializer_list_2d);
 		}
 
-		template<detail::range_2d_with_type<Value> Range2D>
+		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::init_buffer_2d_static(std::forward<Range2D>(range_2d), true);
+			assign_helper<true, detail::range_2d_value_t<Range2D>>(std::forward<Range2D>(range_2d));
 		}
 
-		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& arr_2d) // @TODO: ISSUE #20
+		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& array_2d) // @TODO: ISSUE #20
 		{
-			base::init_buffer_2d_static(arr_2d, false);
+			assign_helper<false, Value>(array_2d);
 		}
 
-		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& arr_2d) // @TODO: ISSUE #20
+		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& array_2d) // @TODO: ISSUE #20
 		{
-			base::init_buffer_2d_static(std::move(arr_2d), false);
+			assign_helper<false, Value>(std::move(array_2d));
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(
 			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
 		{
-			if (RowsExtent != expr.rows() || ColumnsExtent != expr.columns())
-			{
-				throw std::invalid_argument("Dimensions of expression object doesn't match provided extents!");
-			}
+			base::_rows    = RowsExtent;
+			base::_columns = ColumnsExtent;
 
-			base::_rows    = expr.rows();
-			base::_columns = expr.columns();
-			auto index       = std::size_t{};
+			detail::validate_matrices_same_size(*this, expr);
 
-			for (auto row = std::size_t{}; row < base::_rows; ++row)
+			for (auto row = std::size_t{}, index = std::size_t{}; row < RowsExtent; ++row)
 			{
-				for (auto col = std::size_t{}; col < base::_columns; ++col)
+				for (auto column = std::size_t{}; column < ColumnsExtent; ++column)
 				{
-					base::_buffer[index++] = expr(row, col);
+					base::_buffer[index++] = expr(row, column);
 				}
 			}
 		}
 
 		explicit matrix(const Value& value) // @TODO: ISSUE #20
 		{
-			base::init_dimension_with_val_static(value);
-		}
-
-		explicit matrix(identity_matrix_tag) // @TODO: ISSUE #20
-		{
-			detail::validate_dimensions_for_identity(RowsExtent, ColumnsExtent);
-
 			base::_rows    = RowsExtent;
 			base::_columns = ColumnsExtent;
 
-			std::ranges::fill(base::_buffer, Value{});
-			detail::transform_1d_buffer_into_identity<Value>(base::_buffer, RowsExtent);
+			fill_buffer_with_value(value);
+		}
+
+		explicit matrix(identity_matrix_tag,
+			const Value& zero_value = Value{ 0 },
+			const Value& one_value  = Value{ 1 }) // @TODO: ISSUE #20
+		{
+			detail::validate_dimensions_for_identity_matrix(RowsExtent, ColumnsExtent);
+
+			base::_rows    = RowsExtent;
+			base::_columns = ColumnsExtent;
+			fill_buffer_with_value(zero_value);
+
+			detail::make_identity_buffer(base::_buffer, RowsExtent, one_value);
 		}
 
 		template<detail::invocable_with_return_type<Value> Callable>
@@ -115,6 +214,29 @@ namespace mpp
 			base::_columns = ColumnsExtent;
 
 			std::ranges::generate(base::_buffer, std::forward<Callable>(callable));
+		}
+
+		template<std::convertible_to<Value> InitializerListValue>
+		void assign(
+			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
+		{
+			assign_helper<true, InitializerListValue>(initializer_list_2d);
+		}
+
+		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
+		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
+		{
+			assign_helper<true, detail::range_2d_value_t<Range2D>>(std::forward<Range2D>(range_2d));
+		}
+
+		void assign(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& array_2d) // @TODO: ISSUE #20
+		{
+			assign_helper<false, Value>(array_2d);
+		}
+
+		void assign(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& array_2d) // @TODO: ISSUE #20
+		{
+			assign_helper<false, Value>(std::move(array_2d));
 		}
 	};
 } // namespace mpp

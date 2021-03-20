@@ -19,27 +19,17 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/matrix.hpp>
-
 #include <cstddef>
 
-namespace mpp
+namespace mpp::detail
 {
-	struct cast_t : public detail::cpo_base<cast_t>
+	[[nodiscard]] constexpr auto index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
+		-> std::size_t
 	{
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto
-		tag_invoke(cast_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
-		{
-			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			init_matrix_with_1d_range(casted, obj, obj.rows(), obj.columns());
+		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
+		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
+		// spot. This also assumes that the storage of row-major
 
-			return casted;
-		}
-	};
-
-	inline constexpr auto cast = cast_t{};
-} // namespace mpp
+		return row_index * columns + column_index;
+	}
+} // namespace mpp::detail

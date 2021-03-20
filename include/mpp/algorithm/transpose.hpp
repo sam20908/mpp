@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/matrix/matrix_base.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
@@ -38,11 +39,11 @@ namespace mpp
 			const auto columns = obj.columns();
 			const auto data    = obj.data();
 
-			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
+			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent>;
 			using transposed_buffer_t = typename transposed_t::buffer_type;
-			auto transposed        = transposed_t{};
+			auto transposed           = transposed_t{};
 			auto transposed_buffer    = transposed_buffer_t{};
-			detail::allocate_1d_buffer_if_vector(transposed_buffer, columns, rows, Value{});
+			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
 			for (auto col = std::size_t{}; col < columns; ++col)
 			{

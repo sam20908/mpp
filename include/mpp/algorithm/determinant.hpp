@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/algo_types.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
@@ -62,12 +63,15 @@ namespace mpp
 
 			auto u_buffer = lu_decomp_buffer_t{};
 
-			allocate_1d_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buffer.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomp_common<default_floating_type, false>(rows, columns, dummy_variable, u_buffer);
+			const auto det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, false>(rows,
+				columns,
+				dummy_variable,
+				u_buffer);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));
