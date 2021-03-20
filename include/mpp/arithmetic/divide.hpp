@@ -19,7 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/expr_binary_constant_op.hpp>
+#include <mpp/detail/expr/expr_binary_constant_op.hpp>
+#include <mpp/detail/expr/expr_binary_op.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
