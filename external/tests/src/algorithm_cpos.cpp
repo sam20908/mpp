@@ -143,8 +143,8 @@ void test_block_helper(const auto& results, const auto& data, auto... dimension_
 		const auto col_start_index = std::get<1>(result);
 		const auto row_end_index   = std::get<2>(result);
 		const auto col_end_index   = std::get<3>(result);
-		const auto cropped       = mpp::block(matrix, row_start_index, col_start_index, row_end_index, col_end_index);
-		const auto result_matrix = mpp::matrix<value_type>{ std::get<4>(result) };
+		const auto cropped         = mpp::block(matrix, row_start_index, col_start_index, row_end_index, col_end_index);
+		const auto result_matrix   = mpp::matrix<value_type>{ std::get<4>(result) };
 
 		expect(cropped.rows() == result_matrix.rows());
 		expect(cropped.columns() == result_matrix.columns());

@@ -82,7 +82,8 @@ namespace mpp::detail
 			return operator()(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
+			-> value_type // @TODO: ISSUE #20
 		{
 			return _op(_obj, _constant, row_index, col_index);
 		}

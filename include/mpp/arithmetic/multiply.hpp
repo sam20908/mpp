@@ -33,11 +33,10 @@ namespace mpp
 {
 	namespace detail
 	{
-		using mul_constant_op_t = decltype(
-			[](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) -> decltype(left(row_index, col_index) *
-																								right) {
-				return left(row_index, col_index) * right;
-			});
+		using mul_constant_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index)
+											   -> decltype(left(row_index, col_index) * right) {
+			return left(row_index, col_index) * right;
+		});
 		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) ->
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
