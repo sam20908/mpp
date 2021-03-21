@@ -98,7 +98,6 @@ Normally with C++20, we could simply provide a `operator<=>` and let the compile
 ```cpp
 
 #include <mpp/matrix.hpp>
-#include <mpp/utility/comparator.hpp> // mpp::compare_three_way_equivalent
 #include <mpp/utility/comparison.hpp>
 
 int main()
@@ -133,8 +132,8 @@ int main()
   // 41.F / 99.F is recurring 0.41
   const auto left = mpp::matrix<float>{ { 41.F / 99.F } };
   const auto right = mpp::matrix<float>{ { 41.F / 99.F } };
-  const auto ordering_2 = mpp::elements_compare(left, right, mpp::compare_three_way_equivalent);
-  // mpp::compare_three_way_equivalent is exposed to the public as a comparator that handles floating points
+  const auto ordering_2 = mpp::elements_compare(left, right, mpp::floating_point_compare);
+  // mpp::floating_point_compare is exposed to the public as a comparator that handles floating points
   // ordering_2 -> std::partial_ordering::equivalent
 
   return 0;
@@ -143,7 +142,7 @@ int main()
 
 #### Customizations
 
-Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize` namespace
+Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize_extents` namespace
 
 ```cpp
 #include <mpp/utility/config_extents.hpp>
@@ -164,7 +163,7 @@ namespace mpp::customize_extents
   {
     return 10;
   }
-} // namespace mpp::customize
+} // namespace mpp::customize_extents
 
 #include <mpp/matrix.hpp>
 

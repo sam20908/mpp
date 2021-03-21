@@ -142,8 +142,6 @@ int main()
 {
 	cfg<override> = { .tag = { "execute" } };
 
-	// @TODO: Several tests are skipped due to #163
-
 	feature("algorithm CPOs") = []() {
 		given("determinant CPO") = []() {
 			test_determinant<int, int>("test_data/0x0_det.txt");
