@@ -304,7 +304,11 @@ inline auto parse_data_file_block_transformation(const std::filesystem::path& da
 		{
 			if (line == "=")
 			{
-				blocks.emplace_back(row_start, column_start, row_end, column_end, mpp::matrix{ current_block_data });
+				blocks.push_back(block_transformation_testcase{ row_start,
+					column_start,
+					row_end,
+					column_end,
+					mpp::matrix{ current_block_data } });
 				line_is_block_indices = true;
 				current_block_data.clear();
 				continue;
