@@ -148,7 +148,7 @@ int main()
 		given("determinant CPO") = []() {
 			test_determinant<int, int>("test_data/0x0_det.txt");
 			test_determinant<int, float>("test_data/1x1_det.txt");
-			test_determinant<long, long>("test_data/2x2_det.txt");
+			test_determinant<double, double>("test_data/2x2_det.txt");
 
 			test_determinant<double, double>("test_data/10x10_det.txt", tag("skip"));
 		};
