@@ -47,8 +47,6 @@ using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-using value_type = double;
-
 // @TODO: DRY the two matrices element compare wise (dependent on #130?)
 
 static auto get_actual_filepath(const std::string& filename) -> std::filesystem::path
@@ -66,110 +64,77 @@ auto skip_test_if_file_not_exists(bool file_exists, Tag& test_tag)
 	}
 }
 
-template<typename Tag = decltype(tag(""))>
-void test_det(const std::string& filename, Tag test_tag = tag("execute"))
+template<typename From, typename To, typename Tag = decltype(tag(""))>
+void test_determinant(const std::string& filename, Tag test_tag = tag("execute"))
 {
-	const auto result_tuple = parse_data_file_double_det(get_actual_filepath(filename));
-	const auto& data        = std::get<0>(result_tuple);
-	const auto& result      = std::get<1>(result_tuple);
-	const auto& file_exists = std::get<2>(result_tuple);
+	const auto result_struct  = parse_data_file_with_single_number_result<From, To>(get_actual_filepath(filename));
+	const auto& original_data = result_struct.original_data;
+	const auto result         = result_struct.result;
+	const auto file_exists    = result_struct.file_exists;
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
 	test_tag / test(filename) = [&]() {
-		const auto matrix = mpp::matrix<value_type>{ data };
-		const auto det    = mpp::determinant(std::type_identity<value_type>{}, matrix);
+		const auto det = mpp::determinant(std::type_identity<To>{}, original_data);
 
-		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
+		using ordering_type = std::compare_three_way_result_t<To, To>;
 
-		expect(mpp::floating_point_compare(det, static_cast<value_type>(result)) == ordering_type::equivalent);
+		expect(mpp::floating_point_compare(det, result) == ordering_type::equivalent);
 	};
 }
 
-template<std::size_t RowsExtent,
-	std::size_t ColumnsExtent,
-	std::size_t ResultRowsExtent,
-	std::size_t ResultColumnsExtent>
-void test_transformation_helper(const auto& transform_fn, const auto& result, const auto& data)
-{
-	const auto result_matrix = mpp::matrix<value_type, ResultRowsExtent, ResultColumnsExtent>{ result };
-	const auto matrix        = mpp::matrix<value_type, RowsExtent, ColumnsExtent>{ data };
-	const auto transformed   = std::invoke(transform_fn, matrix);
-
-	expect(result_matrix.rows() == transformed.rows());
-	expect(result_matrix.columns() == transformed.columns());
-	expect(result_matrix.rows_extent() == transformed.rows_extent());
-	expect(result_matrix.columns_extent() == transformed.columns_extent());
-
-	using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
-
-	expect(mpp::elements_compare(result_matrix, transformed, mpp::floating_point_compare) == ordering_type::equivalent);
-}
-
-template<std::size_t RowsExtent,
-	std::size_t ColumnsExtent,
-	std::size_t ResultRowsExtent,
-	std::size_t ResultColumnsExtent,
-	typename Tag = decltype(tag(""))>
+template<typename From, typename To, typename Tag = decltype(tag(""))>
 void test_transformation(const std::string& filename, const auto& transform_fn, Tag test_tag = tag("execute"))
 {
-	// @FIXME: Find a way to avoid reparse the same file when calling this with different extents but with the same
-	// filename
-	const auto result_tuple = parse_data_file_matrix_transformation_double(get_actual_filepath(filename));
-	const auto& data        = std::get<0>(result_tuple);
-	const auto& results     = std::get<1>(result_tuple);
-	const auto& file_exists = std::get<2>(result_tuple);
+	const auto result_struct       = parse_data_file_matrix_transformation<From, To>(get_actual_filepath(filename));
+	const auto& original_matrix    = result_struct.original_matrix;
+	const auto& transformed_matrix = result_struct.transformed_matrix;
+	const auto file_exists         = result_struct.file_exists;
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
 	test_tag / test(filename) = [&]() {
-		test_transformation_helper<RowsExtent, ColumnsExtent, ResultRowsExtent, ResultColumnsExtent>(transform_fn,
-			results,
-			data);
+		const auto result_matrix = transform_fn(original_matrix);
+
+		expect(result_matrix.rows() == transformed_matrix.rows());
+		expect(result_matrix.columns() == transformed_matrix.columns());
+
+		using ordering_type = std::compare_three_way_result_t<To, To>;
+
+		expect(mpp::elements_compare(result_matrix, transformed_matrix, mpp::floating_point_compare) ==
+			   ordering_type::equivalent);
 	};
 }
 
-template<std::size_t RowsExtent,
-	std::size_t ColumnsExtent,
-	std::size_t ResultRowsExtent,
-	std::size_t ResultColumnsExtent>
-void test_block_helper(const auto& results, const auto& data, auto... dimension_args)
-{
-	const auto matrix = mpp::matrix<value_type, RowsExtent, ColumnsExtent>{ dimension_args..., data };
-
-	for (const auto& result : results)
-	{
-		const auto row_start_index = std::get<0>(result);
-		const auto col_start_index = std::get<1>(result);
-		const auto row_end_index   = std::get<2>(result);
-		const auto col_end_index   = std::get<3>(result);
-		const auto cropped         = mpp::block(matrix, row_start_index, col_start_index, row_end_index, col_end_index);
-		const auto result_matrix   = mpp::matrix<value_type>{ std::get<4>(result) };
-
-		expect(cropped.rows() == result_matrix.rows());
-		expect(cropped.columns() == result_matrix.columns());
-
-		using ordering_type = std::compare_three_way_result_t<value_type, value_type>;
-
-		expect(mpp::elements_compare(result_matrix, cropped, mpp::floating_point_compare) == ordering_type::equivalent);
-	}
-}
-
-template<typename Tag = decltype(tag(""))>
+template<typename From, typename To, typename Tag = decltype(tag(""))>
 void test_block(const std::string& filename, Tag test_tag = tag("execute"))
 {
-	// @FIXME: Find a way to avoid reparse the same file when calling this with different extents but with the same
-	// filename
-	const auto result_tuple = parse_data_file_matrix_block_double(get_actual_filepath(filename));
-	const auto& data        = std::get<0>(result_tuple);
-	const auto& results     = std::get<1>(result_tuple);
-	const auto& file_exists = std::get<2>(result_tuple);
+	const auto result_struct    = parse_data_file_block_transformation<From, To>(get_actual_filepath(filename));
+	const auto& original_matrix = result_struct.original_matrix;
+	const auto& blocks          = result_struct.blocks;
+	const auto file_exists      = result_struct.file_exists;
 
 	skip_test_if_file_not_exists(file_exists, test_tag);
 
 	test_tag / test(filename) = [&]() {
-		test_block_helper<std::dynamic_extent, std::dynamic_extent, std::dynamic_extent, std::dynamic_extent>(results,
-			data);
+		for (const auto& block : blocks)
+		{
+			const auto row_start    = block.row_start;
+			const auto column_start = block.column_start;
+			const auto row_end      = block.row_end;
+			const auto column_end   = block.column_end;
+			const auto cropped_original_matrix =
+				mpp::block(original_matrix, row_start, column_start, row_end, column_end);
+			const auto& block_matrix = block.block_matrix;
+
+			expect(cropped_original_matrix.rows() == block_matrix.rows());
+			expect(cropped_original_matrix.columns() == block_matrix.columns());
+
+			using ordering_type = std::compare_three_way_result_t<To, To>;
+
+			expect(mpp::elements_compare(cropped_original_matrix, block_matrix, mpp::floating_point_compare) ==
+				   ordering_type::equivalent);
+		}
 	};
 }
 
@@ -181,28 +146,30 @@ int main()
 
 	feature("algorithm CPOs") = []() {
 		given("determinant CPO") = []() {
-			test_det("test_data/0x0_det.txt");
-			test_det("test_data/1x1_det.txt");
-			test_det("test_data/2x2_det.txt");
+			test_determinant<int, int>("test_data/0x0_det.txt");
+			test_determinant<int, float>("test_data/1x1_det.txt");
+			test_determinant<long, long>("test_data/2x2_det.txt");
 
-			test_det("test_data/10x10_det.txt", tag("skip"));
+			test_determinant<double, double>("test_data/10x10_det.txt", tag("skip"));
 		};
 
 		given("transpose CPO") = []() {
-			test_transformation<25, 25, 25, 25>("test_data/25x25_transpose.txt", mpp::transpose);
-			test_transformation<50, 2, 2, 50>("test_data/50x2_transpose.txt", mpp::transpose);
+			test_transformation<int, int>("test_data/25x25_transpose.txt", mpp::transpose);
+			test_transformation<int, int>("test_data/50x2_transpose.txt", mpp::transpose);
 		};
 
 		given("inverse CPO") = []() {
-			auto inverse_fn = std::bind_front(mpp::inverse, std::type_identity<value_type>{});
+			using to_type = double;
 
-			test_transformation<2, 2, 2, 2>("test_data/2x2_inv.txt", inverse_fn);
+			auto inverse_fn = std::bind_front(mpp::inverse, std::type_identity<to_type>{});
 
-			test_transformation<10, 10, 10, 10>("test_data/10x10_inv.txt", inverse_fn, tag("skip"));
+			test_transformation<int, to_type>("test_data/2x2_inv.txt", inverse_fn);
+
+			test_transformation<double, to_type>("test_data/10x10_inv.txt", inverse_fn, tag("skip"));
 		};
 
 		given("block CPO") = []() {
-			test_block("test_data/4x4_block.txt");
+			test_block<float, float>("test_data/4x4_block.txt");
 		};
 	};
 
