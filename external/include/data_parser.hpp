@@ -298,7 +298,7 @@ inline auto parse_data_file_block_transformation(const std::filesystem::path& da
 	{
 		auto line_is_block_indices = true;
 		auto current_block_data    = std::vector<std::vector<To>>{};
-		std::size_t row_start, column_start, row_end, column_end;
+		std::size_t row_start{}, column_start{}, row_end{}, column_end{};
 
 		while (std::getline(data_file, line))
 		{
