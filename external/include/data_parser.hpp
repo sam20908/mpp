@@ -304,7 +304,7 @@ inline auto parse_data_file_block_transformation(const std::filesystem::path& da
 		{
 			if (line == "=")
 			{
-				blocks.push_back(block_transformation_testcase{ row_start,
+				blocks.push_back(block_transformation_testcase<To>{ row_start,
 					column_start,
 					row_end,
 					column_end,
