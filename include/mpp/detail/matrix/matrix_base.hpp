@@ -70,6 +70,114 @@ namespace mpp::detail
 		{
 		}
 
+		template<bool CheckAgainstCurrentRows,
+			bool CheckAgainstCurrentColumns,
+			bool CheckUnequalColumns,
+			bool Unsafe,
+			typename Range2D>
+		void assign_and_insert_if_bigger(Range2D&& range_2d)
+		{
+			const auto range_rows = std::ranges::size(std::forward<Range2D>(range_2d));
+
+			if constexpr (CheckAgainstCurrentRows)
+			{
+				if (range_rows != _rows)
+				{
+					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+				}
+			}
+
+			auto range_begin         = std::ranges::begin(range_2d);
+			const auto range_columns = range_rows > 0 ? std::ranges::size(*range_begin) : std::size_t{};
+
+			constexpr auto range_is_moved = std::is_rvalue_reference_v<Range2D>;
+
+			// Assign until min(range_rows, _rows)
+			const auto min_rows = (std::min)(range_rows, _rows);
+			auto buffer_begin   = _buffer.begin();
+
+			// Handle dynamic column matrices
+			if (_columns != 0)
+			{
+				for (auto row = std::size_t{}; row < min_rows; ++row)
+				{
+					const auto current_columns = std::ranges::size(*range_begin);
+
+					if constexpr (CheckAgainstCurrentColumns)
+					{
+						if (current_columns != _columns)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (CheckUnequalColumns)
+					{
+						if (current_columns != range_columns)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (range_is_moved)
+					{
+						std::ranges::move(*range_begin, buffer_begin);
+					}
+					else
+					{
+						std::ranges::copy(*range_begin, buffer_begin);
+					}
+
+					++range_begin;
+					buffer_begin += static_cast<difference_type>(range_columns);
+				}
+			}
+
+			// Insert every element after (only dynamic matrices reach this point)
+			if constexpr (is_vector<Buffer>::value)
+			{
+				_buffer.reserve(range_rows * range_columns);
+
+				const auto buffer_back_inserter = std::back_inserter(_buffer);
+				const auto starting_rows        = _columns == 0 ? 0 : _rows; // Handle dynamic column matrices
+
+				for (auto row = starting_rows; row < range_rows; ++row)
+				{
+					const auto current_columns = std::ranges::size(*range_begin);
+
+					if constexpr (CheckAgainstCurrentColumns)
+					{
+						if (current_columns != _columns)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (CheckUnequalColumns)
+					{
+						if (current_columns != range_columns)
+						{
+							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+						}
+					}
+
+					if constexpr (range_is_moved)
+					{
+						std::ranges::move(*range_begin, buffer_back_inserter);
+					}
+					else
+					{
+						std::ranges::copy(*range_begin, buffer_back_inserter);
+					}
+
+					++range_begin;
+				}
+			}
+
+			_rows    = range_rows;
+			_columns = range_columns;
+		}
+
 	public:
 		using buffer_type = Buffer;
 

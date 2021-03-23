@@ -47,72 +47,6 @@ namespace mpp
 			std::dynamic_extent,
 			Allocator>;
 
-		template<typename RangeValue>
-		void assign_helper(auto&& range_2d) // @TODO: ISSUE #20
-		{
-			// This checks for unequal columns
-
-			const auto back_inserter   = std::back_inserter(base::_buffer);
-			const auto begin           = std::ranges::begin(range_2d);
-			const auto rows            = std::ranges::size(range_2d);
-			const auto initial_columns = rows > 0 ? std::ranges::size(*begin) : std::size_t{};
-
-			base::_buffer.reserve(rows * initial_columns);
-
-			constexpr auto is_moved_from             = std::is_rvalue_reference_v<decltype(range_2d)>;
-			constexpr auto range_has_same_value_type = std::is_same_v<std::remove_cvref_t<Value>, RangeValue>;
-
-			if constexpr (is_moved_from)
-			{
-				for (auto&& row : range_2d)
-				{
-					const auto current_columns = std::ranges::size(std::move(row));
-
-					if (current_columns != initial_columns)
-					{
-						throw std::invalid_argument(detail::INITIALIZER_UNEQUAL_ROWS);
-					}
-
-					if constexpr (range_has_same_value_type)
-					{
-						std::ranges::move(std::move(row), back_inserter);
-					}
-					else
-					{
-						std::ranges::transform(std::move(row), back_inserter, [](auto&& row_value) {
-							return static_cast<Value>(std::move(row_value));
-						});
-					}
-				}
-			}
-			else
-			{
-				for (const auto& row : range_2d)
-				{
-					const auto current_columns = std::ranges::size(row);
-
-					if (current_columns != initial_columns)
-					{
-						throw std::invalid_argument(detail::INITIALIZER_UNEQUAL_ROWS);
-					}
-
-					if constexpr (range_has_same_value_type)
-					{
-						std::ranges::copy(row, back_inserter);
-					}
-					else
-					{
-						std::ranges::transform(row, back_inserter, [](const auto& row_value) {
-							return static_cast<Value>(row_value);
-						});
-					}
-				}
-			}
-
-			base::_rows    = rows;
-			base::_columns = initial_columns;
-		}
-
 	public:
 		using base::operator=;
 
@@ -138,14 +72,14 @@ namespace mpp
 			const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			assign_helper<InitializerListValue>(initializer_list_2d);
+			base::template assign_and_insert_if_bigger<false, false, true, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d, const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			assign_helper<detail::range_2d_value_t<Range2D>>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_if_bigger<false, false, true, false>(std::forward<Range2D>(range_2d));
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -187,13 +121,13 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			assign_helper<InitializerListValue>(initializer_list_2d);
+			base::template assign_and_insert_if_bigger<false, false, true, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			assign_helper<detail::range_2d_value_t<Range2D>>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_if_bigger<false, false, true, false>(std::forward<Range2D>(range_2d));
 		}
 	};
 } // namespace mpp

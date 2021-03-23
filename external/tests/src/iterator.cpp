@@ -75,9 +75,9 @@ void test_iter_semantics(const auto& range_2d, auto... dimension_args)
 }
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_iter_semantics_write(const auto& range_2d, auto... dimension_args)
+void test_iter_semantics_write(const auto& range_2d)
 {
-	auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d, dimension_args... };
+	auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d };
 
 	auto begin  = matrix.begin();
 	auto end    = matrix.end() - 1;
