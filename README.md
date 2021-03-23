@@ -8,6 +8,7 @@ A C++20 and later matrix library
 
 - GCC 10
 - Clang 11
+- MSVC 19.28 (VS 2019 16.9)
 
 ## How to Include:
 
