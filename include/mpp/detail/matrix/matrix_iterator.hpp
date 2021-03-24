@@ -28,7 +28,7 @@ namespace mpp::detail
 	/**
 	 * Custom iterator with additional functionalities
 	 *
-	 * Satisfies LegacyContiguousIterator
+	 * Satisfies contiguous_iterator
 	 */
 	template<typename Iterator>
 	class matrix_iterator
