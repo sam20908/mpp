@@ -55,7 +55,7 @@ int main()
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 	"Basic semantics"_test = [&]() {
-		scenario("Creating matrices with 2D range") = [&]() {
+		scenario("Creating matrices") = [&]() {
 			given("A 2D range") = [&]() {
 				test_initialization(
 					[&]() {
@@ -71,6 +71,17 @@ int main()
 					[&]() {
 						return mpp::matrix<int, 2, std::dynamic_extent>{ range_2d };
 					});
+			};
+
+			given("A callable") = []() {
+				auto iota = [i = 1]() mutable {
+					return i++;
+				};
+
+				const auto matrix_from_iota = mpp::matrix<int>{ 2, 3, iota };
+				const auto right_matrix     = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
+
+				expect(mpp::elements_compare(matrix_from_iota, right_matrix) == std::strong_ordering::equivalent);
 			};
 		};
 
