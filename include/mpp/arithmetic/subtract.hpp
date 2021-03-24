@@ -25,7 +25,7 @@
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
-#include <span>
+#include <mpp/detail/utility/utility.hpp>
 
 namespace mpp
 {

@@ -27,7 +27,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <span>
 #include <stdexcept>
 
 namespace mpp
@@ -84,8 +83,7 @@ namespace mpp
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
-			std::size_t bottom_column_index)
-			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
+			std::size_t bottom_column_index) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
 		{
 			// The result matrix is always dynamic because function parameters are always treated as runtime
 			// expressions, which means it's impossible to change the extent to resized extent
@@ -101,7 +99,7 @@ namespace mpp
 				bottom_row_index,
 				bottom_column_index);
 
-			using block_matrix_t  = matrix<Value, std::dynamic_extent, std::dynamic_extent>;
+			using block_matrix_t  = matrix<Value, dynamic, dynamic>;
 			using block_buffer_t  = typename block_matrix_t::buffer_type;
 			using difference_type = typename block_matrix_t::difference_type;
 

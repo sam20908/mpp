@@ -22,9 +22,9 @@
 #include <mpp/detail/matrix/matrix_base.hpp>
 #include <mpp/detail/matrix/matrix_def.hpp>
 #include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/utility.hpp>
 
 #include <initializer_list>
-#include <span>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -32,19 +32,19 @@
 namespace mpp
 {
 	template<detail::arithmetic Value, std::size_t RowsExtent, typename Allocator>
-	class matrix<Value, RowsExtent, std::dynamic_extent, Allocator> :
-		public detail::matrix_dynamic_base<matrix<Value, RowsExtent, std::dynamic_extent, Allocator>,
+	class matrix<Value, RowsExtent, dynamic, Allocator> :
+		public detail::matrix_dynamic_base<matrix<Value, RowsExtent, dynamic, Allocator>,
 			std::vector<Value, Allocator>,
 			Value,
 			RowsExtent,
-			std::dynamic_extent,
+			dynamic,
 			Allocator>
 	{
-		using base = detail::matrix_dynamic_base<matrix<Value, RowsExtent, std::dynamic_extent, Allocator>,
+		using base = detail::matrix_dynamic_base<matrix<Value, RowsExtent, dynamic, Allocator>,
 			std::vector<Value, Allocator>,
 			Value,
 			RowsExtent,
-			std::dynamic_extent,
+			dynamic,
 			Allocator>;
 
 	public:
@@ -106,11 +106,11 @@ namespace mpp
 		}
 
 		matrix(std::size_t columns,
-			identity_matrix_tag,
+			identity_tag,
 			const Value& zero_value    = Value{ 0 },
 			const Value& one_value     = Value{ 1 },
 			const Allocator& allocator = Allocator{}) :
-			base(RowsExtent, columns, identity_matrix_tag{}, zero_value, one_value, allocator) // @TODO: ISSUE #20
+			base(RowsExtent, columns, identity, zero_value, one_value, allocator) // @TODO: ISSUE #20
 		{
 		}
 

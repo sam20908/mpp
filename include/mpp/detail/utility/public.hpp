@@ -19,11 +19,18 @@
 
 #pragma once
 
+#include <cstddef>
+#include <memory>
+
+// @TODO: Export this header to the user for modules
+
 namespace mpp
 {
-	struct identity_matrix_tag
+	static inline constexpr auto dynamic = static_cast<std::size_t>(-1);
+
+	struct identity_tag
 	{
 	};
 
-	inline constexpr auto identity_matrix = identity_matrix_tag{};
-} // namespace mpp
+	inline constexpr auto identity = identity_tag{};
+}

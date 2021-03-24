@@ -39,20 +39,20 @@ int main()
    * Extents determine if a matrix is fixed or (partially) flexible
    *
    * The following conditions will make the matrix static:
-   * - Explicitly passing sizes different than std::dynamic_extent to the template parameters
+   * - Explicitly passing sizes different than dynamic to the template parameters
    * - Deduction guides with 2D std::array will deduce the extents, e.g.:
    *
    * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
    * - mpp::matrix{ arr_2d }; // Deduces to mpp::matrix<int, 2, 3>
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
-  auto m_fully_dynamic = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{};
-  auto m_dynamic_rows = mpp::matrix<int, std::dynamic_extent, 3>{};
-  auto m_dynamic_columns = mpp::matrix<int, 3, std::dynamic_extent>{};
+  auto m_fully_dynamic = mpp::matrix<int, dynamic, dynamic>{};
+  auto m_dynamic_rows = mpp::matrix<int, dynamic, 3>{};
+  auto m_dynamic_columns = mpp::matrix<int, 3, dynamic>{};
 
   // Initialize using 2D initializer list
   auto m_init_2d_list = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
-  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>
+  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, dynamic, dynamic>
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 
@@ -143,28 +143,23 @@ int main()
 
 #### Customizations
 
-Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize_extents` namespace
+Customizations of default extents used can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag.
 
 ```cpp
-#include <mpp/utility/config_extents.hpp>
+#include <mpp/utility/configuration.hpp>
 
-namespace mpp::customize_extents
+namespace mpp
 {
-  /**
-   * Customization of extents has to take place BEFORE ANY INSTANTIATIONS!
-   * (it will NOT be detected in time after).
-   */
-
-  [[nodiscard]] constexpr std::size_t tag_invoke(rows_extent_tag, customize_tag)
+  template<>
+  struct configuration<override>
   {
-    return 10;
-  }
+    template<typename Value>
+    using allocator = my_custom_allocator<Value>;
 
-  [[nodiscard]] constexpr std::size_t tag_invoke(columns_extent_tag, customize_tag)
-  {
-    return 10;
-  }
-} // namespace mpp::customize_extents
+    static constexpr std::size_t rows_extent    = 10;
+    static constexpr std::size_t columns_extent = 10;
+  };
+} // namespace mpp
 
 #include <mpp/matrix.hpp>
 
@@ -173,6 +168,9 @@ int main()
   auto m = mpp::matrix<int>{};
   auto r = m.rows_extent(); // 10
   auto c = m.columns_extent(); // 10
+
+  using alloc = typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::allocator_type;
+  // ^ my_custom_allocator<int>, note that fully static matrices don't use allocators
 
   return 0;
 }

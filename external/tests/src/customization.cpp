@@ -17,20 +17,20 @@
  * under the License.
  */
 
-#include <mpp/utility/config_extents.hpp>
+#include <mpp/utility/configuration.hpp>
 
-namespace mpp::customize_extents
+namespace mpp
 {
-	[[nodiscard]] constexpr std::size_t tag_invoke(rows_extent_tag, customize_tag)
+	template<>
+	struct configuration<override>
 	{
-		return 10;
-	}
+		template<typename Value>
+		using allocator = std::allocator<Value>;
 
-	[[nodiscard]] constexpr std::size_t tag_invoke(columns_extent_tag, customize_tag)
-	{
-		return 10;
-	}
-} // namespace mpp::customize_extents
+		static constexpr std::size_t rows_extent    = 10;
+		static constexpr std::size_t columns_extent = 10;
+	};
+} // namespace mpp
 
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>

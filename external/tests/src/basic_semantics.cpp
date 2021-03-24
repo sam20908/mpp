@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
@@ -24,7 +25,6 @@
 
 #include <array>
 #include <compare>
-#include <span>
 #include <vector>
 
 using namespace boost::ut::literals;
@@ -69,7 +69,7 @@ int main()
 						return mpp::matrix<double>{ range_2d };
 					},
 					[&]() {
-						return mpp::matrix<int, 2, std::dynamic_extent>{ range_2d };
+						return mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
 					});
 			};
 

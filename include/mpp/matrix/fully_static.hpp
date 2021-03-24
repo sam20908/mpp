@@ -106,7 +106,7 @@ namespace mpp
 			fill_buffer_with_value(value);
 		}
 
-		explicit matrix(identity_matrix_tag,
+		explicit matrix(identity_tag,
 			const Value& zero_value = Value{ 0 },
 			const Value& one_value  = Value{ 1 }) // @TODO: ISSUE #20
 		{

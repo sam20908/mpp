@@ -21,18 +21,17 @@
 
 #include <mpp/detail/expr/expr_base.hpp>
 #include <mpp/detail/matrix/matrix_iterator.hpp>
-#include <mpp/detail/matrix/public_tags.hpp>
 #include <mpp/detail/types/constraints.hpp>
 #include <mpp/detail/types/type_traits.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/detail/utility/validators.hpp>
+#include <mpp/utility/configuration.hpp>
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <span>
 #include <stdexcept>
 #include <type_traits>
 
@@ -53,8 +52,8 @@ namespace mpp::detail
 
 	protected:
 		Buffer _buffer; // Don't default initailize because value type might not be DefaultConstructible
-		std::size_t _rows{ RowsExtent == std::dynamic_extent ? std::size_t{} : RowsExtent };
-		std::size_t _columns{ ColumnsExtent == std::dynamic_extent ? std::size_t{} : ColumnsExtent };
+		std::size_t _rows{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
+		std::size_t _columns{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
 
 		// This is needed for fully static matrices
 		matrix_base() = default;
@@ -661,7 +660,7 @@ namespace mpp::detail
 
 		matrix_dynamic_base(std::size_t rows,
 			std::size_t columns,
-			identity_matrix_tag,
+			identity_tag,
 			const Value& zero_value,
 			const Value& one_value,
 			const Allocator& allocator) :

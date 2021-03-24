@@ -23,8 +23,7 @@
 
 namespace mpp::detail
 {
-	// This is for just providing a valid name at the point of tag_invoke_result_t
-	constexpr void tag_invoke() {}
+	constexpr void tag_invoke() {} // This is for just providing a valid name at the point of tag_invoke_result_t
 
 	template<typename CPO, typename... Args>
 	using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
@@ -39,19 +38,6 @@ namespace mpp::detail
 		}
 	};
 
-	// @TODO: Remove this and make tag_invoke_t constexpr when #20 is resolved
-	struct tag_invoke_t_constexpr
-	{
-		template<typename CPO, typename... Args>
-		[[nodiscard]] constexpr auto operator()(CPO&& cpo, Args&&... args) const -> tag_invoke_result_t<CPO, Args...>
-		{
-			return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
-		}
-	};
-
 	inline constexpr auto tag_invoke_cpo = tag_invoke_t{};
-
-	// @TODO: Remove this and make tag_invoke_t constexpr when #20 is resolved
-	inline constexpr auto tag_invoke_cpo_constexpr = tag_invoke_t_constexpr{};
 
 } // namespace mpp::detail

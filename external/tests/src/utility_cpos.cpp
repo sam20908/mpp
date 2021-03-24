@@ -19,6 +19,7 @@
 
 // @TODO: Move cast to algorithms when #162 is being worked on
 
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
@@ -27,7 +28,6 @@
 
 #include <compare>
 #include <cstddef>
-#include <span>
 #include <utility>
 #include <vector>
 
@@ -94,16 +94,16 @@ int main()
 	feature("utility CPOs") = []() {
 		scenario("using type CPO") = []() {
 			test_type<1, 1>(mpp::matrix_type::fully_static);
-			test_type<std::dynamic_extent, std::dynamic_extent>(mpp::matrix_type::fully_dynamic);
-			test_type<std::dynamic_extent, 1>(mpp::matrix_type::dynamic_rows);
-			test_type<1, std::dynamic_extent>(mpp::matrix_type::dynamic_columns);
+			test_type<mpp::dynamic, mpp::dynamic>(mpp::matrix_type::fully_dynamic);
+			test_type<mpp::dynamic, 1>(mpp::matrix_type::dynamic_rows);
+			test_type<1, mpp::dynamic>(mpp::matrix_type::dynamic_columns);
 		};
 
 		scenario("using square CPO on square matrices") = []() {
 			test_square<1, 1>();
-			test_square<std::dynamic_extent, std::dynamic_extent>(1ul, 1ul);
-			test_square<std::dynamic_extent, 1>(1ul);
-			test_square<1, std::dynamic_extent>(1ul);
+			test_square<mpp::dynamic, mpp::dynamic>(1ul, 1ul);
+			test_square<mpp::dynamic, 1>(1ul);
+			test_square<1, mpp::dynamic>(1ul);
 		};
 
 		scenario("using singular CPO") = []() {
@@ -111,16 +111,16 @@ int main()
 
 			when("checking against non-singular matrices") = []() {
 				test_singular<1, 1>(1, false);
-				test_singular<std::dynamic_extent, std::dynamic_extent>(1, false, 1ul, 1ul);
-				test_singular<std::dynamic_extent, 1>(1, false, 1ul);
-				test_singular<1, std::dynamic_extent>(1, false, 1ul);
+				test_singular<mpp::dynamic, mpp::dynamic>(1, false, 1ul, 1ul);
+				test_singular<mpp::dynamic, 1>(1, false, 1ul);
+				test_singular<1, mpp::dynamic>(1, false, 1ul);
 			};
 
 			when("checking against singular matrices") = []() {
 				test_singular<1, 1>(0, true);
-				test_singular<std::dynamic_extent, std::dynamic_extent>(0, true, 1ul, 1ul);
-				test_singular<std::dynamic_extent, 1>(0, true, 1ul);
-				test_singular<1, std::dynamic_extent>(0, true, 1ul);
+				test_singular<mpp::dynamic, mpp::dynamic>(0, true, 1ul, 1ul);
+				test_singular<mpp::dynamic, 1>(0, true, 1ul);
+				test_singular<1, mpp::dynamic>(0, true, 1ul);
 			};
 		};
 
@@ -142,7 +142,7 @@ int main()
 						return mpp::matrix<int, 1, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
 					},
 					std::partial_ordering::unordered,
 					std::partial_ordering::unordered,
@@ -153,7 +153,7 @@ int main()
 						return mpp::matrix<int, 1, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 3 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 3 };
 					},
 					std::partial_ordering::unordered,
 					std::partial_ordering::less,
@@ -164,7 +164,7 @@ int main()
 						return mpp::matrix<int, 2, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
 					},
 					std::partial_ordering::greater,
 					std::partial_ordering::unordered,

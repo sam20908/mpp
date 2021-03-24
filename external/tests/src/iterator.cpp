@@ -133,14 +133,14 @@ int main()
 			const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 			test_iter_semantics<2, 3>(range_2d);
-			test_iter_semantics<std::dynamic_extent, std::dynamic_extent>(range_2d);
-			test_iter_semantics<std::dynamic_extent, 3>(range_2d);
-			test_iter_semantics<2, std::dynamic_extent>(range_2d);
+			test_iter_semantics<mpp::dynamic, mpp::dynamic>(range_2d);
+			test_iter_semantics<mpp::dynamic, 3>(range_2d);
+			test_iter_semantics<2, mpp::dynamic>(range_2d);
 
 			test_iter_semantics_write<2, 3>(range_2d);
-			test_iter_semantics_write<std::dynamic_extent, std::dynamic_extent>(range_2d);
-			test_iter_semantics_write<std::dynamic_extent, 3>(range_2d);
-			test_iter_semantics_write<2, std::dynamic_extent>(range_2d);
+			test_iter_semantics_write<mpp::dynamic, mpp::dynamic>(range_2d);
+			test_iter_semantics_write<mpp::dynamic, 3>(range_2d);
+			test_iter_semantics_write<2, mpp::dynamic>(range_2d);
 		};
 	};
 

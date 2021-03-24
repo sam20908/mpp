@@ -20,25 +20,19 @@
 #pragma once
 
 #include <mpp/detail/expr/expr_base.hpp>
-#include <mpp/detail/types/constraints.hpp>
-#include <mpp/detail/utility/tag_invoke.hpp>
-
-// @TODO: Make sure to export these modules for C++20
-#include <mpp/detail/matrix/public_tags.hpp>
-#include <mpp/utility/config_extents.hpp>
+#include <mpp/detail/types/constraints.hpp> // @TODO: Export this header to the user for modules
+#include <mpp/detail/utility/public.hpp>
+#include <mpp/utility/configuration.hpp>
 
 #include <cstddef>
 #include <initializer_list>
-#include <memory>
 
 namespace mpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent =
-			detail::tag_invoke_cpo_constexpr(customize_extents::rows_extent, customize_extents::customize),
-		std::size_t ColumnsExtent =
-			detail::tag_invoke_cpo_constexpr(customize_extents::columns_extent, customize_extents::customize),
-		typename Allocator = std::allocator<Value>>
+		std::size_t RowsExtent    = configuration<override>::rows_extent,
+		std::size_t ColumnsExtent = configuration<override>::columns_extent,
+		typename Allocator        = typename configuration<override>::allocator<Value>>
 	class matrix;
 
 	/**

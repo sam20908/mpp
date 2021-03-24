@@ -19,22 +19,22 @@
 
 #pragma once
 
+
 #include <mpp/detail/utility/utility.hpp>
 
 #include <cstddef>
-#include <span>
 
 namespace mpp::detail
 {
 	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) -> std::size_t
 	{
-		if (left_extent != std::dynamic_extent || right_extent != std::dynamic_extent)
+		if (left_extent != dynamic || right_extent != dynamic)
 		{
-			return left_extent != std::dynamic_extent ? left_extent : right_extent;
+			return left_extent != dynamic ? left_extent : right_extent;
 		}
 		else
 		{
-			return std::dynamic_extent;
+			return dynamic;
 		}
 	}
 
