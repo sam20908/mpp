@@ -89,6 +89,8 @@ namespace mpp::detail
 
 			constexpr auto range_is_moved   = std::is_rvalue_reference_v<range_2d_t>;
 			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
+			constexpr auto range_has_same_value_type =
+				std::is_same_v<range_2d_value_t<std::remove_cvref_t<range_2d_t>>, Value>;
 
 			if constexpr (buffer_is_vector)
 			{
@@ -123,13 +125,23 @@ namespace mpp::detail
 
 				if (rooms_available_from_current >= range_columns)
 				{
-					if constexpr (range_is_moved)
+					if constexpr (range_has_same_value_type)
 					{
-						std::ranges::move(*range_begin, buffer_begin);
+						if constexpr (range_is_moved)
+						{
+							std::ranges::move(*range_begin, buffer_begin);
+						}
+						else
+						{
+							std::ranges::copy(*range_begin, buffer_begin);
+						}
 					}
 					else
 					{
-						std::ranges::copy(*range_begin, buffer_begin);
+						// @TODO: Check if this *really* is perfect forwarding values
+						std::ranges::transform(*range_begin, buffer_begin, [](auto&& value) -> decltype(auto) {
+							return static_cast<Value>(std::forward<decltype(value)>(value));
+						});
 					}
 				}
 				else
@@ -139,39 +151,58 @@ namespace mpp::detail
 
 					if constexpr (buffer_is_vector)
 					{
-						auto row_begin = std::ranges::begin(*range_begin);
+						const auto row_assign_begin = std::ranges::begin(*range_begin);
+						const auto row_assign_end =
+							row_assign_begin + static_cast<difference_type>(rooms_available_from_current);
 
 						// Assign the elements to rest of available space
-						if constexpr (range_is_moved)
+						if constexpr (range_has_same_value_type)
 						{
-							std::move(row_begin,
-								row_begin + static_cast<difference_type>(rooms_available_from_current),
-								buffer_begin);
+							if constexpr (range_is_moved)
+							{
+								std::move(row_assign_begin, row_assign_end, buffer_begin);
+							}
+							else
+							{
+								std::copy(row_assign_begin, row_assign_end, buffer_begin);
+							}
 						}
 						else
 						{
-							std::copy(row_begin,
-								row_begin + static_cast<difference_type>(rooms_available_from_current),
-								buffer_begin);
+							// @TODO: Check if this *really* is perfect forwarding values
+							std::transform(row_assign_begin,
+								row_assign_end,
+								buffer_begin,
+								[](auto&& value) -> decltype(auto) {
+									return static_cast<Value>(std::forward<decltype(value)>(value));
+								});
 						}
 
-						row_begin += static_cast<difference_type>(rooms_available_from_current);
-
-						const auto elements_to_insert   = range_columns - rooms_available_from_current;
+						const auto elements_to_insert = range_columns - rooms_available_from_current;
+						const auto row_end = row_assign_end + static_cast<difference_type>(elements_to_insert);
 						const auto buffer_back_inserter = std::back_inserter(_buffer);
 
 						// Insert rest of the elements in the current row
-						if constexpr (range_is_moved)
+						if constexpr (range_has_same_value_type)
 						{
-							std::move(row_begin,
-								row_begin + static_cast<difference_type>(elements_to_insert),
-								buffer_back_inserter);
+							if constexpr (range_is_moved)
+							{
+								std::move(row_assign_end, row_end, buffer_back_inserter);
+							}
+							else
+							{
+								std::copy(row_assign_end, row_end, buffer_back_inserter);
+							}
 						}
 						else
 						{
-							std::copy(row_begin,
-								row_begin + static_cast<difference_type>(elements_to_insert),
-								buffer_back_inserter);
+							// @TODO: Check if this *really* is perfect forwarding values
+							std::transform(row_assign_end,
+								row_end,
+								buffer_back_inserter,
+								[](auto&& value) -> decltype(auto) {
+									return static_cast<Value>(std::forward<decltype(value)>(value));
+								});
 						}
 
 						_rows = ++row; // Use the inserter loop to insert rest of the elements
@@ -264,39 +295,60 @@ namespace mpp::detail
 			const auto max_elements_to_assign = (std::min)(matrix_size, buffer_size);
 			constexpr auto matrix_is_moved    = std::is_rvalue_reference_v<matrix_t>;
 			constexpr auto buffer_is_vector   = is_vector<Buffer>::value;
+			constexpr auto matrix_has_same_value_type =
+				std::is_same_v<typename std::remove_cvref_t<matrix_t>::value_type, Value>;
 
 			if constexpr (is_vector<Buffer>::value)
 			{
 				_buffer.reserve(matrix_size);
 			}
 
-			auto begin = std::forward<matrix_t>(matrix).begin();
+			const auto assign_begin = std::forward<matrix_t>(matrix).begin();
+			const auto assign_end   = assign_begin + static_cast<difference_type>(max_elements_to_assign);
 
-			// Try to assign the elements it can
-			if constexpr (matrix_is_moved)
+			// Try to assign the all elements it can
+			if constexpr (matrix_has_same_value_type)
 			{
-				std::move(begin, begin + static_cast<difference_type>(max_elements_to_assign), _buffer.begin());
+				if constexpr (matrix_is_moved)
+				{
+					std::move(assign_begin, assign_end, _buffer.begin());
+				}
+				else
+				{
+					std::copy(assign_begin, assign_end, _buffer.begin());
+				}
 			}
 			else
 			{
-				std::copy(begin, begin + static_cast<difference_type>(max_elements_to_assign), _buffer.begin());
+				// @TODO: Check if this *really* is perfect forwarding values
+				std::transform(assign_begin, assign_end, _buffer.begin(), [](auto&& value) -> decltype(auto) {
+					return static_cast<Value>(std::forward<decltype(value)>(value));
+				});
 			}
 
-			const auto end           = std::forward<matrix_t>(matrix).end();
-			const auto back_inserter = std::back_inserter(_buffer);
-
-			begin += static_cast<difference_type>(max_elements_to_assign);
+			const auto matrix_end           = std::forward<matrix_t>(matrix).end();
+			const auto buffer_back_inserter = std::back_inserter(_buffer);
 
 			// Insert the leftovers (only dynamic matrices needs this)
 			if constexpr (buffer_is_vector)
 			{
-				if constexpr (matrix_is_moved)
+				if constexpr (matrix_has_same_value_type)
 				{
-					std::move(begin, end, back_inserter);
+					if constexpr (matrix_is_moved)
+					{
+						std::move(assign_end, matrix_end, buffer_back_inserter);
+					}
+					else
+					{
+						std::copy(assign_end, matrix_end, buffer_back_inserter);
+					}
 				}
 				else
 				{
-					std::copy(begin, end, back_inserter);
+					// @TODO: Check if this *really* is perfect forwarding values
+					std::transform(assign_end, matrix_end, buffer_back_inserter, [](auto&& value) -> decltype(auto) {
+						return static_cast<Value>(std::forward<decltype(value)>(value));
+					});
 				}
 
 				if (matrix_size < buffer_size)
