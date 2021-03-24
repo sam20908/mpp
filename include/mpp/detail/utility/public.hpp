@@ -33,4 +33,4 @@ namespace mpp
 	};
 
 	inline constexpr auto identity = identity_tag{};
-}
+} // namespace mpp

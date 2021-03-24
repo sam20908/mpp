@@ -21,11 +21,11 @@
 
 #include <mpp/detail/expr/expr_binary_op.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
-#include <mpp/detail/utility/utility.hpp>
 
 namespace mpp
 {
