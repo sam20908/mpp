@@ -32,7 +32,7 @@ using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-void test_initialization(auto&& left_matrix_creator, auto&& right_matrix_creator)
+void test_initialization(const auto& left_matrix_creator, const auto& right_matrix_creator)
 {
 	const auto left_matrix  = left_matrix_creator();
 	const auto right_matrix = right_matrix_creator();
