@@ -227,7 +227,7 @@ int main()
   ++begin;
   val = *begin; // 2
 
-  // 2.
+  // 2. Navigating by pair of offsets
   auto begin_2 = matrix.begin();
   begin_2 += { 1, 1 }; // 4
 
