@@ -44,17 +44,15 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '^(<(gtest|gmock|benchmark)/.*>)'
-    Priority:        0
   - Regex:           '^(<mpp/.*/.*\.hpp>)'
-    Priority:        1
+    Priority:        0
   - Regex:           '^(<mpp/.*\.hpp>)'
-    Priority:        1
-    SortPriority:    2
+    Priority:        0
+    SortPriority:    1
   - Regex:           '^(".*")'
-    Priority:        3
+    Priority:        2
   - Regex:           '.*'
-    Priority:        4
+    Priority:        3
 IndentCaseLabels: false
 IndentPPDirectives: None
 IndentWidth: 4
