@@ -72,6 +72,16 @@ void test_iter_semantics(const auto& range_2d, auto... dimension_args)
 	expect(*crbegin == 6);
 	expect(*rend == 1);
 	expect(*crend == 1);
+
+	auto begin_2 = matrix.begin();
+	begin_2 += { 1, 2 };
+	expect(*begin_2 == 6);
+
+	begin_2 -= { 1, 0 };
+	expect(*begin_2 == 3);
+
+	auto begin_3 = begin_2 + std::pair{ 0, 0 };
+	expect(begin_3 == begin_2);
 }
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>

@@ -227,6 +227,14 @@ int main()
   ++begin;
   val = *begin; // 2
 
+  // 2.
+  auto begin_2 = matrix.begin();
+	begin_2 += { 1, 1 }; // 4
+
+	begin_2 -= { 1, 0 }; // 2
+
+	auto begin_3 = begin_2 + std::pair{ 0, 0 }; // Both point to the same location
+
   return 0;
 }
 ```
