@@ -30,10 +30,15 @@ namespace mpp::detail
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class [[nodiscard]] expr_base
 	{
+	protected:
 		[[nodiscard]] constexpr auto expr_obj() const -> const Expr&
 		{
-			// Grabs reference to the subclass
 			return static_cast<const Expr&>(*this);
+		}
+
+		[[nodiscard]] constexpr auto expr_mutable_obj() -> Expr&
+		{
+			return static_cast<Expr&>(*this);
 		}
 
 	public:

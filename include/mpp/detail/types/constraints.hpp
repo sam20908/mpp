@@ -26,6 +26,32 @@
 
 namespace mpp::detail
 {
+	template<typename Derived,
+		typename Buffer,
+		typename Value,
+		std::size_t RowsExtent,
+		std::size_t ColumnsExtent,
+		typename Allocator>
+	class matrix_base;
+
+	template<typename Derived,
+		typename Buffer,
+		typename Value,
+		std::size_t RowsExtent,
+		std::size_t ColumnsExtent,
+		typename Allocator>
+	constexpr auto matrix_like_resolver(
+		const matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>&) -> int;
+
+	constexpr void matrix_like_resolver(...);
+
+	template<typename T>
+	concept matrix_like = std::same_as<decltype(matrix_like_resolver(std::declval<T>())), int>;
+
+	template<typename T, typename Value>
+	concept matrix_like_with_value_type_convertible_to =
+		matrix_like<T>&& std::convertible_to<typename std::remove_cvref_t<T>::value_type, Value>;
+
 	template<typename Value>
 	concept arithmetic = requires(Value&& value)
 	{

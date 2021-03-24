@@ -39,6 +39,7 @@ _create_test("customization")
 _create_test("utility_cpos")
 _create_test("iterator")
 _create_test("algorithm_cpos")
+_create_test("basic_semantics")
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     include("../thirdparty/CodeCoverage.cmake")

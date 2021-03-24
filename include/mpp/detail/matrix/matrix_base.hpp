@@ -47,13 +47,10 @@ namespace mpp::detail
 		std::size_t RowsExtent,
 		std::size_t ColumnsExtent,
 		typename Allocator>
-	class matrix_base :
-		public expr_base<matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>,
-			Value,
-			RowsExtent,
-			ColumnsExtent>,
-		public traits<Value>
+	class matrix_base : public expr_base<Derived, Value, RowsExtent, ColumnsExtent>, public traits<Value>
 	{
+		using base = expr_base<Derived, Value, RowsExtent, ColumnsExtent>;
+
 	protected:
 		Buffer _buffer; // Don't default initailize because value type might not be DefaultConstructible
 		std::size_t _rows{ RowsExtent == std::dynamic_extent ? std::size_t{} : RowsExtent };
@@ -70,14 +67,12 @@ namespace mpp::detail
 		{
 		}
 
-		template<bool CheckAgainstCurrentRows,
-			bool CheckAgainstCurrentColumns,
-			bool CheckUnequalColumns,
-			bool Unsafe,
-			typename Range2D>
-		void assign_and_insert_if_bigger(Range2D&& range_2d)
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckUnequalColumns, bool Unsafe>
+		void assign_and_insert_if_bigger(auto&& range_2d)
 		{
-			const auto range_rows = std::ranges::size(std::forward<Range2D>(range_2d));
+			using range_2d_t = decltype(range_2d);
+
+			const auto range_rows = std::ranges::size(std::forward<range_2d_t>(range_2d));
 
 			if constexpr (CheckAgainstCurrentRows)
 			{
@@ -87,38 +82,47 @@ namespace mpp::detail
 				}
 			}
 
-			auto range_begin         = std::ranges::begin(range_2d);
-			const auto range_columns = range_rows > 0 ? std::ranges::size(*range_begin) : std::size_t{};
+			auto range_begin            = std::ranges::begin(range_2d);
+			const auto range_columns    = range_rows > 0 ? std::ranges::size(*range_begin) : std::size_t{};
+			const auto range_total_size = range_rows * range_columns;
+			const auto buffer_size      = _buffer.size();
 
-			constexpr auto range_is_moved = std::is_rvalue_reference_v<Range2D>;
+			constexpr auto range_is_moved   = std::is_rvalue_reference_v<range_2d_t>;
+			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
 
-			// Assign until min(range_rows, _rows)
+			if constexpr (buffer_is_vector)
+			{
+				_buffer.reserve(range_total_size);
+			}
+
+			// Assign all elements (until the need to insert for dynamic matrices)
 			const auto min_rows = (std::min)(range_rows, _rows);
 			auto buffer_begin   = _buffer.begin();
 
-			// Handle dynamic column matrices
-			if (_columns != 0)
+			for (auto row = std::size_t{}; row < min_rows; ++row)
 			{
-				for (auto row = std::size_t{}; row < min_rows; ++row)
+				const auto current_columns = std::ranges::size(*range_begin);
+
+				if constexpr (CheckAgainstCurrentColumns)
 				{
-					const auto current_columns = std::ranges::size(*range_begin);
-
-					if constexpr (CheckAgainstCurrentColumns)
+					if (current_columns != _columns)
 					{
-						if (current_columns != _columns)
-						{
-							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-						}
+						throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 					}
+				}
 
-					if constexpr (CheckUnequalColumns)
+				if constexpr (CheckUnequalColumns)
+				{
+					if (current_columns != range_columns)
 					{
-						if (current_columns != range_columns)
-						{
-							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-						}
+						throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 					}
+				}
 
+				const auto rooms_available_from_current = buffer_size - row * range_columns;
+
+				if (rooms_available_from_current >= range_columns)
+				{
 					if constexpr (range_is_moved)
 					{
 						std::ranges::move(*range_begin, buffer_begin);
@@ -127,21 +131,66 @@ namespace mpp::detail
 					{
 						std::ranges::copy(*range_begin, buffer_begin);
 					}
-
-					++range_begin;
-					buffer_begin += static_cast<difference_type>(range_columns);
 				}
+				else
+				{
+					// Only dynamic matrices reach here
+					// We've gotten to the point where some or rest of the elements needs to be inserted
+
+					if constexpr (buffer_is_vector)
+					{
+						auto row_begin = std::ranges::begin(*range_begin);
+
+						// Assign the elements to rest of available space
+						if constexpr (range_is_moved)
+						{
+							std::move(row_begin,
+								row_begin + static_cast<difference_type>(rooms_available_from_current),
+								buffer_begin);
+						}
+						else
+						{
+							std::copy(row_begin,
+								row_begin + static_cast<difference_type>(rooms_available_from_current),
+								buffer_begin);
+						}
+
+						row_begin += static_cast<difference_type>(rooms_available_from_current);
+
+						const auto elements_to_insert   = range_columns - rooms_available_from_current;
+						const auto buffer_back_inserter = std::back_inserter(_buffer);
+
+						// Insert rest of the elements in the current row
+						if constexpr (range_is_moved)
+						{
+							std::move(row_begin,
+								row_begin + static_cast<difference_type>(elements_to_insert),
+								buffer_back_inserter);
+						}
+						else
+						{
+							std::copy(row_begin,
+								row_begin + static_cast<difference_type>(elements_to_insert),
+								buffer_back_inserter);
+						}
+
+						_rows = ++row; // Use the inserter loop to insert rest of the elements
+						++range_begin;
+
+						break;
+					}
+				}
+
+				++range_begin;
+				buffer_begin += static_cast<difference_type>(range_columns);
 			}
 
 			// Insert every element after (only dynamic matrices reach this point)
-			if constexpr (is_vector<Buffer>::value)
+			if constexpr (buffer_is_vector)
 			{
-				_buffer.reserve(range_rows * range_columns);
-
 				const auto buffer_back_inserter = std::back_inserter(_buffer);
-				const auto starting_rows        = _columns == 0 ? 0 : _rows; // Handle dynamic column matrices
 
-				for (auto row = starting_rows; row < range_rows; ++row)
+				for (auto row = _rows; row < range_rows; ++row)
 				{
 					const auto current_columns = std::ranges::size(*range_begin);
 
@@ -174,8 +223,90 @@ namespace mpp::detail
 				}
 			}
 
+			if constexpr (buffer_is_vector)
+			{
+				if (range_total_size < buffer_size)
+				{
+					_buffer.resize(range_total_size);
+				}
+			}
+
 			_rows    = range_rows;
 			_columns = range_columns;
+		}
+
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns>
+		void assign_and_insert_from_matrix(auto&& matrix)
+		{
+			using matrix_t = decltype(matrix);
+
+			const auto matrix_rows    = std::forward<matrix_t>(matrix).rows();
+			const auto matrix_columns = std::forward<matrix_t>(matrix).columns();
+
+			if constexpr (CheckAgainstCurrentRows)
+			{
+				if (matrix_rows != _rows)
+				{
+					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+				}
+			}
+
+			if constexpr (CheckAgainstCurrentColumns)
+			{
+				if (matrix_columns != _columns)
+				{
+					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+				}
+			}
+
+			const auto matrix_size            = matrix_rows * matrix_columns;
+			const auto buffer_size            = _buffer.size();
+			const auto max_elements_to_assign = (std::min)(matrix_size, buffer_size);
+			constexpr auto matrix_is_moved    = std::is_rvalue_reference_v<matrix_t>;
+			constexpr auto buffer_is_vector   = is_vector<Buffer>::value;
+
+			if constexpr (is_vector<Buffer>::value)
+			{
+				_buffer.reserve(matrix_size);
+			}
+
+			auto begin = std::forward<matrix_t>(matrix).begin();
+
+			// Try to assign the elements it can
+			if constexpr (matrix_is_moved)
+			{
+				std::move(begin, begin + static_cast<difference_type>(max_elements_to_assign), _buffer.begin());
+			}
+			else
+			{
+				std::copy(begin, begin + static_cast<difference_type>(max_elements_to_assign), _buffer.begin());
+			}
+
+			const auto end           = std::forward<matrix_t>(matrix).end();
+			const auto back_inserter = std::back_inserter(_buffer);
+
+			begin += static_cast<difference_type>(max_elements_to_assign);
+
+			// Insert the leftovers (only dynamic matrices needs this)
+			if constexpr (buffer_is_vector)
+			{
+				if constexpr (matrix_is_moved)
+				{
+					std::move(begin, end, back_inserter);
+				}
+				else
+				{
+					std::copy(begin, end, back_inserter);
+				}
+
+				if (matrix_size < buffer_size)
+				{
+					_buffer.resize(matrix_size);
+				}
+			}
+
+			_rows    = matrix_rows;
+			_columns = matrix_columns;
 		}
 
 	public:
@@ -381,7 +512,7 @@ namespace mpp::detail
 		template<typename Range2D>
 		auto operator=(Range2D&& range_2d) -> matrix_base& // @TODO: ISSUE #20
 		{
-			Derived::assign_buffer_2d(std::forward<Range2D>(range_2d), true);
+			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d));
 			return *this;
 		}
 

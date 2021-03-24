@@ -133,5 +133,11 @@ namespace mpp
 		{
 			base::template assign_and_insert_if_bigger<false, true, false, false>(std::forward<Range2D>(range_2d));
 		}
+
+		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
+		void assign(Matrix&& matrix)
+		{
+			base::template assign_and_insert_from_matrix<false, true>(std::forward<Matrix>(matrix));
+		}
 	};
 } // namespace mpp
