@@ -55,7 +55,7 @@ namespace mpp
 				}
 			}
 
-			return transposed_t{columns, rows, std::move(transposed_buffer)};
+			return transposed_t{ columns, rows, std::move(transposed_buffer) };
 		}
 	};
 
