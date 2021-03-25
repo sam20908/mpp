@@ -46,7 +46,10 @@ namespace mpp::detail
 	constexpr void matrix_like_resolver(...);
 
 	template<typename T>
-	concept matrix_like = std::same_as<decltype(matrix_like_resolver(std::declval<T>())), int>;
+	static constexpr auto matrix_like_v = std::is_same_v<decltype(matrix_like_resolver(std::declval<T>())), int>;
+
+	template<typename T>
+	concept matrix_like = matrix_like_v<T>;
 
 	template<typename T, typename Value>
 	concept matrix_like_with_value_type_convertible_to =
@@ -82,4 +85,7 @@ namespace mpp::detail
 
 	template<typename Range, typename Value>
 	concept range_2d_with_value_type_convertible_to = std::convertible_to<range_2d_value_t<Range>, Value>;
+
+	template<typename Range, typename Value>
+	concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
 } // namespace mpp::detail

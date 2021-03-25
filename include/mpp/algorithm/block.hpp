@@ -103,7 +103,6 @@ namespace mpp
 			using block_buffer_t  = typename block_matrix_t::buffer_type;
 			using difference_type = typename block_matrix_t::difference_type;
 
-			auto block_matrix               = block_matrix_t{};
 			auto block_buffer               = block_buffer_t{};
 			auto block_buffer_back_inserter = std::back_inserter(block_buffer);
 
@@ -120,9 +119,7 @@ namespace mpp
 				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buffer_back_inserter);
 			}
 
-			init_matrix_with_1d_range(block_matrix, std::move(block_buffer), block_rows, block_columns);
-
-			return block_matrix;
+			return block_matrix_t{ block_rows, block_columns, std::move(block_buffer) };
 		}
 	};
 

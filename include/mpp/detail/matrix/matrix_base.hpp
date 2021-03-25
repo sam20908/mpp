@@ -67,7 +67,7 @@ namespace mpp::detail
 		}
 
 		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckUnequalColumns, bool Unsafe>
-		void assign_and_insert_if_bigger(auto&& range_2d)
+		void assign_and_insert_from_2d_range(auto&& range_2d)
 		{
 			using range_2d_t = decltype(range_2d);
 
@@ -265,17 +265,12 @@ namespace mpp::detail
 			_columns = range_columns;
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns>
-		void assign_and_insert_from_matrix(auto&& matrix)
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool Unsafe, typename Range>
+		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, Range&& range)
 		{
-			using matrix_t = decltype(matrix);
-
-			const auto matrix_rows    = std::forward<matrix_t>(matrix).rows();
-			const auto matrix_columns = std::forward<matrix_t>(matrix).columns();
-
 			if constexpr (CheckAgainstCurrentRows)
 			{
-				if (matrix_rows != _rows)
+				if (rows != _rows)
 				{
 					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 				}
@@ -283,38 +278,48 @@ namespace mpp::detail
 
 			if constexpr (CheckAgainstCurrentColumns)
 			{
-				if (matrix_columns != _columns)
+				if (columns != _columns)
 				{
 					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 				}
 			}
 
-			const auto matrix_size            = matrix_rows * matrix_columns;
-			const auto buffer_size            = _buffer.size();
-			const auto max_elements_to_assign = (std::min)(matrix_size, buffer_size);
-			constexpr auto matrix_is_moved    = std::is_rvalue_reference_v<matrix_t>;
-			constexpr auto buffer_is_vector   = is_vector<Buffer>::value;
-			constexpr auto matrix_has_same_value_type =
-				std::is_same_v<typename std::remove_cvref_t<matrix_t>::value_type, Value>;
+			const auto buffer_size = _buffer.size();
+			const auto range_size  = rows * columns;
 
-			if constexpr (is_vector<Buffer>::value)
+			if constexpr (!Unsafe)
 			{
-				_buffer.reserve(matrix_size);
+				// Last resort safety check
+				if (range_size != std::ranges::size(range))
+				{
+					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
+				}
 			}
 
-			const auto assign_begin = std::forward<matrix_t>(matrix).begin();
-			const auto assign_end   = assign_begin + static_cast<difference_type>(max_elements_to_assign);
+			constexpr auto range_is_moved            = std::is_rvalue_reference_v<Range>;
+			constexpr auto buffer_is_vector          = is_vector<Buffer>::value;
+			constexpr auto range_has_same_value_type = std::is_same_v<std::ranges::range_value_t<Range>, Value>;
+
+			if constexpr (buffer_is_vector)
+			{
+				_buffer.reserve(range_size);
+			}
+
+			const auto max_elements_to_assign = (std::min)(range_size, buffer_size);
+			const auto assign_begin           = std::ranges::begin(range);
+			const auto assign_end             = assign_begin + static_cast<difference_type>(max_elements_to_assign);
+			const auto buffer_begin           = _buffer.begin();
 
 			// Try to assign the all elements it can
-			if constexpr (matrix_has_same_value_type)
+			if constexpr (range_has_same_value_type)
 			{
-				if constexpr (matrix_is_moved)
+				if constexpr (range_is_moved)
 				{
-					std::move(assign_begin, assign_end, _buffer.begin());
+					std::move(assign_begin, assign_end, buffer_begin);
 				}
 				else
 				{
-					std::copy(assign_begin, assign_end, _buffer.begin());
+					std::copy(assign_begin, assign_end, buffer_begin);
 				}
 			}
 			else
@@ -325,39 +330,39 @@ namespace mpp::detail
 				});
 			}
 
-			const auto matrix_end           = std::forward<matrix_t>(matrix).end();
+			const auto range_end            = std::ranges::end(range);
 			const auto buffer_back_inserter = std::back_inserter(_buffer);
 
 			// Insert the leftovers (only dynamic matrices needs this)
 			if constexpr (buffer_is_vector)
 			{
-				if constexpr (matrix_has_same_value_type)
+				if constexpr (range_has_same_value_type)
 				{
-					if constexpr (matrix_is_moved)
+					if constexpr (range_is_moved)
 					{
-						std::move(assign_end, matrix_end, buffer_back_inserter);
+						std::move(assign_end, range_end, buffer_back_inserter);
 					}
 					else
 					{
-						std::copy(assign_end, matrix_end, buffer_back_inserter);
+						std::copy(assign_end, range_end, buffer_back_inserter);
 					}
 				}
 				else
 				{
 					// @TODO: Check if this *really* is perfect forwarding values
-					std::transform(assign_end, matrix_end, buffer_back_inserter, [](auto&& value) -> decltype(auto) {
+					std::transform(assign_end, range_end, buffer_back_inserter, [](auto&& value) -> decltype(auto) {
 						return static_cast<Value>(std::forward<decltype(value)>(value));
 					});
 				}
 
-				if (matrix_size < buffer_size)
+				if (range_size < buffer_size)
 				{
-					_buffer.resize(matrix_size);
+					_buffer.resize(range_size);
 				}
 			}
 
-			_rows    = matrix_rows;
-			_columns = matrix_columns;
+			_rows    = rows;
+			_columns = columns;
 		}
 
 	public:
@@ -577,62 +582,6 @@ namespace mpp::detail
 				swap(_rows, right._rows);
 				swap(_columns, right._columns);
 				swap(_buffer, right._buffer);
-			}
-		}
-
-		friend inline void init_matrix_with_1d_range(
-			matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& base,
-			const auto& range,
-			std::size_t rows,
-			std::size_t columns) // @TODO: ISSUE #20
-		{
-			base._rows    = rows;
-			base._columns = columns;
-
-			reserve_buffer_if_vector(base._buffer, rows, columns);
-
-			// @FIXME: Probably not optimal. Look at this again later
-			if constexpr (std::is_rvalue_reference_v<decltype(range)>)
-			{
-				if constexpr (is_vector<Buffer>::value)
-				{
-					base._buffer.reserve(std::ranges::size(range));
-
-					for (auto&& val : range)
-					{
-						base._buffer.push_back(std::move(static_cast<Value>(val)));
-					}
-				}
-				else
-				{
-					auto index = std::size_t{};
-
-					for (auto&& val : range)
-					{
-						base._buffer[index++] = std::move(static_cast<Value>(val));
-					}
-				}
-			}
-			else
-			{
-				if constexpr (is_vector<Buffer>::value)
-				{
-					base._buffer.reserve(std::ranges::size(range));
-
-					for (const auto& val : range)
-					{
-						base._buffer.push_back(static_cast<Value>(val));
-					}
-				}
-				else
-				{
-					auto index = std::size_t{};
-
-					for (const auto& val : range)
-					{
-						base._buffer[index++] = static_cast<Value>(val);
-					}
-				}
 			}
 		}
 	};

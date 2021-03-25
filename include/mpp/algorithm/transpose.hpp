@@ -41,7 +41,6 @@ namespace mpp
 
 			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent>;
 			using transposed_buffer_t = typename transposed_t::buffer_type;
-			auto transposed           = transposed_t{};
 			auto transposed_buffer    = transposed_buffer_t{};
 			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
@@ -56,9 +55,7 @@ namespace mpp
 				}
 			}
 
-			init_matrix_with_1d_range(transposed, std::move(transposed_buffer), columns, rows);
-
-			return transposed;
+			return transposed_t{columns, rows, std::move(transposed_buffer)};
 		}
 	};
 

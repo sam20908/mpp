@@ -43,12 +43,11 @@ namespace mpp
 			const auto columns = obj.columns();
 
 			using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
-			auto inverse_matrix    = inverse_matrix_t{};
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
 			{
-				return inverse_matrix;
+				return inverse_matrix_t{};
 			}
 
 			auto inverse_matrix_buffer = typename inverse_matrix_t::buffer_type{};
@@ -153,8 +152,7 @@ namespace mpp
 					columns);
 			}
 
-			init_matrix_with_1d_range(inverse_matrix, std::move(inverse_matrix_buffer), rows, columns);
-			return inverse_matrix;
+			return inverse_matrix_t{ rows, columns, std::move(inverse_matrix_buffer) };
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>

@@ -63,27 +63,43 @@ namespace mpp
 			fill_buffer_with_value(Value{});
 		}
 
+		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
+		explicit matrix(Matrix&& matrix) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<true, true, true>(std::forward<Matrix>(matrix).rows(),
+				std::forward<Matrix>(matrix).columns(),
+				std::forward<Matrix>(matrix));
+		}
+
+		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
+		explicit matrix(std::size_t rows, std::size_t columns, Range&& range) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<true, true, false>(rows,
+				columns,
+				std::forward<Range>(range));
+		}
+
 		template<std::convertible_to<Value> InitializerListValue>
 		explicit matrix(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<true, true, false, false>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<true, true, false, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<true, true, false, false>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<true, true, false, false>(std::forward<Range2D>(range_2d));
 		}
 
 		explicit matrix(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& array_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<false, false, false, true>(array_2d);
+			base::template assign_and_insert_from_2d_range<false, false, false, true>(array_2d);
 		}
 
 		explicit matrix(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& array_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<false, false, false, true>(std::move(array_2d));
+			base::template assign_and_insert_from_2d_range<false, false, false, true>(std::move(array_2d));
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -127,29 +143,31 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<true, true, false, false>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<true, true, false, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<true, true, false, false>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<true, true, false, false>(std::forward<Range2D>(range_2d));
 		}
 
 		void assign(const std::array<std::array<Value, ColumnsExtent>, RowsExtent>& array_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<false, false, false, true>(array_2d);
+			base::template assign_and_insert_from_2d_range<false, false, false, true>(array_2d);
 		}
 
 		void assign(std::array<std::array<Value, ColumnsExtent>, RowsExtent>&& array_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_if_bigger<false, false, false, true>(std::move(array_2d));
+			base::template assign_and_insert_from_2d_range<false, false, false, true>(std::move(array_2d));
 		}
 
 		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
 		void assign(Matrix&& matrix)
 		{
-			base::template assign_and_insert_from_matrix<true, true>(std::forward<Matrix>(matrix));
+			base::template assign_and_insert_from_1d_range<true, true, true>(std::forward<Matrix>(matrix).rows(),
+				std::forward<Matrix>(matrix).columns(),
+				std::forward<Matrix>(matrix));
 		}
 	};
 } // namespace mpp
