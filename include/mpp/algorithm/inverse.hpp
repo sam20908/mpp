@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include <mpp/detail/algo_types.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
-#include <mpp/utility/comparator.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
@@ -34,91 +35,23 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline void forward_substitution(auto& l_buf, std::size_t cols) // @TODO: ISSUE #20
-		{
-			for (auto col = std::size_t{ 1 }; col < cols; ++col)
-			{
-				// Optimized version of forward-substitution which skips making diagnoal 1's because L would've already
-				// had 1's along the diagonal
-
-				for (auto row = col + 1; row < cols; ++row)
-				{
-					const auto factor = l_buf[idx_2d_to_1d(cols, row, row - 1)] * -1;
-
-					for (auto col_2 = std::size_t{}; col_2 < col; ++col_2)
-					{
-						const auto elem_above = l_buf[idx_2d_to_1d(cols, col, col_2)];
-						const auto elem_idx   = idx_2d_to_1d(cols, row, col_2);
-
-						l_buf[elem_idx] -= factor * elem_above;
-					}
-				}
-			}
-		}
-
-		inline void back_substitution(auto& u_buf, std::size_t cols) // @TODO: ISSUE #20
-		{
-			for (auto col = cols; col > 0; --col)
-			{
-				const auto col_idx   = col - 1;
-				auto diag_elem_idx   = idx_2d_to_1d(cols, col_idx, col_idx);
-				const auto diag_elem = u_buf[diag_elem_idx];
-
-				// Diagonal element can simply be replaced with the factor
-				const auto diag_factor = default_floating_type{ 1 } / diag_elem;
-				u_buf[diag_elem_idx]   = diag_factor;
-
-				// Multiply every element to the right of the diagonal element by the factor
-				for (auto idx = cols - col; idx > 0; --idx)
-				{
-					u_buf[++diag_elem_idx] *= diag_factor;
-				}
-
-				for (auto row = col_idx; row > 0; --row)
-				{
-					// Use the diagonal element as the factor to compute the numbers above the pivot in the same column
-					// (this works because) the augmented matrix would have zeroes above the diagonal element
-					const auto row_idx            = row - 1;
-					const auto elem_idx           = idx_2d_to_1d(cols, row_idx, col_idx);
-					const auto elem_before_factor = u_buf[elem_idx];
-					u_buf[elem_idx]               = elem_before_factor * diag_factor * -1;
-
-					// Add the corresponding elements of the rows of the current diagonal element onto the rows above
-					for (auto col_2 = cols; col_2 > col; --col_2)
-					{
-						const auto col_2_idx     = col_2 - 1;
-						auto diag_row_idx        = idx_2d_to_1d(cols, col_idx, col_2_idx);
-						const auto diag_row_elem = u_buf[diag_row_idx];
-
-						const auto cur_elem_idx = idx_2d_to_1d(cols, row_idx, col_2_idx);
-						const auto elem         = u_buf[cur_elem_idx];
-						const auto factor       = elem_before_factor * -1;
-
-						const auto new_elem = factor * diag_row_elem + elem;
-						u_buf[cur_elem_idx] = new_elem;
-					}
-				}
-			}
-		}
-
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto inv_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
-			const auto cols = obj.columns();
+			const auto rows    = obj.rows();
+			const auto columns = obj.columns();
 
-			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
-			auto inv_matrix    = inv_matrix_t{};
+			using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
 			{
-				return inv_matrix;
+				return inverse_matrix_t{};
 			}
 
-			auto inv_matrix_buf = typename inv_matrix_t::buffer_type{};
-			allocate_1d_buf_if_vector(inv_matrix_buf, rows, cols, To{});
+			auto inverse_matrix_buffer = typename inverse_matrix_t::buffer_type{};
+			allocate_buffer_if_vector(inverse_matrix_buffer, rows, columns, To{});
 
 			using default_floating_type_ordering_type =
 				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
@@ -129,12 +62,12 @@ namespace mpp
 
 				using to_ordering_type = std::compare_three_way_result_t<To, To>;
 
-				if (floating_point_compare_three_way(elem, To{}) == to_ordering_type::equivalent)
+				if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
 				}
 
-				inv_matrix_buf[0] = To{ 1 } / elem;
+				inverse_matrix_buffer[0] = To{ 1 } / elem;
 			}
 
 			auto det = default_floating_type{ 1 };
@@ -151,7 +84,7 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
 				{
 					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
@@ -159,71 +92,79 @@ namespace mpp
 
 				const auto multiplier = default_floating_type{ 1 } / det;
 
-				inv_matrix_buf[0] = static_cast<To>(multiplier * element_1);
-				inv_matrix_buf[1] = static_cast<To>(multiplier * element_2 * -1);
-				inv_matrix_buf[2] = static_cast<To>(multiplier * element_3 * -1);
-				inv_matrix_buf[3] = static_cast<To>(multiplier * element_4);
+				inverse_matrix_buffer[0] = static_cast<To>(multiplier * element_1);
+				inverse_matrix_buffer[1] = static_cast<To>(multiplier * element_2 * -1);
+				inverse_matrix_buffer[2] = static_cast<To>(multiplier * element_3 * -1);
+				inverse_matrix_buffer[3] = static_cast<To>(multiplier * element_4);
 			}
 
 			if (rows >= 3)
 			{
 				using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
-				using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
+				using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
-				auto l_buf = lu_decomp_buf_t{};
-				auto u_buf = lu_decomp_buf_t{};
+				auto l_buffer = lu_decomp_buffer_t{};
+				auto u_buffer = lu_decomp_buffer_t{};
 
-				allocate_1d_buf_if_vector(u_buf, rows, cols, default_floating_type{});
-				std::ranges::copy(obj, u_buf.begin());
+				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+				std::ranges::copy(obj, u_buffer.begin());
 
-				allocate_1d_buf_if_vector(l_buf, rows, cols, default_floating_type{});
-				transform_1d_buf_into_identity<default_floating_type>(l_buf, rows);
+				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
+				make_identity_buffer(l_buffer, rows, default_floating_type{});
 
-				det = lu_decomp_common<default_floating_type, true>(rows, cols, l_buf, u_buf);
+				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
+					columns,
+					l_buffer,
+					u_buffer);
 
-				if (floating_point_compare_three_way(det, default_floating_type{}) ==
+				if (floating_point_compare(det, default_floating_type{}) ==
 					default_floating_type_ordering_type::equivalent)
 				{
-					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+					throw std::runtime_error("inverseerse of a singular matrix doesn't exist!");
 				}
 
 				if (std::is_constant_evaluated())
 				{
-					forward_substitution(l_buf, cols);
-					back_substitution(u_buf, cols);
+					forward_substitution_in_place(l_buffer, columns);
+					back_substitution_in_place(u_buffer, columns);
 				}
 				else
 				{
 					// Compute inv(L) and inv(U) in parallel because they don't share data
 
-					auto l_inv_future = std::async(std::launch::async, [&l_buf, cols]() {
-						forward_substitution(l_buf, cols);
+					auto l_inverse_future = std::async(std::launch::async, [&l_buffer, columns]() {
+						forward_substitution_in_place(l_buffer, columns);
 					});
-					auto u_inv_future = std::async(std::launch::async, [&u_buf, cols]() {
-						back_substitution(u_buf, cols);
+					auto u_inverse_future = std::async(std::launch::async, [&u_buffer, columns]() {
+						back_substitution_in_place(u_buffer, columns);
 					});
 
-					l_inv_future.wait();
-					u_inv_future.wait();
+					l_inverse_future.wait();
+					u_inverse_future.wait();
 				}
 
-				mul_square_bufs<To, default_floating_type>(inv_matrix_buf, std::move(u_buf), std::move(l_buf), rows);
+				matrix_multiplication_on_buffers<To, default_floating_type>(inverse_matrix_buffer,
+					std::move(u_buffer),
+					std::move(l_buffer),
+					rows,
+					columns,
+					rows,
+					columns);
 			}
 
-			init_matrix_with_1d_rng(inv_matrix, std::move(inv_matrix_buf), rows, cols);
-			return inv_matrix;
+			return inverse_matrix_t{ rows, columns, std::move(inverse_matrix_buffer) };
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto inv_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		[[nodiscard]] inline auto inverse_common(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			if (!square(obj))
 			{
-				throw std::runtime_error("Inverse of a non-square matrix doesn't exist!");
+				throw std::runtime_error("inverseerse of a non-square matrix doesn't exist!");
 			}
 
-			return inv_lu_decomp<To>(obj);
+			return inverse_lu_decomp<To>(obj);
 		}
 	} // namespace detail
 
@@ -233,7 +174,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inv_func<detail::default_floating_type>(obj);
+			return detail::inverse_common<detail::default_floating_type>(obj);
 		}
 
 		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -241,7 +182,7 @@ namespace mpp
 		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inv_func<To>(obj);
+			return detail::inverse_common<To>(obj);
 		}
 	};
 

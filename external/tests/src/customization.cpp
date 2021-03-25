@@ -17,28 +17,26 @@
  * under the License.
  */
 
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/configuration.hpp>
 
-namespace mpp::customize
+namespace mpp
 {
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+	template<>
+	struct configuration<override>
 	{
-		return 10;
-	}
+		template<typename Value>
+		using allocator = std::allocator<Value>;
 
-	[[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
-	{
-		return 10;
-	}
-} // namespace mpp::customize
+		static constexpr std::size_t rows_extent    = 10;
+		static constexpr std::size_t columns_extent = 10;
+	};
+} // namespace mpp
 
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
 #include "../../thirdparty/ut.hpp"
-
-// @TODO: Add customization test for upcoming equal CPOs
 
 namespace ns
 {
@@ -51,11 +49,6 @@ namespace ns
 	};
 
 	[[nodiscard]] constexpr auto tag_invoke(mpp::type_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
-	[[nodiscard]] constexpr auto tag_invoke(mpp::cast_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -89,10 +82,20 @@ namespace ns
 	{
 		return dumb_class2{};
 	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::size_compare_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::elements_compare_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 } // namespace ns
 
 template<typename CPO>
-using invoke_result_t = mpp::detail::tag_invoke_impl::tag_invoke_result_t<CPO, ns::dumb_class>;
+using invoke_result_t = mpp::detail::tag_invoke_result_t<CPO, ns::dumb_class>;
 
 int main()
 {
@@ -109,13 +112,14 @@ int main()
 
 		when("I check against the CPOs' return types") = []() {
 			expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::cast_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::square_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::determinant_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
 		};
 	};
 

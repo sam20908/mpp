@@ -19,27 +19,25 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/matrix.hpp>
+#include <utility>
 
-#include <cstddef>
-
-namespace mpp
+namespace mpp::detail
 {
-	struct cast_t : public detail::cpo_base<cast_t>
-	{
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto
-		tag_invoke(cast_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
-		{
-			auto casted = matrix<To, RowsExtent, ColumnsExtent>{};
-			init_matrix_with_1d_rng(casted, obj, obj.rows(), obj.columns());
+	constexpr void tag_invoke() {} // This is for just providing a valid name at the point of tag_invoke_result_t
 
-			return casted;
+	template<typename CPO, typename... Args>
+	using tag_invoke_result_t = decltype(tag_invoke(std::declval<CPO>(), std::declval<Args>()...));
+
+	struct tag_invoke_t
+	{
+		template<typename CPO, typename... Args>
+		[[nodiscard]] auto operator()(CPO&& cpo, Args&&... args) const
+			-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+		{
+			return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
 		}
 	};
 
-	inline constexpr auto cast = cast_t{};
-} // namespace mpp
+	inline constexpr auto tag_invoke_cpo = tag_invoke_t{};
+
+} // namespace mpp::detail

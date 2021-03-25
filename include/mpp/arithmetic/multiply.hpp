@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/expr_binary_constant_op.hpp>
-#include <mpp/detail/expr_binary_op.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/expr/expr_binary_constant_op.hpp>
+#include <mpp/detail/expr/expr_binary_op.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
@@ -33,21 +34,20 @@ namespace mpp
 {
 	namespace detail
 	{
-		using mul_constant_op_t = decltype(
-			[](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) -> decltype(left(row_idx, col_idx) *
-																								right) {
-				return left(row_idx, col_idx) * right;
-			});
-		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx) ->
+		using mul_constant_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index)
+											   -> decltype(left(row_index, col_index) * right) {
+			return left(row_index, col_index) * right;
+		});
+		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) ->
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
-				const auto left_cols = left.columns();
-				auto result          = value_type{};
+				const auto left_columns = left.columns();
+				auto result             = value_type{};
 
-				for (auto index = std::size_t{}; index < left_cols; ++index)
+				for (auto index = std::size_t{}; index < left_columns; ++index)
 				{
-					result += left(row_idx, index) * right(index, col_idx);
+					result += left(row_index, index) * right(index, col_index);
 				}
 
 				return result;

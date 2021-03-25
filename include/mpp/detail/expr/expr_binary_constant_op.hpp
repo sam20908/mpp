@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/detail/expr_base.hpp>
+#include <mpp/detail/expr/expr_base.hpp>
 
 #include <cstddef>
 #include <stdexcept>
@@ -28,37 +28,37 @@
 namespace mpp::detail
 {
 	/**
-	 * Binary expression object (no operand is a constant)
+	 * Binary expression object (one of the operands is a constant, so we have to store it
+	 * differently, which differs from expr_binary_op)
 	 */
-	template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Left, typename Right, typename Op>
-	class [[nodiscard]] expr_binary_op :
-		public expr_base<expr_binary_op<RowsExtent, ColumnsExtent, Left, Right, Op>,
-			typename Left::value_type,
+	template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Obj, typename Value, typename Op>
+	class [[nodiscard]] expr_binary_constant_op :
+		public expr_base<expr_binary_constant_op<RowsExtent, ColumnsExtent, Obj, Value, Op>,
+			Value,
 			RowsExtent,
 			ColumnsExtent>
 	{
-		// Store both operands by reference to avoid copying them
-		const Left& _left;
-		const Right& _right;
+		const Obj& _obj;
+		Value _constant; // Store the constant by copy to handle literals
 
 		Op _op{};
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
 		std::size_t _result_rows;
-		std::size_t _result_cols;
+		std::size_t _result_columns;
 
 	public:
-		using value_type = typename Left::value_type;
+		using value_type = Value;
 
-		expr_binary_op(const Left& left,
-			const Right& right,
+		expr_binary_constant_op(const Obj& obj,
+			Value constant,
 			std::size_t result_rows,
-			std::size_t result_cols) // @TODO: ISSUE #20
+			std::size_t result_columns) // @TODO: ISSUE #20
 			:
-			_left(left),
-			_right(right),
+			_obj(obj),
+			_constant(constant),
 			_result_rows(result_rows),
-			_result_cols(result_cols)
+			_result_columns(result_columns)
 		{
 		}
 
@@ -69,22 +69,23 @@ namespace mpp::detail
 
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _result_cols;
+			return _result_columns;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_idx >= _result_rows || col_idx >= _result_cols)
+			if (row_index >= _result_rows || col_index >= _result_columns)
 			{
 				throw std::out_of_range("Access out of range!");
 			}
 
-			return operator()(row_idx, col_idx);
+			return operator()(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
+			-> value_type // @TODO: ISSUE #20
 		{
-			return _op(_left, _right, row_idx, col_idx);
+			return _op(_obj, _constant, row_index, col_index);
 		}
 	};
 } // namespace mpp::detail

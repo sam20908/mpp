@@ -19,193 +19,325 @@
 
 #pragma once
 
+#include <mpp/matrix.hpp>
+
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <tuple>
 #include <vector>
 
-inline auto parse_data_file_double_det(const std::filesystem::path& filename)
-	-> std::tuple<std::vector<std::vector<double>>, double, bool>
+template<typename T>
+inline auto string_conversion_function()
 {
-	auto file   = std::ifstream{ filename };
-	auto data   = std::vector<std::vector<double>>{};
-	auto result = double{};
-
-	auto line           = std::string{};
-	auto line_is_result = false;
-
-	while (std::getline(file, line))
+	if constexpr (std::is_same_v<T, double>)
 	{
-		if (line == "=")
-		{
-			line_is_result = true;
-			continue;
-		}
-
-		if (line_is_result)
-		{
-			result = std::stod(line);
-		}
-		else
-		{
-			auto data_token  = std::string{};
-			auto line_stream = std::istringstream{ line };
-			auto row         = std::vector<double>{};
-
-			while (std::getline(line_stream, data_token, ' '))
-			{
-				auto data_num = std::stod(data_token);
-				row.push_back(data_num);
-			}
-
-			data.push_back(std::move(row));
-		}
+		return [](const std::string& str) {
+			return std::stod(str);
+		};
 	}
-
-	return { data, result, file.is_open() };
+	else if constexpr (std::is_same_v<T, long double>)
+	{
+		return [](const std::string& str) {
+			return std::stold(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, float>)
+	{
+		return [](const std::string& str) {
+			return std::stof(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, long>)
+	{
+		return [](const std::string& str) {
+			return std::stol(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, long long>)
+	{
+		return [](const std::string& str) {
+			return std::stoll(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, unsigned long>)
+	{
+		return [](const std::string& str) {
+			return std::stoul(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, unsigned long long>)
+	{
+		return [](const std::string& str) {
+			return std::stoull(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, int>)
+	{
+		return [](const std::string& str) {
+			return std::stoi(str);
+		};
+	}
 }
 
-inline auto parse_data_file_matrix_transformation_double(const std::filesystem::path& filename)
-	-> std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>, bool>
+template<typename From, typename To>
+struct single_number_result
 {
-	auto file   = std::ifstream{ filename };
-	auto data   = std::vector<std::vector<double>>{};
-	auto result = std::vector<std::vector<double>>{};
+	mpp::matrix<From> original_data;
+	To result;
+	bool file_exists;
+};
 
-	auto line           = std::string{};
-	auto line_is_result = false;
+template<typename From, typename To>
+inline auto parse_data_file_with_single_number_result(const std::filesystem::path& data_file_path)
+	-> single_number_result<From, To>
+{
+	const auto from_value_conversion_function   = string_conversion_function<From>();
+	const auto result_value_conversion_function = string_conversion_function<To>();
 
-	while (std::getline(file, line))
+	auto original_data = std::vector<std::vector<From>>{};
+	std::size_t original_data_rows, original_data_columns;
+
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
+
+	// Parse the dimensions
 	{
-		if (line == "=")
-		{
-			line_is_result = true;
-			continue;
-		}
+		std::getline(data_file, line);
 
-		if (line_is_result)
-		{
-			auto data_token  = std::string{};
-			auto line_stream = std::istringstream{ line };
-			auto row         = std::vector<double>{};
+		auto line_stream = std::istringstream{ line };
+		line_stream >> original_data_rows >> original_data_columns;
 
-			while (std::getline(line_stream, data_token, ' '))
-			{
-				auto data_num = std::stod(data_token);
-				row.push_back(data_num);
-			}
-
-			result.push_back(std::move(row));
-		}
-		else
-		{
-			auto data_token  = std::string{};
-			auto line_stream = std::istringstream{ line };
-			auto row         = std::vector<double>{};
-
-			while (std::getline(line_stream, data_token, ' '))
-			{
-				auto data_num = std::stod(data_token);
-				row.push_back(data_num);
-			}
-
-			data.push_back(std::move(row));
-		}
+		original_data.reserve(original_data_rows);
 	}
 
-	return { data, result, file.is_open() };
-}
-
-inline auto parse_data_file_matrix_block_double(const std::filesystem::path& filename)
-	-> std::tuple<std::vector<std::vector<double>>,
-		std::vector<std::tuple<std::size_t, std::size_t, std::size_t, std::size_t, std::vector<std::vector<double>>>>,
-		bool>
-{
-	auto file = std::ifstream{ filename };
-	auto data = std::vector<std::vector<double>>{};
-	auto results =
-		std::vector<std::tuple<std::size_t, std::size_t, std::size_t, std::size_t, std::vector<std::vector<double>>>>{};
-	auto testcase = std::tuple<std::size_t, std::size_t, std::size_t, std::size_t, std::vector<std::vector<double>>>{};
-	auto block    = std::vector<std::vector<double>>{};
-
-	auto line = std::string{};
-
-	// Parse the data first
-	while (std::getline(file, line))
+	// Parse the original matrix
+	while (std::getline(data_file, line))
 	{
 		if (line == "=")
 		{
 			break;
 		}
 
-		auto data_token  = std::string{};
 		auto line_stream = std::istringstream{ line };
-		auto row         = std::vector<double>{};
+		auto row         = std::vector<From>{};
 
-		while (std::getline(line_stream, data_token, ' '))
+		row.reserve(original_data_columns);
+
+		auto value_string = std::string{};
+		while (std::getline(line_stream, value_string, ' '))
 		{
-			auto data_num = std::stod(data_token);
+			auto data_num = from_value_conversion_function(value_string);
 			row.push_back(data_num);
 		}
 
-		data.push_back(std::move(row));
+		original_data.push_back(std::move(row));
 	}
 
-	auto line_is_block_testcase_data = false;
-	// Helper variable to determine whether we need to manually push the last read test case
-	auto has_test_case = false; // Parse the test cases
+	// Parse the result
+	std::getline(data_file, line);
+	const auto result = result_value_conversion_function(line);
 
-	while (std::getline(file, line))
+	return { mpp::matrix{ original_data }, result, data_file.is_open() };
+}
+
+template<typename From, typename To>
+struct transformation_result
+{
+	mpp::matrix<From> original_matrix;
+	mpp::matrix<To> transformed_matrix;
+	bool file_exists;
+};
+
+template<typename From, typename To>
+inline auto parse_data_file_matrix_transformation(const std::filesystem::path& data_file_path)
+	-> transformation_result<From, To>
+{
+	const auto from_value_conversion_function   = string_conversion_function<From>();
+	const auto result_value_conversion_function = string_conversion_function<To>();
+
+	auto original_data    = std::vector<std::vector<From>>{};
+	auto transformed_data = std::vector<std::vector<To>>{};
+	std::size_t original_data_rows, original_data_columns, transformed_data_rows, transformed_data_columns;
+
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
+
+	// Parse the original matrix dimensions
 	{
-		has_test_case = true;
+		std::getline(data_file, line);
 
+		auto line_stream = std::istringstream{ line };
+		line_stream >> original_data_rows >> original_data_columns;
+
+		original_data.reserve(original_data_rows);
+	}
+
+	// Parse the original matrix
+	while (std::getline(data_file, line))
+	{
 		if (line == "=")
 		{
-			std::get<4>(testcase) = std::move(block);
-			results.push_back(std::move(testcase));
-			line_is_block_testcase_data = false;
+			break;
 		}
-		else
+
+		auto value_string = std::string{};
+		auto line_stream  = std::istringstream{ line };
+		auto row          = std::vector<From>{};
+
+		row.reserve(original_data_columns);
+
+		while (std::getline(line_stream, value_string, ' '))
 		{
-			auto data_token  = std::string{};
+			const auto data_num = from_value_conversion_function(value_string);
+			row.push_back(data_num);
+		}
+
+		original_data.push_back(std::move(row));
+	}
+
+	// Parse the transformed matrix dimensions
+	{
+		std::getline(data_file, line);
+
+		auto line_stream = std::istringstream{ line };
+		line_stream >> transformed_data_rows >> transformed_data_columns;
+
+		transformed_data.reserve(transformed_data_rows);
+	}
+
+	// Parse the transformed matrix
+	while (std::getline(data_file, line))
+	{
+		auto value_string = std::string{};
+		auto line_stream  = std::istringstream{ line };
+		auto row          = std::vector<To>{};
+
+		row.reserve(transformed_data_columns);
+
+		while (std::getline(line_stream, value_string, ' '))
+		{
+			const auto data_num = result_value_conversion_function(value_string);
+			row.push_back(data_num);
+		}
+
+		transformed_data.push_back(std::move(row));
+	}
+
+	return { mpp::matrix{ original_data }, mpp::matrix{ transformed_data }, data_file.is_open() };
+}
+
+template<typename To>
+struct block_transformation_testcase
+{
+	std::size_t row_start;
+	std::size_t column_start;
+	std::size_t row_end;
+	std::size_t column_end;
+	mpp::matrix<To> block_matrix;
+};
+
+template<typename From, typename To>
+struct block_transformation_result
+{
+	mpp::matrix<From> original_matrix;
+	std::vector<block_transformation_testcase<To>> blocks;
+	bool file_exists;
+};
+
+template<typename From, typename To>
+inline auto parse_data_file_block_transformation(const std::filesystem::path& data_file_path)
+	-> block_transformation_result<From, To>
+{
+	const auto from_value_conversion_function   = string_conversion_function<From>();
+	const auto result_value_conversion_function = string_conversion_function<To>();
+
+	auto original_data = std::vector<std::vector<From>>{};
+	auto blocks        = std::vector<block_transformation_testcase<To>>{};
+	std::size_t original_data_rows, original_data_columns;
+
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
+
+	// Parse the original matrix dimensions
+	{
+		std::getline(data_file, line);
+
+		auto line_stream = std::istringstream{ line };
+		line_stream >> original_data_rows >> original_data_columns;
+
+		original_data.reserve(original_data_rows);
+	}
+
+	// Parse the original matrix
+	while (std::getline(data_file, line))
+	{
+		if (line == "=")
+		{
+			break;
+		}
+
+		auto value_string = std::string{};
+		auto line_stream  = std::istringstream{ line };
+		auto row          = std::vector<From>{};
+
+		row.reserve(original_data_columns);
+
+		while (std::getline(line_stream, value_string, ' '))
+		{
+			const auto data_num = from_value_conversion_function(value_string);
+			row.push_back(data_num);
+		}
+
+		original_data.push_back(std::move(row));
+	}
+
+	// Parse each block testcase
+	{
+		auto line_is_block_indices = true;
+		auto current_block_data    = std::vector<std::vector<To>>{};
+		std::size_t row_start{}, column_start{}, row_end{}, column_end{};
+
+		while (std::getline(data_file, line))
+		{
+			if (line == "=")
+			{
+				blocks.push_back(block_transformation_testcase<To>{ row_start,
+					column_start,
+					row_end,
+					column_end,
+					mpp::matrix{ current_block_data } });
+				line_is_block_indices = true;
+				current_block_data.clear();
+				continue;
+			}
+
 			auto line_stream = std::istringstream{ line };
 
-			if (!line_is_block_testcase_data)
+			if (line_is_block_indices)
 			{
-				std::size_t row_start, column_start, row_end, column_end;
 				line_stream >> row_start >> column_start >> row_end >> column_end;
+				line_is_block_indices = false;
 
-				std::get<0>(testcase) = row_start;
-				std::get<1>(testcase) = column_start;
-				std::get<2>(testcase) = row_end;
-				std::get<3>(testcase) = column_end;
-
-				line_is_block_testcase_data = true;
+				current_block_data.reserve(row_end - row_start);
+				continue;
 			}
-			else
+
+			auto row          = std::vector<To>{};
+			auto value_string = std::string{};
+
+			row.reserve(column_end - column_start);
+
+			while (std::getline(line_stream, value_string, ' '))
 			{
-				auto row = std::vector<double>{};
-
-				while (std::getline(line_stream, data_token, ' '))
-				{
-					auto data_num = std::stod(data_token);
-					row.push_back(data_num);
-				}
-
-				block.push_back(std::move(row));
+				const auto value = result_value_conversion_function(value_string);
+				row.push_back(value);
 			}
+
+			current_block_data.push_back(std::move(row));
 		}
 	}
 
-	if (has_test_case)
-	{
-		// The last testcase isn't being pushed to results because the while loop will run out of lines to parse, so we
-		// have to push it manually
-		std::get<4>(testcase) = std::move(block);
-		results.push_back(std::move(testcase));
-	}
-
-	return { data, results, file.is_open() };
+	return { mpp::matrix{ std::move(original_data) }, std::move(blocks), data_file.is_open() };
 }

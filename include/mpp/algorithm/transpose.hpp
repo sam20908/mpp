@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/matrix/matrix_base.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
@@ -34,30 +35,27 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
-			const auto cols = obj.columns();
-			const auto data = obj.data();
+			const auto rows    = obj.rows();
+			const auto columns = obj.columns();
+			const auto data    = obj.data();
 
-			using transposed_t     = matrix<Value, ColumnsExtent, RowsExtent>;
-			using transposed_buf_t = typename transposed_t::buffer_type;
-			auto transposed        = transposed_t{};
-			auto transposed_buf    = transposed_buf_t{};
-			detail::allocate_1d_buf_if_vector(transposed_buf, cols, rows, Value{});
+			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent>;
+			using transposed_buffer_t = typename transposed_t::buffer_type;
+			auto transposed_buffer    = transposed_buffer_t{};
+			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
-			for (auto col = std::size_t{}; col < cols; ++col)
+			for (auto column = std::size_t{}; column < columns; ++column)
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_idx     = detail::idx_2d_to_1d(cols, row, col);
-					auto transposed_idx = detail::idx_2d_to_1d(rows, col, row);
+					auto normal_index     = detail::index_2d_to_1d(columns, row, column);
+					auto transposed_index = detail::index_2d_to_1d(rows, column, row);
 
-					transposed_buf[transposed_idx] = data[normal_idx];
+					transposed_buffer[transposed_index] = data[normal_index];
 				}
 			}
 
-			init_matrix_with_1d_rng(transposed, std::move(transposed_buf), cols, rows);
-
-			return transposed;
+			return transposed_t{ columns, rows, std::move(transposed_buffer) };
 		}
 	};
 

@@ -19,37 +19,26 @@
 
 #pragma once
 
+// @TODO: Export std::allocator for modules
+#include <mpp/detail/utility/public.hpp>
+
 #include <cstddef>
-#include <span>
+#include <memory>
 
 namespace mpp
 {
-	struct matrix_rows_extent_tag
+	struct override;
+
+	/**
+	 * Defines the global configuration the library uses
+	 */
+	template<typename>
+	struct configuration
 	{
+		template<typename Value>
+		using allocator = std::allocator<Value>;
+
+		static constexpr auto rows_extent    = dynamic;
+		static constexpr auto columns_extent = dynamic;
 	};
-
-	struct matrix_columns_extent_tag
-	{
-	};
-
-	namespace customize
-	{
-		struct customize_tag
-		{
-		};
-
-		inline constexpr auto customize = customize_tag{};
-	} // namespace customize
-
-	template<typename... Args>
-	[[nodiscard]] constexpr auto tag_invoke(matrix_rows_extent_tag, Args&&...) -> std::size_t
-	{
-		return std::dynamic_extent;
-	}
-
-	template<typename... Args>
-	[[nodiscard]] constexpr auto tag_invoke(matrix_columns_extent_tag, Args&&...) -> std::size_t
-	{
-		return std::dynamic_extent;
-	}
 } // namespace mpp

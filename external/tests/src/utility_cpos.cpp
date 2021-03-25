@@ -19,6 +19,7 @@
 
 // @TODO: Move cast to algorithms when #162 is being worked on
 
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
@@ -27,7 +28,6 @@
 
 #include <compare>
 #include <cstddef>
-#include <span>
 #include <utility>
 #include <vector>
 
@@ -60,33 +60,17 @@ void test_singular(auto val, bool is_singular, auto... dimension_args)
 	expect(mpp::singular(matrix) == is_singular);
 }
 
-template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_cast(const std::vector<std::vector<int>>& rng_2d)
-{
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng_2d };
-	const auto casted = mpp::cast(std::type_identity<To>{}, matrix);
-
-	expect(matrix.rows() == casted.rows());
-	expect(matrix.columns() == casted.columns());
-	expect(matrix.rows_extent() == casted.rows_extent());
-	expect(matrix.columns_extent() == casted.columns_extent());
-
-	using ordered_type = std::compare_three_way_result_t<To, To>;
-
-	expect(mpp::elements_compare(matrix, casted, mpp::floating_point_compare_three_way) == ordered_type::equivalent);
-}
-
 void test_size_compare(const auto& left_matrix_creator,
 	const auto& right_matrix_creator,
 	std::partial_ordering row_ordering,
 	std::partial_ordering column_ordering,
-	bool equal_in_rows,
-	bool equal_in_columns)
+	bool compare_rows,
+	bool compare_columns)
 {
 	const auto left  = left_matrix_creator();
 	const auto right = right_matrix_creator();
 	const auto [compare_row_ordering, compare_column_ordering] =
-		mpp::size_compare(left, right, equal_in_rows, equal_in_columns);
+		mpp::size_compare(left, right, compare_rows, compare_columns);
 
 	expect(row_ordering == compare_row_ordering);
 	expect(column_ordering == compare_column_ordering);
@@ -110,16 +94,16 @@ int main()
 	feature("utility CPOs") = []() {
 		scenario("using type CPO") = []() {
 			test_type<1, 1>(mpp::matrix_type::fully_static);
-			test_type<std::dynamic_extent, std::dynamic_extent>(mpp::matrix_type::fully_dynamic);
-			test_type<std::dynamic_extent, 1>(mpp::matrix_type::dynamic_rows);
-			test_type<1, std::dynamic_extent>(mpp::matrix_type::dynamic_columns);
+			test_type<mpp::dynamic, mpp::dynamic>(mpp::matrix_type::fully_dynamic);
+			test_type<mpp::dynamic, 1>(mpp::matrix_type::dynamic_rows);
+			test_type<1, mpp::dynamic>(mpp::matrix_type::dynamic_columns);
 		};
 
 		scenario("using square CPO on square matrices") = []() {
 			test_square<1, 1>();
-			test_square<std::dynamic_extent, std::dynamic_extent>(1ul, 1ul);
-			test_square<std::dynamic_extent, 1>(1ul);
-			test_square<1, std::dynamic_extent>(1ul);
+			test_square<mpp::dynamic, mpp::dynamic>(1ul, 1ul);
+			test_square<mpp::dynamic, 1>(1ul);
+			test_square<1, mpp::dynamic>(1ul);
 		};
 
 		scenario("using singular CPO") = []() {
@@ -127,26 +111,17 @@ int main()
 
 			when("checking against non-singular matrices") = []() {
 				test_singular<1, 1>(1, false);
-				test_singular<std::dynamic_extent, std::dynamic_extent>(1, false, 1ul, 1ul);
-				test_singular<std::dynamic_extent, 1>(1, false, 1ul);
-				test_singular<1, std::dynamic_extent>(1, false, 1ul);
+				test_singular<mpp::dynamic, mpp::dynamic>(1, false, 1ul, 1ul);
+				test_singular<mpp::dynamic, 1>(1, false, 1ul);
+				test_singular<1, mpp::dynamic>(1, false, 1ul);
 			};
 
 			when("checking against singular matrices") = []() {
 				test_singular<1, 1>(0, true);
-				test_singular<std::dynamic_extent, std::dynamic_extent>(0, true, 1ul, 1ul);
-				test_singular<std::dynamic_extent, 1>(0, true, 1ul);
-				test_singular<1, std::dynamic_extent>(0, true, 1ul);
+				test_singular<mpp::dynamic, mpp::dynamic>(0, true, 1ul, 1ul);
+				test_singular<mpp::dynamic, 1>(0, true, 1ul);
+				test_singular<1, mpp::dynamic>(0, true, 1ul);
 			};
-		};
-
-		scenario("using cast CPO") = []() {
-			auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-			test_cast<float, 2, 3>(rng_2d);
-			test_cast<float, std::dynamic_extent, std::dynamic_extent>(rng_2d);
-			test_cast<float, std::dynamic_extent, 3>(rng_2d);
-			test_cast<float, 2, std::dynamic_extent>(rng_2d);
 		};
 
 		scenario("comparison CPOs") = []() {
@@ -167,7 +142,7 @@ int main()
 						return mpp::matrix<int, 1, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
 					},
 					std::partial_ordering::unordered,
 					std::partial_ordering::unordered,
@@ -178,7 +153,7 @@ int main()
 						return mpp::matrix<int, 1, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 3 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 3 };
 					},
 					std::partial_ordering::unordered,
 					std::partial_ordering::less,
@@ -189,7 +164,7 @@ int main()
 						return mpp::matrix<int, 2, 1>{};
 					},
 					[]() {
-						return mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{ 1, 1 };
+						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
 					},
 					std::partial_ordering::greater,
 					std::partial_ordering::unordered,
@@ -197,7 +172,7 @@ int main()
 					false);
 			};
 
-			when("using elements_cmopare CPO") = []() {
+			when("using elements_compare CPO") = []() {
 				test_elements_compare(
 					[]() {
 						return mpp::matrix<int, 1, 1>{ 0 };
@@ -230,7 +205,7 @@ int main()
 						return mpp::matrix<float>{ 1, 1, 1.F };
 					},
 					std::partial_ordering::greater,
-					mpp::floating_point_compare_three_way);
+					mpp::floating_point_compare);
 			};
 		};
 	};

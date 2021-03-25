@@ -30,10 +30,15 @@ namespace mpp::detail
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	class [[nodiscard]] expr_base
 	{
+	protected:
 		[[nodiscard]] constexpr auto expr_obj() const -> const Expr&
 		{
-			// Grabs reference to the subclass
 			return static_cast<const Expr&>(*this);
+		}
+
+		[[nodiscard]] constexpr auto expr_mutable_obj() -> Expr&
+		{
+			return static_cast<Expr&>(*this);
 		}
 
 	public:
@@ -59,19 +64,20 @@ namespace mpp::detail
 			return ColumnsExtent;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_idx >= rows() || col_idx >= columns())
+			if (row_index >= rows() || col_index >= columns())
 			{
 				throw std::out_of_range("Access out of range!");
 			}
 
-			return expr_obj().at(row_idx, col_idx);
+			return expr_obj().at(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_idx, std::size_t col_idx) const -> value_type // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
+			-> value_type // @TODO: ISSUE #20
 		{
-			return expr_obj()(row_idx, col_idx);
+			return expr_obj()(row_index, col_index);
 		}
 	};
 } // namespace mpp::detail

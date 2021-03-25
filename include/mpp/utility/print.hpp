@@ -23,18 +23,43 @@
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
+#include <iostream>
+#include <sstream>
 
 namespace mpp
 {
-	struct square_t : public detail::cpo_base<square_t>
+	namespace detail
+	{
+		void insert_matrix_content_into_out_stream(auto& out, const auto& matrix)
+		{
+			const auto columns = matrix.columns();
+			auto index         = std::size_t{};
+
+			for (const auto& value : matrix)
+			{
+				out << value << (++index % columns == 0 ? '\n' : ' ');
+			}
+		}
+	} // namespace detail
+
+	struct print_matrix_t : public detail::cpo_base<print_matrix_t>
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool // @TODO: ISSUE #20
+		friend inline auto tag_invoke(print_matrix_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> void
 		{
-			return obj.rows() == obj.columns();
+			auto message_stream = std::stringstream{};
+			detail::insert_matrix_content_into_out_stream(message_stream, obj);
+
+			std::cout << message_stream.str();
 		}
 	};
 
-	inline constexpr auto square = square_t{};
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	auto operator<<(std::ostream& os, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> std::ostream&
+	{
+		detail::insert_matrix_content_into_out_stream(os, obj);
+		return os;
+	}
+
+	inline constexpr auto print_matrix = print_matrix_t{};
 } // namespace mpp

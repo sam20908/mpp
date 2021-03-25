@@ -19,19 +19,18 @@
 
 #pragma once
 
-#include "tag_invoke.hpp"
+#include <type_traits>
+#include <vector>
 
 namespace mpp::detail
 {
-	template<typename CPO>
-	struct cpo_base
+	template<typename T>
+	struct is_vector : std::false_type
 	{
-		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const
-			-> detail::tag_invoke_impl::tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
-		{
-			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
-			return detail::tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
-		}
+	};
+
+	template<typename T>
+	struct is_vector<std::vector<T>> : std::true_type
+	{
 	};
 } // namespace mpp::detail

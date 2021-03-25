@@ -19,22 +19,23 @@
 
 #pragma once
 
-#include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/matrix.hpp>
-
 #include <cstddef>
+#include <memory>
+
+// @TODO: Export this header to the user for modules
 
 namespace mpp
 {
-	struct square_t : public detail::cpo_base<square_t>
+	static inline constexpr auto dynamic = static_cast<std::size_t>(-1);
+
+	struct identity_tag
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool // @TODO: ISSUE #20
-		{
-			return obj.rows() == obj.columns();
-		}
 	};
 
-	inline constexpr auto square = square_t{};
+	struct unsafe_tag
+	{
+	};
+
+	inline constexpr auto identity = identity_tag{};
+	inline constexpr auto unsafe   = unsafe_tag{};
 } // namespace mpp

@@ -19,24 +19,20 @@
 
 #pragma once
 
-#include <mpp/detail/constraints.hpp>
-#include <mpp/detail/expr_base.hpp>
-#include <mpp/detail/tag_invoke.hpp>
-
-// @TODO: Make sure to export these modules for C++20
-#include <mpp/detail/public_tags.hpp>
-#include <mpp/utility/config.hpp>
+#include <mpp/detail/expr/expr_base.hpp>
+#include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/public.hpp> // @TODO: Export this header to the user for modules
+#include <mpp/utility/configuration.hpp>
 
 #include <cstddef>
 #include <initializer_list>
-#include <memory>
 
 namespace mpp
 {
 	template<detail::arithmetic Value,
-		std::size_t RowsExtent    = detail::tag_invoke_cpo_constexpr(matrix_rows_extent_tag{}, customize::customize),
-		std::size_t ColumnsExtent = detail::tag_invoke_cpo_constexpr(matrix_columns_extent_tag{}, customize::customize),
-		typename Allocator        = std::allocator<Value>>
+		std::size_t RowsExtent    = configuration<override>::rows_extent,
+		std::size_t ColumnsExtent = configuration<override>::columns_extent,
+		typename Allocator        = typename configuration<override>::allocator<Value>>
 	class matrix;
 
 	/**
@@ -49,7 +45,7 @@ namespace mpp
 	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
 	// clang-format off
 	template<typename Range2D>
-	matrix(Range2D&&) -> matrix<detail::range_2d_t<Range2D>>;
+	matrix(Range2D&&) -> matrix<detail::range_2d_value_t<Range2D>>;
 	// clang-format on
 
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>

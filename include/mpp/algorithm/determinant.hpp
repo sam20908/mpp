@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/algo_types.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
@@ -37,8 +38,8 @@ namespace mpp
 		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
-			const auto cols = obj.columns();
+			const auto rows    = obj.rows();
+			const auto columns = obj.columns();
 
 			// Handle special cases - avoid computing LU Decomposition
 			if (rows == 0)
@@ -58,23 +59,26 @@ namespace mpp
 			}
 
 			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
-			using lu_decomp_buf_t    = typename lu_decomp_matrix_t::buffer_type;
+			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
-			auto u_buf = lu_decomp_buf_t{};
+			auto u_buffer = lu_decomp_buffer_t{};
 
-			allocate_1d_buf_if_vector(u_buf, rows, cols, default_floating_type{});
-			std::ranges::copy(obj, u_buf.begin());
+			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
+			std::ranges::copy(obj, u_buffer.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomp_common<default_floating_type, false>(rows, cols, dummy_variable, u_buf);
+			const auto det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, false>(rows,
+				columns,
+				dummy_variable,
+				u_buffer);
 
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto det_func(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		[[nodiscard]] inline auto determinant_common(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
 		{
 			if (!square(obj))
@@ -92,7 +96,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20
 		{
-			return detail::det_func<Value>(obj);
+			return detail::determinant_common<Value>(obj);
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -100,7 +104,7 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_func<To>(obj);
+			return detail::determinant_common<To>(obj);
 		}
 	};
 

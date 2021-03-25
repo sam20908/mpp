@@ -8,6 +8,7 @@ A C++20 and later matrix library
 
 - GCC 10
 - Clang 11
+- MSVC 19.28 (VS 2019 16.9)
 
 ## How to Include:
 
@@ -28,7 +29,9 @@ Here is a _super_ broken down example that showcases the API and functionality m
 ```cpp
 #include <mpp/matrix.h>
 #include <mpp/algorithms.hpp>
-#include <mpp/utilities.hpp>
+#include <mpp/utility.hpp>
+
+#include <iostream>
 
 int main()
 {
@@ -38,25 +41,25 @@ int main()
    * Extents determine if a matrix is fixed or (partially) flexible
    *
    * The following conditions will make the matrix static:
-   * - Explicitly passing sizes different than std::dynamic_extent to the template parameters
+   * - Explicitly passing sizes different than dynamic to the template parameters
    * - Deduction guides with 2D std::array will deduce the extents, e.g.:
    *
    * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
    * - mpp::matrix{ arr_2d }; // Deduces to mpp::matrix<int, 2, 3>
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
-  auto m_fully_dynamic = mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>{};
-  auto m_dynamic_rows = mpp::matrix<int, std::dynamic_extent, 3>{};
-  auto m_dynamic_columns = mpp::matrix<int, 3, std::dynamic_extent>{};
+  auto m_fully_dynamic = mpp::matrix<int, dynamic, dynamic>{};
+  auto m_dynamic_rows = mpp::matrix<int, dynamic, 3>{};
+  auto m_dynamic_columns = mpp::matrix<int, 3, dynamic>{};
 
   // Initialize using 2D initializer list
   auto m_init_2d_list = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
-  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, std::dynamic_extent, std::dynamic_extent>
+  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, dynamic, dynamic>
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 
-  const auto rng_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-  auto m_2d_range = mpp::matrix{ rng_2d }; // Initialize from a 2D range
+  const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+  auto m_2d_range = mpp::matrix{ range_2d }; // Initialize from a 2D range
   m_2d_range.rows(); // 2
   m_2d_range.columns(); // 3
 
@@ -83,6 +86,12 @@ int main()
   auto result_at_top_left = expr_object(0, 0);
   auto result = mpp::matrix{ expr_object }; // Force evaluation of entire matrix
 
+  /**
+   * Ways of printing matrices
+   */
+  mpp::print_matrix(result);
+  std::cout << result; // It automatically inserts newline
+
   return 0;
 }
 ```
@@ -98,7 +107,6 @@ Normally with C++20, we could simply provide a `operator<=>` and let the compile
 ```cpp
 
 #include <mpp/matrix.hpp>
-#include <mpp/utility/comparator.hpp> // mpp::compare_three_way_equivalent
 #include <mpp/utility/comparison.hpp>
 
 int main()
@@ -133,8 +141,8 @@ int main()
   // 41.F / 99.F is recurring 0.41
   const auto left = mpp::matrix<float>{ { 41.F / 99.F } };
   const auto right = mpp::matrix<float>{ { 41.F / 99.F } };
-  const auto ordering_2 = mpp::elements_compare(left, right, mpp::compare_three_way_equivalent);
-  // mpp::compare_three_way_equivalent is exposed to the public as a comparator that handles floating points
+  const auto ordering_2 = mpp::elements_compare(left, right, mpp::floating_point_compare);
+  // mpp::floating_point_compare is exposed to the public as a comparator that handles floating points
   // ordering_2 -> std::partial_ordering::equivalent
 
   return 0;
@@ -143,30 +151,23 @@ int main()
 
 #### Customizations
 
-Customizations of default extents used can be changed via `tag_invoke` within the `mpp::customize` namespace
+Customizations of default extents used can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag.
 
 ```cpp
-#include <mpp/utility/config.hpp>
+#include <mpp/utility/configuration.hpp>
 
-namespace mpp::customize
+namespace mpp
 {
-  /**
-   * Customizations has to take place BEFORE ANY INSTANTIATIONS!
-   * (it will NOT be detected in time after).
-   *
-   * The namespace mpp::customize is where the user can freely open to customize.
-   */
-
-  [[nodiscard]] constexpr std::size_t tag_invoke(matrix_rows_extent_tag, customize_tag)
+  template<>
+  struct configuration<override>
   {
-    return 10;
-  }
+    template<typename Value>
+    using allocator = my_custom_allocator<Value>;
 
-  [[nodiscard]] constexpr std::size_t tag_invoke(matrix_columns_extent_tag, customize_tag)
-  {
-    return 10;
-  }
-} // namespace mpp::customize
+    static constexpr std::size_t rows_extent    = 10;
+    static constexpr std::size_t columns_extent = 10;
+  };
+} // namespace mpp
 
 #include <mpp/matrix.hpp>
 
@@ -175,6 +176,9 @@ int main()
   auto m = mpp::matrix<int>{};
   auto r = m.rows_extent(); // 10
   auto c = m.columns_extent(); // 10
+
+  using alloc = typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::allocator_type;
+  // ^ my_custom_allocator<int>, note that fully static matrices don't use allocators
 
   return 0;
 }
@@ -210,7 +214,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 
 #### Custom Iterators
 
-Custom iterators are used to make navigating matrices easier. They also meet `LegacyContiguousIterator` requirement.
+Custom iterators are used to make navigating matrices easier. They also meet `contiguous_iterator` requirement.
 
 ```cpp
 #include <mpp/matrix.hpp>
@@ -228,6 +232,14 @@ int main()
   begin.move_backward_rows(1);
   ++begin;
   val = *begin; // 2
+
+  // 2. Navigating by pair of offsets
+  auto begin_2 = matrix.begin();
+  begin_2 += { 1, 1 }; // 4
+
+  begin_2 -= { 1, 0 }; // 2
+
+  auto begin_3 = begin_2 + std::pair{ 0, 0 }; // Both point to the same location
 
   return 0;
 }

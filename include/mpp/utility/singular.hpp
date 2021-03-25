@@ -20,9 +20,9 @@
 #pragma once
 
 #include <mpp/algorithm/determinant.hpp>
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/utility.hpp>
-#include <mpp/utility/comparator.hpp>
+#include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
 #include <compare>
@@ -39,7 +39,7 @@ namespace mpp
 			using ordering_type =
 				std::compare_three_way_result_t<detail::default_floating_type, detail::default_floating_type>;
 
-			return floating_point_compare_three_way(detail::det_lu_decomp<detail::default_floating_type>(obj),
+			return floating_point_compare(detail::det_lu_decomp<detail::default_floating_type>(obj),
 					   detail::default_floating_type{}) == ordering_type::equivalent;
 		}
 	};

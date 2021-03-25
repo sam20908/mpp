@@ -19,35 +19,18 @@
 
 #pragma once
 
-#include <concepts>
-#include <ranges>
-#include <type_traits>
+#include <mpp/detail/utility/tag_invoke.hpp>
 
 namespace mpp::detail
 {
-	template<typename Value>
-	concept arithmetic = requires(Value&& value)
+	template<typename CPO>
+	struct cpo_base
 	{
-		// +, -, *, and /
-		{ value + value };
-		{ value - value };
-		{ value * value };
-		{ value / value };
-
-		// +=, -=, *=, and /=
-		{ value += value };
-		{ value -= value };
-		{ value *= value };
-		{ value /= value };
+		template<typename... Args>
+		[[nodiscard]] auto operator()(Args&&... args) const -> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+		{
+			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
+			return tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
+		}
 	};
-
-	template<typename Callable, typename Return, typename... Args>
-	concept invocable_with_return_type =
-		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
-
-	template<typename Range>
-	using range_2d_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
-
-	template<typename Range, typename Value>
-	concept range_2d_with_type = std::same_as<range_2d_t<Range>, Value>;
 } // namespace mpp::detail

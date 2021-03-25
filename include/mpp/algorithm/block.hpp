@@ -19,89 +19,107 @@
 
 #pragma once
 
-#include <mpp/detail/cpo_base.hpp>
-#include <mpp/detail/matrix_base.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/matrix/matrix_base.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/exception_messages.hpp>
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <span>
 #include <stdexcept>
 
 namespace mpp
 {
-	struct block_t : public detail::cpo_base<block_t>
+	namespace detail
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			std::size_t top_row_idx,
-			std::size_t top_column_idx,
-			std::size_t bottom_row_idx,
-			std::size_t bottom_column_idx)
-			-> matrix<Value, std::dynamic_extent, std::dynamic_extent> // @TODO: ISSUE #20
+		// Don't put this in validators.hpp as it's only used here
+		constexpr void validate_block_index_boundaries(std::size_t rows,
+			std::size_t columns,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index)
 		{
-			// The result matrix is always dynamic because function parameters are always treated as runtime
-			// expressions, which means it's impossible to change the extent to resized extent
-
 			// Out of bounds checks
 
-			const auto rows  = obj.rows();
-			const auto cols  = obj.columns();
-			const auto begin = obj.begin();
-
-			if (top_row_idx >= rows)
+			if (top_row_index >= rows)
 			{
-				throw std::invalid_argument("Top row index out of bounds!");
+				throw std::invalid_argument(BLOCK_TOP_ROW_INDEX_OUT_OF_BOUNDS);
 			}
-			else if (top_column_idx >= cols)
+			else if (top_column_index >= columns)
 			{
-				throw std::invalid_argument("Top column index out of bounds!");
+				throw std::invalid_argument(BLOCK_TOP_COLUMN_INDEX_OUT_OF_BOUNDS);
 			}
-			else if (bottom_row_idx >= rows)
+			else if (bottom_row_index >= rows)
 			{
-				throw std::invalid_argument("Bottom row index out of bounds!");
+				throw std::invalid_argument(BLOCK_BOTTOM_ROW_INDEX_OUT_OF_BOUNDS);
 			}
-			else if (bottom_column_idx >= cols)
+			else if (bottom_column_index >= columns)
 			{
-				throw std::invalid_argument("Bottom column index out of bounds!");
+				throw std::invalid_argument(BLOCK_BOTTOM_COLUMN_INDEX_OUT_OF_BOUNDS);
 			}
 
 			// Overlapping checks
 
-			if (top_row_idx > bottom_row_idx)
+			if (top_row_index > bottom_row_index)
 			{
-				throw std::invalid_argument("Top row index bigger than bottom row index!");
+				throw std::invalid_argument(BLOCK_TOP_ROW_INDEX_BIGGER_THAN_BOTTOM_ROW_INDEX);
 			}
-			else if (top_column_idx > bottom_column_idx)
+			else if (top_column_index > bottom_column_index)
 			{
-				throw std::invalid_argument("Top column index bigger than bottom column index!");
+				throw std::invalid_argument(BLOCK_TOP_COLUMN_INDEX_BIGGER_THAN_BOTTOM_COLUMN_INDEX);
 			}
+		}
+	} // namespace detail
 
-			using block_matrix_t = matrix<Value, std::dynamic_extent, std::dynamic_extent>;
-			using block_buf_t    = typename block_matrix_t::buffer_type;
-			using diff_t         = typename block_matrix_t::difference_type;
+	struct block_t : public detail::cpo_base<block_t>
+	{
+		// @TODO: Support fixed block matrix with certain preconditions (#225)
 
-			auto block_matrix            = block_matrix_t{};
-			auto block_buf               = block_buf_t{};
-			auto block_buf_back_inserter = std::back_inserter(block_buf);
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
+		{
+			// The result matrix is always dynamic because function parameters are always treated as runtime
+			// expressions, which means it's impossible to change the extent to resized extent
 
-			const auto block_rows = bottom_row_idx - top_row_idx + 1;
-			const auto block_cols = bottom_column_idx - top_column_idx + 1;
-			block_buf.reserve(block_rows * block_cols);
+			const auto rows    = obj.rows();
+			const auto columns = obj.columns();
+			const auto begin   = obj.begin();
 
-			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
+			detail::validate_block_index_boundaries(rows,
+				columns,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index);
+
+			using block_matrix_t  = matrix<Value, dynamic, dynamic>;
+			using block_buffer_t  = typename block_matrix_t::buffer_type;
+			using difference_type = typename block_matrix_t::difference_type;
+
+			auto block_buffer               = block_buffer_t{};
+			auto block_buffer_back_inserter = std::back_inserter(block_buffer);
+
+			const auto block_rows    = bottom_row_index - top_row_index + 1;
+			const auto block_columns = bottom_column_index - top_column_index + 1;
+			block_buffer.reserve(block_rows * block_columns);
+
+			for (auto row = top_row_index; row <= bottom_row_index; ++row)
 			{
-				auto row_begin_idx = static_cast<diff_t>(detail::idx_2d_to_1d(cols, row, top_column_idx));
-				auto row_begin     = std::next(begin, row_begin_idx);
+				auto row_begin_index =
+					static_cast<difference_type>(detail::index_2d_to_1d(columns, row, top_column_index));
+				auto row_begin = std::next(begin, row_begin_index);
 
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), block_buf_back_inserter);
+				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buffer_back_inserter);
 			}
 
-			init_matrix_with_1d_rng(block_matrix, std::move(block_buf), block_rows, block_cols);
-
-			return block_matrix;
+			return block_matrix_t{ block_rows, block_columns, std::move(block_buffer) };
 		}
 	};
 

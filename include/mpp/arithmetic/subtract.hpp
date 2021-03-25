@@ -19,20 +19,21 @@
 
 #pragma once
 
-#include <mpp/detail/expr_binary_op.hpp>
-#include <mpp/detail/utility.hpp>
+#include <mpp/detail/expr/expr_binary_op.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
-#include <span>
 
 namespace mpp
 {
 	namespace detail
 	{
-		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_idx, std::size_t col_idx)
-										 -> decltype(left(row_idx, col_idx) - right(row_idx, col_idx)) {
-			return left(row_idx, col_idx) - right(row_idx, col_idx);
+		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index)
+										 -> decltype(left(row_index, col_index) - right(row_index, col_index)) {
+			return left(row_index, col_index) - right(row_index, col_index);
 		});
 	} // namespace detail
 
@@ -85,12 +86,12 @@ namespace mpp
 	{
 		detail::validate_same_size(left, right);
 
-		const auto rows = left.rows();
-		const auto cols = left.columns();
+		const auto rows    = left.rows();
+		const auto columns = left.columns();
 
 		for (auto row = std::size_t{ 0 }; row < rows; ++row)
 		{
-			for (auto col = std::size_t{ 0 }; col < cols; ++col)
+			for (auto col = std::size_t{ 0 }; col < columns; ++col)
 			{
 				left(row, col) -= right(row, col);
 			}
