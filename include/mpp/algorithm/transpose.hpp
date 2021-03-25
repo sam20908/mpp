@@ -44,12 +44,12 @@ namespace mpp
 			auto transposed_buffer    = transposed_buffer_t{};
 			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
-			for (auto col = std::size_t{}; col < columns; ++col)
+			for (auto column = std::size_t{}; column < columns; ++column)
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_index     = detail::index_2d_to_1d(columns, row, col);
-					auto transposed_index = detail::index_2d_to_1d(rows, col, row);
+					auto normal_index     = detail::index_2d_to_1d(columns, row, column);
+					auto transposed_index = detail::index_2d_to_1d(rows, column, row);
 
 					transposed_buffer[transposed_index] = data[normal_index];
 				}
