@@ -73,7 +73,7 @@ namespace mpp::detail
 
 			const auto range_rows = std::ranges::size(std::forward<range_2d_t>(range_2d));
 
-			if constexpr (CheckAgainstCurrentRows)
+			if constexpr (!Unsafe && CheckAgainstCurrentRows)
 			{
 				if (range_rows != _rows)
 				{
@@ -104,7 +104,7 @@ namespace mpp::detail
 			{
 				const auto current_columns = std::ranges::size(*range_begin);
 
-				if constexpr (CheckAgainstCurrentColumns)
+				if constexpr (!Unsafe && CheckAgainstCurrentColumns)
 				{
 					if (current_columns != _columns)
 					{
@@ -112,7 +112,7 @@ namespace mpp::detail
 					}
 				}
 
-				if constexpr (CheckUnequalColumns)
+				if constexpr (!Unsafe && CheckUnequalColumns)
 				{
 					if (current_columns != range_columns)
 					{
@@ -224,7 +224,7 @@ namespace mpp::detail
 				{
 					const auto current_columns = std::ranges::size(*range_begin);
 
-					if constexpr (CheckAgainstCurrentColumns)
+					if constexpr (!Unsafe && CheckAgainstCurrentColumns)
 					{
 						if (current_columns != _columns)
 						{
@@ -232,7 +232,7 @@ namespace mpp::detail
 						}
 					}
 
-					if constexpr (CheckUnequalColumns)
+					if constexpr (!Unsafe && CheckUnequalColumns)
 					{
 						if (current_columns != range_columns)
 						{
@@ -268,7 +268,7 @@ namespace mpp::detail
 		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool Unsafe, typename Range>
 		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, Range&& range)
 		{
-			if constexpr (CheckAgainstCurrentRows)
+			if constexpr (!Unsafe && CheckAgainstCurrentRows)
 			{
 				if (rows != _rows)
 				{
@@ -276,7 +276,7 @@ namespace mpp::detail
 				}
 			}
 
-			if constexpr (CheckAgainstCurrentColumns)
+			if constexpr (!Unsafe && CheckAgainstCurrentColumns)
 			{
 				if (columns != _columns)
 				{

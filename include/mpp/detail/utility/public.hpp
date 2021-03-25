@@ -32,5 +32,10 @@ namespace mpp
 	{
 	};
 
+	struct unsafe_tag
+	{
+	};
+
 	inline constexpr auto identity = identity_tag{};
+	inline constexpr auto unsafe   = unsafe_tag{};
 } // namespace mpp

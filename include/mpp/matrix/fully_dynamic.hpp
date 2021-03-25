@@ -71,6 +71,15 @@ namespace mpp
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
+			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
+				std::forward<Matrix>(matrix).columns(),
+				std::forward<Matrix>(matrix));
+		}
+
+		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
+		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
 			base::template assign_and_insert_from_1d_range<false, false, true>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
@@ -88,6 +97,19 @@ namespace mpp
 				std::forward<Range>(range));
 		}
 
+		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
+		explicit matrix(std::size_t rows,
+			std::size_t columns,
+			Range&& range,
+			unsafe_tag,
+			const Allocator& allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<false, false, true>(rows,
+				columns,
+				std::forward<Range>(range));
+		}
+
 		template<std::convertible_to<Value> InitializerListValue>
 		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d,
 			const Allocator allocator = Allocator{}) :
@@ -96,11 +118,27 @@ namespace mpp
 			base::template assign_and_insert_from_2d_range<false, false, true, false>(initializer_list_2d);
 		}
 
+		template<std::convertible_to<Value> InitializerListValue>
+		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d,
+			unsafe_tag,
+			const Allocator allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_2d_range<false, false, true, true>(initializer_list_2d);
+		}
+
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d, const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_2d_range<false, false, true, false>(std::forward<Range2D>(range_2d));
+		}
+
+		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
+		explicit matrix(Range2D&& range_2d, unsafe_tag, const Allocator allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_2d_range<false, false, true, true>(std::forward<Range2D>(range_2d));
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
