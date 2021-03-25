@@ -20,8 +20,8 @@
 #pragma once
 
 #include <mpp/detail/expr/expr_base.hpp>
-#include <mpp/detail/types/constraints.hpp> // @TODO: Export this header to the user for modules
-#include <mpp/detail/utility/public.hpp>
+#include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/public.hpp> // @TODO: Export this header to the user for modules
 #include <mpp/utility/configuration.hpp>
 
 #include <cstddef>

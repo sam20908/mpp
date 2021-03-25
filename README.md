@@ -29,7 +29,9 @@ Here is a _super_ broken down example that showcases the API and functionality m
 ```cpp
 #include <mpp/matrix.h>
 #include <mpp/algorithms.hpp>
-#include <mpp/utilities.hpp>
+#include <mpp/utility.hpp>
+
+#include <iostream>
 
 int main()
 {
@@ -83,6 +85,12 @@ int main()
   auto expr_object = m_fully_static * m_fully_static * 2 / 3;
   auto result_at_top_left = expr_object(0, 0);
   auto result = mpp::matrix{ expr_object }; // Force evaluation of entire matrix
+
+  /**
+   * Ways of printing matrices
+   */
+  mpp::print_matrix(result);
+  std::cout << result; // It automatically inserts newline
 
   return 0;
 }
