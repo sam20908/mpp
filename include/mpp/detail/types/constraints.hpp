@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <array>
 #include <concepts>
 #include <iterator>
 #include <ranges>
@@ -26,35 +27,6 @@
 
 namespace mpp::detail
 {
-	template<typename Derived,
-		typename Buffer,
-		typename Value,
-		std::size_t RowsExtent,
-		std::size_t ColumnsExtent,
-		typename Allocator>
-	class matrix_base;
-
-	template<typename Derived,
-		typename Buffer,
-		typename Value,
-		std::size_t RowsExtent,
-		std::size_t ColumnsExtent,
-		typename Allocator>
-	constexpr auto matrix_like_resolver(
-		const matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>&) -> int;
-
-	constexpr void matrix_like_resolver(...);
-
-	template<typename T>
-	static constexpr auto matrix_like_v = std::is_same_v<decltype(matrix_like_resolver(std::declval<T>())), int>;
-
-	template<typename T>
-	concept matrix_like = matrix_like_v<T>;
-
-	template<typename T, typename Value>
-	concept matrix_like_with_value_type_convertible_to =
-		matrix_like<T>&& std::convertible_to<typename std::remove_cvref_t<T>::value_type, Value>;
-
 	template<typename Value>
 	concept arithmetic = requires(Value&& value)
 	{
@@ -88,4 +60,36 @@ namespace mpp::detail
 
 	template<typename Range, typename Value>
 	concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
+
+	template<arithmetic, std::size_t, std::size_t, typename>
+	class matrix;
+
+	// matrix_with_value_convertible_to
+
+	template<typename>
+	struct matrix_value;
+
+	template<arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+	struct matrix_value<matrix<Value, RowsExtent, ColumnsExtent, Allocator>>
+	{
+		using type = Value;
+	};
+
+	template<typename T, typename To>
+	concept matrix_with_value_convertible_to = std::same_as<typename matrix_value<std::remove_cvref_t<T>>::type, To>;
+
+	// array_2d_with_value_convertible_to
+
+	template<typename, std::size_t, std::size_t>
+	struct array_2d_value;
+
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	struct array_2d_value<std::array<std::array<Value, ColumnsExtent>, RowsExtent>, RowsExtent, ColumnsExtent>
+	{
+		using type = Value;
+	};
+
+	template<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename To>
+	concept array_2d_with_value_convertible_to =
+		std::same_as<typename array_2d_value<std::remove_cvref_t<T>, RowsExtent, ColumnsExtent>::type, To>;
 } // namespace mpp::detail

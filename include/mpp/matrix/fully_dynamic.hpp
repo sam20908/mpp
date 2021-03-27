@@ -67,20 +67,20 @@ namespace mpp
 		{
 		}
 
-		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
+		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}
 
-		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
+		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<false, false, true>(std::forward<Matrix>(matrix).rows(),
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}
@@ -89,19 +89,6 @@ namespace mpp
 		explicit matrix(std::size_t rows,
 			std::size_t columns,
 			Range&& range,
-			const Allocator& allocator = Allocator{}) :
-			base(0, 0, allocator) // @TODO: ISSUE #20
-		{
-			base::template assign_and_insert_from_1d_range<false, false, false>(rows,
-				columns,
-				std::forward<Range>(range));
-		}
-
-		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
-		explicit matrix(std::size_t rows,
-			std::size_t columns,
-			Range&& range,
-			unsafe_tag,
 			const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
@@ -110,12 +97,25 @@ namespace mpp
 				std::forward<Range>(range));
 		}
 
+		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
+		explicit matrix(std::size_t rows,
+			std::size_t columns,
+			Range&& range,
+			unsafe_tag,
+			const Allocator& allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<false, false, false>(rows,
+				columns,
+				std::forward<Range>(range));
+		}
+
 		template<std::convertible_to<Value> InitializerListValue>
 		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d,
 			const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, false>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<false, false, true>(initializer_list_2d);
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
@@ -124,25 +124,34 @@ namespace mpp
 			const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, true>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<false, false, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d, const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, false>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<false, false, true>(std::forward<Range2D>(range_2d));
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d, unsafe_tag, const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, true>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr,
+			const Allocator allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			base::initialize_from_expression_unchecked(expr.rows(), expr.columns(), expr);
+		}
+
+		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
+		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr,
+			unsafe_tag,
 			const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
@@ -165,8 +174,21 @@ namespace mpp
 			const Value& zero_value    = Value{ 0 },
 			const Value& one_value     = Value{ 1 },
 			const Allocator& allocator = Allocator{}) :
-			base(rows, columns, identity, zero_value, one_value, allocator) // @TODO: ISSUE #20
+			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
+			detail::template make_identity_buffer<true>(base::_buffer, rows, columns, zero_value, one_value);
+		}
+
+		matrix(std::size_t rows,
+			std::size_t columns,
+			identity_tag,
+			unsafe_tag,
+			const Value& zero_value    = Value{ 0 },
+			const Value& one_value     = Value{ 1 },
+			const Allocator& allocator = Allocator{}) :
+			base(0, 0, allocator) // @TODO: ISSUE #20
+		{
+			detail::template make_identity_buffer<false>(base::_buffer, rows, columns, zero_value, one_value);
 		}
 
 		template<detail::invocable_with_return_type<Value> Callable>
@@ -180,19 +202,41 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, false>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<false, false, true>(initializer_list_2d);
+		}
+
+		template<std::convertible_to<Value> InitializerListValue>
+		void assign(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d,
+			unsafe_tag) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_2d_range<false, false, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true, false>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<false, false, true>(std::forward<Range2D>(range_2d));
 		}
 
-		template<detail::matrix_like_with_value_type_convertible_to<Value> Matrix>
-		void assign(Matrix&& matrix)
+		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
+		void assign(Range2D&& range_2d, unsafe_tag) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<false, false, true>(std::forward<Matrix>(matrix).rows(),
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
+		}
+
+		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+		void assign(Matrix&& matrix) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
+				std::forward<Matrix>(matrix).columns(),
+				std::forward<Matrix>(matrix));
+		}
+
+		// Declared for consistency
+		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+		void assign(Matrix&& matrix, unsafe_tag) // @TODO: ISSUE #20
+		{
+			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}

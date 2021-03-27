@@ -21,13 +21,14 @@
 
 #include <mpp/detail/types/type_traits.hpp>
 #include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/utility/validators.hpp>
 
 #include <cstddef>
 
 namespace mpp::detail
 {
 	template<typename Buffer, typename InitializerValue>
-	inline void allocate_buffer_if_vector(Buffer& buffer,
+	void allocate_buffer_if_vector(Buffer& buffer,
 		std::size_t rows,
 		std::size_t columns,
 		InitializerValue&& val) // @TODO: ISSUE #20
@@ -41,7 +42,7 @@ namespace mpp::detail
 	}
 
 	template<typename Buffer>
-	inline void reserve_buffer_if_vector(Buffer& buffer, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
+	void reserve_buffer_if_vector(Buffer& buffer, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
 	{
 		constexpr auto is_vec = is_vector<Buffer>::value;
 
@@ -51,13 +52,38 @@ namespace mpp::detail
 		}
 	}
 
-	inline void make_identity_buffer(auto& buffer, std::size_t n, auto value) // @TODO: ISSUE #20
+	template<bool ValidateDimensions, typename Buffer, typename ZeroValue, typename OneValue>
+	void make_identity_buffer(Buffer& buffer,
+		std::size_t rows,
+		std::size_t columns,
+		ZeroValue&& zero_value,
+		OneValue&& one_value) // @TODO: ISSUE #20
 	{
-		// This assumes that the bufferfer is already filled with zeroes
-
-		for (auto index = std::size_t{}; index < n; ++index)
+		if constexpr (ValidateDimensions)
 		{
-			buffer[index_2d_to_1d(n, index, index)] = value;
+			validate_dimensions_for_identity_matrix(rows, columns);
+		}
+
+		const auto total_size           = rows * columns;
+		constexpr auto buffer_is_vector = is_vector<Buffer>::value;
+
+		if constexpr (buffer_is_vector)
+		{
+			buffer.reserve(total_size);
+		}
+
+		for (auto index = std::size_t{}; index < total_size; ++index)
+		{
+			if constexpr (buffer_is_vector)
+			{
+				buffer.push_back(
+					(index + 1) % rows == 0 ? std::forward<OneValue>(one_value) : std::forward<ZeroValue>(zero_value));
+			}
+			else
+			{
+				buffer[index] =
+					(index + 1) % rows == 0 ? std::forward<OneValue>(one_value) : std::forward<ZeroValue>(zero_value);
+			}
 		}
 	}
 } // namespace mpp::detail
