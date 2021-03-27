@@ -162,7 +162,11 @@ namespace mpp
 			const Value& zero_value = Value{ 0 },
 			const Value& one_value  = Value{ 1 }) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<true>(base::_buffer, RowsExtent, ColumnsExtent, one_value);
+			detail::template make_identity_buffer<true>(base::_buffer,
+				RowsExtent,
+				ColumnsExtent,
+				zero_value,
+				one_value);
 		}
 
 		explicit matrix(identity_tag,
@@ -172,7 +176,11 @@ namespace mpp
 		{
 			fill_buffer_with_value(zero_value);
 
-			detail::template make_identity_buffer<false>(base::_buffer, RowsExtent, ColumnsExtent, one_value);
+			detail::template make_identity_buffer<false>(base::_buffer,
+				RowsExtent,
+				ColumnsExtent,
+				zero_value,
+				one_value);
 		}
 
 		template<detail::invocable_with_return_type<Value> Callable>
