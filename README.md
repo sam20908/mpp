@@ -41,20 +41,20 @@ int main()
    * Extents determine if a matrix is fixed or (partially) flexible
    *
    * The following conditions will make the matrix static:
-   * - Explicitly passing sizes different than dynamic to the template parameters
+   * - Explicitly passing sizes different than mpp::dynamic to the template parameters
    * - Deduction guides with 2D std::array will deduce the extents, e.g.:
    *
    * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
    * - mpp::matrix{ arr_2d }; // Deduces to mpp::matrix<int, 2, 3>
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
-  auto m_fully_dynamic = mpp::matrix<int, dynamic, dynamic>{};
-  auto m_dynamic_rows = mpp::matrix<int, dynamic, 3>{};
-  auto m_dynamic_columns = mpp::matrix<int, 3, dynamic>{};
+  auto m_fully_dynamic = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+  auto m_dynamic_rows = mpp::matrix<int, mpp::dynamic, 3>{};
+  auto m_dynamic_columns = mpp::matrix<int, 3, mpp::dynamic>{};
 
   // Initialize using 2D initializer list
   auto m_init_2d_list = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
-  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, dynamic, dynamic>
+  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, mpp::dynamic, mpp::dynamic>
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 

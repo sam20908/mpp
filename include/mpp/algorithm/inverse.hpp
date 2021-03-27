@@ -110,7 +110,8 @@ namespace mpp
 				std::ranges::copy(obj, u_buffer.begin());
 
 				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
-				make_identity_buffer(l_buffer, rows, default_floating_type{});
+				// @TODO: Allow the user to control one_value and zero_value here?
+				make_identity_buffer<false>(l_buffer, rows, columns, default_floating_type{}, default_floating_type{});
 
 				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
 					columns,

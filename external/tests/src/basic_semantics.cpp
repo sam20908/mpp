@@ -57,86 +57,87 @@ int main()
 	"Basic semantics"_test = [&]() {
 		scenario("Creating matrices") = [&]() {
 			given("A 2D range") = [&]() {
-				test_initialization(
-					[&]() {
-						return mpp::matrix<float, 2, 3>{ range_2d };
-					},
-					[&]() {
-						return mpp::matrix{ range_2d };
-					});
-				test_initialization(
-					[&]() {
-						return mpp::matrix<double>{ range_2d };
-					},
-					[&]() {
-						return mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-					});
+				// test_initialization(
+				// 	[&]() {
+				// 		return mpp::matrix<float, 2, 3>{ range_2d };
+				// 	},
+				// 	[&]() {
+				// 		return mpp::matrix{ range_2d };
+				// 	});
+				// test_initialization(
+				// 	[&]() {
+				// 		return mpp::matrix<double>{ range_2d };
+				// 	},
+				// 	[&]() {
+				// 		return mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
+				// 	});
+					mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
 			};
 
-			given("A callable") = []() {
-				auto iota = [i = 1]() mutable {
-					return i++;
-				};
+			// given("A callable") = []() {
+			// 	auto iota = [i = 1]() mutable {
+			// 		return i++;
+			// 	};
 
-				const auto matrix_from_iota = mpp::matrix<int>{ 2, 3, iota };
-				const auto right_matrix     = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
+			// 	const auto matrix_from_iota = mpp::matrix<int>{ 2, 3, iota };
+			// 	const auto right_matrix     = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				expect(mpp::elements_compare(matrix_from_iota, right_matrix) == std::strong_ordering::equivalent);
-			};
+			// 	expect(mpp::elements_compare(matrix_from_iota, right_matrix) == std::strong_ordering::equivalent);
+			// };
 		};
 
-		scenario("Assigning matrices with 2D range") = [&]() {
-			const auto left_range_2d = std::array<std::array<int, 4>, 4>{
-				{ { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 }, { 13, 14, 15, 16 } }
-			};
+		// scenario("Assigning matrices with 2D range") = [&]() {
+		// 	const auto left_range_2d = std::array<std::array<int, 4>, 4>{
+		// 		{ { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 }, { 13, 14, 15, 16 } }
+		// 	};
 
-			auto left_matrix  = mpp::matrix<int>{ left_range_2d };
-			auto right_matrix = mpp::matrix<int, 2, 3>{ range_2d };
+		// 	auto left_matrix  = mpp::matrix<int>{ left_range_2d };
+		// 	auto right_matrix = mpp::matrix<int, 2, 3>{ range_2d };
 
-			left_matrix  = range_2d;
-			right_matrix = range_2d;
+		// 	left_matrix  = range_2d;
+		// 	right_matrix = range_2d;
 
-			expect(mpp::elements_compare(left_matrix, right_matrix) == std::strong_ordering::equivalent);
+		// 	expect(mpp::elements_compare(left_matrix, right_matrix) == std::strong_ordering::equivalent);
 
-			const auto big_range_2d = std::array<std::array<int, 10>, 10>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
+		// 	const auto big_range_2d = std::array<std::array<int, 10>, 10>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+		// 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
 
-			auto big_left_matrix = mpp::matrix{ left_matrix };
-			big_left_matrix      = big_range_2d;
+		// 	auto big_left_matrix = mpp::matrix{ left_matrix };
+		// 	big_left_matrix      = big_range_2d;
 
-			const auto big_right_matrix = mpp::matrix{ big_range_2d };
+		// 	const auto big_right_matrix = mpp::matrix{ big_range_2d };
 
-			expect(mpp::elements_compare(big_left_matrix, big_right_matrix) == std::strong_ordering::equivalent);
-		};
+		// 	expect(mpp::elements_compare(big_left_matrix, big_right_matrix) == std::strong_ordering::equivalent);
+		// };
 
-		scenario("Matrices rule-of-five") = [&]() {
-			auto left_matrix                   = mpp::matrix<int>{ range_2d };
-			const auto matrix_copy_constructed = mpp::matrix<int, 2, 3>{ left_matrix };
+		// scenario("Matrices rule-of-five") = [&]() {
+		// 	auto left_matrix                   = mpp::matrix<int>{ range_2d };
+		// 	const auto matrix_copy_constructed = mpp::matrix<int, 2, 3>{ left_matrix };
 
-			expect(mpp::elements_compare(left_matrix, matrix_copy_constructed) == std::strong_ordering::equivalent);
+		// 	expect(mpp::elements_compare(left_matrix, matrix_copy_constructed) == std::strong_ordering::equivalent);
 
-			const auto matrix_move_constructed = mpp::matrix<int, 2, 3>{ std::move(left_matrix) };
-			expect(mpp::elements_compare(matrix_copy_constructed, matrix_move_constructed) ==
-				   std::strong_ordering::equivalent);
+		// 	const auto matrix_move_constructed = mpp::matrix<int, 2, 3>{ std::move(left_matrix) };
+		// 	expect(mpp::elements_compare(matrix_copy_constructed, matrix_move_constructed) ==
+		// 		   std::strong_ordering::equivalent);
 
-			auto left_matrix_2        = mpp::matrix<int>{ range_2d };
-			auto matrix_copy_assigned = mpp::matrix<int>{};
-			matrix_copy_assigned      = left_matrix_2;
+		// 	auto left_matrix_2        = mpp::matrix<int>{ range_2d };
+		// 	auto matrix_copy_assigned = mpp::matrix<int>{};
+		// 	matrix_copy_assigned      = left_matrix_2;
 
-			expect(mpp::elements_compare(left_matrix_2, matrix_copy_assigned) == std::strong_ordering::equivalent);
+		// 	expect(mpp::elements_compare(left_matrix_2, matrix_copy_assigned) == std::strong_ordering::equivalent);
 
-			auto left_matrix_3 = mpp::matrix<float, 2, 3>{};
-			left_matrix_3      = left_matrix_2;
+		// 	auto left_matrix_3 = mpp::matrix<float, 2, 3>{};
+		// 	left_matrix_3      = left_matrix_2;
 
-			expect(mpp::elements_compare(left_matrix_2, left_matrix_3) == std::partial_ordering::equivalent);
-		};
+		// 	expect(mpp::elements_compare(left_matrix_2, left_matrix_3) == std::partial_ordering::equivalent);
+		// };
 	};
 }

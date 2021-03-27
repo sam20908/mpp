@@ -71,7 +71,7 @@ namespace mpp
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
+			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}
@@ -80,7 +80,7 @@ namespace mpp
 		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
+			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}
