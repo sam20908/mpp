@@ -151,7 +151,7 @@ int main()
 
 #### Customizations
 
-Customizations of default extents used can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag.
+Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
 ```cpp
 #include <mpp/utility/configuration.hpp>
@@ -166,6 +166,8 @@ namespace mpp
 
     static constexpr std::size_t rows_extent    = 10;
     static constexpr std::size_t columns_extent = 10;
+
+    static constexpr bool use_unsafe = true;
   };
 } // namespace mpp
 

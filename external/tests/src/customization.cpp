@@ -29,6 +29,8 @@ namespace mpp
 
 		static constexpr std::size_t rows_extent    = 10;
 		static constexpr std::size_t columns_extent = 10;
+
+		static constexpr bool use_unsafe = true;
 	};
 } // namespace mpp
 
@@ -108,6 +110,10 @@ int main()
 		when("I check the new extents through the default matrix type") = []() {
 			expect(constant<mpp::matrix<int>::rows_extent() == 10_ul>);
 			expect(constant<mpp::matrix<int>::columns_extent() == 10_ul>);
+		};
+
+		when("I check the new use_unsafe") = []() {
+			expect(constant<mpp::detail::configuration_use_unsafe == true>);
 		};
 
 		when("I check against the CPOs' return types") = []() {

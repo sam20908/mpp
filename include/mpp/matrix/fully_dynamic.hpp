@@ -92,7 +92,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<false, false, true>(rows,
+			base::template assign_and_insert_from_1d_range<false, false, detail::configuration_use_unsafe>(rows,
 				columns,
 				std::forward<Range>(range));
 		}
@@ -115,7 +115,8 @@ namespace mpp
 			const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<false, false, detail::configuration_use_unsafe>(
+				initializer_list_2d);
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
@@ -131,7 +132,8 @@ namespace mpp
 		explicit matrix(Range2D&& range_2d, const Allocator allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<false, false, detail::configuration_use_unsafe>(
+				std::forward<Range2D>(range_2d));
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
@@ -176,7 +178,11 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(0, 0, allocator) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<true>(base::_buffer, rows, columns, zero_value, one_value);
+			detail::template make_identity_buffer<detail::configuration_use_unsafe>(base::_buffer,
+				rows,
+				columns,
+				zero_value,
+				one_value);
 		}
 
 		matrix(std::size_t rows,
@@ -202,7 +208,8 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true>(initializer_list_2d);
+			base::template assign_and_insert_from_2d_range<false, false, detail::configuration_use_unsafe>(
+				initializer_list_2d);
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
@@ -215,7 +222,8 @@ namespace mpp
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<false, false, true>(std::forward<Range2D>(range_2d));
+			base::template assign_and_insert_from_2d_range<false, false, detail::configuration_use_unsafe>(
+				std::forward<Range2D>(range_2d));
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
