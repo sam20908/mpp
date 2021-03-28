@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <mpp/utility/configuration.hpp>
+
 #include <cstddef>
 
 namespace mpp::detail
@@ -32,4 +34,6 @@ namespace mpp::detail
 
 		return row_index * columns + column_index;
 	}
+
+	static constexpr auto configuration_use_unsafe = configuration<override>::use_unsafe;
 } // namespace mpp::detail

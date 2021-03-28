@@ -66,14 +66,14 @@ namespace mpp::detail
 		{
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckUnequalColumns, bool Unsafe>
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckUnequalColumns>
 		void assign_and_insert_from_2d_range(auto&& range_2d)
 		{
 			using range_2d_t = decltype(range_2d);
 
 			const auto range_rows = std::ranges::size(std::forward<range_2d_t>(range_2d));
 
-			if constexpr (!Unsafe && CheckAgainstCurrentRows)
+			if constexpr (CheckAgainstCurrentRows)
 			{
 				if (range_rows != _rows)
 				{
@@ -104,7 +104,7 @@ namespace mpp::detail
 			{
 				const auto current_columns = std::ranges::size(*range_begin);
 
-				if constexpr (!Unsafe && CheckAgainstCurrentColumns)
+				if constexpr (CheckAgainstCurrentColumns)
 				{
 					if (current_columns != _columns)
 					{
@@ -112,7 +112,7 @@ namespace mpp::detail
 					}
 				}
 
-				if constexpr (!Unsafe && CheckUnequalColumns)
+				if constexpr (CheckUnequalColumns)
 				{
 					if (current_columns != range_columns)
 					{
@@ -224,7 +224,7 @@ namespace mpp::detail
 				{
 					const auto current_columns = std::ranges::size(*range_begin);
 
-					if constexpr (!Unsafe && CheckAgainstCurrentColumns)
+					if constexpr (CheckAgainstCurrentColumns)
 					{
 						if (current_columns != _columns)
 						{
@@ -232,7 +232,7 @@ namespace mpp::detail
 						}
 					}
 
-					if constexpr (!Unsafe && CheckUnequalColumns)
+					if constexpr (CheckUnequalColumns)
 					{
 						if (current_columns != range_columns)
 						{
@@ -265,10 +265,10 @@ namespace mpp::detail
 			_columns = range_columns;
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool Unsafe, typename Range>
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize, typename Range>
 		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, Range&& range)
 		{
-			if constexpr (!Unsafe && CheckAgainstCurrentRows)
+			if constexpr (CheckAgainstCurrentRows)
 			{
 				if (rows != _rows)
 				{
@@ -276,7 +276,7 @@ namespace mpp::detail
 				}
 			}
 
-			if constexpr (!Unsafe && CheckAgainstCurrentColumns)
+			if constexpr (CheckAgainstCurrentColumns)
 			{
 				if (columns != _columns)
 				{
@@ -287,7 +287,7 @@ namespace mpp::detail
 			const auto buffer_size = _buffer.size();
 			const auto range_size  = rows * columns;
 
-			if constexpr (!Unsafe)
+			if constexpr (CheckRangeSize)
 			{
 				// Last resort safety check
 				if (range_size != std::ranges::size(range))

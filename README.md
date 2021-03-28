@@ -41,20 +41,20 @@ int main()
    * Extents determine if a matrix is fixed or (partially) flexible
    *
    * The following conditions will make the matrix static:
-   * - Explicitly passing sizes different than dynamic to the template parameters
+   * - Explicitly passing sizes different than mpp::dynamic to the template parameters
    * - Deduction guides with 2D std::array will deduce the extents, e.g.:
    *
    * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
    * - mpp::matrix{ arr_2d }; // Deduces to mpp::matrix<int, 2, 3>
    */
   auto m_fully_static = mpp::matrix<int, 3, 3>{};
-  auto m_fully_dynamic = mpp::matrix<int, dynamic, dynamic>{};
-  auto m_dynamic_rows = mpp::matrix<int, dynamic, 3>{};
-  auto m_dynamic_columns = mpp::matrix<int, 3, dynamic>{};
+  auto m_fully_dynamic = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+  auto m_dynamic_rows = mpp::matrix<int, mpp::dynamic, 3>{};
+  auto m_dynamic_columns = mpp::matrix<int, 3, mpp::dynamic>{};
 
   // Initialize using 2D initializer list
   auto m_init_2d_list = mpp::matrix{ { 1, 2, 3 }, { 4, 5, 6 } };
-  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, dynamic, dynamic>
+  // Note that deduction guides is used again, but it's deduced as mpp::matrix<int, mpp::dynamic, mpp::dynamic>
   m_init_2d_list.rows(); // 2
   m_init_2d_list.columns(); // 3
 
@@ -98,14 +98,48 @@ int main()
 
 One of the main things to take away is the concept of **"extents"** for dimensions. Matrices default to "dynamic extents", which means the sizes can be provided at runtime and matrices can be (partially) flexible (e.g. you can resize rows and columns of a "fully dynamic" matrix, but a "dynamic rows" matrix can only be resized in rows).
 
+#### Unsafe Operations
+
+If you as a user can make guarantees that the library checks internally (e.g. properly initialize the matrix with valid parameters), then you can pass `mpp::unsafe` as a parameter to avoid them. **Note that only some operations allow unsafe because they are the ones that needs to validate their arguments.**
+
+```cpp
+#include <mpp/algorithm/inverse.hpp>
+#include <mpp/matrix.hpp>
+
+#include <vector>
+
+int main()
+{
+  const auto range_2d = std::vector<std::vector<int>>{ { 1, 1 }, { 1, 1 } }; // 2x2 data
+  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
+
+  /**
+   * For constructors, mpp::unsafe will allow avoid checks like these (different depending on type of matrix you are constructing):
+   * - The 2D initializer has equal columns in all rows
+   * - The 2D initializer's rows matches the RowsExtent template parameter for fully static matrices
+   * - The 2D initializer's columns matches the ColumnsExtent template parameter for fully static matrices
+   * and much more...
+   */
+
+  const auto inv = mpp::inverse(matrix, mpp::unsafe);
+
+  /**
+   * For mpp::inverse, mpp::unsafe allows avoid checking if the determinant of the matrix is 0, which we guaranteed with our range_2d
+   */
+
+  return 0;
+}
+```
+
+Not all of the operations that support unsafe is shown here, but you can look for them in the (upcoming) documentation.
+
 #### Comparisons
 
 **Note: comparisons only work for matrices of the same value type!**
 
-Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
+Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
 
 ```cpp
-
 #include <mpp/matrix.hpp>
 #include <mpp/utility/comparison.hpp>
 
@@ -151,7 +185,7 @@ int main()
 
 #### Customizations
 
-Customizations of default extents used can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag.
+Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
 ```cpp
 #include <mpp/utility/configuration.hpp>
@@ -166,6 +200,8 @@ namespace mpp
 
     static constexpr std::size_t rows_extent    = 10;
     static constexpr std::size_t columns_extent = 10;
+
+    static constexpr bool use_unsafe = true;
   };
 } // namespace mpp
 

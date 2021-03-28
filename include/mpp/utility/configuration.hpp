@@ -40,5 +40,7 @@ namespace mpp
 
 		static constexpr auto rows_extent    = dynamic;
 		static constexpr auto columns_extent = dynamic;
+
+		static constexpr auto use_unsafe = false;
 	};
 } // namespace mpp

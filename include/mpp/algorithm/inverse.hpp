@@ -35,10 +35,18 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<bool Check, typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
+			if constexpr (Check)
+			{
+				if (!square(obj))
+				{
+					throw std::runtime_error(MATRIX_NOT_SQUARE);
+				}
+			}
+
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
@@ -62,9 +70,12 @@ namespace mpp
 
 				using to_ordering_type = std::compare_three_way_result_t<To, To>;
 
-				if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
+				if constexpr (Check)
 				{
-					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+					if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
+					{
+						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+					}
 				}
 
 				inverse_matrix_buffer[0] = To{ 1 } / elem;
@@ -84,10 +95,13 @@ namespace mpp
 
 				det = ad - bc;
 
-				if (floating_point_compare(det, default_floating_type{}) ==
-					default_floating_type_ordering_type::equivalent)
+				if constexpr (Check)
 				{
-					throw std::runtime_error("Inverse of a singular matrix doesn't exist!");
+					if (floating_point_compare(det, default_floating_type{}) ==
+						default_floating_type_ordering_type::equivalent)
+					{
+						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+					}
 				}
 
 				const auto multiplier = default_floating_type{ 1 } / det;
@@ -110,17 +124,21 @@ namespace mpp
 				std::ranges::copy(obj, u_buffer.begin());
 
 				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
-				make_identity_buffer(l_buffer, rows, default_floating_type{});
+				// @TODO: Allow the user to control one_value and zero_value here?
+				make_identity_buffer<false>(l_buffer, rows, columns, default_floating_type{}, default_floating_type{});
 
 				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
 					columns,
 					l_buffer,
 					u_buffer);
 
-				if (floating_point_compare(det, default_floating_type{}) ==
-					default_floating_type_ordering_type::equivalent)
+				if constexpr (Check)
 				{
-					throw std::runtime_error("inverseerse of a singular matrix doesn't exist!");
+					if (floating_point_compare(det, default_floating_type{}) ==
+						default_floating_type_ordering_type::equivalent)
+					{
+						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+					}
 				}
 
 				if (std::is_constant_evaluated())
@@ -154,18 +172,6 @@ namespace mpp
 
 			return inverse_matrix_t{ rows, columns, std::move(inverse_matrix_buffer) };
 		}
-
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto inverse_common(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
-		{
-			if (!square(obj))
-			{
-				throw std::runtime_error("inverseerse of a non-square matrix doesn't exist!");
-			}
-
-			return inverse_lu_decomp<To>(obj);
-		}
 	} // namespace detail
 
 	struct inverse_t : public detail::cpo_base<inverse_t>
@@ -174,7 +180,15 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inverse_common<detail::default_floating_type>(obj);
+			return detail::inverse_lu_decomp<detail::configuration_use_unsafe, detail::default_floating_type>(obj);
+		}
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			unsafe_tag) -> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+		{
+			return detail::inverse_lu_decomp<false, detail::default_floating_type>(obj);
 		}
 
 		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -182,7 +196,15 @@ namespace mpp
 		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inverse_common<To>(obj);
+			return detail::inverse_lu_decomp<detail::configuration_use_unsafe, To>(obj);
+		}
+
+		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto
+		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj, unsafe_tag)
+			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+		{
+			return detail::inverse_lu_decomp<false, To>(obj);
 		}
 	};
 

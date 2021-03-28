@@ -41,4 +41,8 @@ namespace mpp::detail
 		"Top column index bigger than bottom column index!";
 
 	static inline constexpr auto BOUNDS_OUT_OF_RANGE = "Bounds are out of range!";
+
+	static inline constexpr auto MATRIX_NOT_SQUARE = "Matrix is not square!";
+
+	static inline constexpr auto INVERSE_MATRIX_SINGULAR = "Inverse of a singular matrix does not exist!";
 } // namespace mpp::detail

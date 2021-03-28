@@ -19,73 +19,84 @@
 
 #pragma once
 
+#include <array>
 #include <concepts>
 #include <iterator>
 #include <ranges>
 #include <type_traits>
 
-namespace mpp::detail
+namespace mpp
 {
-	template<typename Derived,
-		typename Buffer,
-		typename Value,
-		std::size_t RowsExtent,
-		std::size_t ColumnsExtent,
-		typename Allocator>
-	class matrix_base;
-
-	template<typename Derived,
-		typename Buffer,
-		typename Value,
-		std::size_t RowsExtent,
-		std::size_t ColumnsExtent,
-		typename Allocator>
-	constexpr auto matrix_like_resolver(
-		const matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>&) -> int;
-
-	constexpr void matrix_like_resolver(...);
-
-	template<typename T>
-	static constexpr auto matrix_like_v = std::is_same_v<decltype(matrix_like_resolver(std::declval<T>())), int>;
-
-	template<typename T>
-	concept matrix_like = matrix_like_v<T>;
-
-	template<typename T, typename Value>
-	concept matrix_like_with_value_type_convertible_to =
-		matrix_like<T>&& std::convertible_to<typename std::remove_cvref_t<T>::value_type, Value>;
-
-	template<typename Value>
-	concept arithmetic = requires(Value&& value)
+	namespace detail
 	{
-		{ value + value };
-		{ value - value };
-		{ value * value };
-		{ value / value };
-		{ value += value };
-		{ value -= value };
-		{ value *= value };
-		{ value /= value };
-	};
+		template<typename Value>
+		concept arithmetic = requires(Value&& value)
+		{
+			{ value + value };
+			{ value - value };
+			{ value * value };
+			{ value / value };
+			{ value += value };
+			{ value -= value };
+			{ value *= value };
+			{ value /= value };
+		};
+	} // namespace detail
 
-	template<typename Iterator, typename Value>
-	concept input_iterator_2d_with_value = requires(Iterator it)
+	template<detail::arithmetic, std::size_t, std::size_t, typename>
+	class matrix;
+
+	namespace detail
 	{
-		requires std::input_iterator<Iterator>;
-		requires std::ranges::range<Iterator>;
-		requires std::same_as<std::iter_value_t<Iterator>, Value>;
-	};
+		template<typename Iterator, typename Value>
+		concept input_iterator_2d_with_value = requires(Iterator it)
+		{
+			requires std::input_iterator<Iterator>;
+			requires std::ranges::range<Iterator>;
+			requires std::same_as<std::iter_value_t<Iterator>, Value>;
+		};
 
-	template<typename Callable, typename Return, typename... Args>
-	concept invocable_with_return_type =
-		std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+		template<typename Callable, typename Return, typename... Args>
+		concept invocable_with_return_type =
+			std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
 
-	template<typename Range>
-	using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
+		template<typename Range>
+		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
 
-	template<typename Range, typename Value>
-	concept range_2d_with_value_type_convertible_to = std::convertible_to<range_2d_value_t<Range>, Value>;
+		template<typename Range, typename Value>
+		concept range_2d_with_value_type_convertible_to = std::convertible_to<range_2d_value_t<Range>, Value>;
 
-	template<typename Range, typename Value>
-	concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
-} // namespace mpp::detail
+		template<typename Range, typename Value>
+		concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
+
+		// matrix_with_value_convertible_to
+
+		template<typename>
+		struct matrix_value;
+
+		template<arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		struct matrix_value<matrix<Value, RowsExtent, ColumnsExtent, Allocator>>
+		{
+			using type = Value;
+		};
+
+		template<typename T, typename To>
+		concept matrix_with_value_convertible_to =
+			std::convertible_to<typename matrix_value<std::remove_cvref_t<T>>::type, To>;
+
+		// array_2d_with_value_convertible_to
+
+		template<typename, std::size_t, std::size_t>
+		struct array_2d_value;
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		struct array_2d_value<std::array<std::array<Value, ColumnsExtent>, RowsExtent>, RowsExtent, ColumnsExtent>
+		{
+			using type = Value;
+		};
+
+		template<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename To>
+		concept array_2d_with_value_convertible_to =
+			std::convertible_to<typename array_2d_value<std::remove_cvref_t<T>, RowsExtent, ColumnsExtent>::type, To>;
+	} // namespace detail
+} // namespace mpp
