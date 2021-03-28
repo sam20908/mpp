@@ -251,7 +251,7 @@ int main()
 				given("A smaller range") = [&]() {
 					// Test resize machinery (only for dynamic matrices)
 
-					const auto small_range_2d = std::array<std::array<int, 2>, 1>{ { 1, 1 } };
+					const auto small_range_2d = std::array<std::array<int, 2>, 1>{ { { 1, 1 } } };
 
 					auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
 					auto matrix_2 = mpp::matrix<int, 1, mpp::dynamic>{ range_2d };
