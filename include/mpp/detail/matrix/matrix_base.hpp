@@ -240,13 +240,23 @@ namespace mpp::detail
 						}
 					}
 
-					if constexpr (range_is_moved)
+					if constexpr (range_has_same_value_type)
 					{
-						std::ranges::move(*range_begin, buffer_back_inserter);
+						if constexpr (range_is_moved)
+						{
+							std::ranges::move(*range_begin, buffer_back_inserter);
+						}
+						else
+						{
+							std::ranges::copy(*range_begin, buffer_back_inserter);
+						}
 					}
 					else
 					{
-						std::ranges::copy(*range_begin, buffer_back_inserter);
+						// @TODO: Check if this *really* is perfect forwarding values
+						std::ranges::transform(*range_begin, buffer_back_inserter, [](auto&& value) -> decltype(auto) {
+							return static_cast<Value>(std::forward<decltype(value)>(value));
+						});
 					}
 
 					++range_begin;
