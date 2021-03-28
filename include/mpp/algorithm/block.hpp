@@ -90,7 +90,6 @@ namespace mpp
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
-			const auto begin   = obj.begin();
 
 			detail::validate_block_index_boundaries(rows,
 				columns,
@@ -98,6 +97,27 @@ namespace mpp
 				top_column_index,
 				bottom_row_index,
 				bottom_column_index);
+
+			return tag_invoke(block_t{},
+				obj,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index,
+				unsafe);
+		}
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			unsafe_tag) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
+		{
+			const auto columns = obj.columns();
+			const auto begin   = obj.begin();
 
 			using block_matrix_t  = matrix<Value, dynamic, dynamic>;
 			using block_buffer_t  = typename block_matrix_t::buffer_type;

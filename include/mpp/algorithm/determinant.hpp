@@ -22,6 +22,7 @@
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
@@ -34,10 +35,18 @@ namespace mpp
 	{
 		inline static constexpr auto dummy_variable = ' ';
 
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<bool CheckSquare, typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> To // @TODO: ISSUE #20
 		{
+			if constexpr (CheckSquare)
+			{
+				if (!square(obj))
+				{
+					throw std::runtime_error(MATRIX_NOT_SQUARE);
+				}
+			}
+
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
@@ -76,18 +85,6 @@ namespace mpp
 			// We can't directly cast because that would round down floating points
 			return static_cast<To>(std::round(det));
 		}
-
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto determinant_common(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> To // @TODO: ISSUE #20
-		{
-			if (!square(obj))
-			{
-				throw std::runtime_error("Cannot find determinant of a non-square matrix!");
-			}
-
-			return det_lu_decomp<To>(obj);
-		}
 	} // namespace detail
 
 	struct determinant_t : public detail::cpo_base<determinant_t>
@@ -96,7 +93,15 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20
 		{
-			return detail::determinant_common<Value>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_unsafe, Value>(obj);
+		}
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			unsafe_tag) -> Value // @TODO: ISSUE #20
+		{
+			return detail::det_lu_decomp<false, Value>(obj);
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -104,7 +109,16 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
-			return detail::determinant_common<To>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_unsafe, To>(obj);
+		}
+
+		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
+			std::type_identity<To>,
+			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			unsafe_tag) -> To // @TODO: ISSUE #20
+		{
+			return detail::det_lu_decomp<false, To>(obj);
 		}
 	};
 
