@@ -22,8 +22,8 @@
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
-#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
