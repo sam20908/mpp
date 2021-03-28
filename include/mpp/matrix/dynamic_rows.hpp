@@ -182,7 +182,7 @@ namespace mpp
 			const Value& zero_value    = Value{ 0 },
 			const Value& one_value     = Value{ 1 },
 			const Allocator& allocator = Allocator{}) :
-			base(0, ColumnsExtent, allocator) // @TODO: ISSUE #20
+			base(rows, ColumnsExtent, allocator) // @TODO: ISSUE #20
 		{
 			detail::make_identity_buffer<detail::configuration_use_unsafe>(base::_buffer,
 				rows,
@@ -197,7 +197,7 @@ namespace mpp
 			const Value& zero_value    = Value{ 0 },
 			const Value& one_value     = Value{ 1 },
 			const Allocator& allocator = Allocator{}) :
-			base(0, ColumnsExtent, allocator) // @TODO: ISSUE #20
+			base(rows, ColumnsExtent, allocator) // @TODO: ISSUE #20
 		{
 			detail::make_identity_buffer<false>(base::_buffer, rows, ColumnsExtent, zero_value, one_value);
 		}

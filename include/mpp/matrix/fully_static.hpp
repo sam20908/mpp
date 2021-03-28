@@ -128,11 +128,18 @@ namespace mpp
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
 		}
 
-		template<detail::array_2d_with_value_convertible_to<RowsExtent, ColumnsExtent, Value> Array2D>
-		explicit matrix(Array2D&& array_2d) // @TODO: ISSUE #20
+		template<std::convertible_to<Value> Array2DValue>
+		explicit matrix(const std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>& array_2d)
 		{
-			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Array2D>(array_2d));
+			base::template assign_and_insert_from_2d_range<false, false, false>(array_2d);
 		}
+
+		template<std::convertible_to<Value> Array2DValue>
+		explicit matrix(std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>&& array_2d)
+		{
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::move(array_2d));
+		}
+
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
 		explicit matrix(
@@ -226,10 +233,16 @@ namespace mpp
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
 		}
 
-		template<detail::array_2d_with_value_convertible_to<RowsExtent, ColumnsExtent, Value> Array2D>
-		void assign(Array2D&& array_2d) // @TODO: ISSUE #20
+		template<std::convertible_to<Value> Array2DValue>
+		void assign(const std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>& array_2d)
 		{
-			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Array2D>(array_2d));
+			base::template assign_and_insert_from_2d_range<false, false, false>(array_2d);
+		}
+
+		template<std::convertible_to<Value> Array2DValue>
+		void assign(std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>&& array_2d)
+		{
+			base::template assign_and_insert_from_2d_range<false, false, false>(std::move(array_2d));
 		}
 
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>

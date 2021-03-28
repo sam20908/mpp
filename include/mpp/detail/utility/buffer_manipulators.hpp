@@ -52,12 +52,12 @@ namespace mpp::detail
 		}
 	}
 
-	template<bool ValidateDimensions, typename Buffer, typename ZeroValue, typename OneValue>
+	template<bool ValidateDimensions, typename Buffer>
 	void make_identity_buffer(Buffer& buffer,
 		std::size_t rows,
 		std::size_t columns,
-		ZeroValue&& zero_value,
-		OneValue&& one_value) // @TODO: ISSUE #20
+		const auto& zero_value,
+		const auto& one_value) // @TODO: ISSUE #20
 	{
 		if constexpr (ValidateDimensions)
 		{
@@ -72,17 +72,21 @@ namespace mpp::detail
 			buffer.reserve(total_size);
 		}
 
+		auto diagnoal_index = std::size_t{};
 		for (auto index = std::size_t{}; index < total_size; ++index)
 		{
 			if constexpr (buffer_is_vector)
 			{
-				buffer.push_back(
-					(index + 1) % rows == 0 ? std::forward<OneValue>(one_value) : std::forward<ZeroValue>(zero_value));
+				buffer.push_back((index == diagnoal_index) ? one_value : zero_value);
 			}
 			else
 			{
-				buffer[index] =
-					(index + 1) % rows == 0 ? std::forward<OneValue>(one_value) : std::forward<ZeroValue>(zero_value);
+				buffer[index] = (index == diagnoal_index) ? one_value : zero_value;
+			}
+
+			if ((index + 1) % columns == 0)
+			{
+				diagnoal_index += columns + 1;
 			}
 		}
 	}
