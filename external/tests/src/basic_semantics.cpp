@@ -112,6 +112,8 @@ void test_matrix_comparison(const auto& range_2d)
 
 int main()
 {
+	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
+
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
@@ -170,6 +172,20 @@ int main()
 				compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
 				compare_matrix_to_range_2d(matrix_3, range_2d, 2, 3);
 				compare_matrix_to_range_2d(matrix_4, range_2d, 2, 3);
+			};
+
+			given("A value") = [&]() {
+				const auto value_range_2d = std::vector<std::vector<int>>{ { 2, 2, 2 }, { 2, 2, 2 } };
+
+				const auto matrix_1 = mpp::matrix<int, 2, 3>{ 2 };
+				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, 2 };
+				const auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 2 };
+				const auto matrix_4 = mpp::matrix<int, 2, mpp::dynamic>{ 3, 2 };
+
+				compare_matrix_to_range_2d(matrix_1, value_range_2d, 2, 3);
+				compare_matrix_to_range_2d(matrix_2, value_range_2d, 2, 3);
+				compare_matrix_to_range_2d(matrix_3, value_range_2d, 2, 3);
+				compare_matrix_to_range_2d(matrix_4, value_range_2d, 2, 3);
 			};
 
 			given("A 2D initializer_list") = [&]() {
