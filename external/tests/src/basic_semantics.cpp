@@ -37,6 +37,8 @@ int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 
+	// Next free template parameter suffix is 8
+
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
@@ -284,31 +286,31 @@ int main()
 				};
 
 				given("A range that is the same size") = [&]() {
-					auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
-						auto matrix_1 = mpp::matrix<Value, Rows, Columns>{};
-						auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
-						auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns };
-						auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows };
+					auto test_fn = [&]<typename Value5, std::size_t Rows5, std::size_t Columns5>() {
+						auto matrix_1 = mpp::matrix<Value5, Rows5, Columns5>{};
+						auto matrix_2 = mpp::matrix<Value5, mpp::dynamic, mpp::dynamic>{ Rows5, Columns5 };
+						auto matrix_3 = mpp::matrix<Value5, Rows5, mpp::dynamic>{ Columns5 };
+						auto matrix_4 = mpp::matrix<Value5, mpp::dynamic, Columns5>{ Rows5 };
 
 						matrix_1 = range_2d;
 						matrix_2 = range_2d;
 						matrix_3 = range_2d;
 						matrix_4 = range_2d;
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
 
 						matrix_1.assign(range_2d);
 						matrix_2.assign(range_2d);
 						matrix_3.assign(range_2d);
 						matrix_4.assign(range_2d);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
 
 						// Test rvalue overload
 						matrix_1.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
@@ -316,24 +318,25 @@ int main()
 						matrix_3.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
 						matrix_4.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
 
 						// Test std::array overloads for fully static matrices
 
 						const auto range_2d_as_array =
-							std::array<std::array<Value, Columns>, Rows>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
+							std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
 
 						matrix_1 = range_2d_as_array;
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
 
 						matrix_1.assign(range_2d_as_array);
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
 
-						matrix_1.assign(std::array<std::array<Value, Columns>, Rows>{ { { 1, 2, 3 }, { 4, 5, 6 } } });
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
+						matrix_1.assign(
+							std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } });
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
 					};
 
 					test_fn.template operator()<int, 2, 3>();
@@ -344,31 +347,31 @@ int main()
 					const auto initializer_list_2d =
 						std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-					auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
-						auto matrix_1 = mpp::matrix<Value, Rows, Columns>{};
-						auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
-						auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns };
-						auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows };
+					auto test_fn = [&]<typename Value6, std::size_t Rows6, std::size_t Columns6>() {
+						auto matrix_1 = mpp::matrix<Value6, Rows6, Columns6>{};
+						auto matrix_2 = mpp::matrix<Value6, mpp::dynamic, mpp::dynamic>{ Rows6, Columns6 };
+						auto matrix_3 = mpp::matrix<Value6, Rows6, mpp::dynamic>{ Columns6 };
+						auto matrix_4 = mpp::matrix<Value6, mpp::dynamic, Columns6>{ Rows6 };
 
 						matrix_1 = initializer_list_2d;
 						matrix_2 = initializer_list_2d;
 						matrix_3 = initializer_list_2d;
 						matrix_4 = initializer_list_2d;
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows6, Columns6);
 
 						matrix_1.assign(initializer_list_2d);
 						matrix_2.assign(initializer_list_2d);
 						matrix_3.assign(initializer_list_2d);
 						matrix_4.assign(initializer_list_2d);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows6, Columns6);
 
 						// Test rvalue overload
 						matrix_1.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
@@ -380,10 +383,10 @@ int main()
 						matrix_4.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
 							mpp::unsafe);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows6, Columns6);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows6, Columns6);
 					};
 
 					test_fn.template operator()<int, 2, 3>();
@@ -392,12 +395,12 @@ int main()
 
 				given("A matrix") = [&]() {
 					auto test_fn =
-						[&]<typename LeftValue, typename RightValue, std::size_t Rows, std::size_t Columns>() {
-							const auto matrix = mpp::matrix<LeftValue, Rows, Columns>{ range_2d };
-							auto matrix_1     = mpp::matrix<RightValue, Rows, Columns>{};
-							auto matrix_2     = mpp::matrix<RightValue, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
-							auto matrix_3     = mpp::matrix<RightValue, Rows, mpp::dynamic>{ Columns };
-							auto matrix_4     = mpp::matrix<RightValue, mpp::dynamic, Columns>{ Rows };
+						[&]<typename LeftValue7, typename RightValue7, std::size_t Rows7, std::size_t Columns7>() {
+							const auto matrix = mpp::matrix<LeftValue7, Rows7, Columns7>{ range_2d };
+							auto matrix_1     = mpp::matrix<RightValue7, Rows7, Columns7>{};
+							auto matrix_2     = mpp::matrix<RightValue7, mpp::dynamic, mpp::dynamic>{ Rows7, Columns7 };
+							auto matrix_3     = mpp::matrix<RightValue7, Rows7, mpp::dynamic>{ Columns7 };
+							auto matrix_4     = mpp::matrix<RightValue7, mpp::dynamic, Columns7>{ Rows7 };
 
 							matrix_1 = matrix;
 							matrix_2 = matrix;
