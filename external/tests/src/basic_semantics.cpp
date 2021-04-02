@@ -326,17 +326,17 @@ int main()
 						// Test std::array overloads for fully static matrices
 
 						const auto range_2d_as_array =
-							std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
+							std::array<std::array<Value8, Columns8>, Rows8>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
 
 						matrix_1 = range_2d_as_array;
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows8, Columns8);
 
 						matrix_1.assign(range_2d_as_array);
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows8, Columns8);
 
-						matrix_1.assign(std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } },
+						matrix_1.assign(std::array<std::array<Value8, Columns8>, Rows8>{ { { 1, 2, 3 }, { 4, 5, 6 } } },
 							mpp::unsafe);
-						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows8, Columns8);
 					};
 
 					test_fn.template operator()<int, 2, 3>();
