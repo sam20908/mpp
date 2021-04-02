@@ -37,7 +37,7 @@ int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 
-	// Next free template parameter suffix is 8
+	// Next free template parameter suffix is 9
 
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
@@ -286,31 +286,31 @@ int main()
 				};
 
 				given("A range that is the same size") = [&]() {
-					auto test_fn = [&]<typename Value5, std::size_t Rows5, std::size_t Columns5>() {
-						auto matrix_1 = mpp::matrix<Value5, Rows5, Columns5>{};
-						auto matrix_2 = mpp::matrix<Value5, mpp::dynamic, mpp::dynamic>{ Rows5, Columns5 };
-						auto matrix_3 = mpp::matrix<Value5, Rows5, mpp::dynamic>{ Columns5 };
-						auto matrix_4 = mpp::matrix<Value5, mpp::dynamic, Columns5>{ Rows5 };
+					auto test_fn = [&]<typename Value8, std::size_t Rows8, std::size_t Columns8>() {
+						auto matrix_1 = mpp::matrix<Value8, Rows8, Columns8>{};
+						auto matrix_2 = mpp::matrix<Value8, mpp::dynamic, mpp::dynamic>{ Rows8, Columns8 };
+						auto matrix_3 = mpp::matrix<Value8, Rows8, mpp::dynamic>{ Columns8 };
+						auto matrix_4 = mpp::matrix<Value8, mpp::dynamic, Columns8>{ Rows8 };
 
 						matrix_1 = range_2d;
 						matrix_2 = range_2d;
 						matrix_3 = range_2d;
 						matrix_4 = range_2d;
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows8, Columns8);
 
 						matrix_1.assign(range_2d);
 						matrix_2.assign(range_2d);
 						matrix_3.assign(range_2d);
 						matrix_4.assign(range_2d);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows8, Columns8);
 
 						// Test rvalue overload
 						matrix_1.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
@@ -318,10 +318,10 @@ int main()
 						matrix_3.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
 						matrix_4.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
 
-						compare_matrix_to_range_2d(matrix_1, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_2, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_3, range_2d, Rows5, Columns5);
-						compare_matrix_to_range_2d(matrix_4, range_2d, Rows5, Columns5);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows8, Columns8);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows8, Columns8);
 
 						// Test std::array overloads for fully static matrices
 
@@ -334,8 +334,8 @@ int main()
 						matrix_1.assign(range_2d_as_array);
 						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
 
-						matrix_1.assign(
-							std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } });
+						matrix_1.assign(std::array<std::array<Value5, Columns5>, Rows5>{ { { 1, 2, 3 }, { 4, 5, 6 } } },
+							mpp::unsafe);
 						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows5, Columns5);
 					};
 
