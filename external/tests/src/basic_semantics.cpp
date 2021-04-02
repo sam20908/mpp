@@ -43,7 +43,7 @@ int main()
 	"Basic semantics"_test = [&]() {
 		scenario("Creating matrices") = [&]() {
 			given("A 2D range") = [&]() {
-				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
 					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
 					const auto matrix_2 =
 						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ range_2d, additional_args... };
@@ -56,16 +56,16 @@ int main()
 					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 				};
 
-				test.template operator()<int, 2, 3>();
-				test.template operator()<float, 2, 3>(); // Test value convertibility
-				test.template operator()<int, 2, 3>(mpp::unsafe);
-				test.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<float, 2, 3>(); // Test value convertibility
+				test_fn.template operator()<int, 2, 3>(mpp::unsafe);
+				test_fn.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
 			};
 
 			given("A callable") = []() {
 				const auto iota_range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
+				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
 					auto iota = []() {
 						return [i = 1]() mutable {
 							return i++;
@@ -83,15 +83,15 @@ int main()
 					compare_matrix_to_range_2d(matrix_4, iota_range_2d, Rows, Columns);
 				};
 
-				test.template operator()<int, 2, 3>();
-				// test.template operator()<float, 2, 3>(); // @FIXME: Allow callable's value return be convertible to
-				// value typeest value convertibility
+				test_fn.template operator()<int, 2, 3>();
+				// test_fn.template operator()<float, 2, 3>(); // @FIXME: Allow callable's value return be convertible
+				// to value typeest value convertibility
 			};
 
 			given("A 1D range") = [&]() {
 				const auto range_1d = std::vector<int>{ 1, 2, 3, 4, 5, 6 };
 
-				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
 					const auto matrix_1 =
 						mpp::matrix<Value, Rows, Columns>{ Rows, Columns, range_1d, additional_args... };
 					const auto matrix_2 =
@@ -107,8 +107,8 @@ int main()
 					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 				};
 
-				test.template operator()<int, 2, 3>();
-				test.template operator()<int, 2, 3>(mpp::unsafe);
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, 2, 3>(mpp::unsafe);
 			};
 
 			given("A value") = [&]() {
@@ -129,7 +129,7 @@ int main()
 				const auto initializer_list_2d =
 					std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
 					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ initializer_list_2d, additional_args... };
 					const auto matrix_2 =
 						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ initializer_list_2d, additional_args... };
@@ -144,10 +144,10 @@ int main()
 					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 				};
 
-				test.template operator()<int, 2, 3>();
-				test.template operator()<float, 2, 3>(); // Test value convertibility
-				test.template operator()<int, 2, 3>(mpp::unsafe);
-				test.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<float, 2, 3>(); // Test value convertibility
+				test_fn.template operator()<int, 2, 3>(mpp::unsafe);
+				test_fn.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
 			};
 
 			given("A matrix of different value type or extents") = [&]() {
@@ -185,7 +185,7 @@ int main()
 			scenario("Constructing an identity matrix") = [&]() {
 				const auto identity_range_2d = std::vector<std::vector<int>>{ { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
 					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ mpp::identity, additional_args... };
 					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows,
 						Columns,
@@ -202,18 +202,18 @@ int main()
 					compare_matrix_to_range_2d(matrix_4, identity_range_2d, Rows, Columns);
 				};
 
-				test.template operator()<int, 3, 3>();
-				test.template operator()<int, 3, 3>(mpp::unsafe);
+				test_fn.template operator()<int, 3, 3>();
+				test_fn.template operator()<int, 3, 3>(mpp::unsafe);
 			};
 		};
 
 		scenario("Comparing matrices") = [&]() {
-			auto test = [&]<typename LeftValue,
-							typename RightValue,
-							std::size_t LeftRows,
-							std::size_t LeftColumns,
-							std::size_t RightRows,
-							std::size_t RightColumns>() {
+			auto test_fn = [&]<typename LeftValue,
+							   typename RightValue,
+							   std::size_t LeftRows,
+							   std::size_t LeftColumns,
+							   std::size_t RightRows,
+							   std::size_t RightColumns>() {
 				const auto matrix_1   = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ range_2d };
 				const auto matrix_1_1 = mpp::matrix<RightValue, RightRows, RightColumns>{ range_2d };
 				compare_matrix_to_matrix(matrix_1, matrix_1_1);
@@ -227,8 +227,8 @@ int main()
 				const auto matrix_1_4 = mpp::matrix<RightValue, mpp::dynamic, RightColumns>{ range_2d };
 				compare_matrix_to_matrix(matrix_1, matrix_1_4);
 			};
-			test.template operator()<int, int, 2, 3, 2, 3>();
-			test.template operator()<double, short, 2, 3, 2, 3>(); // Test different value type comparison
+			test_fn.template operator()<int, int, 2, 3, 2, 3>();
+			test_fn.template operator()<double, short, 2, 3, 2, 3>(); // Test different value type comparison
 		};
 
 		scenario("Assigning matrices") = [&]() {
