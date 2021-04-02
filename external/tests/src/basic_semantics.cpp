@@ -284,116 +284,155 @@ int main()
 				};
 
 				given("A range that is the same size") = [&]() {
-					const auto another_range_2d_v = std::vector<std::vector<int>>{ { { 4, 5, 6 }, { 7, 8, 9 } } };
-					auto another_range_2d_v2      = std::vector<std::vector<int>>{ { { 4, 5, 6 }, { 7, 8, 9 } } };
+					auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
+						auto matrix_1 = mpp::matrix<Value, Rows, Columns>{};
+						auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
+						auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns };
+						auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows };
 
-					auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-					auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-					auto matrix_3 = mpp::matrix<int, 1, mpp::dynamic>{ range_2d };
-					auto matrix_4 = mpp::matrix<int, mpp::dynamic, 2>{ range_2d };
+						matrix_1 = range_2d;
+						matrix_2 = range_2d;
+						matrix_3 = range_2d;
+						matrix_4 = range_2d;
 
-					// Test const Range2D& overload
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 
-					matrix_1 = another_range_2d_v;
-					matrix_2 = another_range_2d_v;
-					matrix_3 = another_range_2d_v;
-					matrix_4 = another_range_2d_v;
+						matrix_1.assign(range_2d);
+						matrix_2.assign(range_2d);
+						matrix_3.assign(range_2d);
+						matrix_4.assign(range_2d);
 
-					compare_matrix_to_range_2d(matrix_1,
-						another_range_2d_v,
-						2,
-						3); // Test constrained const Range2D& overload
-					compare_matrix_to_range_2d(matrix_2, another_range_2d_v, 2, 3);
-					compare_matrix_to_range_2d(matrix_3, another_range_2d_v, 2, 3);
-					compare_matrix_to_range_2d(matrix_4, another_range_2d_v, 2, 3);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 
-					// Test Range2D&& overload
+						// Test rvalue overload
+						matrix_1.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
+						matrix_2.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
+						matrix_3.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
+						matrix_4.assign(std::vector<std::vector<int>>{ { { 1, 2, 3 }, { 4, 5, 6 } } }, mpp::unsafe);
 
-					matrix_1 = std::move(another_range_2d_v2);
-					matrix_2 = std::move(another_range_2d_v2);
-					matrix_3 = std::move(another_range_2d_v2);
-					matrix_4 = std::move(another_range_2d_v2);
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 
-					compare_matrix_to_range_2d(matrix_1,
-						another_range_2d_v,
-						2,
-						3); // Test constrained Range2D&& overload
-					compare_matrix_to_range_2d(matrix_2, another_range_2d_v, 2, 3);
-					compare_matrix_to_range_2d(matrix_3, another_range_2d_v, 2, 3);
-					compare_matrix_to_range_2d(matrix_4, another_range_2d_v, 2, 3);
+						// Test std::array overloads for fully static matrices
 
-					const auto another_range_2d_a =
-						std::array<std::array<int, 3>, 2>{ { { 3, 2, 61 }, { 75, 86, 92 } } };
-					auto another_range_2d_a2 = std::array<std::array<int, 3>, 2>{ { { 3, 2, 61 }, { 75, 86, 92 } } };
+						const auto range_2d_as_array =
+							std::array<std::array<Value, Columns>, Rows>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
 
-					// Test const std::array& overload
+						matrix_1 = range_2d_as_array;
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
 
-					matrix_1 = another_range_2d_a;
+						matrix_1.assign(range_2d_as_array);
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
 
-					compare_matrix_to_range_2d(matrix_1, another_range_2d_a, 2, 3);
+						matrix_1.assign(std::array<std::array<Value, Columns>, Rows>{ { { 1, 2, 3 }, { 4, 5, 6 } } });
+						compare_matrix_to_range_2d(matrix_1, range_2d_as_array, Rows, Columns);
+					};
 
-					// Test std::array&& overload
-
-					matrix_1 = std::move(another_range_2d_a2);
-
-					compare_matrix_to_range_2d(matrix_1, another_range_2d_a, 2, 3);
+					test_fn.template operator()<int, 2, 3>();
+					test_fn.template operator()<float, 2, 3>(); // Test different value type assignment
 				};
 
 				given("A 2D initializer_list") = [&]() {
 					const auto initializer_list_2d =
 						std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-					auto matrix_1 = mpp::matrix<int, 2, 3>{};
-					auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-					auto matrix_3 = mpp::matrix<int, 1, mpp::dynamic>{};
-					auto matrix_4 = mpp::matrix<int, mpp::dynamic, 2>{};
+					auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
+						auto matrix_1 = mpp::matrix<Value, Rows, Columns>{};
+						auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
+						auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns };
+						auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows };
 
-					matrix_1 = initializer_list_2d;
-					matrix_2 = initializer_list_2d;
-					matrix_3 = initializer_list_2d;
-					matrix_4 = initializer_list_2d;
+						matrix_1 = initializer_list_2d;
+						matrix_2 = initializer_list_2d;
+						matrix_3 = initializer_list_2d;
+						matrix_4 = initializer_list_2d;
 
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 
-					compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_3, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_4, range_2d, 2, 3);
+						matrix_1.assign(initializer_list_2d);
+						matrix_2.assign(initializer_list_2d);
+						matrix_3.assign(initializer_list_2d);
+						matrix_4.assign(initializer_list_2d);
+
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+
+						// Test rvalue overload
+						matrix_1.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
+							mpp::unsafe);
+						matrix_2.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
+							mpp::unsafe);
+						matrix_3.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
+							mpp::unsafe);
+						matrix_4.assign(std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } },
+							mpp::unsafe);
+
+						compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+						compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+					};
+
+					test_fn.template operator()<int, 2, 3>();
+					test_fn.template operator()<float, 2, 3>(); // Test different value type assignment
 				};
 
-				given("A matrix of different value type or extents") = [&]() {
-					const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-					const auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d };
-					const auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d };
-					const auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d };
+				given("A matrix") = [&]() {
+					auto test_fn =
+						[&]<typename LeftValue, typename RightValue, std::size_t Rows, std::size_t Columns>() {
+							const auto matrix = mpp::matrix<LeftValue, Rows, Columns>{ range_2d };
+							auto matrix_1     = mpp::matrix<RightValue, Rows, Columns>{};
+							auto matrix_2     = mpp::matrix<RightValue, mpp::dynamic, mpp::dynamic>{ Rows, Columns };
+							auto matrix_3     = mpp::matrix<RightValue, Rows, mpp::dynamic>{ Columns };
+							auto matrix_4     = mpp::matrix<RightValue, mpp::dynamic, Columns>{ Rows };
 
-					auto matrix_v1 = mpp::matrix<short, 2, 3>{};
-					auto matrix_v2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{};
-					auto matrix_v3 = mpp::matrix<int, mpp::dynamic, 3>{};
-					auto matrix_v4 = mpp::matrix<double, 2, mpp::dynamic>{};
+							matrix_1 = matrix;
+							matrix_2 = matrix;
+							matrix_3 = matrix;
+							matrix_4 = matrix;
 
-					// Test constrained const Matrix& overload
+							compare_matrix_to_matrix(matrix, matrix_1);
+							compare_matrix_to_matrix(matrix, matrix_2);
+							compare_matrix_to_matrix(matrix, matrix_3);
+							compare_matrix_to_matrix(matrix, matrix_4);
 
-					matrix_v1 = matrix_4;
-					matrix_v2 = matrix_3;
-					matrix_v3 = matrix_2;
-					matrix_v4 = matrix_1;
+							matrix_1.assign(matrix);
+							matrix_2.assign(matrix);
+							matrix_3.assign(matrix);
+							matrix_4.assign(matrix);
 
-					compare_matrix_to_range_2d(matrix_v1, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v2, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v3, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v4, range_2d, 2, 3);
+							compare_matrix_to_matrix(matrix, matrix_1);
+							compare_matrix_to_matrix(matrix, matrix_2);
+							compare_matrix_to_matrix(matrix, matrix_3);
+							compare_matrix_to_matrix(matrix, matrix_4);
 
-					// Test constrained Matrix&& overload
+							// Test rvalue overload
+							matrix_1.assign(mpp::matrix{ range_2d }, mpp::unsafe);
+							matrix_2.assign(mpp::matrix{ range_2d }, mpp::unsafe);
+							matrix_3.assign(mpp::matrix{ range_2d }, mpp::unsafe);
+							matrix_4.assign(mpp::matrix{ range_2d }, mpp::unsafe);
 
-					matrix_v1 = std::move(matrix_4);
-					matrix_v2 = std::move(matrix_3);
-					matrix_v3 = std::move(matrix_2);
-					matrix_v4 = std::move(matrix_1);
+							compare_matrix_to_matrix(matrix, matrix_1);
+							compare_matrix_to_matrix(matrix, matrix_2);
+							compare_matrix_to_matrix(matrix, matrix_3);
+							compare_matrix_to_matrix(matrix, matrix_4);
+						};
 
-					compare_matrix_to_range_2d(matrix_v1, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v2, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v3, range_2d, 2, 3);
-					compare_matrix_to_range_2d(matrix_v4, range_2d, 2, 3);
+					test_fn.template operator()<int, int, 2, 3>();   // @NOTE: Also covers defaulted operator=
+					test_fn.template operator()<int, float, 2, 3>(); // Test different value type assignment
 				};
 			};
 		};
@@ -459,83 +498,7 @@ int main()
 				}
 			};
 
-			scenario("Copy assigning from matrices") = [&]() {
-				{
-					const auto matrix = mpp::matrix<int, 2, 3>{ range_2d };
-					auto matrix_2     = mpp::matrix<int, 2, 3>{};
-
-					matrix_2 = matrix;
-
-					compare_matrix_to_matrix(matrix, matrix_2);
-				}
-
-				{
-					const auto matrix = mpp::matrix<int>{ range_2d };
-					auto matrix_2     = mpp::matrix<int>{};
-
-					matrix_2 = matrix;
-
-					compare_matrix_to_matrix(matrix, matrix_2);
-				}
-
-
-				{
-					const auto matrix = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-					auto matrix_2     = mpp::matrix<int, mpp::dynamic, 3>{};
-
-					matrix_2 = matrix;
-
-					compare_matrix_to_matrix(matrix, matrix_2);
-				}
-
-				{
-					const auto matrix = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-					auto matrix_2     = mpp::matrix<int, 2, mpp::dynamic>{};
-
-					matrix_2 = matrix;
-
-					compare_matrix_to_matrix(matrix, matrix_2);
-				}
-			};
-
-			scenario("Move assigning from matrices") = [&]() {
-				{
-					auto matrix   = mpp::matrix<int, 2, 3>{ range_2d };
-					auto matrix_2 = mpp::matrix<int, 2, 3>{};
-
-					matrix_2 = std::move(matrix);
-
-					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				}
-
-				{
-					auto matrix   = mpp::matrix<int>{ range_2d };
-					auto matrix_2 = mpp::matrix<int>{};
-
-					matrix_2 = std::move(matrix);
-
-					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				}
-
-
-				{
-					auto matrix   = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-					auto matrix_2 = mpp::matrix<int, mpp::dynamic, 3>{};
-
-					matrix_2 = std::move(matrix);
-
-					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				}
-
-				{
-					auto matrix   = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-					auto matrix_2 = mpp::matrix<int, 2, mpp::dynamic>{};
-
-					matrix_2 = std::move(matrix);
-
-					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				}
-			};
+			// @NOTE: Copy and move assigning matrices is already covered in above assignment test
 
 			scenario("Matrices should be destructible") = [&]() {
 				expect(constant<std::is_destructible_v<mpp::matrix<int, 2, 3>>>);
