@@ -19,19 +19,58 @@
 
 #pragma once
 
-#include <limits>
+#include <mpp/matrix.hpp>
+
+#include "../thirdparty/ut.hpp"
+
+#include <compare>
+#include <cstddef>
 #include <type_traits>
 
-// @NOTE TO SELF: Copied from detail/utility.hpp
-template<typename T>
-constexpr auto accurate_equals(T left, T right) -> bool
+using namespace boost::ut;
+
+void compare_matrix_to_range_2d(const auto& matrix, const auto& range_2d, std::size_t rows, std::size_t columns)
 {
-	if constexpr (std::is_floating_point_v<T>)
+	expect(matrix.rows() == rows);
+	expect(matrix.columns() == columns);
+
+	using matrix_value_t   = typename std::remove_cvref_t<decltype(matrix)>::value_type;
+	using range_2d_value_t = typename std::remove_cvref_t<decltype(range_2d)>::value_type::value_type;
+	using ordering_type    = std::compare_three_way_result_t<matrix_value_t, range_2d_value_t>;
+
+	auto all_elems_equal = true;
+
+	for (auto row = std::size_t{}; row < rows; ++row)
 	{
-		return std::abs(left - right) < std::numeric_limits<T>::epsilon();
+		for (auto column = std::size_t{}; column < columns; ++column)
+		{
+			if (mpp::floating_point_compare(matrix(row, column), range_2d[row][column]) != ordering_type::equivalent)
+			{
+				all_elems_equal = false;
+				break;
+			}
+		}
 	}
-	else
-	{
-		return left == right;
-	}
+
+	expect(all_elems_equal);
 }
+
+void compare_matrix_to_matrix(const auto& left_matrix, const auto& right_matrix)
+{
+	const auto [row_ordering, column_ordering] = mpp::size_compare(left_matrix, right_matrix, true, true);
+
+	expect(row_ordering == std::partial_ordering::equivalent);
+	expect(column_ordering == std::partial_ordering::equivalent);
+
+	using ordering_type =
+		std::compare_three_way_result_t<typename std::remove_cvref_t<decltype(left_matrix)>::value_type,
+			typename std::remove_cvref_t<decltype(right_matrix)>::value_type>;
+
+	expect(mpp::elements_compare(left_matrix, right_matrix, mpp::floating_point_compare) == ordering_type::equivalent);
+}
+
+inline constexpr auto compose = [](auto&& compose_fn, auto&&... args) -> decltype(auto) {
+	return [compose_fn = compose_fn, ... args = args]() -> decltype(auto) {
+		return std::invoke(FWD(compose_fn), FWD(args)...);
+	};
+};

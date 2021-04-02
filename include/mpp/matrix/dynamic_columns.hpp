@@ -204,6 +204,7 @@ namespace mpp
 			detail::make_identity_buffer<false>(base::_buffer, RowsExtent, columns, zero_value, one_value);
 		}
 
+		// @FIXME: Allow callable's value return be convertible to value type
 		template<detail::invocable_with_return_type<Value> Callable>
 		matrix(std::size_t columns, Callable&& callable, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, columns, allocator) // @TODO: ISSUE #20

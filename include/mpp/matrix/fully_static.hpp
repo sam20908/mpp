@@ -197,6 +197,7 @@ namespace mpp
 				one_value);
 		}
 
+		// @FIXME: Allow callable's value return be convertible to value type
 		template<detail::invocable_with_return_type<Value> Callable>
 		explicit matrix(Callable&& callable) // @TODO: ISSUE #20
 		{

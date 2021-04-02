@@ -20,6 +20,7 @@
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
+#include "../../include/utility.hpp"
 #include "../../thirdparty/ut.hpp"
 
 #include <array>
@@ -32,59 +33,19 @@ using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-void compare_matrix_to_range_2d(const auto& matrix, const auto& range_2d, std::size_t rows, std::size_t columns)
-{
-	expect(matrix.rows() == rows);
-	expect(matrix.columns() == columns);
-
-	using matrix_value_t   = typename std::remove_cvref_t<decltype(matrix)>::value_type;
-	using range_2d_value_t = typename std::remove_cvref_t<decltype(range_2d)>::value_type::value_type;
-	using ordering_type    = std::compare_three_way_result_t<matrix_value_t, range_2d_value_t>;
-
-	auto all_elems_equal = true;
-
-	for (auto row = std::size_t{}; row < rows; ++row)
-	{
-		for (auto column = std::size_t{}; column < columns; ++column)
-		{
-			if (mpp::floating_point_compare(matrix(row, column), range_2d[row][column]) != ordering_type::equivalent)
-			{
-				all_elems_equal = false;
-				break;
-			}
-		}
-	}
-
-	expect(all_elems_equal);
-}
-
-void compare_matrix_to_matrix(const auto& left_matrix, const auto& right_matrix)
-{
-	const auto [row_ordering, column_ordering] = mpp::size_compare(left_matrix, right_matrix, true, true);
-
-	expect(row_ordering == std::partial_ordering::equivalent);
-	expect(column_ordering == std::partial_ordering::equivalent);
-
-	using ordering_type =
-		std::compare_three_way_result_t<typename std::remove_cvref_t<decltype(left_matrix)>::value_type,
-			typename std::remove_cvref_t<decltype(right_matrix)>::value_type>;
-
-	expect(mpp::elements_compare(left_matrix, right_matrix, mpp::floating_point_compare) == ordering_type::equivalent);
-}
-
 template<typename Value, std::size_t Rows, std::size_t Columns>
-void test_matrix_against_range_2d(const auto& range_2d)
+void test_matrix_initialization_range_2d_against_range_2d(const auto& range_2d, auto... additional_args)
 {
-	const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d };
+	const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
 	compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
 
-	const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ range_2d };
+	const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ range_2d, additional_args... };
 	compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
 
-	const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ range_2d };
+	const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ range_2d, additional_args... };
 	compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
 
-	const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ range_2d };
+	const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ range_2d, additional_args... };
 	compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
 }
 
@@ -120,58 +81,72 @@ int main()
 	"Basic semantics"_test = [&]() {
 		scenario("Creating matrices") = [&]() {
 			given("A 2D range") = [&]() {
-				test_matrix_against_range_2d<int, 2, 3>(range_2d);
-				test_matrix_against_range_2d<float, 2, 3>(range_2d); // Test value convertibility
+				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
+					const auto matrix_2 =
+						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ range_2d, additional_args... };
+					const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ range_2d, additional_args... };
+					const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ range_2d, additional_args... };
+
+					compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+				};
+
+				test.template operator()<int, 2, 3>();
+				test.template operator()<float, 2, 3>(); // Test value convertibility
+				test.template operator()<int, 2, 3>(mpp::unsafe);
+				test.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
 			};
 
 			given("A callable") = []() {
 				const auto iota_range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				{
-					auto iota = [i = 1]() mutable {
-						return i++;
+				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
+					auto iota = []() {
+						return [i = 1]() mutable {
+							return i++;
+						};
 					};
-					const auto matrix = mpp::matrix<int, 2, 3>{ iota };
-					compare_matrix_to_range_2d(matrix, iota_range_2d, 2, 3);
-				}
 
-				{
-					auto iota = [i = 1]() mutable {
-						return i++;
-					};
-					const auto matrix = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, iota };
-					compare_matrix_to_range_2d(matrix, iota_range_2d, 2, 3);
-				}
+					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ iota() };
+					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns, iota() };
+					const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns, iota() };
+					const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, iota() };
 
-				{
-					auto iota = [i = 1]() mutable {
-						return i++;
-					};
-					const auto matrix = mpp::matrix<int, 2, mpp::dynamic>{ 3, iota };
-					compare_matrix_to_range_2d(matrix, iota_range_2d, 2, 3);
-				}
+					compare_matrix_to_range_2d(matrix_1, iota_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_2, iota_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_3, iota_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_4, iota_range_2d, Rows, Columns);
+				};
 
-				{
-					auto iota = [i = 1]() mutable {
-						return i++;
-					};
-					const auto matrix = mpp::matrix<int, mpp::dynamic, 3>{ 2, iota };
-					compare_matrix_to_range_2d(matrix, iota_range_2d, 2, 3);
-				}
+				test.template operator()<int, 2, 3>();
+				// test.template operator()<float, 2, 3>(); // @FIXME: Allow callable's value return be convertible to
+				// value typeest value convertibility
 			};
 
 			given("A 1D range") = [&]() {
 				const auto range_1d = std::vector<int>{ 1, 2, 3, 4, 5, 6 };
 
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ 2, 3, range_1d };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, range_1d };
-				const auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 3, range_1d };
-				const auto matrix_4 = mpp::matrix<int, 2, mpp::dynamic>{ 2, 3, range_1d };
+				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+					const auto matrix_1 =
+						mpp::matrix<Value, Rows, Columns>{ Rows, Columns, range_1d, additional_args... };
+					const auto matrix_2 =
+						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns, range_1d, additional_args... };
+					const auto matrix_3 =
+						mpp::matrix<Value, Rows, mpp::dynamic>{ Rows, Columns, range_1d, additional_args... };
+					const auto matrix_4 =
+						mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, Columns, range_1d, additional_args... };
 
-				compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_3, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_4, range_2d, 2, 3);
+					compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+				};
+
+				test.template operator()<int, 2, 3>();
+				test.template operator()<int, 2, 3>(mpp::unsafe);
 			};
 
 			given("A value") = [&]() {
@@ -192,41 +167,81 @@ int main()
 				const auto initializer_list_2d =
 					std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ initializer_list_2d };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ initializer_list_2d };
-				const auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3>{ initializer_list_2d };
-				const auto matrix_4 = mpp::matrix<int, 2, mpp::dynamic>{ initializer_list_2d };
+				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ initializer_list_2d, additional_args... };
+					const auto matrix_2 =
+						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ initializer_list_2d, additional_args... };
+					const auto matrix_3 =
+						mpp::matrix<Value, Rows, mpp::dynamic>{ initializer_list_2d, additional_args... };
+					const auto matrix_4 =
+						mpp::matrix<Value, mpp::dynamic, Columns>{ initializer_list_2d, additional_args... };
 
-				compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_3, range_2d, 2, 3);
-				compare_matrix_to_range_2d(matrix_4, range_2d, 2, 3);
+					compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+				};
+
+				test.template operator()<int, 2, 3>();
+				test.template operator()<float, 2, 3>(); // Test value convertibility
+				test.template operator()<int, 2, 3>(mpp::unsafe);
+				test.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
 			};
 
 			given("A matrix of different value type or extents") = [&]() {
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-				const auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d };
-				const auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d };
-				const auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d };
+				{
+					const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
+					const auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d };
+					const auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d };
+					const auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d };
 
-				compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ matrix_4 }, range_2d, 2, 3);
-				compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ matrix_3 }, range_2d, 2, 3);
-				compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ matrix_2 }, range_2d, 2, 3);
-				compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ matrix_1 }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ matrix_4 }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ matrix_3 },
+						range_2d,
+						2,
+						3);
+					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ matrix_2 }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ matrix_1 }, range_2d, 2, 3);
+				}
+
+				{
+					const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d, mpp::unsafe };
+					const auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d, mpp::unsafe };
+					const auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d, mpp::unsafe };
+					const auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d, mpp::unsafe };
+
+					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ matrix_4 }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ matrix_3 },
+						range_2d,
+						2,
+						3);
+					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ matrix_2 }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ matrix_1 }, range_2d, 2, 3);
+				}
 			};
 
 			scenario("Constructing an identity matrix") = [&]() {
 				const auto identity_range_2d = std::vector<std::vector<int>>{ { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-				const auto matrix_1 = mpp::matrix<int, 3, 3>{ mpp::identity };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity };
-				const auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity };
-				const auto matrix_4 = mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity };
+				auto test = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ mpp::identity, additional_args... };
+					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows,
+						Columns,
+						mpp::identity,
+						additional_args... };
+					const auto matrix_3 =
+						mpp::matrix<Value, Rows, mpp::dynamic>{ Columns, mpp::identity, additional_args... };
+					const auto matrix_4 =
+						mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, mpp::identity, additional_args... };
 
-				compare_matrix_to_range_2d(matrix_1, identity_range_2d, 3, 3);
-				compare_matrix_to_range_2d(matrix_2, identity_range_2d, 3, 3);
-				compare_matrix_to_range_2d(matrix_3, identity_range_2d, 3, 3);
-				compare_matrix_to_range_2d(matrix_4, identity_range_2d, 3, 3);
+					compare_matrix_to_range_2d(matrix_1, identity_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_2, identity_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_3, identity_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_4, identity_range_2d, Rows, Columns);
+				};
+
+				test.template operator()<int, 3, 3>();
+				test.template operator()<int, 3, 3>(mpp::unsafe);
 			};
 		};
 
@@ -251,17 +266,19 @@ int main()
 						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
 						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
 
-					auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-					auto matrix_2 = mpp::matrix<int, 10, mpp::dynamic>{ range_2d };
-					auto matrix_3 = mpp::matrix<int, mpp::dynamic, 10>{ range_2d };
+					{
+						auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+						auto matrix_2 = mpp::matrix<int, 10, mpp::dynamic>{ range_2d };
+						auto matrix_3 = mpp::matrix<int, mpp::dynamic, 10>{ range_2d };
 
-					matrix_1 = big_range_2d;
-					matrix_2 = big_range_2d;
-					matrix_3 = big_range_2d;
+						matrix_1 = big_range_2d;
+						matrix_2 = big_range_2d;
+						matrix_3 = big_range_2d;
 
-					compare_matrix_to_range_2d(matrix_1, big_range_2d, 10, 10);
-					compare_matrix_to_range_2d(matrix_2, big_range_2d, 10, 10);
-					compare_matrix_to_range_2d(matrix_3, big_range_2d, 10, 10);
+						compare_matrix_to_range_2d(matrix_1, big_range_2d, 10, 10);
+						compare_matrix_to_range_2d(matrix_2, big_range_2d, 10, 10);
+						compare_matrix_to_range_2d(matrix_3, big_range_2d, 10, 10);
+					}
 				};
 
 				given("A smaller range") = [&]() {
