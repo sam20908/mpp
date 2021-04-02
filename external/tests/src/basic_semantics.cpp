@@ -65,22 +65,22 @@ int main()
 			given("A callable") = []() {
 				const auto iota_range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
+				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>() {
 					auto iota = []() {
 						return [i = 1]() mutable {
 							return i++;
 						};
 					};
 
-					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ iota() };
-					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns, iota() };
-					const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ Columns, iota() };
-					const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, iota() };
+					const auto matrix_1 = mpp::matrix<Value2, Rows2, Columns2>{ iota() };
+					const auto matrix_2 = mpp::matrix<Value2, mpp::dynamic, mpp::dynamic>{ Rows2, Columns2, iota() };
+					const auto matrix_3 = mpp::matrix<Value2, Rows2, mpp::dynamic>{ Columns2, iota() };
+					const auto matrix_4 = mpp::matrix<Value2, mpp::dynamic, Columns2>{ Rows2, iota() };
 
-					compare_matrix_to_range_2d(matrix_1, iota_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_2, iota_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_3, iota_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_4, iota_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_1, iota_range_2d, Rows2, Columns2);
+					compare_matrix_to_range_2d(matrix_2, iota_range_2d, Rows2, Columns2);
+					compare_matrix_to_range_2d(matrix_3, iota_range_2d, Rows2, Columns2);
+					compare_matrix_to_range_2d(matrix_4, iota_range_2d, Rows2, Columns2);
 				};
 
 				test_fn.template operator()<int, 2, 3>();
@@ -91,20 +91,22 @@ int main()
 			given("A 1D range") = [&]() {
 				const auto range_1d = std::vector<int>{ 1, 2, 3, 4, 5, 6 };
 
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+				auto test_fn = [&]<typename Value3, std::size_t Rows3, std::size_t Columns3>(auto... additional_args) {
 					const auto matrix_1 =
-						mpp::matrix<Value, Rows, Columns>{ Rows, Columns, range_1d, additional_args... };
-					const auto matrix_2 =
-						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows, Columns, range_1d, additional_args... };
+						mpp::matrix<Value3, Rows3, Columns3>{ Rows3, Columns3, range_1d, additional_args... };
+					const auto matrix_2 = mpp::matrix<Value3, mpp::dynamic, mpp::dynamic>{ Rows3,
+						Columns3,
+						range_1d,
+						additional_args... };
 					const auto matrix_3 =
-						mpp::matrix<Value, Rows, mpp::dynamic>{ Rows, Columns, range_1d, additional_args... };
+						mpp::matrix<Value3, Rows3, mpp::dynamic>{ Rows3, Columns3, range_1d, additional_args... };
 					const auto matrix_4 =
-						mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, Columns, range_1d, additional_args... };
+						mpp::matrix<Value3, mpp::dynamic, Columns3>{ Rows3, Columns3, range_1d, additional_args... };
 
-					compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_1, range_2d, Rows3, Columns3);
+					compare_matrix_to_range_2d(matrix_2, range_2d, Rows3, Columns3);
+					compare_matrix_to_range_2d(matrix_3, range_2d, Rows3, Columns3);
+					compare_matrix_to_range_2d(matrix_4, range_2d, Rows3, Columns3);
 				};
 
 				test_fn.template operator()<int, 2, 3>();
@@ -129,19 +131,20 @@ int main()
 				const auto initializer_list_2d =
 					std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
-					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ initializer_list_2d, additional_args... };
+				auto test_fn = [&]<typename Value4, std::size_t Rows4, std::size_t Columns4>(auto... additional_args) {
+					const auto matrix_1 =
+						mpp::matrix<Value4, Rows4, Columns4>{ initializer_list_2d, additional_args... };
 					const auto matrix_2 =
-						mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ initializer_list_2d, additional_args... };
+						mpp::matrix<Value4, mpp::dynamic, mpp::dynamic>{ initializer_list_2d, additional_args... };
 					const auto matrix_3 =
-						mpp::matrix<Value, Rows, mpp::dynamic>{ initializer_list_2d, additional_args... };
+						mpp::matrix<Value4, Rows4, mpp::dynamic>{ initializer_list_2d, additional_args... };
 					const auto matrix_4 =
-						mpp::matrix<Value, mpp::dynamic, Columns>{ initializer_list_2d, additional_args... };
+						mpp::matrix<Value4, mpp::dynamic, Columns4>{ initializer_list_2d, additional_args... };
 
-					compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_1, range_2d, Rows4, Columns4);
+					compare_matrix_to_range_2d(matrix_2, range_2d, Rows4, Columns4);
+					compare_matrix_to_range_2d(matrix_3, range_2d, Rows4, Columns4);
+					compare_matrix_to_range_2d(matrix_4, range_2d, Rows4, Columns4);
 				};
 
 				test_fn.template operator()<int, 2, 3>();
@@ -185,21 +188,21 @@ int main()
 			scenario("Constructing an identity matrix") = [&]() {
 				const auto identity_range_2d = std::vector<std::vector<int>>{ { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
-					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ mpp::identity, additional_args... };
-					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows,
-						Columns,
+				auto test_fn = [&]<typename Value5, std::size_t Rows5, std::size_t Columns5>(auto... additional_args) {
+					const auto matrix_1 = mpp::matrix<Value5, Rows5, Columns5>{ mpp::identity, additional_args... };
+					const auto matrix_2 = mpp::matrix<Value5, mpp::dynamic, mpp::dynamic>{ Rows5,
+						Columns5,
 						mpp::identity,
 						additional_args... };
 					const auto matrix_3 =
-						mpp::matrix<Value, Rows, mpp::dynamic>{ Columns, mpp::identity, additional_args... };
+						mpp::matrix<Value5, Rows5, mpp::dynamic>{ Columns5, mpp::identity, additional_args... };
 					const auto matrix_4 =
-						mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, mpp::identity, additional_args... };
+						mpp::matrix<Value5, mpp::dynamic, Columns5>{ Rows5, mpp::identity, additional_args... };
 
-					compare_matrix_to_range_2d(matrix_1, identity_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_2, identity_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_3, identity_range_2d, Rows, Columns);
-					compare_matrix_to_range_2d(matrix_4, identity_range_2d, Rows, Columns);
+					compare_matrix_to_range_2d(matrix_1, identity_range_2d, Rows5, Columns5);
+					compare_matrix_to_range_2d(matrix_2, identity_range_2d, Rows5, Columns5);
+					compare_matrix_to_range_2d(matrix_3, identity_range_2d, Rows5, Columns5);
+					compare_matrix_to_range_2d(matrix_4, identity_range_2d, Rows5, Columns5);
 				};
 
 				test_fn.template operator()<int, 3, 3>();
