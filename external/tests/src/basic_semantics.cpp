@@ -28,11 +28,6 @@
 #include <cstddef>
 #include <vector>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 7576)
-#endif
-
 using namespace boost::ut::literals;
 using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
@@ -548,7 +543,3 @@ int main()
 		};
 	};
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
