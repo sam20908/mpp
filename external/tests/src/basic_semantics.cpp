@@ -33,44 +33,6 @@ using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<typename Value, std::size_t Rows, std::size_t Columns>
-void test_matrix_initialization_range_2d_against_range_2d(const auto& range_2d, auto... additional_args)
-{
-	const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
-	compare_matrix_to_range_2d(matrix_1, range_2d, Rows, Columns);
-
-	const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ range_2d, additional_args... };
-	compare_matrix_to_range_2d(matrix_2, range_2d, Rows, Columns);
-
-	const auto matrix_3 = mpp::matrix<Value, Rows, mpp::dynamic>{ range_2d, additional_args... };
-	compare_matrix_to_range_2d(matrix_3, range_2d, Rows, Columns);
-
-	const auto matrix_4 = mpp::matrix<Value, mpp::dynamic, Columns>{ range_2d, additional_args... };
-	compare_matrix_to_range_2d(matrix_4, range_2d, Rows, Columns);
-}
-
-template<typename LeftValue,
-	typename RightValue,
-	std::size_t LeftRows,
-	std::size_t LeftColumns,
-	std::size_t RightRows,
-	std::size_t RightColumns>
-void test_matrix_comparison(const auto& range_2d)
-{
-	const auto matrix_1   = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ range_2d };
-	const auto matrix_1_1 = mpp::matrix<RightValue, RightRows, RightColumns>{ range_2d };
-	compare_matrix_to_matrix(matrix_1, matrix_1_1);
-
-	const auto matrix_1_2 = mpp::matrix<RightValue, mpp::dynamic, mpp::dynamic>{ range_2d };
-	compare_matrix_to_matrix(matrix_1, matrix_1_2);
-
-	const auto matrix_1_3 = mpp::matrix<RightValue, RightRows, mpp::dynamic>{ range_2d };
-	compare_matrix_to_matrix(matrix_1, matrix_1_3);
-
-	const auto matrix_1_4 = mpp::matrix<RightValue, mpp::dynamic, RightColumns>{ range_2d };
-	compare_matrix_to_matrix(matrix_1, matrix_1_4);
-}
-
 int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
@@ -246,8 +208,27 @@ int main()
 		};
 
 		scenario("Comparing matrices") = [&]() {
-			test_matrix_comparison<int, int, 2, 3, 2, 3>(range_2d);
-			test_matrix_comparison<double, short, 2, 3, 2, 3>(range_2d); // Test different value type comparison
+			auto test = [&]<typename LeftValue,
+							typename RightValue,
+							std::size_t LeftRows,
+							std::size_t LeftColumns,
+							std::size_t RightRows,
+							std::size_t RightColumns>() {
+				const auto matrix_1   = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ range_2d };
+				const auto matrix_1_1 = mpp::matrix<RightValue, RightRows, RightColumns>{ range_2d };
+				compare_matrix_to_matrix(matrix_1, matrix_1_1);
+
+				const auto matrix_1_2 = mpp::matrix<RightValue, mpp::dynamic, mpp::dynamic>{ range_2d };
+				compare_matrix_to_matrix(matrix_1, matrix_1_2);
+
+				const auto matrix_1_3 = mpp::matrix<RightValue, RightRows, mpp::dynamic>{ range_2d };
+				compare_matrix_to_matrix(matrix_1, matrix_1_3);
+
+				const auto matrix_1_4 = mpp::matrix<RightValue, mpp::dynamic, RightColumns>{ range_2d };
+				compare_matrix_to_matrix(matrix_1, matrix_1_4);
+			};
+			test.template operator()<int, int, 2, 3, 2, 3>();
+			test.template operator()<double, short, 2, 3, 2, 3>(); // Test different value type comparison
 		};
 
 		scenario("Assigning matrices") = [&]() {
