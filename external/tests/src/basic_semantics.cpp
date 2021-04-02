@@ -85,7 +85,7 @@ int main()
 
 				test_fn.template operator()<int, 2, 3>();
 				// test_fn.template operator()<float, 2, 3>(); // @FIXME: Allow callable's value return be convertible
-				// to value typeest value convertibility
+				// to value type
 			};
 
 			given("A 1D range") = [&]() {
@@ -185,16 +185,16 @@ int main()
 			scenario("Constructing an identity matrix") = [&]() {
 				const auto identity_range_2d = std::vector<std::vector<int>>{ { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
-					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ mpp::identity, additional_args... };
-					const auto matrix_2 = mpp::matrix<Value, mpp::dynamic, mpp::dynamic>{ Rows,
+				auto test_fn = [&]<typename ValueT, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
+					const auto matrix_1 = mpp::matrix<ValueT, Rows, Columns>{ mpp::identity, additional_args... };
+					const auto matrix_2 = mpp::matrix<ValueT, mpp::dynamic, mpp::dynamic>{ Rows,
 						Columns,
 						mpp::identity,
 						additional_args... };
 					const auto matrix_3 =
-						mpp::matrix<Value, Rows, mpp::dynamic>{ Columns, mpp::identity, additional_args... };
+						mpp::matrix<ValueT, Rows, mpp::dynamic>{ Columns, mpp::identity, additional_args... };
 					const auto matrix_4 =
-						mpp::matrix<Value, mpp::dynamic, Columns>{ Rows, mpp::identity, additional_args... };
+						mpp::matrix<ValueT, mpp::dynamic, Columns>{ Rows, mpp::identity, additional_args... };
 
 					compare_matrix_to_range_2d(matrix_1, identity_range_2d, Rows, Columns);
 					compare_matrix_to_range_2d(matrix_2, identity_range_2d, Rows, Columns);
