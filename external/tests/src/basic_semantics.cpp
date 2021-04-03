@@ -206,16 +206,20 @@ int main()
 					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ matrix_2 }, range_2d, 2, 3);
 					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ matrix_1 }, range_2d, 2, 3);
 
-					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ std::move(matrix_4) }, range_2d, 2, 3);
-					compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3) },
+					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ std::move(matrix_4), mpp::unsafe },
 						range_2d,
 						2,
 						3);
-					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ std::move(matrix_2) },
+					compare_matrix_to_range_2d(
+						mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3), mpp::unsafe },
 						range_2d,
 						2,
 						3);
-					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ std::move(matrix_1) },
+					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ std::move(matrix_2), mpp::unsafe },
+						range_2d,
+						2,
+						3);
+					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ std::move(matrix_1), mpp::unsafe },
 						range_2d,
 						2,
 						3);
