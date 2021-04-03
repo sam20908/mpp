@@ -20,6 +20,7 @@
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
+#include "../../include/custom_allocator.hpp"
 #include "../../include/utility.hpp"
 #include "../../thirdparty/ut.hpp"
 
@@ -67,6 +68,19 @@ int main()
 				expect(matrix_4.rows() == 0_ul);
 				expect(matrix_4.columns() == 0_ul);
 				compare_matrix_to_range_2d(matrix_4, empty_range_2d, std::size_t{}, std::size_t{});
+			};
+
+			given("Default initialize with custom allocators in dynamic matrices") = []() {
+				const auto allocator      = custom_allocator<int>{};
+				const auto empty_range_2d = std::vector<std::vector<int>>{};
+
+				const auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ allocator };
+				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ allocator };
+				const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ allocator };
+
+				compare_matrix_to_range_2d(matrix_1, empty_range_2d, 0, 0);
+				compare_matrix_to_range_2d(matrix_2, empty_range_2d, 0, 0);
+				compare_matrix_to_range_2d(matrix_3, empty_range_2d, 0, 0);
 			};
 
 			given("A 2D range") = [&]() {
