@@ -89,6 +89,16 @@ int main()
 				test_fn.template operator()<float, 2, 3>(mpp::unsafe); // Test value convertibility
 			};
 
+			given("A std::array for fully static matrices") = [&]() {
+				auto range_2d_array = std::array<std::array<int, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
+
+				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d_array };
+				compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
+
+				const auto matrix_2 = mpp::matrix<int, 2, 3>{ std::move(range_2d_array) };
+				compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+			};
+
 			given("A callable") = []() {
 				const auto iota_range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
