@@ -59,13 +59,13 @@ namespace mpp
 	public:
 		using base::operator=;
 
-		matrix()
+		matrix() : base(RowsExtent, ColumnsExtent)
 		{
 			fill_buffer_with_value(Value{});
 		}
 
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-		explicit matrix(Matrix&& matrix) // @TODO: ISSUE #20
+		explicit matrix(Matrix&& matrix) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
 				detail::configuration_use_unsafe,
@@ -75,7 +75,7 @@ namespace mpp
 		}
 
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-		explicit matrix(Matrix&& matrix, unsafe_tag) // @TODO: ISSUE #20
+		explicit matrix(Matrix&& matrix, unsafe_tag) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
@@ -83,7 +83,8 @@ namespace mpp
 		}
 
 		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
-		explicit matrix(std::size_t rows, std::size_t columns, Range&& range) // @TODO: ISSUE #20
+		explicit matrix(std::size_t rows, std::size_t columns, Range&& range) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
 				detail::configuration_use_unsafe,
@@ -91,7 +92,8 @@ namespace mpp
 		}
 
 		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
-		explicit matrix(std::size_t rows, std::size_t columns, Range&& range, unsafe_tag) // @TODO: ISSUE #20
+		explicit matrix(std::size_t rows, std::size_t columns, Range&& range, unsafe_tag) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_1d_range<false, false, false>(rows,
 				columns,
@@ -99,8 +101,8 @@ namespace mpp
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
-		explicit matrix(
-			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
+		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
 				detail::configuration_use_unsafe,
@@ -109,13 +111,14 @@ namespace mpp
 
 		template<std::convertible_to<Value> InitializerListValue>
 		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d,
-			unsafe_tag) // @TODO: ISSUE #20
+			unsafe_tag) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_2d_range<false, false, false>(initializer_list_2d);
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
-		explicit matrix(Range2D&& range_2d) // @TODO: ISSUE #20
+		explicit matrix(Range2D&& range_2d) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
 				detail::configuration_use_unsafe,
@@ -123,27 +126,29 @@ namespace mpp
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
-		explicit matrix(Range2D&& range_2d, unsafe_tag) // @TODO: ISSUE #20
+		explicit matrix(Range2D&& range_2d, unsafe_tag) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
 		}
 
 		template<std::convertible_to<Value> Array2DValue>
-		explicit matrix(const std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>& array_2d)
+		explicit matrix(const std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>& array_2d) :
+			base(RowsExtent, ColumnsExtent)
 		{
 			base::template assign_and_insert_from_2d_range<false, false, false>(array_2d);
 		}
 
 		template<std::convertible_to<Value> Array2DValue>
-		explicit matrix(std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>&& array_2d)
+		explicit matrix(std::array<std::array<Array2DValue, ColumnsExtent>, RowsExtent>&& array_2d) :
+			base(RowsExtent, ColumnsExtent)
 		{
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::move(array_2d));
 		}
 
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
-		explicit matrix(
-			const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) // @TODO: ISSUE #20
+		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			detail::validate_matrices_same_size(*this, expr);
 
@@ -157,8 +162,8 @@ namespace mpp
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
-		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr,
-			unsafe_tag) // @TODO: ISSUE #20
+		explicit matrix(const detail::expr_base<Expr, Value, ExprRowsExtent, ExprColumnsExtent>& expr, unsafe_tag) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			for (auto row = std::size_t{}, index = std::size_t{}; row < RowsExtent; ++row)
 			{
@@ -169,14 +174,13 @@ namespace mpp
 			}
 		}
 
-		explicit matrix(const Value& value) // @TODO: ISSUE #20
+		explicit matrix(const Value& value) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			fill_buffer_with_value(value);
 		}
 
-		explicit matrix(identity_tag,
-			const Value& zero_value = Value{ 0 },
-			const Value& one_value  = Value{ 1 }) // @TODO: ISSUE #20
+		explicit matrix(identity_tag, const Value& zero_value = Value{ 0 }, const Value& one_value = Value{ 1 }) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			detail::template make_identity_buffer<detail::configuration_use_unsafe>(base::_buffer,
 				RowsExtent,
@@ -188,7 +192,8 @@ namespace mpp
 		explicit matrix(identity_tag,
 			unsafe_tag,
 			const Value& zero_value = Value{ 0 },
-			const Value& one_value  = Value{ 1 }) // @TODO: ISSUE #20
+			const Value& one_value  = Value{ 1 }) :
+			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			detail::template make_identity_buffer<false>(base::_buffer,
 				RowsExtent,
@@ -199,7 +204,7 @@ namespace mpp
 
 		// @FIXME: Allow callable's value return be convertible to value type
 		template<detail::invocable_with_return_type<Value> Callable>
-		explicit matrix(Callable&& callable) // @TODO: ISSUE #20
+		explicit matrix(Callable&& callable) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			std::ranges::generate(base::_buffer, std::forward<Callable>(callable));
 		}

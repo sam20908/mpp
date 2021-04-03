@@ -55,9 +55,6 @@ namespace mpp::detail
 		std::size_t _rows{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
 		std::size_t _columns{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
 
-		// This is needed for fully static matrices
-		matrix_base() = default;
-
 		template<typename... Args>
 		matrix_base(std::size_t rows, std::size_t columns, Args&&... args) :
 			_buffer(std::forward<Args>(args)...),

@@ -44,6 +44,31 @@ int main()
 
 	"Basic semantics"_test = [&]() {
 		scenario("Creating matrices") = [&]() {
+			scenario("Default initialization") = []() {
+				const auto empty_range_2d = std::vector<std::vector<int>>{};
+
+				const auto matrix_1 = mpp::matrix<int, 0, 0>{};
+				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+				const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+				const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+
+				expect(matrix_1.rows() == 0_ul);
+				expect(matrix_1.columns() == 0_ul);
+				compare_matrix_to_range_2d(matrix_1, empty_range_2d, std::size_t{}, std::size_t{});
+
+				expect(matrix_2.rows() == 0_ul);
+				expect(matrix_2.columns() == 0_ul);
+				compare_matrix_to_range_2d(matrix_2, empty_range_2d, std::size_t{}, std::size_t{});
+
+				expect(matrix_3.rows() == 0_ul);
+				expect(matrix_3.columns() == 0_ul);
+				compare_matrix_to_range_2d(matrix_3, empty_range_2d, std::size_t{}, std::size_t{});
+
+				expect(matrix_4.rows() == 0_ul);
+				expect(matrix_4.columns() == 0_ul);
+				compare_matrix_to_range_2d(matrix_4, empty_range_2d, std::size_t{}, std::size_t{});
+			};
+
 			given("A 2D range") = [&]() {
 				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
 					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
