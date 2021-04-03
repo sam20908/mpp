@@ -49,3 +49,6 @@ compile_commands.json
 
 # Local Neovim configuration file
 .nvimrc
+
+# Local Vimspector configuration file
+.vimspector.json
