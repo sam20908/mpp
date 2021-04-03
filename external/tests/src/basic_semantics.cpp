@@ -193,10 +193,10 @@ int main()
 
 			given("A matrix of different value type or extents") = [&]() {
 				{
-					const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-					const auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d };
-					const auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d };
-					const auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d };
+					auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
+					auto matrix_2 = mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ range_2d };
+					auto matrix_3 = mpp::matrix<long, mpp::dynamic, 3>{ range_2d };
+					auto matrix_4 = mpp::matrix<short, 2, mpp::dynamic>{ range_2d };
 
 					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ matrix_4 }, range_2d, 2, 3);
 					compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ matrix_3 },
@@ -205,6 +205,20 @@ int main()
 						3);
 					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ matrix_2 }, range_2d, 2, 3);
 					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ matrix_1 }, range_2d, 2, 3);
+
+					compare_matrix_to_range_2d(mpp::matrix<short, 2, 3>{ std::move(matrix_4) }, range_2d, 2, 3);
+					compare_matrix_to_range_2d(mpp::matrix<float, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3) },
+						range_2d,
+						2,
+						3);
+					compare_matrix_to_range_2d(mpp::matrix<int, mpp::dynamic, 3>{ std::move(matrix_2) },
+						range_2d,
+						2,
+						3);
+					compare_matrix_to_range_2d(mpp::matrix<double, 2, mpp::dynamic>{ std::move(matrix_1) },
+						range_2d,
+						2,
+						3);
 				}
 
 				{

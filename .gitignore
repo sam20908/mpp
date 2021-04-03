@@ -46,3 +46,6 @@ compile_commands.json
 
 # JetBrain IDE cache
 .idea/
+
+# Local Neovim configuration file
+.nvimrc
