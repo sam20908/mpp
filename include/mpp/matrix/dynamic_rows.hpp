@@ -55,14 +55,14 @@ namespace mpp
 		explicit matrix(const Allocator& allocator) : base(0, ColumnsExtent, allocator) {} // @TODO: ISSUE #20
 
 		matrix(const matrix& right, const Allocator& allocator) :
-			base(right._rows, right._columns, right, allocator) // @TODO: ISSUE #20
+			base(right._rows, right._columns, right._buffer, allocator) // @TODO: ISSUE #20
 		{
 		}
 
 		matrix(matrix&& right, const Allocator& allocator) :
-			base(std::move(right)._rows,
-				std::move(right)._columns,
-				std::move(right),
+			base(std::move(right._rows),
+				std::move(right._columns),
+				std::move(right._buffer),
 				allocator) // @TODO: ISSUE #20
 		{
 		}

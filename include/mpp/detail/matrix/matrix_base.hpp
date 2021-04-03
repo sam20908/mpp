@@ -272,8 +272,8 @@ namespace mpp::detail
 			_columns = range_columns;
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize, typename Range>
-		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, Range&& range)
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize>
+		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, auto&& range)
 		{
 			if constexpr (CheckAgainstCurrentRows)
 			{
@@ -303,9 +303,10 @@ namespace mpp::detail
 				}
 			}
 
-			constexpr auto range_is_moved            = std::is_rvalue_reference_v<Range>;
-			constexpr auto buffer_is_vector          = is_vector<Buffer>::value;
-			constexpr auto range_has_same_value_type = std::is_same_v<std::ranges::range_value_t<Range>, Value>;
+			constexpr auto range_is_moved   = std::is_rvalue_reference_v<decltype(range)>;
+			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
+			constexpr auto range_has_same_value_type =
+				std::is_same_v<std::ranges::range_value_t<decltype(range)>, Value>;
 
 			if constexpr (buffer_is_vector)
 			{

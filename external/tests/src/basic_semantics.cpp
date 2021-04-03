@@ -529,8 +529,8 @@ int main()
 				}
 
 				{
-					const auto matrix   = mpp::matrix<int>{ range_2d };
-					const auto matrix_2 = mpp::matrix<int>{ matrix };
+					const auto matrix   = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+					const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ matrix };
 
 					compare_matrix_to_matrix(matrix, matrix_2);
 				}
@@ -548,6 +548,35 @@ int main()
 
 					compare_matrix_to_matrix(matrix, matrix_2);
 				}
+
+				scenario("Copy constructing from another matrix with custom allocator") = [&]() {
+					const auto allocator = custom_allocator<int>{};
+
+					{
+						const auto matrix =
+							mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ matrix, allocator };
+
+						compare_matrix_to_matrix(matrix, matrix_2);
+					}
+
+					{
+						const auto matrix = mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ matrix, allocator };
+
+						compare_matrix_to_matrix(matrix, matrix_2);
+					}
+
+					{
+						const auto matrix = mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ matrix, allocator };
+
+						compare_matrix_to_matrix(matrix, matrix_2);
+					}
+				};
 			};
 
 			scenario("Move constructing from another matrix") = [&]() {
@@ -578,6 +607,35 @@ int main()
 
 					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
 				}
+
+				scenario("Move constructing from another matrix with custom allocator") = [&]() {
+					const auto allocator = custom_allocator<int>{};
+
+					{
+						auto matrix = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::move(matrix),
+								allocator };
+
+						compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+					}
+
+					{
+						auto matrix = mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::move(matrix), allocator };
+
+						compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+					}
+
+					{
+						auto matrix = mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ range_2d };
+						const auto matrix_2 =
+							mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::move(matrix), allocator };
+
+						compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+					}
+				};
 			};
 
 			// @NOTE: Copy and move assigning matrices is already covered in above assignment test
