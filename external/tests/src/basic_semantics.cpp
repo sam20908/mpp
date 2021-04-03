@@ -320,6 +320,17 @@ int main()
 					compare_matrix_to_range_2d(matrix_3, small_range_2d, 1, 2);
 				};
 
+				given("A std::array for fully static matrices") = [&]() {
+					auto range_2d_array = std::array<std::array<int, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
+					auto matrix_1       = mpp::matrix<int, 2, 3>{};
+					matrix_1.assign(range_2d_array);
+					compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
+
+					auto matrix_2 = mpp::matrix<int, 2, 3>{};
+					matrix_2.assign(std::move(range_2d_array));
+					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+				};
+
 				given("A range that is the same size") = [&]() {
 					auto test_fn = [&]<typename Value8, std::size_t Rows8, std::size_t Columns8>() {
 						auto matrix_1 = mpp::matrix<Value8, Rows8, Columns8>{};
