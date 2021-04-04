@@ -637,5 +637,51 @@ int main()
 				expect(constant<std::is_destructible_v<mpp::matrix<int, 2, mpp::dynamic>>>);
 			};
 		};
+
+		scenario("Test member functions") = [&]() {
+			scenario("Element access functions") = [&]() {
+				auto test_fn = [&]<typename Value10, std::size_t Rows10, std::size_t Columns10>() {
+					auto matrix = mpp::matrix<Value10, Rows10, Columns10>{ range_2d };
+
+					expect(*matrix.data() == 1_i);
+					*matrix.data() = 2;
+					expect(*matrix.data() == 2_i);
+
+					expect(matrix.at(0, 0) == 2_i); // Modified above
+					expect(matrix(1, 2) == 6_i);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
+
+			scenario("More element access functions") = [&]() {
+				auto test_fn = [&]<typename Value11, std::size_t Rows11, std::size_t Columns11>() {
+					auto matrix = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+
+					expect(matrix.front() == 1_i);
+					expect(matrix.back() == 6_i);
+
+					matrix.front() = 2;
+					matrix.back()  = 2;
+
+					expect(matrix.front() == 2_i);
+					expect(matrix.back() == 2_i);
+
+					expect(matrix.size() == 6_ul);
+					expect(!matrix.empty());
+
+					(void)matrix.max_size(); // Due to outside conditions, max_size is very hard to test, but call it
+											 // for test coverage
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
+		};
 	};
 }
