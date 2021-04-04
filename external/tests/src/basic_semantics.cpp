@@ -38,7 +38,7 @@ int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 
-	// Next free template parameter suffix is 9
+	// Next free template parameter suffix is 10
 
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
@@ -104,14 +104,18 @@ int main()
 			};
 
 			given("A std::array for fully static matrices") = [&]() {
-				const auto range_2d_array = std::array<std::array<int, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
+				auto test_fn = [&]<typename Value9>() {
+					auto range_2d_array = std::array<std::array<int, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
 
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d_array };
-				compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
+					const auto matrix_1 = mpp::matrix<Value9, 2, 3>{ range_2d_array };
+					compare_matrix_to_range_2d(matrix_1, range_2d, 2, 3);
 
-				const auto matrix_2 =
-					mpp::matrix<int, 2, 3>{ std::array<std::array<int, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } } };
-				compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+					const auto matrix_2 = mpp::matrix<Value9, 2, 3>{ std::move(range_2d_array) };
+					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int>();
+				test_fn.template operator()<float>(); // Test value convertibility
 			};
 
 			given("A callable") = []() {
