@@ -391,22 +391,6 @@ namespace mpp::detail
 		matrix_base(const matrix_base&) = default; // @TODO: ISSUE #20
 		matrix_base(matrix_base&&)      = default; // @TODO: ISSUE #20
 
-		matrix_base(const matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& right,
-			const Allocator& allocator) :
-			_buffer(right._buffer, allocator), // @TODO: ISSUE #20
-			_rows{ right._rows },
-			_columns{ right._columns }
-		{
-		}
-
-		matrix_base(matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>&& right,
-			const Allocator& allocator) :
-			_buffer(std::move(right._buffer), allocator), // @TODO: ISSUE #20
-			_rows{ std::move(right._rows) },
-			_columns{ std::move(right._columns) }
-		{
-		}
-
 		auto operator=(const matrix_base&) -> matrix_base& = default; // @TODO: ISSUE #20
 		auto operator=(matrix_base&&) -> matrix_base& = default;      // @TODO: ISSUE #20
 
