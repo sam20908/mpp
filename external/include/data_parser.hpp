@@ -29,7 +29,7 @@
 #include <vector>
 
 template<typename T>
-inline auto string_conversion_function()
+auto string_conversion_function()
 {
 	if constexpr (std::is_same_v<T, double>)
 	{
@@ -90,7 +90,7 @@ struct single_number_result
 };
 
 template<typename From, typename To>
-inline auto parse_data_file_with_single_number_result(const std::filesystem::path& data_file_path)
+auto parse_data_file_with_single_number_result(const std::filesystem::path& data_file_path)
 	-> single_number_result<From, To>
 {
 	const auto from_value_conversion_function   = string_conversion_function<From>();
@@ -151,7 +151,7 @@ struct transformation_result
 };
 
 template<typename From, typename To>
-inline auto parse_data_file_matrix_transformation(const std::filesystem::path& data_file_path)
+auto parse_data_file_matrix_transformation(const std::filesystem::path& data_file_path)
 	-> transformation_result<From, To>
 {
 	const auto from_value_conversion_function   = string_conversion_function<From>();
@@ -247,7 +247,7 @@ struct block_transformation_result
 };
 
 template<typename From, typename To>
-inline auto parse_data_file_block_transformation(const std::filesystem::path& data_file_path)
+auto parse_data_file_block_transformation(const std::filesystem::path& data_file_path)
 	-> block_transformation_result<From, To>
 {
 	const auto from_value_conversion_function   = string_conversion_function<From>();
