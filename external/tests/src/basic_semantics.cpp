@@ -38,7 +38,7 @@ int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 
-	// Next free template parameter suffix is 12
+	// Next free template parameter suffix is 13
 
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
@@ -685,9 +685,9 @@ int main()
 			};
 
 			scenario("Swapping matrices") = [&]() {
-				auto test_fn = [&]<typename Value11, std::size_t Rows11, std::size_t Columns11>() {
-					auto matrix   = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
-					auto matrix_2 = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+				auto test_fn = [&]<typename Value12, std::size_t Rows12, std::size_t Columns12>() {
+					auto matrix   = mpp::matrix<Value12, Rows12, Columns12>{ range_2d };
+					auto matrix_2 = mpp::matrix<Value12, Rows12, Columns12>{ range_2d };
 
 					matrix.swap(matrix_2);
 
