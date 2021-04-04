@@ -89,6 +89,16 @@ void test_iter_semantics_write(const auto& range_2d)
 {
 	auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ range_2d };
 
+	auto cbegin  = matrix.cbegin();
+	auto cend    = matrix.cend() - 1;
+	auto crbegin = matrix.crbegin();
+	auto crend   = matrix.crend() - 1;
+
+	expect(*cbegin == 1_i);
+	expect(*cend == 6_i);
+	expect(*crbegin == 6_i);
+	expect(*crend == 1_i);
+
 	auto begin  = matrix.begin();
 	auto end    = matrix.end() - 1;
 	auto rbegin = matrix.rbegin();
