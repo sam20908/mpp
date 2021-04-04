@@ -599,23 +599,6 @@ namespace mpp::detail
 		{
 		}
 
-		matrix_dynamic_base(std::size_t rows,
-			std::size_t columns,
-			identity_tag,
-			const Value& zero_value,
-			const Value& one_value,
-			const Allocator& allocator) :
-			base(rows, columns, rows * columns, zero_value, allocator) // @TODO: ISSUE #20
-		{
-			base::_rows    = rows;
-			base::_columns = columns;
-
-			validate_dimensions_square(*this);
-			validate_dimensions_for_identity_matrix(*this);
-
-			make_identity_buffer(base::_buffer, rows, one_value);
-		}
-
 		void initialize_from_expression_unchecked(std::size_t rows,
 			std::size_t columns,
 			const auto& expr) // @TODO: ISSUE #20
