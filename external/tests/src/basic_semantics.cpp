@@ -38,7 +38,7 @@ int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 
-	// Next free template parameter suffix is 10
+	// Next free template parameter suffix is 12
 
 	// @NOTE: Most of the tests are referring to this 2d range
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
@@ -682,6 +682,49 @@ int main()
 				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
 				test_fn.template operator()<int, 2, mpp::dynamic>();
 				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
+
+			scenario("Swapping matrices") = [&]() {
+				auto test_fn = [&]<typename Value11, std::size_t Rows11, std::size_t Columns11>() {
+					auto matrix   = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+					auto matrix_2 = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+
+					matrix.swap(matrix_2);
+
+					compare_matrix_to_range_2d(matrix, range_2d, 2, 3);
+					compare_matrix_to_range_2d(matrix_2, range_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
+
+			scenario("Getting allocator for dynamic matrices") = []() {
+				const auto allocator = custom_allocator<int>{};
+
+				const auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ allocator };
+				const auto matrix_2 = mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ allocator };
+				const auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ allocator };
+
+				expect(matrix_1.get_allocator() == allocator);
+				expect(matrix_2.get_allocator() == allocator);
+				expect(matrix_3.get_allocator() == allocator);
+			};
+
+			scenario("Clearing dynamic matrices") = [&]() {
+				auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ range_2d };
+				auto matrix_2 = mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ range_2d };
+				auto matrix_3 = mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ range_2d };
+
+				matrix_1.clear();
+				matrix_2.clear();
+				matrix_3.clear();
+
+				expect(matrix_1.empty());
+				expect(matrix_2.empty());
+				expect(matrix_3.empty());
 			};
 		};
 	};
