@@ -659,10 +659,11 @@ int main()
 
 			scenario("More element access functions") = [&]() {
 				auto test_fn = [&]<typename Value11, std::size_t Rows11, std::size_t Columns11>() {
-					auto matrix = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+					auto matrix         = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
+					const auto matrix_2 = mpp::matrix<Value11, Rows11, Columns11>{ range_2d };
 
-					expect(matrix.front() == 1_i);
-					expect(matrix.back() == 6_i);
+					expect(matrix_2.front() == 1_i);
+					expect(matrix_2.back() == 6_i);
 
 					matrix.front() = 2;
 					matrix.back()  = 2;
