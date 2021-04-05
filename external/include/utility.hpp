@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
 #include "../thirdparty/ut.hpp"

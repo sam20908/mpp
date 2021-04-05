@@ -162,7 +162,7 @@ namespace mpp
 				throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 			}
 
-			base::init_expr_dynamic_without_check(RowsExtent, expr.columns(), expr);
+			base::initialize_from_expression_unchecked(RowsExtent, expr.columns(), expr);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -171,7 +171,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::init_expr_dynamic_without_check(RowsExtent, expr.columns(), expr);
+			base::initialize_from_expression_unchecked(RowsExtent, expr.columns(), expr);
 		}
 
 		matrix(std::size_t columns, const Value& value, const Allocator& allocator = Allocator{}) :

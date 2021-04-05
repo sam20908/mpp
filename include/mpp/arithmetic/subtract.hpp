@@ -53,7 +53,7 @@ namespace mpp
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
 			detail::sub_op_type> // @TODO: ISSUE #20
 	{
-		detail::validate_same_size(left, right);
+		detail::validate_matrices_same_size(left, right);
 
 		return { left, right, left.rows(), left.columns() };
 	}
@@ -67,7 +67,7 @@ namespace mpp
 		const matrix<Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_same_size(left, right);
+		detail::validate_matrices_same_size(left, right);
 
 		std::ranges::transform(left, right, left.begin(), std::minus{});
 
@@ -84,7 +84,7 @@ namespace mpp
 		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_same_size(left, right);
+		detail::validate_matrices_same_size(left, right);
 
 		const auto rows    = left.rows();
 		const auto columns = left.columns();

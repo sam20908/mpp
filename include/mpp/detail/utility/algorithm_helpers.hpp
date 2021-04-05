@@ -21,6 +21,7 @@
 
 
 #include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/types/algo_types.hpp>
 
 #include <cstddef>
 
