@@ -34,11 +34,16 @@ namespace mpp
 {
 	namespace detail
 	{
-		using mul_constant_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index)
-											   -> decltype(left(row_index, col_index) * right) {
+		inline constexpr auto mul_constant_op = [](const auto& left,
+													const auto& right,
+													std::size_t row_index,
+													std::size_t col_index) -> decltype(left(row_index, col_index) *
+																					   right) {
 			return left(row_index, col_index) * right;
-		});
-		using mul_op_t = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index) ->
+		};
+
+		inline constexpr auto mul_op =
+			[](const auto& left, const auto& right, std::size_t row_index, std::size_t col_index) ->
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
@@ -51,7 +56,7 @@ namespace mpp
 				}
 
 				return result;
-			});
+			};
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -60,9 +65,9 @@ namespace mpp
 		ColumnsExtent,
 		detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
 		Value,
-		detail::mul_constant_op_t> // @TODO: ISSUE #20
+		decltype(detail::mul_constant_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns(), detail::mul_constant_op };
 	}
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -72,9 +77,9 @@ namespace mpp
 			ColumnsExtent,
 			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
 			Value,
-			detail::mul_constant_op_t> // @TODO: ISSUE #20
+			decltype(detail::mul_constant_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns(), detail::mul_constant_op };
 	}
 
 	template<typename LeftBase,
@@ -91,11 +96,11 @@ namespace mpp
 			RightColumnsExtent,
 			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
-			detail::mul_op_t> // @TODO: ISSUE #20
+			decltype(detail::mul_op)> // @TODO: ISSUE #20
 	{
 		detail::validate_matrices_multipliable(left, right);
 
-		return { left, right, left.rows(), right.columns() };
+		return { left, right, left.rows(), right.columns(), detail::mul_op };
 	}
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
