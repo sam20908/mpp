@@ -43,6 +43,8 @@ int main()
 
 					const auto expr_obj = matrix_1 + matrix_2;
 
+					expect(expr_obj.rows() == 2_ul);
+					expect(expr_obj.columns() == 3_ul);
 					expect(expr_obj(0, 0) == 2_i);
 					expect(expr_obj(0, 1) == 4_i);
 					expect(expr_obj(0, 2) == 6_i);
@@ -88,6 +90,8 @@ int main()
 
 					const auto expr_obj = matrix_1 - matrix_2;
 
+					expect(expr_obj.rows() == 2_ul);
+					expect(expr_obj.columns() == 3_ul);
 					expect(expr_obj(0, 0) == 0_i);
 					expect(expr_obj(0, 1) == 0_i);
 					expect(expr_obj(0, 2) == 0_i);
@@ -122,6 +126,64 @@ int main()
 				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, 2, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, mpp::dynamic, 3>(mpp::unsafe);
+			};
+		};
+
+		feature("Multiplication with matrices") = [&]() {
+			scenario("Multiplying matrices without evaluating the full result") = [&]() {
+				const auto left_range_2d  = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+				const auto right_range_2d = std::vector<std::vector<int>>{ { 3 }, { 6 }, { 9 } };
+
+				auto test_fn = [&]<typename Value6,
+								   std::size_t LeftRows6,
+								   std::size_t LeftColumns6,
+								   std::size_t RightRows6,
+								   std::size_t RightColumns6>() {
+					const auto matrix_1 = mpp::matrix<Value6, LeftRows6, LeftColumns6>{ left_range_2d };
+					const auto matrix_2 = mpp::matrix<Value6, RightRows6, RightColumns6>{ right_range_2d };
+
+					const auto expr_obj = matrix_1 * matrix_2;
+
+					// Note that result is 2x1 [[42], [96]]
+					expect(expr_obj.rows() == 2_ul);
+					expect(expr_obj.columns() == 1_ul);
+					expect(expr_obj(0, 0) == 42_i);
+					expect(expr_obj(1, 0) == 96_i);
+				};
+
+				test_fn.template operator()<int, 2, 3, mpp::dynamic, 1>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic, 3, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3, 3, 1>();
+			};
+
+			scenario("Multiplying matrices and evaluate the full result") = [&]() {
+				const auto left_range_2d  = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+				const auto right_range_2d = std::vector<std::vector<int>>{ { 3 }, { 6 }, { 9 } };
+
+				auto test_fn = [&]<typename Value5,
+								   std::size_t LeftRows5,
+								   std::size_t LeftColumns5,
+								   std::size_t RightRows5,
+								   std::size_t RightColumns5>(auto... additional_args) {
+					const auto matrix_1  = mpp::matrix<Value5, LeftRows5, LeftColumns5>{ left_range_2d };
+					const auto matrix_2  = mpp::matrix<Value5, RightRows5, RightColumns5>{ right_range_2d };
+					const auto result_2d = std::vector<std::vector<int>>{ { 42 }, { 96 } };
+
+					const auto result = mpp::matrix{ matrix_1 * matrix_2, additional_args... };
+
+					compare_matrix_to_range_2d(result, result_2d, 2, 1);
+				};
+
+				test_fn.template operator()<int, 2, 3, mpp::dynamic, 1>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic, 3, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3, 3, 1>();
+
+				test_fn.template operator()<int, 2, 3, mpp::dynamic, 1>(mpp::unsafe);
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic, 3, mpp::dynamic>(mpp::unsafe);
+				test_fn.template operator()<int, 2, mpp::dynamic, mpp::dynamic, mpp::dynamic>(mpp::unsafe);
+				test_fn.template operator()<int, mpp::dynamic, 3, 3, 1>(mpp::unsafe);
 			};
 		};
 	};
