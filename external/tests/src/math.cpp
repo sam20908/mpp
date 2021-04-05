@@ -61,11 +61,11 @@ int main()
 
 			scenario("Adding matrices and evaluate the full result") = [&]() {
 				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>(auto... additional_args) {
-					const auto matrix_1  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d, additional_args... };
-					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d, additional_args... };
+					const auto matrix_1  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
 					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
 
-					const auto result = mpp::matrix{ matrix_1 + matrix_2 };
+					const auto result = mpp::matrix{ matrix_1 + matrix_2, additional_args... };
 
 					compare_matrix_to_range_2d(result, result_2d, 2, 3);
 				};
@@ -79,6 +79,23 @@ int main()
 				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, 2, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, mpp::dynamic, 3>(mpp::unsafe);
+			};
+
+			scenario("Adding onto existing matrix") = [&]() {
+				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>() {
+					auto matrix_1        = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
+
+					matrix_1 += matrix_2;
+
+					compare_matrix_to_range_2d(matrix_1, result_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
 			};
 		};
 
@@ -108,11 +125,11 @@ int main()
 
 			scenario("Subtracting matrices and evaluate the full result") = [&]() {
 				auto test_fn = [&]<typename Value4, std::size_t Rows4, std::size_t Columns4>(auto... additional_args) {
-					const auto matrix_1  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d, additional_args... };
-					const auto matrix_2  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d, additional_args... };
+					const auto matrix_1  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d };
 					const auto result_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
 
-					const auto result = mpp::matrix{ matrix_1 - matrix_2 };
+					const auto result = mpp::matrix{ matrix_1 - matrix_2, additional_args... };
 
 					compare_matrix_to_range_2d(result, result_2d, 2, 3);
 				};
@@ -126,6 +143,23 @@ int main()
 				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, 2, mpp::dynamic>(mpp::unsafe);
 				test_fn.template operator()<int, mpp::dynamic, 3>(mpp::unsafe);
+			};
+
+			scenario("Subtracting onto existing matrix") = [&]() {
+				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>() {
+					auto matrix_1        = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+					const auto result_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
+
+					matrix_1 -= matrix_2;
+
+					compare_matrix_to_range_2d(matrix_1, result_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
 			};
 		};
 
