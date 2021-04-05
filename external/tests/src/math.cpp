@@ -30,7 +30,7 @@ using namespace boost::ut;
 
 int main()
 {
-	// Next free template parameter suffix is 9
+	// Next free template parameter suffix is 11 
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
@@ -97,6 +97,26 @@ int main()
 				test_fn.template operator()<int, 2, mpp::dynamic>();
 				test_fn.template operator()<int, mpp::dynamic, 3>();
 			};
+
+			scenario("Adding onto existing matrix with an expression object") = [&]() {
+				const auto empty_range_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
+
+				auto test_fn = [&]<typename Value9, std::size_t Rows9, std::size_t Columns9>() {
+					auto matrix_1        = mpp::matrix<Value9, Rows9, Columns9>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value9, Rows9, Columns9>{ range_2d };
+					const auto matrix_3  = mpp::matrix<Value9, Rows9, Columns9>{ empty_range_2d };
+					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
+
+					matrix_1 += matrix_2 + matrix_3;
+
+					compare_matrix_to_range_2d(matrix_1, result_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
 		};
 
 		scenario("Subtracting matrices") = [&]() {
@@ -152,6 +172,26 @@ int main()
 					const auto result_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
 
 					matrix_1 -= matrix_2;
+
+					compare_matrix_to_range_2d(matrix_1, result_2d, 2, 3);
+				};
+
+				test_fn.template operator()<int, 2, 3>();
+				test_fn.template operator()<int, mpp::dynamic, mpp::dynamic>();
+				test_fn.template operator()<int, 2, mpp::dynamic>();
+				test_fn.template operator()<int, mpp::dynamic, 3>();
+			};
+
+			scenario("Subtracting onto existing matrix with an expression object") = [&]() {
+				const auto empty_range_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
+
+				auto test_fn = [&]<typename Value10, std::size_t Rows10, std::size_t Columns10>() {
+					auto matrix_1        = mpp::matrix<Value10, Rows10, Columns10>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value10, Rows10, Columns10>{ range_2d };
+					const auto matrix_3  = mpp::matrix<Value10, Rows10, Columns10>{ empty_range_2d };
+					const auto result_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
+
+					matrix_1 -= matrix_2 - matrix_3;
 
 					compare_matrix_to_range_2d(matrix_1, result_2d, 2, 3);
 				};
