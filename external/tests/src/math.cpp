@@ -30,7 +30,7 @@ using namespace boost::ut;
 
 int main()
 {
-	// Next free template parameter suffix is 5
+	// Next free template parameter suffix is 9
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
@@ -60,9 +60,9 @@ int main()
 			};
 
 			scenario("Adding matrices and evaluate the full result") = [&]() {
-				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>(auto... additional_args) {
-					const auto matrix_1  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
-					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+				auto test_fn = [&]<typename Value8, std::size_t Rows8, std::size_t Columns8>(auto... additional_args) {
+					const auto matrix_1  = mpp::matrix<Value8, Rows8, Columns8>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value8, Rows8, Columns8>{ range_2d };
 					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
 
 					const auto result = mpp::matrix{ matrix_1 + matrix_2, additional_args... };
@@ -82,9 +82,9 @@ int main()
 			};
 
 			scenario("Adding onto existing matrix") = [&]() {
-				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>() {
-					auto matrix_1        = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
-					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d };
+				auto test_fn = [&]<typename Value7, std::size_t Rows7, std::size_t Columns7>() {
+					auto matrix_1        = mpp::matrix<Value7, Rows7, Columns7>{ range_2d };
+					const auto matrix_2  = mpp::matrix<Value7, Rows7, Columns7>{ range_2d };
 					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
 
 					matrix_1 += matrix_2;
