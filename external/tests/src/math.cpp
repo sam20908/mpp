@@ -30,6 +30,8 @@ using namespace boost::ut;
 
 int main()
 {
+	// Next free template parameter suffix is 5
+
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 	"Math computations"_test = [&]() {
@@ -56,9 +58,9 @@ int main()
 			};
 
 			scenario("Adding matrices and evaluate the full result") = [&]() {
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
-					const auto matrix_1  = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
-					const auto matrix_2  = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
+				auto test_fn = [&]<typename Value2, std::size_t Rows2, std::size_t Columns2>(auto... additional_args) {
+					const auto matrix_1  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d, additional_args... };
+					const auto matrix_2  = mpp::matrix<Value2, Rows2, Columns2>{ range_2d, additional_args... };
 					const auto result_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
 
 					const auto result = mpp::matrix{ matrix_1 + matrix_2 };
@@ -80,9 +82,9 @@ int main()
 
 		scenario("Subtracting matrices") = [&]() {
 			scenario("Subtracting matrices without evaluating the full result") = [&]() {
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>() {
-					const auto matrix_1 = mpp::matrix<Value, Rows, Columns>{ range_2d };
-					const auto matrix_2 = mpp::matrix<Value, Rows, Columns>{ range_2d };
+				auto test_fn = [&]<typename Value3, std::size_t Rows3, std::size_t Columns3>() {
+					const auto matrix_1 = mpp::matrix<Value3, Rows3, Columns3>{ range_2d };
+					const auto matrix_2 = mpp::matrix<Value3, Rows3, Columns3>{ range_2d };
 
 					const auto expr_obj = matrix_1 - matrix_2;
 
@@ -101,9 +103,9 @@ int main()
 			};
 
 			scenario("Subtracting matrices and evaluate the full result") = [&]() {
-				auto test_fn = [&]<typename Value, std::size_t Rows, std::size_t Columns>(auto... additional_args) {
-					const auto matrix_1  = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
-					const auto matrix_2  = mpp::matrix<Value, Rows, Columns>{ range_2d, additional_args... };
+				auto test_fn = [&]<typename Value4, std::size_t Rows4, std::size_t Columns4>(auto... additional_args) {
+					const auto matrix_1  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d, additional_args... };
+					const auto matrix_2  = mpp::matrix<Value4, Rows4, Columns4>{ range_2d, additional_args... };
 					const auto result_2d = std::vector<std::vector<int>>{ { 0, 0, 0 }, { 0, 0, 0 } };
 
 					const auto result = mpp::matrix{ matrix_1 - matrix_2 };

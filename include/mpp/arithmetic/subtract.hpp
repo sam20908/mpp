@@ -31,10 +31,13 @@ namespace mpp
 {
 	namespace detail
 	{
-		using sub_op_type = decltype([](auto&& left, auto&& right, std::size_t row_index, std::size_t col_index)
-										 -> decltype(left(row_index, col_index) - right(row_index, col_index)) {
+		inline constexpr auto sub_op = [](const auto& left,
+										   const auto& right,
+										   std::size_t row_index,
+										   std::size_t col_index) -> decltype(left(row_index, col_index) -
+																			  right(row_index, col_index)) {
 			return left(row_index, col_index) - right(row_index, col_index);
-		});
+		};
 	} // namespace detail
 
 	template<typename LeftBase,
@@ -51,11 +54,11 @@ namespace mpp
 			detail::prefer_static_extent(LeftColumnsExtent, RightColumnsExtent),
 			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
-			detail::sub_op_type> // @TODO: ISSUE #20
+			decltype(detail::sub_op)> // @TODO: ISSUE #20
 	{
 		detail::validate_matrices_same_size(left, right);
 
-		return { left, right, left.rows(), left.columns() };
+		return { left, right, left.rows(), left.columns(), detail::sub_op };
 	}
 
 	template<typename Value,
