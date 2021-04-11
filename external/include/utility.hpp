@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include <boost/ut.hpp>
+
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
-
-#include "../thirdparty/ut.hpp"
 
 #include <compare>
 #include <cstddef>
@@ -56,6 +56,32 @@ void compare_matrix_to_range_2d(const auto& matrix, const auto& range_2d, std::s
 	expect(all_elems_equal);
 }
 
+void compare_expr_to_range_2d(const auto& expr, const auto& range_2d, std::size_t rows, std::size_t columns)
+{
+	expect(expr.rows() == rows);
+	expect(expr.columns() == columns);
+
+	using expr_value_t     = typename std::remove_cvref_t<decltype(expr)>::value_type;
+	using range_2d_value_t = typename std::remove_cvref_t<decltype(range_2d)>::value_type::value_type;
+	using ordering_type    = std::compare_three_way_result_t<expr_value_t, range_2d_value_t>;
+
+	auto all_elems_equal = true;
+
+	for (auto row = std::size_t{}; row < rows; ++row)
+	{
+		for (auto column = std::size_t{}; column < columns; ++column)
+		{
+			if (mpp::floating_point_compare(expr(row, column), range_2d[row][column]) != ordering_type::equivalent)
+			{
+				all_elems_equal = false;
+				break;
+			}
+		}
+	}
+
+	expect(all_elems_equal);
+}
+
 void compare_matrix_to_matrix(const auto& left_matrix, const auto& right_matrix)
 {
 	const auto [row_ordering, column_ordering] = mpp::size_compare(left_matrix, right_matrix, true, true);
@@ -69,9 +95,3 @@ void compare_matrix_to_matrix(const auto& left_matrix, const auto& right_matrix)
 
 	expect(mpp::elements_compare(left_matrix, right_matrix, mpp::floating_point_compare) == ordering_type::equivalent);
 }
-
-inline constexpr auto compose = [](auto&& compose_fn, auto&&... args) -> decltype(auto) {
-	return [compose_fn = compose_fn, ... args = args]() -> decltype(auto) {
-		return std::invoke(FWD(compose_fn), FWD(args)...);
-	};
-};

@@ -67,8 +67,8 @@ namespace mpp
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		explicit matrix(Matrix&& matrix) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
@@ -86,8 +86,8 @@ namespace mpp
 		explicit matrix(std::size_t rows, std::size_t columns, Range&& range) :
 			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				true>(rows, columns, std::forward<Range>(range));
 		}
 
@@ -104,8 +104,8 @@ namespace mpp
 		explicit matrix(std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) :
 			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(initializer_list_2d);
 		}
 
@@ -120,8 +120,8 @@ namespace mpp
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		explicit matrix(Range2D&& range_2d) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(std::forward<Range2D>(range_2d));
 		}
 
@@ -182,7 +182,7 @@ namespace mpp
 		explicit matrix(identity_tag, const Value& zero_value = Value{ 0 }, const Value& one_value = Value{ 1 }) :
 			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<detail::configuration_use_unsafe>(base::_buffer,
+			detail::template make_identity_buffer<detail::configuration_use_safe>(base::_buffer,
 				RowsExtent,
 				ColumnsExtent,
 				zero_value,
@@ -213,8 +213,8 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(initializer_list_2d);
 		}
 
@@ -228,8 +228,8 @@ namespace mpp
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(std::forward<Range2D>(range_2d));
 		}
 
@@ -254,8 +254,8 @@ namespace mpp
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		void assign(Matrix&& matrix) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
-				detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
+				detail::configuration_use_safe,
 				false>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));

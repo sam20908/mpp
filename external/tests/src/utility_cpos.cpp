@@ -19,12 +19,13 @@
 
 // @TODO: Move cast to algorithms when #162 is being worked on
 
+#include <boost/ut.hpp>
+
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
 #include "../../include/utility.hpp"
-#include "../../thirdparty/ut.hpp"
 
 #include <compare>
 #include <cstddef>

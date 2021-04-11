@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#include <boost/ut.hpp>
+
 #include <mpp/utility/comparison.hpp>
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
@@ -24,20 +26,8 @@
 #include "../../include/data_parser.hpp"
 #include "../../include/utility.hpp"
 
-// clang-format off
-/**
- * @TODO: Remove this whole clang-format off section once
- * https://github.com/boost-ext/ut/issues/432 is resolved
- * 
- * ut.hpp actually has a bug in its headers when __cpp_modules is defined due
- * to how it's closing its namespaces
- */
-
-#include <filesystem>
-#include "../../thirdparty/ut.hpp"
-// clang-format on
-
 #include <compare>
+#include <filesystem>
 #include <functional>
 #include <string>
 #include <utility>

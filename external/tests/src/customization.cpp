@@ -34,11 +34,11 @@ namespace mpp
 	};
 } // namespace mpp
 
+#include <boost/ut.hpp>
+
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
-
-#include "../../thirdparty/ut.hpp"
 
 namespace ns
 {
@@ -102,7 +102,6 @@ using invoke_result_t = mpp::detail::tag_invoke_result_t<CPO, ns::dumb_class>;
 int main()
 {
 	using namespace boost::ut::literals;
-	using namespace boost::ut::operators::terse;
 	using namespace boost::ut::bdd;
 	using namespace boost::ut;
 

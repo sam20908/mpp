@@ -19,22 +19,22 @@
 
 #pragma once
 
-#include <mpp/utility/configuration.hpp>
-
 #include <cstddef>
 
 namespace mpp::detail
 {
-	[[nodiscard]] constexpr auto index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index)
-		-> std::size_t
+	void insert_expr_content_into_out_stream(auto& out, const auto& expr)
 	{
-		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
-		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
-		// spot. This also assumes that the storage of row-major
+		const auto rows    = expr.rows();
+		const auto columns = expr.columns();
 
-		return row_index * columns + column_index;
+		for (auto row = std::size_t{}; row < rows; ++row)
+		{
+			for (auto column = std::size_t{}; column < columns; ++column)
+			{
+				const auto value = expr(row, column);
+				out << value << (column == columns - 1 ? '\n' : ' ');
+			}
+		}
 	}
-
-	static constexpr auto configuration_use_unsafe = configuration<override>::use_unsafe;
-	static constexpr auto configuration_use_safe   = !configuration_use_unsafe;
 } // namespace mpp::detail

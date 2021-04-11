@@ -17,9 +17,9 @@
  * under the License.
  */
 
-#include <mpp/matrix.hpp>
+#include <boost/ut.hpp>
 
-#include "../../thirdparty/ut.hpp"
+#include <mpp/matrix.hpp>
 
 using namespace boost::ut::literals;
 using namespace boost::ut::operators::terse;

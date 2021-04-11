@@ -52,3 +52,9 @@ compile_commands.json
 
 # Local Vimspector configuration file
 .vimspector.json
+
+# ApprovalTests .received files
+*.received.*
+
+# ccls cache
+.ccls-cache/
