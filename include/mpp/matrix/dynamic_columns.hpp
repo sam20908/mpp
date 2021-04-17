@@ -55,14 +55,14 @@ namespace mpp
 		explicit matrix(const Allocator& allocator) : base(RowsExtent, 0, allocator) {} // @TODO: ISSUE #20
 
 		matrix(const matrix& right, const Allocator& allocator) :
-			base(right._rows, right._columns, right, allocator) // @TODO: ISSUE #20
+			base(right._rows, right._columns, right._buffer, allocator) // @TODO: ISSUE #20
 		{
 		}
 
 		matrix(matrix&& right, const Allocator& allocator) :
-			base(std::move(right)._rows,
-				std::move(right)._columns,
-				std::move(right),
+			base(std::move(right._rows),
+				std::move(right._columns),
+				std::move(right._buffer),
 				allocator) // @TODO: ISSUE #20
 		{
 		}
@@ -71,9 +71,9 @@ namespace mpp
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(std::forward<Matrix>(matrix).rows(),
+				detail::configuration_use_safe>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}
@@ -94,9 +94,9 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(rows, columns, std::forward<Range>(range));
+				detail::configuration_use_safe>(rows, columns, std::forward<Range>(range));
 		}
 
 		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
@@ -122,9 +122,9 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(initializer_list_2d);
+				detail::configuration_use_safe>(initializer_list_2d);
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
@@ -140,9 +140,9 @@ namespace mpp
 		explicit matrix(Range2D&& range_2d, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(std::forward<Range2D>(range_2d));
+				detail::configuration_use_safe>(std::forward<Range2D>(range_2d));
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
@@ -162,7 +162,7 @@ namespace mpp
 				throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 			}
 
-			base::init_expr_dynamic_without_check(RowsExtent, expr.columns(), expr);
+			base::initialize_from_expression_unchecked(RowsExtent, expr.columns(), expr);
 		}
 
 		template<typename Expr, std::size_t ExprRowsExtent, std::size_t ExprColumnsExtent>
@@ -171,7 +171,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::init_expr_dynamic_without_check(RowsExtent, expr.columns(), expr);
+			base::initialize_from_expression_unchecked(RowsExtent, expr.columns(), expr);
 		}
 
 		matrix(std::size_t columns, const Value& value, const Allocator& allocator = Allocator{}) :
@@ -186,7 +186,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, columns, allocator) // @TODO: ISSUE #20
 		{
-			detail::make_identity_buffer<detail::configuration_use_unsafe>(base::_buffer,
+			detail::make_identity_buffer<detail::configuration_use_safe>(base::_buffer,
 				RowsExtent,
 				columns,
 				zero_value,
@@ -204,6 +204,7 @@ namespace mpp
 			detail::make_identity_buffer<false>(base::_buffer, RowsExtent, columns, zero_value, one_value);
 		}
 
+		// @FIXME: Allow callable's value return be convertible to value type
 		template<detail::invocable_with_return_type<Value> Callable>
 		matrix(std::size_t columns, Callable&& callable, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, columns, allocator) // @TODO: ISSUE #20
@@ -215,9 +216,9 @@ namespace mpp
 		void assign(
 			std::initializer_list<std::initializer_list<InitializerListValue>> initializer_list_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(initializer_list_2d);
+				detail::configuration_use_safe>(initializer_list_2d);
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
@@ -230,9 +231,9 @@ namespace mpp
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
 		void assign(Range2D&& range_2d) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_2d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_2d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(std::forward<Range2D>(range_2d));
+				detail::configuration_use_safe>(std::forward<Range2D>(range_2d));
 		}
 
 		template<detail::range_2d_with_value_type_convertible_to<Value> Range2D>
@@ -244,9 +245,9 @@ namespace mpp
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		void assign(Matrix&& matrix)
 		{
-			base::template assign_and_insert_from_1d_range<detail::configuration_use_unsafe,
+			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_unsafe>(std::forward<Matrix>(matrix).rows(),
+				detail::configuration_use_safe>(std::forward<Matrix>(matrix).rows(),
 				std::forward<Matrix>(matrix).columns(),
 				std::forward<Matrix>(matrix));
 		}

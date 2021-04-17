@@ -93,7 +93,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> Value // @TODO: ISSUE #20
 		{
-			return detail::det_lu_decomp<detail::configuration_use_unsafe, Value>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_safe, Value>(obj);
 		}
 
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -109,7 +109,7 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_lu_decomp<detail::configuration_use_unsafe, To>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_safe, To>(obj);
 		}
 
 		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>

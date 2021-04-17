@@ -19,32 +19,28 @@
 
 #pragma once
 
-template<typename T>
-using container_allocator_type = typename T::allocator_type;
+#include <mpp/detail/utility/print_helpers.hpp>
 
-template<typename T>
-using container_value_type = typename T::value_type;
+#include <cstddef>
+#include <sstream>
+#include <string>
 
-template<typename T>
-using container_reference = typename T::reference;
+template<bool IncludeExtents>
+struct expr_string_maker
+{
+	static std::string toString(const auto& matrix)
+	{
+		std::ostringstream os;
 
-template<typename T>
-using container_const_reference = typename T::const_reference;
+		if constexpr (IncludeExtents)
+		{
+			os << "RowsExtent: " << matrix.rows_extent() << "\nColumnsExtent: " << matrix.columns_extent() << '\n';
+		}
 
-template<typename T>
-using container_iterator = typename T::iterator;
+		os << "Rows: " << matrix.rows() << "\nColumns: " << matrix.columns() << '\n';
 
-template<typename T>
-using container_const_iterator = typename T::const_iterator;
+		mpp::detail::insert_expr_content_into_out_stream(os, matrix);
 
-template<typename T>
-using container_reverse_iterator = typename T::reverse_iterator;
-
-template<typename T>
-using container_const_reverse_iterator = typename T::const_reverse_iterator;
-
-template<typename T>
-using container_difference_type = typename T::difference_type;
-
-template<typename T>
-using container_size_type = typename T::size_type;
+		return os.str();
+	}
+};

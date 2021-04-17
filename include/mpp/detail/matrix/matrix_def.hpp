@@ -52,6 +52,10 @@ namespace mpp
 	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)
 		-> matrix<Value, RowsExtent, ColumnsExtent>;
 
+	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&, mpp::unsafe_tag)
+		-> matrix<Value, RowsExtent, ColumnsExtent>;
+
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 	matrix(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>&, const Allocator&)
 		-> matrix<Value, RowsExtent, ColumnsExtent, Allocator>;

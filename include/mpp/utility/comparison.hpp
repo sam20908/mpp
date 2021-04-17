@@ -36,10 +36,12 @@ namespace mpp
 			std::size_t LeftRowsExtent,
 			std::size_t LeftColumnsExtent,
 			std::size_t RightRowsExtent,
-			std::size_t RightColumnsExtent>
+			std::size_t RightColumnsExtent,
+			typename LeftAllocator,
+			typename RightAllocator>
 		[[nodiscard]] friend inline auto tag_invoke(size_compare_t,
-			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent>& left,
-			const matrix<RightValue, RightRowsExtent, RightColumnsExtent>& right,
+			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
+			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			bool compare_rows,
 			bool compare_columns) -> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
 		{
@@ -56,10 +58,12 @@ namespace mpp
 			std::size_t LeftColumnsExtent,
 			std::size_t RightRowsExtent,
 			std::size_t RightColumnsExtent,
+			typename LeftAllocator,
+			typename RightAllocator,
 			typename CompareThreeway = std::compare_three_way>
 		[[nodiscard]] friend inline auto tag_invoke(elements_compare_t,
-			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent>& left,
-			const matrix<RightValue, RightRowsExtent, RightColumnsExtent>& right,
+			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
+			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			CompareThreeway compare_three_way_fn = {}) // @TODO: ISSUE #20
 		{
 			return std::lexicographical_compare_three_way(left.begin(),

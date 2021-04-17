@@ -46,3 +46,15 @@ compile_commands.json
 
 # JetBrain IDE cache
 .idea/
+
+# Local Neovim configuration file
+.nvimrc
+
+# Local Vimspector configuration file
+.vimspector.json
+
+# ApprovalTests .received files
+*.received.*
+
+# ccls cache
+.ccls-cache/

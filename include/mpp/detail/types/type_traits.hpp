@@ -29,8 +29,8 @@ namespace mpp::detail
 	{
 	};
 
-	template<typename T>
-	struct is_vector<std::vector<T>> : std::true_type
+	template<typename T, typename Allocator>
+	struct is_vector<std::vector<T, Allocator>> : std::true_type
 	{
 	};
 } // namespace mpp::detail

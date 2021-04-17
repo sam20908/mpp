@@ -32,10 +32,12 @@ namespace mpp
 {
 	namespace detail
 	{
-		using div_op_t = decltype([](auto&& lhs, auto&& rhs, std::size_t row_index, std::size_t column_index)
-									  -> decltype(lhs(row_index, column_index) / rhs) {
+		inline constexpr auto div_op = [](const auto& lhs,
+										   const auto& rhs,
+										   std::size_t row_index,
+										   std::size_t column_index) -> decltype(lhs(row_index, column_index) / rhs) {
 			return lhs(row_index, column_index) / rhs;
-		});
+		};
 	} // namespace detail
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -44,9 +46,9 @@ namespace mpp
 			ColumnsExtent,
 			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
 			Value,
-			detail::div_op_t> // @TODO: ISSUE #20
+			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns(), detail::div_op };
 	}
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -55,9 +57,9 @@ namespace mpp
 			ColumnsExtent,
 			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
 			Value,
-			detail::div_op_t> // @TODO: ISSUE #20
+			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns() };
+		return { obj, constant, obj.rows(), obj.columns(), detail::div_op };
 	}
 
 	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -65,7 +67,7 @@ namespace mpp
 		-> matrix<Value, RowsExtent, ColumnsExtent>& // @TODO: ISSUE #20
 	{
 		// Can't use bind_front here because we want elem / constant, not constant / elem
-		std::ranges::transform(obj, obj.begin(), [constant](auto elem) {
+		std::ranges::transform(obj, obj.begin(), [&constant](const auto& elem) {
 			return elem / constant;
 		});
 

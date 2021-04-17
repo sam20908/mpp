@@ -83,20 +83,5 @@ namespace mpp
 		template<typename T, typename To>
 		concept matrix_with_value_convertible_to =
 			std::convertible_to<typename matrix_value<std::remove_cvref_t<T>>::type, To>;
-
-		// array_2d_with_value_convertible_to
-
-		template<typename, std::size_t, std::size_t>
-		struct array_2d_value;
-
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		struct array_2d_value<std::array<std::array<Value, ColumnsExtent>, RowsExtent>, RowsExtent, ColumnsExtent>
-		{
-			using type = Value;
-		};
-
-		template<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename To>
-		concept array_2d_with_value_convertible_to =
-			std::convertible_to<typename array_2d_value<std::remove_cvref_t<T>, RowsExtent, ColumnsExtent>::type, To>;
 	} // namespace detail
 } // namespace mpp

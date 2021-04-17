@@ -55,9 +55,6 @@ namespace mpp::detail
 		std::size_t _rows{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
 		std::size_t _columns{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
 
-		// This is needed for fully static matrices
-		matrix_base() = default;
-
 		template<typename... Args>
 		matrix_base(std::size_t rows, std::size_t columns, Args&&... args) :
 			_buffer(std::forward<Args>(args)...),
@@ -240,13 +237,23 @@ namespace mpp::detail
 						}
 					}
 
-					if constexpr (range_is_moved)
+					if constexpr (range_has_same_value_type)
 					{
-						std::ranges::move(*range_begin, buffer_back_inserter);
+						if constexpr (range_is_moved)
+						{
+							std::ranges::move(*range_begin, buffer_back_inserter);
+						}
+						else
+						{
+							std::ranges::copy(*range_begin, buffer_back_inserter);
+						}
 					}
 					else
 					{
-						std::ranges::copy(*range_begin, buffer_back_inserter);
+						// @TODO: Check if this *really* is perfect forwarding values
+						std::ranges::transform(*range_begin, buffer_back_inserter, [](auto&& value) -> decltype(auto) {
+							return static_cast<Value>(std::forward<decltype(value)>(value));
+						});
 					}
 
 					++range_begin;
@@ -265,8 +272,8 @@ namespace mpp::detail
 			_columns = range_columns;
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize, typename Range>
-		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, Range&& range)
+		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize>
+		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, auto&& range)
 		{
 			if constexpr (CheckAgainstCurrentRows)
 			{
@@ -296,9 +303,10 @@ namespace mpp::detail
 				}
 			}
 
-			constexpr auto range_is_moved            = std::is_rvalue_reference_v<Range>;
-			constexpr auto buffer_is_vector          = is_vector<Buffer>::value;
-			constexpr auto range_has_same_value_type = std::is_same_v<std::ranges::range_value_t<Range>, Value>;
+			constexpr auto range_is_moved   = std::is_rvalue_reference_v<decltype(range)>;
+			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
+			constexpr auto range_has_same_value_type =
+				std::is_same_v<std::ranges::range_value_t<decltype(range)>, Value>;
 
 			if constexpr (buffer_is_vector)
 			{
@@ -382,22 +390,6 @@ namespace mpp::detail
 
 		matrix_base(const matrix_base&) = default; // @TODO: ISSUE #20
 		matrix_base(matrix_base&&)      = default; // @TODO: ISSUE #20
-
-		matrix_base(const matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>& right,
-			const Allocator& allocator) :
-			_buffer(right._buffer, allocator), // @TODO: ISSUE #20
-			_rows{ right._rows },
-			_columns{ right._columns }
-		{
-		}
-
-		matrix_base(matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>&& right,
-			const Allocator& allocator) :
-			_buffer(std::move(right._buffer), allocator), // @TODO: ISSUE #20
-			_rows{ std::move(right._rows) },
-			_columns{ std::move(right._columns) }
-		{
-		}
 
 		auto operator=(const matrix_base&) -> matrix_base& = default; // @TODO: ISSUE #20
 		auto operator=(matrix_base&&) -> matrix_base& = default;      // @TODO: ISSUE #20
@@ -605,23 +597,6 @@ namespace mpp::detail
 		matrix_dynamic_base(std::size_t rows, std::size_t columns, Args&&... args) :
 			base(rows, columns, std::forward<Args>(args)...)
 		{
-		}
-
-		matrix_dynamic_base(std::size_t rows,
-			std::size_t columns,
-			identity_tag,
-			const Value& zero_value,
-			const Value& one_value,
-			const Allocator& allocator) :
-			base(rows, columns, rows * columns, zero_value, allocator) // @TODO: ISSUE #20
-		{
-			base::_rows    = rows;
-			base::_columns = columns;
-
-			validate_dimensions_square(*this);
-			validate_dimensions_for_identity_matrix(*this);
-
-			make_identity_buffer(base::_buffer, rows, one_value);
 		}
 
 		void initialize_from_expression_unchecked(std::size_t rows,
