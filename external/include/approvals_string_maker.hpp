@@ -26,7 +26,7 @@
 #include <string>
 
 template<bool IncludeExtents>
-struct string_maker
+struct expr_string_maker
 {
 	static std::string toString(const auto& matrix)
 	{

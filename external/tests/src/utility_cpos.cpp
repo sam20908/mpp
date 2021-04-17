@@ -33,7 +33,6 @@
 #include <vector>
 
 using namespace boost::ut::literals;
-using namespace boost::ut::operators::terse;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 

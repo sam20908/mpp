@@ -180,7 +180,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<detail::configuration_use_unsafe, detail::default_floating_type>(obj);
+			return detail::inverse_lu_decomp<detail::configuration_use_safe, detail::default_floating_type>(obj);
 		}
 
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
@@ -196,7 +196,7 @@ namespace mpp
 		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<detail::configuration_use_unsafe, To>(obj);
+			return detail::inverse_lu_decomp<detail::configuration_use_safe, To>(obj);
 		}
 
 		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>

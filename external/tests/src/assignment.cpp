@@ -34,8 +34,8 @@ int main()
 	using namespace boost::ut::bdd;
 	using namespace ApprovalTests;
 
-	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<string_maker<false>>>;
-	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<string_maker<true>>>;
+	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<expr_string_maker<false>>>;
+	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<expr_string_maker<true>>>;
 
 	auto subdirectory_disposer = Approvals::useApprovalsSubdirectory("../approval_tests");
 

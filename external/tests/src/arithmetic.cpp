@@ -70,8 +70,8 @@ void test_matrix_multiplication_op(const auto& left_range_2d, const auto& right_
 
 int main()
 {
-	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<string_maker<false>>>;
-	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<string_maker<true>>>;
+	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<expr_string_maker<false>>>;
+	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<expr_string_maker<true>>>;
 
 	auto subdirectory_disposer = Approvals::useApprovalsSubdirectory("../approval_tests");
 
