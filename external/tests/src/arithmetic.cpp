@@ -17,8 +17,17 @@
  * under the License.
  */
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4459)
+#endif
+
 #define APPROVALS_UT
 #include <ApprovalTests.hpp>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #include <mpp/arithmetic.hpp>
 #include <mpp/matrix.hpp>

@@ -19,7 +19,16 @@
 
 // @TODO: Move cast to algorithms when #162 is being worked on
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4459)
+#endif
+
 #include <boost/ut.hpp>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
