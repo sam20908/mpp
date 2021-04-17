@@ -205,15 +205,15 @@ int main()
 	};
 
 	feature(".get_allocator()") = [&]() {
-	    const auto allocator = std::allocator<int>{};
+		const auto allocator = std::allocator<int>{};
 
 		expect(matrix_2.get_allocator() == allocator);
 		expect(matrix_3.get_allocator() == allocator);
 		expect(matrix_4.get_allocator() == allocator);
 	};
 
-    // This should be tested last because it destroys dynamic matrices
-    feature(".clear()") = [&]() {
+	// This should be tested last because it destroys dynamic matrices
+	feature(".clear()") = [&]() {
 		mut(matrix_2).clear();
 		mut(matrix_3).clear();
 		mut(matrix_4).clear();
