@@ -96,8 +96,8 @@ namespace mpp
 		}
 	} // namespace detail
 
-	inline constexpr auto floating_point_compare =
-		[]<typename T, typename U>(const T& left, const U& right) -> std::compare_three_way_result_t<T, U> {
+	inline constexpr auto floating_point_compare = []<typename T, typename U>(const T& left,
+													   const U& right) -> std::compare_three_way_result_t<T, U> {
 		using common_type   = std::common_type_t<T, U>;
 		using ordering_type = std::compare_three_way_result_t<common_type, common_type>;
 
