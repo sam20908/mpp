@@ -35,8 +35,13 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		template<bool Check,
+			typename To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator>
+		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
@@ -93,7 +98,7 @@ namespace mpp
 				const auto ad = element_4 * element_1;
 				const auto bc = element_2 * element_3;
 
-				det = ad - bc;
+				det = std::round(ad - bc);
 
 				if constexpr (Check)
 				{
@@ -120,17 +125,19 @@ namespace mpp
 				auto l_buffer = lu_decomp_buffer_t{};
 				auto u_buffer = lu_decomp_buffer_t{};
 
+				// @TODO: Should do a direct copy initialization instead
 				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 				std::ranges::copy(obj, u_buffer.begin());
 
-				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
+				// allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
 				// @TODO: Allow the user to control one_value and zero_value here?
-				make_identity_buffer<false>(l_buffer, rows, columns, default_floating_type{}, default_floating_type{});
-
-				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
+				make_identity_buffer<false>(l_buffer,
+					rows,
 					columns,
-					l_buffer,
-					u_buffer);
+					default_floating_type{},
+					default_floating_type{ 1 });
+
+				det = lu_generic<default_floating_type, true, true>(rows, columns, l_buffer, u_buffer);
 
 				if constexpr (Check)
 				{

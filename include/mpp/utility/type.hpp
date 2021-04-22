@@ -37,9 +37,9 @@ namespace mpp
 
 	struct type_t : public detail::cpo_base<type_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(type_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix_type // @TODO: ISSUE #20
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(type_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> matrix_type // @TODO: ISSUE #20
 		{
 			auto row_is_dynamic    = obj.rows_extent() == dynamic;
 			auto column_is_dynamic = obj.columns_extent() == dynamic;

@@ -77,9 +77,9 @@ namespace mpp
 	{
 		// @TODO: Support fixed block matrix with certain preconditions (#225)
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,

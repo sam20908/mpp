@@ -135,11 +135,9 @@ namespace mpp::detail
 		}
 	}
 
-	template<typename To, bool FillLBuf>
-	inline auto lu_decomposition_and_compute_determinant_in_place(std::size_t rows,
-		std::size_t columns,
-		auto& l_buffer,
-		auto& u_buffer) -> To // @TODO: ISSUE #20
+	template<typename To, bool FillLBuffer, bool CalculateDeterminant>
+	inline auto lu_generic(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
+		-> To // @TODO: ISSUE #20
 	{
 		// Things this function expects from l_buffer and u_buffer:
 		// 1. l_buffer is already an identity buffer
@@ -147,42 +145,46 @@ namespace mpp::detail
 
 		auto det = To{ 1 };
 
-		// Compute the determinant while also compute LU Decomposition
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
-			auto begin_index     = index_2d_to_1d(columns, row, std::size_t{});
-			const auto end_index = index_2d_to_1d(columns, row, columns);
+			// Micro-optimization: allow other indexes to reference this instead of multi-step calculation
+			const auto diag_front_index = index_2d_to_1d(columns, row, std::size_t{});
+			const auto diag_index       = diag_front_index + row;
+			const auto diag_elem        = u_buffer[diag_index];
 
-			for (auto col = std::size_t{}; col < row; ++col)
+			for (auto inner_row = row + 1; inner_row < rows; ++inner_row)
 			{
-				// This allows us to keep track of the row of the factor later on without having to manually
-				// calculate from indexes
-				auto factor_row_index = index_2d_to_1d(columns, col, col);
+				const auto inner_front_index = index_2d_to_1d(columns, inner_row, row);
+				const auto inner_front_elem  = u_buffer[inner_front_index];
 
-				const auto elem_index = index_2d_to_1d(columns, row, col);
-				const auto factor     = u_buffer[elem_index] / u_buffer[factor_row_index] * -1;
-
-				for (auto index = begin_index; index < end_index; ++index)
+				for (auto column = row; column < columns; ++column)
 				{
-					u_buffer[index] += factor * u_buffer[factor_row_index++];
-				}
+					const auto inner_row_current_index = index_2d_to_1d(columns, inner_row, column);
 
-				// Handle cases where we don't need to store the factors in a separate buffer (plain determinant
-				// algorithm for example). This allows passing empty buffer as l_buffer for optimization
-				if constexpr (FillLBuf)
+					// row as column parameter means accessing diagnoal element
+					const auto inner_row_current_elem      = u_buffer[inner_row_current_index];
+					const auto diag_row_corresponding_elem = u_buffer[diag_front_index + column];
+
+					// inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem
+
+					const auto result_elem =
+						inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem;
+
+					u_buffer[inner_row_current_index] = result_elem;
+				};
+
+				if constexpr (FillLBuffer)
 				{
-					// L stores the opposite (opposite sign) of the factors used for U in the corresponding
-					// location. But, to help optimize the calculation of inv(L), we can just leave the sign because
-					// all the diagnoal elements below the diagonal element by 1 are the opposite sign, and it's
-					// relatively easy to fix the values of other factors
-					l_buffer[elem_index] = factor;
-				}
-
-				++begin_index;
+					// We don't necessarily need to fill the l_buffer if we're only getting the determinant because only
+					// u_buffer will be used
+					l_buffer[inner_front_index] = inner_front_elem / diag_elem;
+				};
 			}
 
-			const auto diag_elem_index = index_2d_to_1d(columns, row, row);
-			det *= u_buffer[diag_elem_index];
+			if constexpr (CalculateDeterminant)
+			{
+				det *= u_buffer[diag_index];
+			}
 		}
 
 		return det;

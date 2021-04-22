@@ -32,9 +32,9 @@ namespace mpp
 {
 	struct singular_t : public detail::cpo_base<singular_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(singular_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool // @TODO: ISSUE #20
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(singular_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> bool // @TODO: ISSUE #20
 		{
 			using ordering_type =
 				std::compare_three_way_result_t<detail::default_floating_type, detail::default_floating_type>;

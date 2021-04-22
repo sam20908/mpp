@@ -23,6 +23,7 @@
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <compare>
 #include <cstddef>
 #include <type_traits>
@@ -95,10 +96,10 @@ namespace mpp
 		}
 	} // namespace detail
 
-	inline constexpr auto floating_point_compare = []<typename T, typename U>(const T& left,
-													   const U& right) -> std::compare_three_way_result_t<T, U> {
-		using ordering_type = std::compare_three_way_result_t<T, U>;
+	inline constexpr auto floating_point_compare =
+		[]<typename T, typename U>(const T& left, const U& right) -> std::compare_three_way_result_t<T, U> {
 		using common_type   = std::common_type_t<T, U>;
+		using ordering_type = std::compare_three_way_result_t<common_type, common_type>;
 
 		const auto left_casted  = static_cast<common_type>(left);
 		const auto right_casted = static_cast<common_type>(right);
@@ -106,6 +107,7 @@ namespace mpp
 		const auto is_equivalent =
 			detail::constexpr_abs(left_casted - right_casted) < std::numeric_limits<common_type>::epsilon();
 
+		// @TODO: Somehow avoid branching here?
 		if (is_equivalent)
 		{
 			return ordering_type::equivalent;
