@@ -49,7 +49,6 @@ jobs:
       - script: |
           cd build/bin/tests
           lit . --xunit-xml-output results.xml
-        continueOnError: true # Tests might fail, but we still want the results
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -91,7 +90,6 @@ jobs:
       - script: |
           cd build/bin/tests
           lit . --xunit-xml-output results.xml
-        continueOnError: true # Tests might fail, but we still want the results
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -127,7 +125,6 @@ jobs:
       - script: |
           cd build/bin/tests
           lit . --xunit-xml-output results.xml
-        continueOnError: true # Tests might fail, but we still want the results
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -161,7 +158,6 @@ jobs:
       - script: |
           cd build/bin/tests
           lit . --xunit-xml-output results.xml
-        continueOnError: true # Tests might fail, but we still want the results
         displayName: Run Tests
 
       - task: PublishTestResults@2
