@@ -41,7 +41,6 @@
 #include <string>
 #include <utility>
 
-using namespace boost::ut::literals;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
@@ -141,8 +140,6 @@ void test_lu_decomposition(const std::string& filename)
 }
 int main()
 {
-	cfg<override> = { .tag = { "execute" } };
-
 	feature("Determinant") = []() {
 		test_determinant<int, int>("test_data/0x0_det.txt");
 		test_determinant<int, float>("test_data/1x1_det.txt");
