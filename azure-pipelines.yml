@@ -84,11 +84,6 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          sudo apt-get update
-          sudo apt-get install clang-11 clang++-11
-        displayName: Install Clang 11
-
-      - script: |
           cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
           cmake --build build --target tests
         displayName: Configure and Build Tests
