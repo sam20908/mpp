@@ -79,14 +79,12 @@ namespace mpp
 				{
 					if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
 				inverse_matrix_buffer[0] = To{ 1 } / elem;
 			}
-
-			auto det = default_floating_type{ 1 };
 
 			if (rows == 2)
 			{
@@ -98,14 +96,14 @@ namespace mpp
 				const auto ad = element_4 * element_1;
 				const auto bc = element_2 * element_3;
 
-				det = std::round(ad - bc);
+				const auto det = std::round(ad - bc);
 
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
 						default_floating_type_ordering_type::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
@@ -137,14 +135,14 @@ namespace mpp
 					default_floating_type{},
 					default_floating_type{ 1 });
 
-				det = lu_generic<default_floating_type, true, true>(rows, columns, l_buffer, u_buffer);
+				const auto det = lu_generic<default_floating_type, true, true>(rows, columns, l_buffer, u_buffer);
 
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
 						default_floating_type_ordering_type::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
