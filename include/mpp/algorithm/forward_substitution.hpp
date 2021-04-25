@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/square.hpp>
@@ -30,22 +31,9 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, bool Check>
-		inline auto forward_subst_func(const auto& a, const auto& b)
+		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		inline auto forward_subst_unchecked(const auto& a, const auto& b)
 		{
-			if constexpr (Check)
-			{
-				if (!square(a))
-				{
-					throw std::logic_error(MATRIX_NOT_SQUARE);
-				}
-
-				if (const auto b_cols = b.columns(); b_cols != 1)
-				{
-					throw std::logic_error(MATRIX_NOT_COLUMN_VECTOR);
-				}
-			}
-
 			const auto rows = a.rows();
 
 			using x_matrix_t = mpp::matrix<default_floating_type, RowsExtent, ColumnsExtent>;
@@ -81,7 +69,30 @@ namespace mpp
 				}
 			}
 
-			return mpp::matrix<To, RowsExtent, ColumnsExtent>{ rows, 1, std::move(x_buffer), mpp::unsafe };
+			return x_buffer;
+		}
+
+		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, bool Check>
+		inline auto forward_subst_matrix(const auto& a, const auto& b)
+		{
+			// @FIXME: Find best message to error about a.rows() != b.rows()
+			if constexpr (Check)
+			{
+				if (!square(a))
+				{
+					throw std::logic_error(MATRIX_NOT_SQUARE);
+				}
+
+				if (const auto b_cols = b.columns(); b_cols != 1)
+				{
+					throw std::logic_error(MATRIX_NOT_COLUMN_VECTOR);
+				}
+			}
+
+			return mpp::matrix<To, RowsExtent, ColumnsExtent>{ a.rows(),
+				1,
+				forward_subst_unchecked<To, RowsExtent, ColumnsExtent>(a, b),
+				mpp::unsafe };
 		}
 	} // namespace detail
 
@@ -102,7 +113,7 @@ namespace mpp
 			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_func<To,
+			return detail::forward_subst_matrix<To,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				detail::configuration_use_safe>(a, b);
@@ -124,7 +135,7 @@ namespace mpp
 			mpp::unsafe_tag) // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_func<To,
+			return detail::forward_subst_matrix<To,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				false>(a, b);
@@ -142,7 +153,7 @@ namespace mpp
 			const mpp::matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
 		{
-			return detail::forward_subst_func<std::common_type_t<AValue, BValue>,
+			return detail::forward_subst_matrix<std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				detail::configuration_use_safe>(a, b);
@@ -161,7 +172,7 @@ namespace mpp
 			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
 			mpp::unsafe_tag) // @TODO: ISSUE #20
 		{
-			return detail::forward_subst_func<std::common_type_t<AValue, BValue>,
+			return detail::forward_subst_matrix<std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				false>(a, b);
