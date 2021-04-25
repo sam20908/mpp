@@ -55,14 +55,14 @@ namespace mpp
 		explicit matrix(const Allocator& allocator) : base(0, 0, allocator) {} // @TODO: ISSUE #20
 
 		matrix(const matrix& right, const Allocator& allocator) :
-			base(right._rows, right._columns, right._buffer, allocator) // @TODO: ISSUE #20
+			base(right.rows_, right.columns_, right.buffer_, allocator) // @TODO: ISSUE #20
 		{
 		}
 
 		matrix(matrix&& right, const Allocator& allocator) :
-			base(std::move(right._rows),
-				std::move(right._columns),
-				std::move(right._buffer),
+			base(std::move(right.rows_),
+				std::move(right.columns_),
+				std::move(right.buffer_),
 				allocator) // @TODO: ISSUE #20
 		{
 		}
@@ -178,7 +178,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(rows, columns, allocator) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<detail::configuration_use_safe>(base::_buffer,
+			detail::template make_identity_buffer<detail::configuration_use_safe>(base::buffer_,
 				rows,
 				columns,
 				zero_value,
@@ -194,7 +194,7 @@ namespace mpp
 			const Allocator& allocator = Allocator{}) :
 			base(rows, columns, allocator) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<false>(base::_buffer, rows, columns, zero_value, one_value);
+			detail::template make_identity_buffer<false>(base::buffer_, rows, columns, zero_value, one_value);
 		}
 
 		// @FIXME: Allow callable's value return be convertible to value type

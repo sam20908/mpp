@@ -53,7 +53,7 @@ namespace mpp
 
 		void fill_buffer_with_value(const Value& value) // @TODO: ISSUE #20
 		{
-			std::ranges::fill(base::_buffer, value);
+			std::ranges::fill(base::buffer_, value);
 		}
 
 	public:
@@ -156,7 +156,7 @@ namespace mpp
 			{
 				for (auto column = std::size_t{}; column < ColumnsExtent; ++column)
 				{
-					base::_buffer[index++] = expr(row, column);
+					base::buffer_[index++] = expr(row, column);
 				}
 			}
 		}
@@ -169,7 +169,7 @@ namespace mpp
 			{
 				for (auto column = std::size_t{}; column < ColumnsExtent; ++column)
 				{
-					base::_buffer[index++] = expr(row, column);
+					base::buffer_[index++] = expr(row, column);
 				}
 			}
 		}
@@ -182,7 +182,7 @@ namespace mpp
 		explicit matrix(identity_tag, const Value& zero_value = Value{ 0 }, const Value& one_value = Value{ 1 }) :
 			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<detail::configuration_use_safe>(base::_buffer,
+			detail::template make_identity_buffer<detail::configuration_use_safe>(base::buffer_,
 				RowsExtent,
 				ColumnsExtent,
 				zero_value,
@@ -195,7 +195,7 @@ namespace mpp
 			const Value& one_value  = Value{ 1 }) :
 			base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			detail::template make_identity_buffer<false>(base::_buffer,
+			detail::template make_identity_buffer<false>(base::buffer_,
 				RowsExtent,
 				ColumnsExtent,
 				zero_value,
@@ -206,7 +206,7 @@ namespace mpp
 		template<detail::invocable_with_return_type<Value> Callable>
 		explicit matrix(Callable&& callable) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
-			std::ranges::generate(base::_buffer, std::forward<Callable>(callable));
+			std::ranges::generate(base::buffer_, std::forward<Callable>(callable));
 		}
 
 		template<std::convertible_to<Value> InitializerListValue>
