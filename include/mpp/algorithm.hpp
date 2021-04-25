@@ -19,8 +19,10 @@
 
 #pragma once
 
+#include <mpp/algorithm/back_substitution.hpp>
 #include <mpp/algorithm/block.hpp>
 #include <mpp/algorithm/determinant.hpp>
+#include <mpp/algorithm/forward_substitution.hpp>
 #include <mpp/algorithm/inverse.hpp>
 #include <mpp/algorithm/lu_decomposition.hpp>
 #include <mpp/algorithm/transpose.hpp>

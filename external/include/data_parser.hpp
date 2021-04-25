@@ -211,7 +211,7 @@ auto parse_data_file_block_transformation(const std::filesystem::path& data_file
 }
 
 template<typename From, typename To>
-struct lu_decomposition_result
+struct two_matrices_transformation_result
 {
 	mpp::matrix<From> original_matrix;
 	mpp::matrix<To> l_matrix;
@@ -219,8 +219,8 @@ struct lu_decomposition_result
 };
 
 template<typename From, typename To>
-auto parse_data_file_lu_decomposition_transformation(const std::filesystem::path& data_file_path)
-	-> lu_decomposition_result<From, To>
+auto parse_data_file_two_matrices_transformation(const std::filesystem::path& data_file_path)
+	-> two_matrices_transformation_result<From, To>
 {
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
@@ -230,4 +230,26 @@ auto parse_data_file_lu_decomposition_transformation(const std::filesystem::path
 	auto u    = parse_matrix_block<To>(data_file, line);
 
 	return { std::move(from), std::move(l), std::move(u) };
+}
+
+template<typename AValue, typename XValue, typename BValue>
+struct substitution_result
+{
+	mpp::matrix<AValue> a;
+	mpp::matrix<XValue> x;
+	mpp::matrix<BValue> b;
+};
+
+template<typename AValue, typename XValue, typename BValue>
+auto parse_data_file_substitution_transformation(const std::filesystem::path& data_file_path)
+	-> substitution_result<AValue, XValue, BValue>
+{
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
+
+	auto a = parse_matrix_block<AValue>(data_file, line);
+	auto b = parse_matrix_block<BValue>(data_file, line);
+	auto x = parse_matrix_block<XValue>(data_file, line);
+
+	return { std::move(a), std::move(x), std::move(b) };
 }

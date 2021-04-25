@@ -139,6 +139,9 @@ namespace mpp::detail
 	inline auto lu_generic(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
 		-> To // @TODO: ISSUE #20
 	{
+		// Shortcut method from
+		// https://medium.com/linear-algebra-basics/lu-decomposition-c8f9b75ddeff
+
 		// Things this function expects from l_buffer and u_buffer:
 		// 1. l_buffer is already an identity buffer
 		// 2. u_buffer has the original values

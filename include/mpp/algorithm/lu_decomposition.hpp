@@ -25,6 +25,7 @@
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
+#include <cstddef>
 #include <utility>
 
 namespace mpp
@@ -38,7 +39,8 @@ namespace mpp
 			std::size_t ColumnsExtent,
 			typename Allocator>
 		auto lu_decomposition_func(const mpp::matrix<Value, RowsExtent, ColumnsExtent, Allocator>& matrix)
-			-> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>, mpp::matrix<To, RowsExtent, ColumnsExtent>>
+			-> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>,
+				mpp::matrix<To, RowsExtent, ColumnsExtent>> // @TODO: ISSUE #20
 		{
 			if constexpr (CheckSquare)
 			{
@@ -75,7 +77,8 @@ namespace mpp
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		friend inline auto tag_invoke(lu_decomposition_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& matrix)
-			-> std::pair<mpp::matrix<Value, RowsExtent, ColumnsExtent>, mpp::matrix<Value, RowsExtent, ColumnsExtent>>
+			-> std::pair<mpp::matrix<Value, RowsExtent, ColumnsExtent>,
+				mpp::matrix<Value, RowsExtent, ColumnsExtent>> // @TODO: ISSUE #20
 		{
 			return detail::lu_decomposition_func<Value, detail::configuration_use_safe>(matrix);
 		}
@@ -83,8 +86,9 @@ namespace mpp
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		friend inline auto tag_invoke(lu_decomposition_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& matrix,
-			mpp::unsafe_tag)
-			-> std::pair<mpp::matrix<Value, RowsExtent, ColumnsExtent>, mpp::matrix<Value, RowsExtent, ColumnsExtent>>
+			mpp::unsafe_tag) -> std::pair<mpp::matrix<Value, RowsExtent, ColumnsExtent>,
+			mpp::matrix<Value, RowsExtent, ColumnsExtent>> // @TODO: ISSUE #20
+
 		{
 			return detail::lu_decomposition_func<Value, false>(matrix);
 		}
@@ -93,7 +97,9 @@ namespace mpp
 		friend inline auto tag_invoke(lu_decomposition_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& matrix)
-			-> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>, mpp::matrix<To, RowsExtent, ColumnsExtent>>
+			-> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>,
+				mpp::matrix<To, RowsExtent, ColumnsExtent>> // @TODO: ISSUE #20
+
 		{
 			return detail::lu_decomposition_func<To, detail::configuration_use_safe>(matrix);
 		}
@@ -103,8 +109,9 @@ namespace mpp
 		friend inline auto tag_invoke(lu_decomposition_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& matrix,
-			mpp::unsafe_tag)
-			-> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>, mpp::matrix<To, RowsExtent, ColumnsExtent>>
+			mpp::unsafe_tag) -> std::pair<mpp::matrix<To, RowsExtent, ColumnsExtent>,
+			mpp::matrix<To, RowsExtent, ColumnsExtent>> // @TODO: ISSUE #20
+
 		{
 			return detail::lu_decomposition_func<To, false>(matrix);
 		}
