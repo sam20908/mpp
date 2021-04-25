@@ -51,15 +51,15 @@ namespace mpp::detail
 		using base = expr_base<Derived, Value, RowsExtent, ColumnsExtent>;
 
 	protected:
-		Buffer _buffer; // Don't default initailize because value type might not be DefaultConstructible
-		std::size_t _rows{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
-		std::size_t _columns{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
+		Buffer buffer_; // Don't default initailize because value type might not be DefaultConstructible
+		std::size_t rows_{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
+		std::size_t columns_{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
 
 		template<typename... Args>
 		matrix_base(std::size_t rows, std::size_t columns, Args&&... args) :
-			_buffer(std::forward<Args>(args)...),
-			_rows{ rows },
-			_columns{ columns } // @TODO: ISSUE #20
+			buffer_(std::forward<Args>(args)...),
+			rows_{ rows },
+			columns_{ columns } // @TODO: ISSUE #20
 		{
 		}
 
@@ -72,7 +72,7 @@ namespace mpp::detail
 
 			if constexpr (CheckAgainstCurrentRows)
 			{
-				if (range_rows != _rows)
+				if (range_rows != rows_)
 				{
 					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 				}
@@ -81,7 +81,7 @@ namespace mpp::detail
 			auto range_begin            = std::ranges::begin(range_2d);
 			const auto range_columns    = range_rows > 0 ? std::ranges::size(*range_begin) : std::size_t{};
 			const auto range_total_size = range_rows * range_columns;
-			const auto buffer_size      = _buffer.size();
+			const auto buffer_size      = buffer_.size();
 
 			constexpr auto range_is_moved   = std::is_rvalue_reference_v<range_2d_t>;
 			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
@@ -90,12 +90,12 @@ namespace mpp::detail
 
 			if constexpr (buffer_is_vector)
 			{
-				_buffer.reserve(range_total_size);
+				buffer_.reserve(range_total_size);
 			}
 
 			// Assign all elements (until the need to insert for dynamic matrices)
-			const auto min_rows = (std::min)(range_rows, _rows);
-			auto buffer_begin   = _buffer.begin();
+			const auto min_rows = (std::min)(range_rows, rows_);
+			auto buffer_begin   = buffer_.begin();
 
 			for (auto row = std::size_t{}; row < min_rows; ++row)
 			{
@@ -103,7 +103,7 @@ namespace mpp::detail
 
 				if constexpr (CheckAgainstCurrentColumns)
 				{
-					if (current_columns != _columns)
+					if (current_columns != columns_)
 					{
 						throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 					}
@@ -176,7 +176,7 @@ namespace mpp::detail
 
 						const auto elements_to_insert = range_columns - rooms_available_from_current;
 						const auto row_end = row_assign_end + static_cast<difference_type>(elements_to_insert);
-						const auto buffer_back_inserter = std::back_inserter(_buffer);
+						const auto buffer_back_inserter = std::back_inserter(buffer_);
 
 						// Insert rest of the elements in the current row
 						if constexpr (range_has_same_value_type)
@@ -201,7 +201,7 @@ namespace mpp::detail
 								});
 						}
 
-						_rows = ++row; // Use the inserter loop to insert rest of the elements
+						rows_ = ++row; // Use the inserter loop to insert rest of the elements
 						++range_begin;
 
 						break;
@@ -215,15 +215,15 @@ namespace mpp::detail
 			// Insert every element after (only dynamic matrices reach this point)
 			if constexpr (buffer_is_vector)
 			{
-				const auto buffer_back_inserter = std::back_inserter(_buffer);
+				const auto buffer_back_inserter = std::back_inserter(buffer_);
 
-				for (auto row = _rows; row < range_rows; ++row)
+				for (auto row = rows_; row < range_rows; ++row)
 				{
 					const auto current_columns = std::ranges::size(*range_begin);
 
 					if constexpr (CheckAgainstCurrentColumns)
 					{
-						if (current_columns != _columns)
+						if (current_columns != columns_)
 						{
 							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 						}
@@ -264,12 +264,12 @@ namespace mpp::detail
 			{
 				if (range_total_size < buffer_size)
 				{
-					_buffer.resize(range_total_size);
+					buffer_.resize(range_total_size);
 				}
 			}
 
-			_rows    = range_rows;
-			_columns = range_columns;
+			rows_    = range_rows;
+			columns_ = range_columns;
 		}
 
 		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize>
@@ -277,7 +277,7 @@ namespace mpp::detail
 		{
 			if constexpr (CheckAgainstCurrentRows)
 			{
-				if (rows != _rows)
+				if (rows != rows_)
 				{
 					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 				}
@@ -285,13 +285,13 @@ namespace mpp::detail
 
 			if constexpr (CheckAgainstCurrentColumns)
 			{
-				if (columns != _columns)
+				if (columns != columns_)
 				{
 					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
 				}
 			}
 
-			const auto buffer_size = _buffer.size();
+			const auto buffer_size = buffer_.size();
 			const auto range_size  = rows * columns;
 
 			if constexpr (CheckRangeSize)
@@ -310,13 +310,13 @@ namespace mpp::detail
 
 			if constexpr (buffer_is_vector)
 			{
-				_buffer.reserve(range_size);
+				buffer_.reserve(range_size);
 			}
 
 			const auto max_elements_to_assign = (std::min)(range_size, buffer_size);
 			const auto assign_begin           = std::ranges::begin(range);
 			const auto assign_end             = assign_begin + static_cast<difference_type>(max_elements_to_assign);
-			const auto buffer_begin           = _buffer.begin();
+			const auto buffer_begin           = buffer_.begin();
 
 			// Try to assign the all elements it can
 			if constexpr (range_has_same_value_type)
@@ -333,13 +333,13 @@ namespace mpp::detail
 			else
 			{
 				// @TODO: Check if this *really* is perfect forwarding values
-				std::transform(assign_begin, assign_end, _buffer.begin(), [](auto&& value) -> decltype(auto) {
+				std::transform(assign_begin, assign_end, buffer_.begin(), [](auto&& value) -> decltype(auto) {
 					return static_cast<Value>(std::forward<decltype(value)>(value));
 				});
 			}
 
 			const auto range_end            = std::ranges::end(range);
-			const auto buffer_back_inserter = std::back_inserter(_buffer);
+			const auto buffer_back_inserter = std::back_inserter(buffer_);
 
 			// Insert the leftovers (only dynamic matrices needs this)
 			if constexpr (buffer_is_vector)
@@ -365,12 +365,12 @@ namespace mpp::detail
 
 				if (range_size < buffer_size)
 				{
-					_buffer.resize(range_size);
+					buffer_.resize(range_size);
 				}
 			}
 
-			_rows    = rows;
-			_columns = columns;
+			rows_    = rows;
+			columns_ = columns;
 		}
 
 	public:
@@ -396,98 +396,98 @@ namespace mpp::detail
 
 		[[nodiscard]] auto data() -> pointer // @TODO: ISSUE #20
 		{
-			return _buffer.data();
+			return buffer_.data();
 		}
 
 		[[nodiscard]] auto data() const -> const_pointer // @TODO: ISSUE #20
 		{
-			return _buffer.data();
+			return buffer_.data();
 		}
 
 		[[nodiscard]] auto begin() -> iterator // @TODO: ISSUE #20
 		{
-			return iterator(_buffer.begin(), _columns);
+			return iterator(buffer_.begin(), columns_);
 		}
 
 		[[nodiscard]] auto begin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cbegin(), _columns);
+			return const_iterator(buffer_.cbegin(), columns_);
 		}
 
 		[[nodiscard]] auto end() -> iterator // @TODO: ISSUE #20
 		{
-			return iterator(_buffer.end(), _columns);
+			return iterator(buffer_.end(), columns_);
 		}
 
 		[[nodiscard]] auto end() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cend(), _columns);
+			return const_iterator(buffer_.cend(), columns_);
 		}
 
 		[[nodiscard]] auto rbegin() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return reverse_iterator(_buffer.rbegin(), _columns);
+			return reverse_iterator(buffer_.rbegin(), columns_);
 		}
 
 		[[nodiscard]] auto rbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crbegin(), _columns);
+			return const_reverse_iterator(buffer_.crbegin(), columns_);
 		}
 
 		[[nodiscard]] auto rend() -> reverse_iterator // @TODO: ISSUE #20
 		{
-			return reverse_iterator(_buffer.rend(), _columns);
+			return reverse_iterator(buffer_.rend(), columns_);
 		}
 
 		[[nodiscard]] auto rend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crend(), _columns);
+			return const_reverse_iterator(buffer_.crend(), columns_);
 		}
 
 		[[nodiscard]] auto cbegin() -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cbegin(), _columns);
+			return const_iterator(buffer_.cbegin(), columns_);
 		}
 
 		[[nodiscard]] auto cbegin() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cbegin(), _columns);
+			return const_iterator(buffer_.cbegin(), columns_);
 		}
 
 		[[nodiscard]] auto cend() -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cend(), _columns);
+			return const_iterator(buffer_.cend(), columns_);
 		}
 
 		[[nodiscard]] auto cend() const -> const_iterator // @TODO: ISSUE #20
 		{
-			return const_iterator(_buffer.cend(), _columns);
+			return const_iterator(buffer_.cend(), columns_);
 		}
 
 		[[nodiscard]] auto crbegin() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crbegin(), _columns);
+			return const_reverse_iterator(buffer_.crbegin(), columns_);
 		}
 
 		[[nodiscard]] auto crbegin() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crbegin(), _columns);
+			return const_reverse_iterator(buffer_.crbegin(), columns_);
 		}
 
 		[[nodiscard]] auto crend() -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crend(), _columns);
+			return const_reverse_iterator(buffer_.crend(), columns_);
 		}
 
 		[[nodiscard]] auto crend() const -> const_reverse_iterator // @TODO: ISSUE #20
 		{
-			return const_reverse_iterator(_buffer.crend(), _columns);
+			return const_reverse_iterator(buffer_.crend(), columns_);
 		}
 
 		[[nodiscard]] auto at(std::size_t row_index, std::size_t column_index) const
 			-> const_reference // @TODO: ISSUE #20
 		{
-			if (row_index >= _rows || column_index >= _columns)
+			if (row_index >= rows_ || column_index >= columns_)
 			{
 				throw std::out_of_range("Access out of bounds!");
 			}
@@ -499,62 +499,62 @@ namespace mpp::detail
 
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) -> reference // @TODO: ISSUE #20
 		{
-			const auto index = index_2d_to_1d(_columns, row_index, col_index);
+			const auto index = index_2d_to_1d(columns_, row_index, col_index);
 
-			return _buffer[index];
+			return buffer_[index];
 		}
 
 		[[nodiscard]] auto operator()(std::size_t row_index,
 			std::size_t col_index) const -> const_reference // @TODO: ISSUE #20
 		{
-			const auto index = index_2d_to_1d(_columns, row_index, col_index);
+			const auto index = index_2d_to_1d(columns_, row_index, col_index);
 
-			return _buffer[index];
+			return buffer_[index];
 		}
 
 		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _rows;
+			return rows_;
 		}
 
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _columns;
+			return columns_;
 		}
 
 		[[nodiscard]] auto front() -> reference // @TODO: ISSUE #20
 		{
-			return _buffer.front();
+			return buffer_.front();
 		}
 
 		[[nodiscard]] auto front() const -> const_reference // @TODO: ISSUE #20
 		{
-			return _buffer.front();
+			return buffer_.front();
 		}
 
 		[[nodiscard]] auto back() -> reference // @TODO: ISSUE #20
 		{
-			return _buffer.back();
+			return buffer_.back();
 		}
 
 		[[nodiscard]] auto back() const -> const_reference // @TODO: ISSUE #20
 		{
-			return _buffer.back();
+			return buffer_.back();
 		}
 
 		[[nodiscard]] auto size() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _buffer.size();
+			return buffer_.size();
 		}
 
 		[[nodiscard]] auto max_size() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _buffer.max_size();
+			return buffer_.max_size();
 		}
 
 		[[nodiscard]] auto empty() const -> bool // @TODO: ISSUE #20
 		{
-			return _buffer.empty();
+			return buffer_.empty();
 		}
 
 		template<typename Range2D>
@@ -571,9 +571,9 @@ namespace mpp::detail
 			{
 				using std::swap;
 
-				swap(_rows, right._rows);
-				swap(_columns, right._columns);
-				swap(_buffer, right._buffer);
+				swap(rows_, right.rows_);
+				swap(columns_, right.columns_);
+				swap(buffer_, right.buffer_);
 			}
 		}
 	};
@@ -603,16 +603,16 @@ namespace mpp::detail
 			std::size_t columns,
 			const auto& expr) // @TODO: ISSUE #20
 		{
-			base::_rows    = rows;
-			base::_columns = columns;
+			base::rows_    = rows;
+			base::columns_ = columns;
 
-			base::_buffer.reserve(rows * columns);
+			base::buffer_.reserve(rows * columns);
 
-			for (auto row = std::size_t{}; row < base::_rows; ++row)
+			for (auto row = std::size_t{}; row < base::rows_; ++row)
 			{
-				for (auto column = std::size_t{}; column < base::_columns; ++column)
+				for (auto column = std::size_t{}; column < base::columns_; ++column)
 				{
-					base::_buffer.push_back(expr(row, column));
+					base::buffer_.push_back(expr(row, column));
 				}
 			}
 		}
@@ -624,11 +624,11 @@ namespace mpp::detail
 		{
 			const auto total_size = rows * columns;
 
-			base::_buffer.reserve(total_size);
+			base::buffer_.reserve(total_size);
 
 			for (auto index = std::size_t{}; index < total_size; ++index)
 			{
-				base::_buffer.push_back(std::invoke(std::forward<Callable>(callable)));
+				base::buffer_.push_back(std::invoke(std::forward<Callable>(callable)));
 			}
 		}
 
@@ -639,14 +639,14 @@ namespace mpp::detail
 
 		[[nodiscard]] auto get_allocator() const -> allocator_type // @TODO: ISSUE #20
 		{
-			return base::_buffer.get_allocator();
+			return base::buffer_.get_allocator();
 		}
 
 		void clear() // @TODO: ISSUE #20
 		{
-			base::_rows    = 0;
-			base::_columns = 0;
-			base::_buffer.clear();
+			base::rows_    = 0;
+			base::columns_ = 0;
+			base::buffer_.clear();
 		}
 	};
 } // namespace mpp::detail
