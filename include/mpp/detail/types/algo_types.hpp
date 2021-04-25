@@ -19,9 +19,14 @@
 
 #pragma once
 
+#include <compare>
+
 namespace mpp::detail
 {
 	// Double was tested to be *at least* accurate enough to do calculations involve irrational fractions (e.g. 1/3) and
 	// provide accurate enough results
 	using default_floating_type = double;
+
+	using default_floating_type_ordering =
+		std::compare_three_way_result_t<default_floating_type, default_floating_type>;
 } // namespace mpp::detail

@@ -25,6 +25,8 @@ namespace mpp::detail
 	static inline constexpr auto DIMENSIONS_NOT_MULTIPLIABLE = "Matrices are not multipliable!";
 	static inline constexpr auto DIMENSIONS_NOT_SQUARE       = "Dimensions are not square!";
 
+	static inline constexpr auto DIAGONAL_ELEMENT_IS_ZERO = "Diagnoal element is zero!";
+
 	static inline constexpr auto IDENTITY_RANK_OF_ZERO = "Identity matrix cannot have a rank of 0!";
 
 	static inline constexpr auto INITIALIZER_UNEQUAL_ROWS = "Initializer does not have equal columns in rows!";

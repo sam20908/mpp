@@ -69,9 +69,6 @@ namespace mpp
 			auto inv_buffer = lu_buffer_t{};
 			allocate_buffer_if_vector(inv_buffer, rows, columns, default_floating_type{});
 
-			using default_floating_type_ordering_type =
-				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
-
 			if (rows == 1)
 			{
 				const auto elem = static_cast<default_floating_type>(obj(0, 0));
@@ -79,7 +76,7 @@ namespace mpp
 				if constexpr (Check)
 				{
 					if (floating_point_compare(elem, default_floating_type{}) ==
-						default_floating_type_ordering_type::equivalent)
+						default_floating_type_ordering::equivalent)
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}
@@ -103,7 +100,7 @@ namespace mpp
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering_type::equivalent)
+						default_floating_type_ordering::equivalent)
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}
@@ -142,7 +139,7 @@ namespace mpp
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering_type::equivalent)
+						default_floating_type_ordering::equivalent)
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}
@@ -169,7 +166,7 @@ namespace mpp
 					identity_column_buffer[last_column_index] = default_floating_type{};
 					identity_column_buffer[row]               = default_floating_type{ 1 };
 
-					auto l_x_buffer = forward_subst_on_buffer_unchecked<default_floating_type, RowsExtent, 1>(l_buffer,
+					auto l_x_buffer = forward_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(l_buffer,
 						identity_column_buffer,
 						rows);
 
@@ -177,7 +174,7 @@ namespace mpp
 					// part_inverse_buffer now corresponds to a column of the inverse matrix
 
 					auto part_inverse_buffer =
-						back_subst_on_buffer_unchecked<default_floating_type, RowsExtent, 1>(u_buffer,
+						back_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(u_buffer,
 							std::move(l_x_buffer),
 							rows);
 

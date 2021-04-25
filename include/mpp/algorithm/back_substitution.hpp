@@ -22,6 +22,8 @@
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/exception_messages.hpp>
+#include <mpp/utility/comparison.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
@@ -31,8 +33,8 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		inline auto back_subst_on_buffer_unchecked(auto a, auto b, std::size_t n)
+		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, bool Check>
+		inline auto back_subst_on_buffer(auto a, auto b, std::size_t n)
 		{
 			using x_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
 			using x_buffer_t = typename x_matrix_t::buffer_type;
@@ -56,7 +58,18 @@ namespace mpp
 					result -= a[index_2d_to_1d(n, row_index, column)] * x_buffer[column];
 				}
 
-				result /= a[index_2d_to_1d(n, row_index, row_index)];
+				const auto diag_elem = static_cast<default_floating_type>(a[index_2d_to_1d(n, row_index, row_index)]);
+
+				if constexpr (Check)
+				{
+					if (floating_point_compare(diag_elem, default_floating_type{}) ==
+						default_floating_type_ordering::equivalent)
+					{
+						throw std::runtime_error(DIAGONAL_ELEMENT_IS_ZERO);
+					}
+				}
+
+				result /= diag_elem;
 
 				x_buffer[row_index] = result;
 			}
@@ -83,7 +96,7 @@ namespace mpp
 
 			return matrix<To, RowsExtent, ColumnsExtent>{ a.rows(),
 				1,
-				back_subst_on_buffer_unchecked<To, RowsExtent, ColumnsExtent>(a.data(), b.data(), a.rows()),
+				back_subst_on_buffer<To, RowsExtent, ColumnsExtent, Check>(a.data(), b.data(), a.rows()),
 				unsafe };
 		}
 	} // namespace detail
