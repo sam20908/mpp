@@ -103,6 +103,21 @@ namespace ns
 	{
 		return dumb_class2{};
 	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::lu_decomposition_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::forward_substitution_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
+
+	[[nodiscard]] constexpr auto tag_invoke(mpp::back_substitution_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 } // namespace ns
 
 template<typename CPO>
@@ -134,6 +149,9 @@ int main()
 			expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
 			expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::lu_decomposition_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::forward_substitution_t>> == type<ns::dumb_class2>);
+			expect(type<invoke_result_t<mpp::back_substitution_t>> == type<ns::dumb_class2>);
 		};
 	};
 
