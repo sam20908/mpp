@@ -180,12 +180,12 @@ int main()
 		test_lu_decomposition<int, double>("test_data/3x3_lu.txt");
 	};
 
-	// @FIXME: Remove the skip once the inverse implementation has been fixed
-	skip / feature("Inverse") = []() {
+	feature("Inverse") = []() {
 		auto inverse_fn = std::bind_front(mpp::inverse, std::type_identity<double>{});
 
 		test_transformation<int, double>("test_data/2x2_inv.txt", inverse_fn);
 		test_transformation<int, double>("test_data/3x3_inv.txt", inverse_fn);
+		test_transformation<int, double>("test_data/3x3_inv_int.txt", inverse_fn);
 		test_transformation<double, double>("test_data/10x10_inv.txt", inverse_fn);
 	};
 

@@ -32,34 +32,31 @@ namespace mpp
 	namespace detail
 	{
 		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		inline auto back_subst_unchecked(const auto& a, const auto& b)
+		inline auto back_subst_on_buffer_unchecked(auto a, auto b, std::size_t n)
 		{
-			const auto rows    = a.rows();
-			const auto columns = a.columns();
-
-			using x_matrix_t = mpp::matrix<default_floating_type, RowsExtent, ColumnsExtent>;
+			using x_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
 			using x_buffer_t = typename x_matrix_t::buffer_type;
 			auto x_buffer    = x_buffer_t{};
 
 			// @TODO: Any way to make this utilize push_back?
-			allocate_buffer_if_vector(x_buffer, rows, 1, default_floating_type{});
+			allocate_buffer_if_vector(x_buffer, n, 1, default_floating_type{});
 
 			/**
 			 * Implementation of back substitution from
 			 * https://www.gaussianwaves.com/2013/05/solving-a-triangular-matrix-using-back-backward-substitution/
 			 */
-			for (auto row = rows; row > std::size_t{}; --row)
+			for (auto row = n; row > std::size_t{}; --row)
 			{
 				const auto row_index = row - 1;
 
-				auto result = static_cast<default_floating_type>(b(row_index, 0));
+				auto result = static_cast<default_floating_type>(b[index_2d_to_1d(1, row_index, 0)]);
 
-				for (auto column = columns - 1; column > row_index; --column)
+				for (auto column = n - 1; column > row_index; --column)
 				{
-					result -= a(row_index, column) * x_buffer[column];
+					result -= a[index_2d_to_1d(n, row_index, column)] * x_buffer[column];
 				}
 
-				result /= a(row_index, row_index);
+				result /= a[index_2d_to_1d(n, row_index, row_index)];
 
 				x_buffer[row_index] = result;
 			}
@@ -84,10 +81,10 @@ namespace mpp
 				}
 			}
 
-			return mpp::matrix<To, RowsExtent, ColumnsExtent>{ a.rows(),
+			return matrix<To, RowsExtent, ColumnsExtent>{ a.rows(),
 				1,
-				back_subst_unchecked<To, RowsExtent, ColumnsExtent>(a, b),
-				mpp::unsafe };
+				back_subst_on_buffer_unchecked<To, RowsExtent, ColumnsExtent>(a.data(), b.data(), a.rows()),
+				unsafe };
 		}
 	} // namespace detail
 
@@ -104,8 +101,8 @@ namespace mpp
 			typename BAllocator>
 		friend inline auto tag_invoke(back_substitution_t,
 			std::type_identity<To>,
-			const mpp::matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
+			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
+			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
 			return detail::back_subst_matrix<To,
@@ -125,9 +122,9 @@ namespace mpp
 			typename BAllocator>
 		friend inline auto tag_invoke(back_substitution_t,
 			std::type_identity<To>,
-			const mpp::matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			mpp::unsafe_tag) // @TODO: ISSUE #20
+			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
+			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
+			unsafe_tag) // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
 			return detail::
@@ -145,8 +142,8 @@ namespace mpp
 			typename AAllocator,
 			typename BAllocator>
 		friend inline auto tag_invoke(back_substitution_t,
-			const mpp::matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
+			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
+			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b) // @TODO: ISSUE #20
 		{
 			return detail::back_subst_matrix<std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
@@ -163,9 +160,9 @@ namespace mpp
 			typename AAllocator,
 			typename BAllocator>
 		friend inline auto tag_invoke(back_substitution_t,
-			const mpp::matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const mpp::matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			mpp::unsafe_tag) // @TODO: ISSUE #20
+			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
+			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
+			unsafe_tag) // @TODO: ISSUE #20
 		{
 			return detail::back_subst_matrix<std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),

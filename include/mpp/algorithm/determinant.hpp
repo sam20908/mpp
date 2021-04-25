@@ -85,6 +85,7 @@ namespace mpp
 			const auto det = lu_generic<default_floating_type, false, true>(rows, columns, dummy_variable, u_buffer);
 
 			// We can't directly cast because that would round down floating points
+			// @TODO: Analyze if other algorithms that uses determinant need this treatment
 			return static_cast<To>(std::round(det));
 		}
 	} // namespace detail
