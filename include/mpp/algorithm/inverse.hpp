@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <mpp/algorithm/back_substitution.hpp>
+#include <mpp/algorithm/forward_substitution.hpp>
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
@@ -35,8 +37,13 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		template<bool Check,
+			typename To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator>
+		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
@@ -50,38 +57,33 @@ namespace mpp
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			using inverse_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
+			using lu_buffer_t  = typename matrix<default_floating_type, RowsExtent, ColumnsExtent>::buffer_type;
+			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
 			{
-				return inverse_matrix_t{};
+				return inv_matrix_t{};
 			}
 
-			auto inverse_matrix_buffer = typename inverse_matrix_t::buffer_type{};
-			allocate_buffer_if_vector(inverse_matrix_buffer, rows, columns, To{});
-
-			using default_floating_type_ordering_type =
-				std::compare_three_way_result_t<default_floating_type, default_floating_type>;
+			auto inv_buffer = lu_buffer_t{};
+			allocate_buffer_if_vector(inv_buffer, rows, columns, default_floating_type{});
 
 			if (rows == 1)
 			{
-				const auto elem = static_cast<To>(obj(0, 0));
-
-				using to_ordering_type = std::compare_three_way_result_t<To, To>;
+				const auto elem = static_cast<default_floating_type>(obj(0, 0));
 
 				if constexpr (Check)
 				{
-					if (floating_point_compare(elem, To{}) == to_ordering_type::equivalent)
+					if (floating_point_compare(elem, default_floating_type{}) ==
+						default_floating_type_ordering::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
-				inverse_matrix_buffer[0] = To{ 1 } / elem;
+				inv_buffer[0] = 1 / elem;
 			}
-
-			auto det = default_floating_type{ 1 };
 
 			if (rows == 2)
 			{
@@ -93,23 +95,23 @@ namespace mpp
 				const auto ad = element_4 * element_1;
 				const auto bc = element_2 * element_3;
 
-				det = ad - bc;
+				const auto det = std::round(ad - bc);
 
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering_type::equivalent)
+						default_floating_type_ordering::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
-				const auto multiplier = default_floating_type{ 1 } / det;
+				const auto multiplier = 1 / det;
 
-				inverse_matrix_buffer[0] = static_cast<To>(multiplier * element_1);
-				inverse_matrix_buffer[1] = static_cast<To>(multiplier * element_2 * -1);
-				inverse_matrix_buffer[2] = static_cast<To>(multiplier * element_3 * -1);
-				inverse_matrix_buffer[3] = static_cast<To>(multiplier * element_4);
+				inv_buffer[0] = multiplier * element_1;
+				inv_buffer[1] = multiplier * element_2 * -1;
+				inv_buffer[2] = multiplier * element_3 * -1;
+				inv_buffer[3] = multiplier * element_4;
 			}
 
 			if (rows >= 3)
@@ -120,57 +122,70 @@ namespace mpp
 				auto l_buffer = lu_decomp_buffer_t{};
 				auto u_buffer = lu_decomp_buffer_t{};
 
+				// @TODO: Should do a direct copy initialization instead
 				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 				std::ranges::copy(obj, u_buffer.begin());
 
-				allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
+				// allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
 				// @TODO: Allow the user to control one_value and zero_value here?
-				make_identity_buffer<false>(l_buffer, rows, columns, default_floating_type{}, default_floating_type{});
-
-				det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, true>(rows,
+				make_identity_buffer<false>(l_buffer,
+					rows,
 					columns,
-					l_buffer,
-					u_buffer);
+					default_floating_type{},
+					default_floating_type{ 1 });
+
+				const auto det = lu_generic<default_floating_type, true, true>(rows, columns, l_buffer, u_buffer);
 
 				if constexpr (Check)
 				{
 					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering_type::equivalent)
+						default_floating_type_ordering::equivalent)
 					{
-						throw std::runtime_error(INVERSE_MATRIX_SINGULAR);
+						throw std::runtime_error(MATRIX_SINGULAR);
 					}
 				}
 
-				if (std::is_constant_evaluated())
+				// Solve for x_buffer values with Ax=b with A=l_buffer and b=Column of identity matrix
+
+				auto identity_column_buffer = typename matrix<default_floating_type, RowsExtent, 1>::buffer_type{};
+
+				allocate_buffer_if_vector(identity_column_buffer, rows, 1, default_floating_type{});
+
+				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					forward_substitution_in_place(l_buffer, columns);
-					back_substitution_in_place(u_buffer, columns);
+					// Branch-less logic to do:
+					// row if row == 0
+					// row - 1 if row > 0
+					const auto last_column_index = row - 1 * (row != 0);
+
+					// This forms b that corresponds to corresponding column from the identity matrix
+					// e.g. with a 3x1 column vector
+					// row 1 -> 1 0 0
+					// row 2 -> 0 1 0
+					// row 3 -> 0 0 1
+					identity_column_buffer[last_column_index] = default_floating_type{};
+					identity_column_buffer[row]               = default_floating_type{ 1 };
+
+					auto l_x_buffer = forward_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(l_buffer,
+						identity_column_buffer,
+						rows);
+
+					// Use l_x_buffer to do back substitution to solve Ax=B with A=u_buffer and b=l_x_buffer. The
+					// part_inverse_buffer now corresponds to a column of the inverse matrix
+
+					auto part_inverse_buffer =
+						back_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(u_buffer,
+							std::move(l_x_buffer),
+							rows);
+
+					for (auto column = std::size_t{}; auto&& value : part_inverse_buffer)
+					{
+						inv_buffer[index_2d_to_1d(columns, column++, row)] = std::move(value);
+					}
 				}
-				else
-				{
-					// Compute inv(L) and inv(U) in parallel because they don't share data
-
-					auto l_inverse_future = std::async(std::launch::async, [&l_buffer, columns]() {
-						forward_substitution_in_place(l_buffer, columns);
-					});
-					auto u_inverse_future = std::async(std::launch::async, [&u_buffer, columns]() {
-						back_substitution_in_place(u_buffer, columns);
-					});
-
-					l_inverse_future.wait();
-					u_inverse_future.wait();
-				}
-
-				matrix_multiplication_on_buffers<To, default_floating_type>(inverse_matrix_buffer,
-					std::move(u_buffer),
-					std::move(l_buffer),
-					rows,
-					columns,
-					rows,
-					columns);
 			}
 
-			return inverse_matrix_t{ rows, columns, std::move(inverse_matrix_buffer) };
+			return inv_matrix_t{ rows, columns, std::move(inv_buffer), unsafe };
 		}
 	} // namespace detail
 

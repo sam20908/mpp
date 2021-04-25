@@ -35,8 +35,13 @@ namespace mpp
 	{
 		inline static constexpr auto dummy_variable = ' ';
 
-		template<bool CheckSquare, typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		template<bool CheckSquare,
+			typename To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator>
+		[[nodiscard]] inline auto det_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> To // @TODO: ISSUE #20
 		{
 			if constexpr (CheckSquare)
@@ -77,12 +82,10 @@ namespace mpp
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_decomposition_and_compute_determinant_in_place<default_floating_type, false>(rows,
-				columns,
-				dummy_variable,
-				u_buffer);
+			const auto det = lu_generic<default_floating_type, false, true>(rows, columns, dummy_variable, u_buffer);
 
 			// We can't directly cast because that would round down floating points
+			// @TODO: Analyze if other algorithms that uses determinant need this treatment
 			return static_cast<To>(std::round(det));
 		}
 	} // namespace detail

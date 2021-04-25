@@ -31,8 +31,9 @@ namespace mpp
 {
 	struct print_matrix_t : public detail::cpo_base<print_matrix_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		friend inline auto tag_invoke(print_matrix_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> void
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		friend inline auto tag_invoke(print_matrix_t, const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
+			-> void
 		{
 			auto message_stream = std::stringstream{};
 			detail::insert_expr_content_into_out_stream(message_stream, obj);

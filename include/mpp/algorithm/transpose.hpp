@@ -31,8 +31,9 @@ namespace mpp
 {
 	struct transpose_t : public detail::cpo_base<transpose_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(transpose_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
 		{
 			const auto rows    = obj.rows();

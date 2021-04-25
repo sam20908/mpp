@@ -36,17 +36,53 @@ namespace mpp
 	class matrix;
 
 	/**
+	 * Aliases
+	 */
+
+	// matrix2v aliases
+
+	template<typename Value, typename Allocator = std::allocator<Value>>
+	using matrix2v = mpp::matrix<Value, 2, 2, Allocator>;
+
+	template<typename Allocator = std::allocator<int>>
+	using matrix2i = matrix2v<int, Allocator>;
+
+	template<typename Allocator = std::allocator<float>>
+	using matrix2f = matrix2v<float, Allocator>;
+
+	template<typename Allocator = std::allocator<double>>
+	using matrix2d = matrix2v<double, Allocator>;
+
+	// matrix3v aliases
+
+	template<typename Value, typename Allocator = std::allocator<Value>>
+	using matrix3v = mpp::matrix<Value, 3, 3, Allocator>;
+
+	template<typename Allocator = std::allocator<int>>
+	using matrix3i = matrix3v<int, Allocator>;
+
+	template<typename Allocator = std::allocator<float>>
+	using matrix3f = matrix3v<float, Allocator>;
+
+	template<typename Allocator = std::allocator<double>>
+	using matrix3d = matrix3v<double, Allocator>;
+	// vector aliases
+
+	template<typename Value, std::size_t ColumnsExtent, typename Allocator = std::allocator<Value>>
+	using row_vector = mpp::matrix<Value, 1, ColumnsExtent, Allocator>;
+
+	template<typename Value, std::size_t RowsExtent, typename Allocator = std::allocator<Value>>
+	using column_vector = mpp::matrix<Value, RowsExtent, 1, Allocator>;
+
+	/**
 	 * Deduction guides
 	 */
 
 	template<typename Value>
 	matrix(std::initializer_list<std::initializer_list<Value>>) -> matrix<Value>;
 
-	// @TODO: Properly format this once ReferenceAlignment is implemented in clang-format
-	// clang-format off
 	template<typename Range2D>
 	matrix(Range2D&&) -> matrix<detail::range_2d_value_t<Range2D>>;
-	// clang-format on
 
 	template<typename Expr, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	matrix(const detail::expr_base<Expr, Value, RowsExtent, ColumnsExtent>&)

@@ -28,9 +28,9 @@ namespace mpp
 {
 	struct square_t : public detail::cpo_base<square_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(square_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> bool // @TODO: ISSUE #20
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(square_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> bool // @TODO: ISSUE #20
 		{
 			return obj.rows() == obj.columns();
 		}

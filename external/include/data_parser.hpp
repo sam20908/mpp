@@ -81,6 +81,45 @@ auto string_conversion_function()
 	}
 }
 
+template<typename T>
+auto parse_matrix_elements(auto& data_file, auto& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
+{
+	auto data          = std::vector<T>{};
+	auto from_value_fn = string_conversion_function<T>();
+
+	data.reserve(rows * columns);
+
+	while (std::getline(data_file, line))
+	{
+		if (line == "=")
+		{
+			break;
+		}
+
+		auto value_string = std::string{};
+		auto line_stream  = std::istringstream{ line };
+
+		while (std::getline(line_stream, value_string, ' '))
+		{
+			data.push_back(from_value_fn(value_string));
+		}
+	}
+
+	return mpp::matrix<T>{ rows, columns, std::move(data) };
+}
+
+template<typename T>
+auto parse_matrix_block(auto& data_file, auto& line) -> mpp::matrix<T>
+{
+	std::size_t rows, columns;
+	std::getline(data_file, line);
+
+	auto line_stream = std::istringstream{ line };
+	line_stream >> rows >> columns;
+
+	return parse_matrix_elements<T>(data_file, line, rows, columns);
+}
+
 template<typename From, typename To>
 struct single_number_result
 {
@@ -93,53 +132,16 @@ template<typename From, typename To>
 auto parse_data_file_with_single_number_result(const std::filesystem::path& data_file_path)
 	-> single_number_result<From, To>
 {
-	const auto from_value_conversion_function   = string_conversion_function<From>();
-	const auto result_value_conversion_function = string_conversion_function<To>();
+	auto data_file       = std::ifstream{ data_file_path };
+	auto line            = std::string{};
+	auto result_value_fn = string_conversion_function<To>();
 
-	auto original_data = std::vector<std::vector<From>>{};
-	std::size_t original_data_rows, original_data_columns;
+	auto matrix = parse_matrix_block<From>(data_file, line);
 
-	auto data_file = std::ifstream{ data_file_path };
-	auto line      = std::string{};
-
-	// Parse the dimensions
-	{
-		std::getline(data_file, line);
-
-		auto line_stream = std::istringstream{ line };
-		line_stream >> original_data_rows >> original_data_columns;
-
-		original_data.reserve(original_data_rows);
-	}
-
-	// Parse the original matrix
-	while (std::getline(data_file, line))
-	{
-		if (line == "=")
-		{
-			break;
-		}
-
-		auto line_stream = std::istringstream{ line };
-		auto row         = std::vector<From>{};
-
-		row.reserve(original_data_columns);
-
-		auto value_string = std::string{};
-		while (std::getline(line_stream, value_string, ' '))
-		{
-			auto data_num = from_value_conversion_function(value_string);
-			row.push_back(data_num);
-		}
-
-		original_data.push_back(std::move(row));
-	}
-
-	// Parse the result
 	std::getline(data_file, line);
-	const auto result = result_value_conversion_function(line);
+	const auto result = result_value_fn(line);
 
-	return { mpp::matrix{ original_data }, result, data_file.is_open() };
+	return { std::move(matrix), result, data_file.is_open() };
 }
 
 template<typename From, typename To>
@@ -154,78 +156,13 @@ template<typename From, typename To>
 auto parse_data_file_matrix_transformation(const std::filesystem::path& data_file_path)
 	-> transformation_result<From, To>
 {
-	const auto from_value_conversion_function   = string_conversion_function<From>();
-	const auto result_value_conversion_function = string_conversion_function<To>();
-
-	auto original_data    = std::vector<std::vector<From>>{};
-	auto transformed_data = std::vector<std::vector<To>>{};
-	std::size_t original_data_rows, original_data_columns, transformed_data_rows, transformed_data_columns;
-
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
 
-	// Parse the original matrix dimensions
-	{
-		std::getline(data_file, line);
+	auto from = parse_matrix_block<From>(data_file, line);
+	auto to   = parse_matrix_block<To>(data_file, line);
 
-		auto line_stream = std::istringstream{ line };
-		line_stream >> original_data_rows >> original_data_columns;
-
-		original_data.reserve(original_data_rows);
-	}
-
-	// Parse the original matrix
-	while (std::getline(data_file, line))
-	{
-		if (line == "=")
-		{
-			break;
-		}
-
-		auto value_string = std::string{};
-		auto line_stream  = std::istringstream{ line };
-		auto row          = std::vector<From>{};
-
-		row.reserve(original_data_columns);
-
-		while (std::getline(line_stream, value_string, ' '))
-		{
-			const auto data_num = from_value_conversion_function(value_string);
-			row.push_back(data_num);
-		}
-
-		original_data.push_back(std::move(row));
-	}
-
-	// Parse the transformed matrix dimensions
-	{
-		std::getline(data_file, line);
-
-		auto line_stream = std::istringstream{ line };
-		line_stream >> transformed_data_rows >> transformed_data_columns;
-
-		transformed_data.reserve(transformed_data_rows);
-	}
-
-	// Parse the transformed matrix
-	while (std::getline(data_file, line))
-	{
-		auto value_string = std::string{};
-		auto line_stream  = std::istringstream{ line };
-		auto row          = std::vector<To>{};
-
-		row.reserve(transformed_data_columns);
-
-		while (std::getline(line_stream, value_string, ' '))
-		{
-			const auto data_num = result_value_conversion_function(value_string);
-			row.push_back(data_num);
-		}
-
-		transformed_data.push_back(std::move(row));
-	}
-
-	return { mpp::matrix{ original_data }, mpp::matrix{ transformed_data }, data_file.is_open() };
+	return { std::move(from), std::move(to), data_file.is_open() };
 }
 
 template<typename To>
@@ -250,94 +187,69 @@ template<typename From, typename To>
 auto parse_data_file_block_transformation(const std::filesystem::path& data_file_path)
 	-> block_transformation_result<From, To>
 {
-	const auto from_value_conversion_function   = string_conversion_function<From>();
-	const auto result_value_conversion_function = string_conversion_function<To>();
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
+	auto blocks    = std::vector<block_transformation_testcase<To>>{};
 
-	auto original_data = std::vector<std::vector<From>>{};
-	auto blocks        = std::vector<block_transformation_testcase<To>>{};
-	std::size_t original_data_rows, original_data_columns;
+	auto from = parse_matrix_block<From>(data_file, line);
+	std::size_t row_start, column_start, row_end, column_end;
 
+	while (std::getline(data_file, line))
+	{
+		// Parse the block indices
+		{
+			auto line_stream = std::istringstream{ line };
+			line_stream >> row_start >> column_start >> row_end >> column_end;
+		}
+
+		// Parse the block
+		auto block = parse_matrix_elements<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1);
+		blocks.push_back(block_transformation_testcase<To>{ row_start, column_start, row_end, column_end, block });
+	}
+
+	return { std::move(from), std::move(blocks), data_file.is_open() };
+}
+
+template<typename From, typename To>
+struct two_matrices_transformation_result
+{
+	mpp::matrix<From> original_matrix;
+	mpp::matrix<To> l_matrix;
+	mpp::matrix<To> u_matrix;
+};
+
+template<typename From, typename To>
+auto parse_data_file_two_matrices_transformation(const std::filesystem::path& data_file_path)
+	-> two_matrices_transformation_result<From, To>
+{
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
 
-	// Parse the original matrix dimensions
-	{
-		std::getline(data_file, line);
+	auto from = parse_matrix_block<From>(data_file, line);
+	auto l    = parse_matrix_block<To>(data_file, line);
+	auto u    = parse_matrix_block<To>(data_file, line);
 
-		auto line_stream = std::istringstream{ line };
-		line_stream >> original_data_rows >> original_data_columns;
+	return { std::move(from), std::move(l), std::move(u) };
+}
 
-		original_data.reserve(original_data_rows);
-	}
+template<typename AValue, typename XValue, typename BValue>
+struct substitution_result
+{
+	mpp::matrix<AValue> a;
+	mpp::matrix<XValue> x;
+	mpp::matrix<BValue> b;
+};
 
-	// Parse the original matrix
-	while (std::getline(data_file, line))
-	{
-		if (line == "=")
-		{
-			break;
-		}
+template<typename AValue, typename XValue, typename BValue>
+auto parse_data_file_substitution_transformation(const std::filesystem::path& data_file_path)
+	-> substitution_result<AValue, XValue, BValue>
+{
+	auto data_file = std::ifstream{ data_file_path };
+	auto line      = std::string{};
 
-		auto value_string = std::string{};
-		auto line_stream  = std::istringstream{ line };
-		auto row          = std::vector<From>{};
+	auto a = parse_matrix_block<AValue>(data_file, line);
+	auto b = parse_matrix_block<BValue>(data_file, line);
+	auto x = parse_matrix_block<XValue>(data_file, line);
 
-		row.reserve(original_data_columns);
-
-		while (std::getline(line_stream, value_string, ' '))
-		{
-			const auto data_num = from_value_conversion_function(value_string);
-			row.push_back(data_num);
-		}
-
-		original_data.push_back(std::move(row));
-	}
-
-	// Parse each block testcase
-	{
-		auto line_is_block_indices = true;
-		auto current_block_data    = std::vector<std::vector<To>>{};
-		std::size_t row_start{}, column_start{}, row_end{}, column_end{};
-
-		while (std::getline(data_file, line))
-		{
-			if (line == "=")
-			{
-				blocks.push_back(block_transformation_testcase<To>{ row_start,
-					column_start,
-					row_end,
-					column_end,
-					mpp::matrix{ current_block_data } });
-				line_is_block_indices = true;
-				current_block_data.clear();
-				continue;
-			}
-
-			auto line_stream = std::istringstream{ line };
-
-			if (line_is_block_indices)
-			{
-				line_stream >> row_start >> column_start >> row_end >> column_end;
-				line_is_block_indices = false;
-
-				current_block_data.reserve(row_end - row_start);
-				continue;
-			}
-
-			auto row          = std::vector<To>{};
-			auto value_string = std::string{};
-
-			row.reserve(column_end - column_start);
-
-			while (std::getline(line_stream, value_string, ' '))
-			{
-				const auto value = result_value_conversion_function(value_string);
-				row.push_back(value);
-			}
-
-			current_block_data.push_back(std::move(row));
-		}
-	}
-
-	return { mpp::matrix{ std::move(original_data) }, std::move(blocks), data_file.is_open() };
+	return { std::move(a), std::move(x), std::move(b) };
 }
