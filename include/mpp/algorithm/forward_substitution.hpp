@@ -61,8 +61,7 @@ namespace mpp
 
 				if constexpr (Check)
 				{
-					if (floating_point_compare(diag_elem, default_floating_type{}) ==
-						default_floating_type_ordering::equivalent)
+					if (fp_is_zero_or_nan(diag_elem))
 					{
 						throw std::runtime_error(DIAGONAL_ELEMENT_IS_ZERO);
 					}

@@ -75,8 +75,7 @@ namespace mpp
 
 				if constexpr (Check)
 				{
-					if (floating_point_compare(elem, default_floating_type{}) ==
-						default_floating_type_ordering::equivalent)
+					if (fp_is_zero_or_nan(elem))
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}
@@ -99,8 +98,7 @@ namespace mpp
 
 				if constexpr (Check)
 				{
-					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering::equivalent)
+					if (fp_is_zero_or_nan(det))
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}
@@ -138,8 +136,7 @@ namespace mpp
 
 				if constexpr (Check)
 				{
-					if (floating_point_compare(det, default_floating_type{}) ==
-						default_floating_type_ordering::equivalent)
+					if (fp_is_zero_or_nan(det))
 					{
 						throw std::runtime_error(MATRIX_SINGULAR);
 					}

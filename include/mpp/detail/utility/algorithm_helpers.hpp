@@ -22,8 +22,12 @@
 
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/utility.hpp>
+#include <mpp/utility/comparison.hpp>
 
+#include <cmath>
+#include <compare>
 #include <cstddef>
+#include <type_traits>
 
 namespace mpp::detail
 {
@@ -39,6 +43,14 @@ namespace mpp::detail
 		}
 	}
 
+	template<typename Value>
+	[[nodiscard]] constexpr auto fp_is_zero_or_nan(const Value& val) -> bool
+	{
+		using ordering = std::compare_three_way_result_t<Value, Value>;
+
+		return floating_point_compare(val, Value{}) == ordering::equivalent || std::isnan(val);
+	}
+
 	template<typename To, bool FillLBuffer, bool CalculateDeterminant>
 	inline auto lu_generic(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
 		-> To // @TODO: ISSUE #20
@@ -50,7 +62,7 @@ namespace mpp::detail
 		// 1. l_buffer is already an identity buffer
 		// 2. u_buffer has the original values
 
-		auto det = To{ 1 };
+		auto det = default_floating_type{ 1 };
 
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
@@ -94,6 +106,6 @@ namespace mpp::detail
 			}
 		}
 
-		return det;
+		return static_cast<To>(std::round(det));
 	}
 } // namespace mpp::detail

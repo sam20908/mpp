@@ -21,12 +21,14 @@
 
 #include <mpp/algorithm/determinant.hpp>
 #include <mpp/detail/types/algo_types.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
-#include <compare>
+#include <algorithm>
 #include <cstddef>
+#include <iterator>
 
 namespace mpp
 {
@@ -36,11 +38,28 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(singular_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> bool // @TODO: ISSUE #20
 		{
-			using ordering_type =
-				std::compare_three_way_result_t<detail::default_floating_type, detail::default_floating_type>;
+			using fp_matrix_t = matrix<detail::default_floating_type, RowsExtent, ColumnsExtent>;
+			using fp_buffer_t = typename fp_matrix_t::buffer_type;
 
-			return floating_point_compare(detail::det_lu_decomp<false, detail::default_floating_type>(obj),
-					   detail::default_floating_type{}) == ordering_type::equivalent;
+			const auto dummy_l_buffer = 1;
+			auto obj_buf_copy         = fp_buffer_t{};
+
+			if constexpr (detail::is_vector<fp_buffer_t>::value)
+			{
+				obj_buf_copy.reserve(obj.size());
+				std::ranges::copy(obj, std::back_inserter(obj_buf_copy));
+			}
+			else
+			{
+				std::ranges::copy(obj, obj_buf_copy.begin());
+			}
+
+			const auto det = detail::lu_generic<detail::default_floating_type, false, true>(obj.rows(),
+				obj.columns(),
+				dummy_l_buffer,
+				obj_buf_copy);
+
+			return detail::fp_is_zero_or_nan(det);
 		}
 	};
 
