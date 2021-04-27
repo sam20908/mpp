@@ -26,6 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 template<typename T>
@@ -82,14 +83,14 @@ auto str_fn()
 }
 
 template<typename T>
-auto parse_mat_elems(auto& data_file, auto& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
+auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
 {
 	auto data          = std::vector<T>{};
 	auto from_value_fn = str_fn<T>();
 
 	data.reserve(rows * columns);
 
-	while (std::getline(data_file, line))
+	while (std::getline(file, line))
 	{
 		if (line == "=")
 		{
@@ -109,15 +110,15 @@ auto parse_mat_elems(auto& data_file, auto& line, std::size_t rows, std::size_t 
 }
 
 template<typename T>
-auto parse_mat_with_dims(auto& data_file, auto& line) -> mpp::matrix<T>
+auto parse_mat_with_dims(std::ifstream& file, std::string& line) -> mpp::matrix<T>
 {
 	std::size_t rows, columns;
-	std::getline(data_file, line);
+	std::getline(file, line);
 
 	auto line_stream = std::istringstream{ line };
 	line_stream >> rows >> columns;
 
-	return parse_mat_elems<T>(data_file, line, rows, columns);
+	return parse_mat_elems<T>(file, line, rows, columns);
 }
 
 template<typename From, typename To>
@@ -128,9 +129,9 @@ struct num_out
 };
 
 template<typename From, typename To>
-auto parse_num_out(const std::filesystem::path& data_file_path) -> num_out<From, To>
+auto parse_num_out(const std::filesystem::path& path) -> num_out<From, To>
 {
-	auto data_file  = std::ifstream{ data_file_path };
+	auto data_file  = std::ifstream{ path };
 	auto line       = std::string{};
 	auto num_val_fn = str_fn<To>();
 
@@ -140,25 +141,6 @@ auto parse_num_out(const std::filesystem::path& data_file_path) -> num_out<From,
 	const auto out = num_val_fn(line);
 
 	return { std::move(mat), out };
-}
-
-template<typename From, typename To>
-struct mat_out
-{
-	mpp::matrix<From> mat;
-	mpp::matrix<To> out;
-};
-
-template<typename From, typename To>
-auto parse_mat_out(const std::filesystem::path& data_file_path) -> mat_out<From, To>
-{
-	auto data_file = std::ifstream{ data_file_path };
-	auto line      = std::string{};
-
-	auto mat = parse_mat_with_dims<From>(data_file, line);
-	auto out = parse_mat_with_dims<To>(data_file, line);
-
-	return { std::move(mat), std::move(out) };
 }
 
 template<typename To>
@@ -179,9 +161,9 @@ struct block_out
 };
 
 template<typename From, typename To>
-auto parse_block_out(const std::filesystem::path& data_file_path) -> block_out<From, To>
+auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 {
-	auto data_file = std::ifstream{ data_file_path };
+	auto data_file = std::ifstream{ path };
 	auto line      = std::string{};
 	auto blocks    = std::vector<block<To>>{};
 
@@ -204,44 +186,32 @@ auto parse_block_out(const std::filesystem::path& data_file_path) -> block_out<F
 	return { std::move(mat), std::move(blocks) };
 }
 
-template<typename From, typename To>
-struct two_mat_out
+template<typename... Ts>
+using mats_out = std::tuple<mpp::matrix<Ts>...>;
+
+template<std::size_t I, std::size_t Size, typename Tup>
+auto parse_mats_out_impl(std::ifstream& file, std::string& line, Tup& out)
 {
-	mpp::matrix<From> mat;
-	mpp::matrix<To> left;
-	mpp::matrix<To> right;
-};
+	if constexpr (I == Size)
+	{
+		return out;
+	}
+	else
+	{
+		using mat_val_t = typename std::tuple_element_t<I, Tup>::value_type;
 
-template<typename From, typename To>
-auto parse_two_mat_out(const std::filesystem::path& data_file_path) -> two_mat_out<From, To>
-{
-	auto data_file = std::ifstream{ data_file_path };
-	auto line      = std::string{};
+		std::get<I>(out) = parse_mat_with_dims<mat_val_t>(file, line);
 
-	auto mat   = parse_mat_with_dims<From>(data_file, line);
-	auto left  = parse_mat_with_dims<To>(data_file, line);
-	auto right = parse_mat_with_dims<To>(data_file, line);
-
-	return { std::move(mat), std::move(left), std::move(right) };
+		return parse_mats_out_impl<I + 1, Size>(file, line, out);
+	}
 }
 
-template<typename AValue, typename XValue, typename BValue>
-struct subst_out
+template<typename... Ts>
+auto parse_mats_out(const std::filesystem::path& path) -> mats_out<Ts...>
 {
-	mpp::matrix<AValue> a;
-	mpp::matrix<BValue> b;
-	mpp::matrix<XValue> x;
-};
+	auto out  = mats_out<Ts...>{};
+	auto line = std::string{};
+	auto file = std::ifstream(path);
 
-template<typename AValue, typename BValue, typename XValue>
-auto parse_subst_out(const std::filesystem::path& data_file_path) -> subst_out<AValue, XValue, BValue>
-{
-	auto data_file = std::ifstream{ data_file_path };
-	auto line      = std::string{};
-
-	auto a = parse_mat_with_dims<AValue>(data_file, line);
-	auto b = parse_mat_with_dims<BValue>(data_file, line);
-	auto x = parse_mat_with_dims<XValue>(data_file, line);
-
-	return { std::move(a), std::move(b), std::move(x) };
+	return parse_mats_out_impl<0, sizeof...(Ts)>(file, line, out);
 }

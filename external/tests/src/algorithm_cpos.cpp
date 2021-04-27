@@ -67,9 +67,9 @@ void test_det(const std::string& filename)
 template<typename From, typename To>
 void test_transformation(const std::string& filename, const auto& transform_fn)
 {
-	const auto result        = parse_mat_out<From, To>(get_filepath(filename));
-	const auto& mat          = result.mat;
-	const auto& expected_out = result.out;
+	const auto result        = parse_mats_out<From, To>(get_filepath(filename));
+	const auto& mat          = std::get<0>(result);
+	const auto& expected_out = std::get<1>(result);
 
 	test(filename) = [&]() {
 		const auto out = transform_fn(mat);
@@ -114,10 +114,10 @@ void test_block(const std::string& filename)
 template<typename From, typename To>
 void test_lu(const std::string& filename)
 {
-	const auto result          = parse_two_mat_out<From, To>(get_filepath(filename));
-	const auto& mat            = result.mat;
-	const auto& expected_left  = result.left;
-	const auto& expected_right = result.right;
+	const auto result          = parse_mats_out<From, To, To>(get_filepath(filename));
+	const auto& mat            = std::get<0>(result);
+	const auto& expected_left  = std::get<1>(result);
+	const auto& expected_right = std::get<2>(result);
 
 	test(filename) = [&]() {
 		const auto [left, right] = mpp::lu_decomposition(std::type_identity<To>{}, mat);
@@ -137,10 +137,10 @@ void test_lu(const std::string& filename)
 template<typename AValue, typename BValue, typename XValue>
 void test_sub(const std::string& filename, const auto& fn)
 {
-	const auto result      = parse_subst_out<AValue, BValue, XValue>(get_filepath(filename));
-	const auto& a          = result.a;
-	const auto& b          = result.b;
-	const auto& expected_x = result.x;
+	const auto result      = parse_mats_out<AValue, BValue, XValue>(get_filepath(filename));
+	const auto& a          = std::get<0>(result);
+	const auto& b          = std::get<1>(result);
+	const auto& expected_x = std::get<2>(result);
 
 	test(filename) = [&]() {
 		const auto x = fn(a, b);
