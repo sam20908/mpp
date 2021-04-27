@@ -52,63 +52,61 @@ static auto get_filepath(const std::string& filename) -> std::filesystem::path
 template<typename From, typename To>
 void test_det(const std::string& filename)
 {
-	const auto result_struct  = parse_num_out<From, To>(get_filepath(filename));
-	const auto& original_data = result_struct.original_data;
-	const auto result         = result_struct.result;
+	const auto result       = parse_num_out<From, To>(get_filepath(filename));
+	const auto& mat         = result.mat;
+	const auto expected_num = result.num;
 
 	test(filename) = [&]() {
-		const auto det = mpp::determinant(std::type_identity<To>{}, original_data);
+		const auto num = mpp::determinant(std::type_identity<To>{}, mat);
 
 		using ordering_type = std::compare_three_way_result_t<To, To>;
 
-		expect(mpp::floating_point_compare(det, result) == ordering_type::equivalent);
+		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent);
 	};
 }
 
 template<typename From, typename To>
 void test_transformation(const std::string& filename, const auto& transform_fn)
 {
-	const auto result_struct       = parse_mat_out<From, To>(get_filepath(filename));
-	const auto& original_matrix    = result_struct.original_matrix;
-	const auto& transformed_matrix = result_struct.transformed_matrix;
+	const auto result        = parse_mat_out<From, To>(get_filepath(filename));
+	const auto& mat          = result.mat;
+	const auto& expected_out = result.out;
 
 	test(filename) = [&]() {
-		const auto result_matrix = transform_fn(original_matrix);
+		const auto out = transform_fn(mat);
 
-		expect(result_matrix.rows() == transformed_matrix.rows());
-		expect(result_matrix.columns() == transformed_matrix.columns());
+		expect(out.rows() == expected_out.rows());
+		expect(out.columns() == expected_out.columns());
 
 		using ordering_type = std::compare_three_way_result_t<To, To>;
 
-		expect(mpp::elements_compare(result_matrix, transformed_matrix, mpp::floating_point_compare) ==
-			   ordering_type::equivalent);
+		expect(mpp::elements_compare(out, expected_out, mpp::floating_point_compare) == ordering_type::equivalent);
 	};
 }
 
 template<typename From, typename To>
 void test_block(const std::string& filename)
 {
-	const auto result_struct    = parse_block_out<From, To>(get_filepath(filename));
-	const auto& original_matrix = result_struct.original_matrix;
-	const auto& blocks          = result_struct.blocks;
+	const auto result  = parse_block_out<From, To>(get_filepath(filename));
+	const auto& mat    = result.mat;
+	const auto& blocks = result.blocks;
 
 	test(filename) = [&]() {
+		using ordering_type = std::compare_three_way_result_t<To, To>;
+
 		for (const auto& block : blocks)
 		{
-			const auto row_start    = block.row_start;
-			const auto column_start = block.column_start;
-			const auto row_end      = block.row_end;
-			const auto column_end   = block.column_end;
-			const auto cropped_original_matrix =
-				mpp::block(original_matrix, row_start, column_start, row_end, column_end);
-			const auto& block_matrix = block.block_matrix;
+			const auto row_start       = block.row_start;
+			const auto column_start    = block.column_start;
+			const auto row_end         = block.row_end;
+			const auto column_end      = block.column_end;
+			const auto block_          = mpp::block(mat, row_start, column_start, row_end, column_end);
+			const auto& expected_block = block.mat;
 
-			expect(cropped_original_matrix.rows() == block_matrix.rows());
-			expect(cropped_original_matrix.columns() == block_matrix.columns());
+			expect(block_.rows() == expected_block.rows());
+			expect(block_.columns() == expected_block.columns());
 
-			using ordering_type = std::compare_three_way_result_t<To, To>;
-
-			expect(mpp::elements_compare(cropped_original_matrix, block_matrix, mpp::floating_point_compare) ==
+			expect(mpp::elements_compare(block_, expected_block, mpp::floating_point_compare) ==
 				   ordering_type::equivalent);
 		}
 	};
@@ -117,47 +115,43 @@ void test_block(const std::string& filename)
 template<typename From, typename To>
 void test_lu(const std::string& filename)
 {
-	const auto result_struct      = parse_two_mat_out<From, To>(get_filepath(filename));
-	const auto& original_matrix   = result_struct.original_matrix;
-	const auto& l_expected_matrix = result_struct.l_matrix;
-	const auto& u_expected_matrix = result_struct.u_matrix;
+	const auto result          = parse_two_mat_out<From, To>(get_filepath(filename));
+	const auto& mat            = result.mat;
+	const auto& expected_left  = result.left;
+	const auto& expected_right = result.right;
 
 	test(filename) = [&]() {
-		const auto [l_matrix, u_matrix] = mpp::lu_decomposition(std::type_identity<To>{}, original_matrix);
+		const auto [left, right] = mpp::lu_decomposition(std::type_identity<To>{}, mat);
 
-		expect(l_matrix.rows() == l_expected_matrix.rows());
-		expect(l_matrix.columns() == l_expected_matrix.columns());
-		expect(u_matrix.rows() == u_expected_matrix.rows());
-		expect(u_matrix.columns() == u_expected_matrix.columns());
+		expect(left.rows() == expected_left.rows());
+		expect(left.columns() == expected_left.columns());
+		expect(right.rows() == expected_right.rows());
+		expect(right.columns() == expected_right.columns());
 
 		using ordering_type = std::compare_three_way_result_t<To, To>;
 
-		expect(mpp::elements_compare(l_matrix, l_expected_matrix, mpp::floating_point_compare) ==
-			   ordering_type::equivalent);
-		expect(mpp::elements_compare(u_matrix, u_expected_matrix, mpp::floating_point_compare) ==
-			   ordering_type::equivalent);
+		expect(mpp::elements_compare(left, expected_left, mpp::floating_point_compare) == ordering_type::equivalent);
+		expect(mpp::elements_compare(right, expected_right, mpp::floating_point_compare) == ordering_type::equivalent);
 	};
 }
 
-template<typename AValue, typename XValue, typename BValue>
+template<typename AValue, typename BValue, typename XValue>
 void test_sub(const std::string& filename, const auto& fn)
 {
-	const auto result_struct =
-		parse_subst_out<AValue, XValue, BValue>(get_filepath(filename));
-	const auto& a                 = result_struct.a;
-	const auto& b                 = result_struct.b;
-	const auto& x_expected_matrix = result_struct.x;
+	const auto result      = parse_subst_out<AValue, BValue, XValue>(get_filepath(filename));
+	const auto& a          = result.a;
+	const auto& b          = result.b;
+	const auto& expected_x = result.x;
 
 	test(filename) = [&]() {
-		const auto x_matrix = fn(a, b);
+		const auto x = fn(a, b);
 
-		expect(x_matrix.rows() == x_expected_matrix.rows());
-		expect(x_matrix.columns() == x_expected_matrix.columns());
+		expect(x.rows() == expected_x.rows());
+		expect(x.columns() == expected_x.columns());
 
 		using ordering_type = std::compare_three_way_result_t<XValue, XValue>;
 
-		expect(mpp::elements_compare(x_matrix, x_expected_matrix, mpp::floating_point_compare) ==
-			   ordering_type::equivalent);
+		expect(mpp::elements_compare(x, expected_x, mpp::floating_point_compare) == ordering_type::equivalent);
 	};
 }
 
@@ -203,7 +197,7 @@ int main()
 	feature("Back substitution") = []() {
 		auto back_sub_fn = std::bind_front(mpp::back_substitution, std::type_identity<double>{});
 
-		test_sub<int, double, int>("test_data/back_sub/3x3_3x1.txt", back_sub_fn);
+		test_sub<int, int, double>("test_data/back_sub/3x3_3x1.txt", back_sub_fn);
 	};
 
 	return 0;
