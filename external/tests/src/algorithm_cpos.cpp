@@ -32,7 +32,7 @@
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
-#include "../../include/data_parser.hpp"
+#include "../../include/test_parsers.hpp"
 #include "../../include/utility.hpp"
 
 #include <compare>
@@ -50,9 +50,9 @@ static auto get_filepath(const std::string& filename) -> std::filesystem::path
 }
 
 template<typename From, typename To>
-void test_determinant(const std::string& filename)
+void test_det(const std::string& filename)
 {
-	const auto result_struct  = parse_data_file_with_single_number_result<From, To>(get_filepath(filename));
+	const auto result_struct  = parse_num_out<From, To>(get_filepath(filename));
 	const auto& original_data = result_struct.original_data;
 	const auto result         = result_struct.result;
 
@@ -68,7 +68,7 @@ void test_determinant(const std::string& filename)
 template<typename From, typename To>
 void test_transformation(const std::string& filename, const auto& transform_fn)
 {
-	const auto result_struct       = parse_data_file_matrix_transformation<From, To>(get_filepath(filename));
+	const auto result_struct       = parse_mat_out<From, To>(get_filepath(filename));
 	const auto& original_matrix    = result_struct.original_matrix;
 	const auto& transformed_matrix = result_struct.transformed_matrix;
 
@@ -88,7 +88,7 @@ void test_transformation(const std::string& filename, const auto& transform_fn)
 template<typename From, typename To>
 void test_block(const std::string& filename)
 {
-	const auto result_struct    = parse_data_file_block_transformation<From, To>(get_filepath(filename));
+	const auto result_struct    = parse_block_out<From, To>(get_filepath(filename));
 	const auto& original_matrix = result_struct.original_matrix;
 	const auto& blocks          = result_struct.blocks;
 
@@ -115,9 +115,9 @@ void test_block(const std::string& filename)
 }
 
 template<typename From, typename To>
-void test_lu_decomposition(const std::string& filename)
+void test_lu(const std::string& filename)
 {
-	const auto result_struct      = parse_data_file_two_matrices_transformation<From, To>(get_filepath(filename));
+	const auto result_struct      = parse_two_mat_out<From, To>(get_filepath(filename));
 	const auto& original_matrix   = result_struct.original_matrix;
 	const auto& l_expected_matrix = result_struct.l_matrix;
 	const auto& u_expected_matrix = result_struct.u_matrix;
@@ -140,10 +140,10 @@ void test_lu_decomposition(const std::string& filename)
 }
 
 template<typename AValue, typename XValue, typename BValue>
-void test_substitution(const std::string& filename, const auto& fn)
+void test_sub(const std::string& filename, const auto& fn)
 {
 	const auto result_struct =
-		parse_data_file_substitution_transformation<AValue, XValue, BValue>(get_filepath(filename));
+		parse_subst_out<AValue, XValue, BValue>(get_filepath(filename));
 	const auto& a                 = result_struct.a;
 	const auto& b                 = result_struct.b;
 	const auto& x_expected_matrix = result_struct.x;
@@ -164,45 +164,46 @@ void test_substitution(const std::string& filename, const auto& fn)
 int main()
 {
 	feature("Determinant") = []() {
-		test_determinant<int, int>("test_data/0x0_det.txt");
-		test_determinant<int, float>("test_data/1x1_det.txt");
-		test_determinant<int, double>("test_data/2x2_det.txt");
-		test_determinant<int, double>("test_data/10x10_det.txt");
+		test_det<int, int>("test_data/det/0x0.txt");
+		test_det<int, int>("test_data/det/1x1.txt");
+		test_det<int, long>("test_data/det/2x2.txt");
+		test_det<int, int>("test_data/det/3x3.txt");
+		test_det<int, double>("test_data/det/10x10.txt");
 	};
 
 	feature("Transpose") = []() {
-		test_transformation<int, int>("test_data/25x25_transpose.txt", mpp::transpose);
-		test_transformation<int, int>("test_data/50x2_transpose.txt", mpp::transpose);
+		test_transformation<int, int>("test_data/t/25x25.txt", mpp::transpose);
+		test_transformation<int, int>("test_data/t/50x2.txt", mpp::transpose);
 	};
 
 	feature("LU Decomposition") = []() {
-		test_lu_decomposition<int, double>("test_data/2x2_lu.txt");
-		test_lu_decomposition<int, double>("test_data/3x3_lu.txt");
+		test_lu<int, double>("test_data/lu/2x2.txt");
+		test_lu<int, double>("test_data/lu/3x3.txt");
 	};
 
 	feature("Inverse") = []() {
-		auto inverse_fn = std::bind_front(mpp::inverse, std::type_identity<double>{});
+		auto inv_fn = std::bind_front(mpp::inverse, std::type_identity<double>{});
 
-		test_transformation<int, double>("test_data/2x2_inv.txt", inverse_fn);
-		test_transformation<int, double>("test_data/3x3_inv.txt", inverse_fn);
-		test_transformation<int, double>("test_data/3x3_inv_int.txt", inverse_fn);
-		test_transformation<double, double>("test_data/10x10_inv.txt", inverse_fn);
+		test_transformation<int, double>("test_data/inv/2x2.txt", inv_fn);
+		test_transformation<int, double>("test_data/inv/3x3.txt", inv_fn);
+		test_transformation<int, double>("test_data/inv/3x3_int.txt", inv_fn);
+		test_transformation<double, double>("test_data/inv/10x10.txt", inv_fn);
 	};
 
 	feature("Block") = []() {
-		test_block<int, float>("test_data/4x4_block.txt");
+		test_block<int, int>("test_data/block/4x4.txt");
 	};
 
 	feature("Forward substitution") = []() {
-		auto fwd_substitute_fn = std::bind_front(mpp::forward_substitution, std::type_identity<int>{});
+		auto fwd_sub_fn = std::bind_front(mpp::forward_substitution, std::type_identity<int>{});
 
-		test_substitution<int, int, int>("test_data/4x4_4x1_fwd_substitution.txt", fwd_substitute_fn);
+		test_sub<int, int, int>("test_data/fwd_sub/4x4_4x1.txt", fwd_sub_fn);
 	};
 
 	feature("Back substitution") = []() {
-		auto back_substitution_fn = std::bind_front(mpp::back_substitution, std::type_identity<double>{});
+		auto back_sub_fn = std::bind_front(mpp::back_substitution, std::type_identity<double>{});
 
-		test_substitution<int, double, int>("test_data/3x3_3x1_back_substitution.txt", back_substitution_fn);
+		test_sub<int, double, int>("test_data/back_sub/3x3_3x1.txt", back_sub_fn);
 	};
 
 	return 0;

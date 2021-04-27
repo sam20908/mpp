@@ -29,7 +29,7 @@
 #include <vector>
 
 template<typename T>
-auto string_conversion_function()
+auto str_fn()
 {
 	if constexpr (std::is_same_v<T, double>)
 	{
@@ -82,10 +82,10 @@ auto string_conversion_function()
 }
 
 template<typename T>
-auto parse_matrix_elements(auto& data_file, auto& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
+auto parse_mat_elems(auto& data_file, auto& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
 {
 	auto data          = std::vector<T>{};
-	auto from_value_fn = string_conversion_function<T>();
+	auto from_value_fn = str_fn<T>();
 
 	data.reserve(rows * columns);
 
@@ -109,7 +109,7 @@ auto parse_matrix_elements(auto& data_file, auto& line, std::size_t rows, std::s
 }
 
 template<typename T>
-auto parse_matrix_block(auto& data_file, auto& line) -> mpp::matrix<T>
+auto parse_mat_with_dims(auto& data_file, auto& line) -> mpp::matrix<T>
 {
 	std::size_t rows, columns;
 	std::getline(data_file, line);
@@ -117,11 +117,11 @@ auto parse_matrix_block(auto& data_file, auto& line) -> mpp::matrix<T>
 	auto line_stream = std::istringstream{ line };
 	line_stream >> rows >> columns;
 
-	return parse_matrix_elements<T>(data_file, line, rows, columns);
+	return parse_mat_elems<T>(data_file, line, rows, columns);
 }
 
 template<typename From, typename To>
-struct single_number_result
+struct num_out
 {
 	mpp::matrix<From> original_data;
 	To result;
@@ -129,14 +129,13 @@ struct single_number_result
 };
 
 template<typename From, typename To>
-auto parse_data_file_with_single_number_result(const std::filesystem::path& data_file_path)
-	-> single_number_result<From, To>
+auto parse_num_out(const std::filesystem::path& data_file_path) -> num_out<From, To>
 {
 	auto data_file       = std::ifstream{ data_file_path };
 	auto line            = std::string{};
-	auto result_value_fn = string_conversion_function<To>();
+	auto result_value_fn = str_fn<To>();
 
-	auto matrix = parse_matrix_block<From>(data_file, line);
+	auto matrix = parse_mat_with_dims<From>(data_file, line);
 
 	std::getline(data_file, line);
 	const auto result = result_value_fn(line);
@@ -145,7 +144,7 @@ auto parse_data_file_with_single_number_result(const std::filesystem::path& data
 }
 
 template<typename From, typename To>
-struct transformation_result
+struct mat_out
 {
 	mpp::matrix<From> original_matrix;
 	mpp::matrix<To> transformed_matrix;
@@ -153,20 +152,19 @@ struct transformation_result
 };
 
 template<typename From, typename To>
-auto parse_data_file_matrix_transformation(const std::filesystem::path& data_file_path)
-	-> transformation_result<From, To>
+auto parse_mat_out(const std::filesystem::path& data_file_path) -> mat_out<From, To>
 {
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
 
-	auto from = parse_matrix_block<From>(data_file, line);
-	auto to   = parse_matrix_block<To>(data_file, line);
+	auto from = parse_mat_with_dims<From>(data_file, line);
+	auto to   = parse_mat_with_dims<To>(data_file, line);
 
 	return { std::move(from), std::move(to), data_file.is_open() };
 }
 
 template<typename To>
-struct block_transformation_testcase
+struct block
 {
 	std::size_t row_start;
 	std::size_t column_start;
@@ -176,22 +174,21 @@ struct block_transformation_testcase
 };
 
 template<typename From, typename To>
-struct block_transformation_result
+struct block_out
 {
 	mpp::matrix<From> original_matrix;
-	std::vector<block_transformation_testcase<To>> blocks;
+	std::vector<block<To>> blocks;
 	bool file_exists;
 };
 
 template<typename From, typename To>
-auto parse_data_file_block_transformation(const std::filesystem::path& data_file_path)
-	-> block_transformation_result<From, To>
+auto parse_block_out(const std::filesystem::path& data_file_path) -> block_out<From, To>
 {
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
-	auto blocks    = std::vector<block_transformation_testcase<To>>{};
+	auto blocks    = std::vector<block<To>>{};
 
-	auto from = parse_matrix_block<From>(data_file, line);
+	auto from = parse_mat_with_dims<From>(data_file, line);
 	std::size_t row_start, column_start, row_end, column_end;
 
 	while (std::getline(data_file, line))
@@ -203,15 +200,15 @@ auto parse_data_file_block_transformation(const std::filesystem::path& data_file
 		}
 
 		// Parse the block
-		auto block = parse_matrix_elements<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1);
-		blocks.push_back(block_transformation_testcase<To>{ row_start, column_start, row_end, column_end, block });
+		auto block_ = parse_mat_elems<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1);
+		blocks.push_back(block<To>{ row_start, column_start, row_end, column_end, block_ });
 	}
 
 	return { std::move(from), std::move(blocks), data_file.is_open() };
 }
 
 template<typename From, typename To>
-struct two_matrices_transformation_result
+struct two_mat_out
 {
 	mpp::matrix<From> original_matrix;
 	mpp::matrix<To> l_matrix;
@@ -219,21 +216,20 @@ struct two_matrices_transformation_result
 };
 
 template<typename From, typename To>
-auto parse_data_file_two_matrices_transformation(const std::filesystem::path& data_file_path)
-	-> two_matrices_transformation_result<From, To>
+auto parse_two_mat_out(const std::filesystem::path& data_file_path) -> two_mat_out<From, To>
 {
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
 
-	auto from = parse_matrix_block<From>(data_file, line);
-	auto l    = parse_matrix_block<To>(data_file, line);
-	auto u    = parse_matrix_block<To>(data_file, line);
+	auto from = parse_mat_with_dims<From>(data_file, line);
+	auto l    = parse_mat_with_dims<To>(data_file, line);
+	auto u    = parse_mat_with_dims<To>(data_file, line);
 
 	return { std::move(from), std::move(l), std::move(u) };
 }
 
 template<typename AValue, typename XValue, typename BValue>
-struct substitution_result
+struct subst_out
 {
 	mpp::matrix<AValue> a;
 	mpp::matrix<XValue> x;
@@ -241,15 +237,14 @@ struct substitution_result
 };
 
 template<typename AValue, typename XValue, typename BValue>
-auto parse_data_file_substitution_transformation(const std::filesystem::path& data_file_path)
-	-> substitution_result<AValue, XValue, BValue>
+auto parse_subst_out(const std::filesystem::path& data_file_path) -> subst_out<AValue, XValue, BValue>
 {
 	auto data_file = std::ifstream{ data_file_path };
 	auto line      = std::string{};
 
-	auto a = parse_matrix_block<AValue>(data_file, line);
-	auto b = parse_matrix_block<BValue>(data_file, line);
-	auto x = parse_matrix_block<XValue>(data_file, line);
+	auto a = parse_mat_with_dims<AValue>(data_file, line);
+	auto b = parse_mat_with_dims<BValue>(data_file, line);
+	auto x = parse_mat_with_dims<XValue>(data_file, line);
 
 	return { std::move(a), std::move(x), std::move(b) };
 }
