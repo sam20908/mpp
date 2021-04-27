@@ -34,8 +34,6 @@
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
-#include "../../include/utility.hpp"
-
 #include <compare>
 #include <cstddef>
 #include <utility>

@@ -33,7 +33,6 @@
 #include <mpp/matrix.hpp>
 
 #include "../../include/test_parsers.hpp"
-#include "../../include/utility.hpp"
 
 #include <compare>
 #include <filesystem>
@@ -158,46 +157,46 @@ void test_sub(const std::string& filename, const auto& fn)
 int main()
 {
 	feature("Determinant") = []() {
-		test_det<int, int>("test_data/det/0x0.txt");
-		test_det<int, int>("test_data/det/1x1.txt");
-		test_det<int, long>("test_data/det/2x2.txt");
-		test_det<int, int>("test_data/det/3x3.txt");
-		test_det<int, double>("test_data/det/10x10.txt");
+		test_det<int, int>("test_data/algorithm/det/0x0.txt");
+		test_det<int, int>("test_data/algorithm/det/1x1.txt");
+		test_det<int, long>("test_data/algorithm/det/2x2.txt");
+		test_det<int, int>("test_data/algorithm/det/3x3.txt");
+		test_det<int, double>("test_data/algorithm/det/10x10.txt");
 	};
 
 	feature("Transpose") = []() {
-		test_transformation<int, int>("test_data/t/25x25.txt", mpp::transpose);
-		test_transformation<int, int>("test_data/t/50x2.txt", mpp::transpose);
+		test_transformation<int, int>("test_data/algorithm/t/25x25.txt", mpp::transpose);
+		test_transformation<int, int>("test_data/algorithm/t/50x2.txt", mpp::transpose);
 	};
 
 	feature("LU Decomposition") = []() {
-		test_lu<int, double>("test_data/lu/2x2.txt");
-		test_lu<int, double>("test_data/lu/3x3.txt");
+		test_lu<int, double>("test_data/algorithm/lu/2x2.txt");
+		test_lu<int, double>("test_data/algorithm/lu/3x3.txt");
 	};
 
 	feature("Inverse") = []() {
 		auto inv_fn = std::bind_front(mpp::inverse, std::type_identity<double>{});
 
-		test_transformation<int, double>("test_data/inv/2x2.txt", inv_fn);
-		test_transformation<int, double>("test_data/inv/3x3.txt", inv_fn);
-		test_transformation<int, double>("test_data/inv/3x3_int.txt", inv_fn);
-		test_transformation<double, double>("test_data/inv/10x10.txt", inv_fn);
+		test_transformation<int, double>("test_data/algorithm/inv/2x2.txt", inv_fn);
+		test_transformation<int, double>("test_data/algorithm/inv/3x3.txt", inv_fn);
+		test_transformation<int, double>("test_data/algorithm/inv/3x3_int.txt", inv_fn);
+		test_transformation<double, double>("test_data/algorithm/inv/10x10.txt", inv_fn);
 	};
 
 	feature("Block") = []() {
-		test_block<int, int>("test_data/block/4x4.txt");
+		test_block<int, int>("test_data/algorithm/block/4x4.txt");
 	};
 
 	feature("Forward substitution") = []() {
 		auto fwd_sub_fn = std::bind_front(mpp::forward_substitution, std::type_identity<int>{});
 
-		test_sub<int, int, int>("test_data/fwd_sub/4x4_4x1.txt", fwd_sub_fn);
+		test_sub<int, int, int>("test_data/algorithm/fwd_sub/4x4_4x1.txt", fwd_sub_fn);
 	};
 
 	feature("Back substitution") = []() {
 		auto back_sub_fn = std::bind_front(mpp::back_substitution, std::type_identity<double>{});
 
-		test_sub<int, int, double>("test_data/back_sub/3x3_3x1.txt", back_sub_fn);
+		test_sub<int, int, double>("test_data/algorithm/back_sub/3x3_3x1.txt", back_sub_fn);
 	};
 
 	return 0;

@@ -46,7 +46,7 @@ int main()
 	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<expr_string_maker<false>>>;
 	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<expr_string_maker<true>>>;
 
-	auto subdirectory_disposer = Approvals::useApprovalsSubdirectory("../approval_tests");
+	auto subdirectory_disposer = Approvals::useApprovalsSubdirectory("../test_data/approval_tests");
 
 	// @NOTE: We need to define the range in the lambdas because the topmost lambda can't have captured notation,
 	// otherwise ApprovalTests can't find the source file
