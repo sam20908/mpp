@@ -52,7 +52,7 @@ void test_type(mpp::matrix_type type)
 }
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_square(auto... dimension_args)
+void test_sq(auto... dimension_args)
 {
 	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ dimension_args... };
 
@@ -60,14 +60,14 @@ void test_square(auto... dimension_args)
 }
 
 template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_singular(auto val, bool is_singular, auto... dimension_args)
+void test_sg(auto val, bool is_singular, auto... dimension_args)
 {
 	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ dimension_args..., val };
 
 	expect(mpp::singular(matrix) == is_singular);
 }
 
-void test_size_compare(const auto& left_matrix_creator,
+void test_cmp_size(const auto& left_matrix_creator,
 	const auto& right_matrix_creator,
 	std::partial_ordering row_ordering,
 	std::partial_ordering column_ordering,
@@ -84,7 +84,7 @@ void test_size_compare(const auto& left_matrix_creator,
 }
 
 template<typename CompareThreeWay = std::compare_three_way>
-void test_elements_compare(auto&& left_matrix_creator,
+void test_cmp_elems(auto&& left_matrix_creator,
 	auto&& right_matrix_creator,
 	auto ordering,
 	CompareThreeWay compare_three_way_fn = {})
@@ -99,41 +99,41 @@ void test_elements_compare(auto&& left_matrix_creator,
 int main()
 {
 	feature("utility CPOs") = []() {
-		scenario("using type CPO") = []() {
+		feature("type") = []() {
 			test_type<1, 1>(mpp::matrix_type::fully_static);
 			test_type<mpp::dynamic, mpp::dynamic>(mpp::matrix_type::fully_dynamic);
 			test_type<mpp::dynamic, 1>(mpp::matrix_type::dynamic_rows);
 			test_type<1, mpp::dynamic>(mpp::matrix_type::dynamic_columns);
 		};
 
-		scenario("using square CPO on square matrices") = []() {
-			test_square<1, 1>();
-			test_square<mpp::dynamic, mpp::dynamic>(1ul, 1ul);
-			test_square<mpp::dynamic, 1>(1ul);
-			test_square<1, mpp::dynamic>(1ul);
+		feature("suare") = []() {
+			test_sq<1, 1>();
+			test_sq<mpp::dynamic, mpp::dynamic>(1ul, 1ul);
+			test_sq<mpp::dynamic, 1>(1ul);
+			test_sq<1, mpp::dynamic>(1ul);
 		};
 
-		scenario("using singular CPO") = []() {
+		feature("singular") = []() {
 			// Most common scenario for singular matrices is all elements are 0
 
 			when("checking against non-singular matrices") = []() {
-				test_singular<1, 1>(1, false);
-				test_singular<mpp::dynamic, mpp::dynamic>(1, false, 1ul, 1ul);
-				test_singular<mpp::dynamic, 1>(1, false, 1ul);
-				test_singular<1, mpp::dynamic>(1, false, 1ul);
+				test_sg<1, 1>(1, false);
+				test_sg<mpp::dynamic, mpp::dynamic>(1, false, 1ul, 1ul);
+				test_sg<mpp::dynamic, 1>(1, false, 1ul);
+				test_sg<1, mpp::dynamic>(1, false, 1ul);
 			};
 
 			when("checking against singular matrices") = []() {
-				test_singular<1, 1>(0, true);
-				test_singular<mpp::dynamic, mpp::dynamic>(0, true, 1ul, 1ul);
-				test_singular<mpp::dynamic, 1>(0, true, 1ul);
-				test_singular<1, mpp::dynamic>(0, true, 1ul);
+				test_sg<1, 1>(0, true);
+				test_sg<mpp::dynamic, mpp::dynamic>(0, true, 1ul, 1ul);
+				test_sg<mpp::dynamic, 1>(0, true, 1ul);
+				test_sg<1, mpp::dynamic>(0, true, 1ul);
 			};
 		};
 
-		scenario("comparison CPOs") = []() {
-			when("using size_compare CPO") = []() {
-				test_size_compare(
+		feature("comparison CPOs") = []() {
+			feature("size_compare") = []() {
+				test_cmp_size(
 					[]() {
 						return mpp::matrix<int, 1, 1>{};
 					},
@@ -144,7 +144,7 @@ int main()
 					std::partial_ordering::equivalent,
 					true,
 					true);
-				test_size_compare(
+				test_cmp_size(
 					[]() {
 						return mpp::matrix<int, 1, 1>{};
 					},
@@ -155,7 +155,7 @@ int main()
 					std::partial_ordering::unordered,
 					false,
 					false);
-				test_size_compare(
+				test_cmp_size(
 					[]() {
 						return mpp::matrix<int, 1, 1>{};
 					},
@@ -166,7 +166,7 @@ int main()
 					std::partial_ordering::less,
 					false,
 					true);
-				test_size_compare(
+				test_cmp_size(
 					[]() {
 						return mpp::matrix<int, 2, 1>{};
 					},
@@ -179,8 +179,8 @@ int main()
 					false);
 			};
 
-			when("using elements_compare CPO") = []() {
-				test_elements_compare(
+			feature("elements_compare") = []() {
+				test_cmp_elems(
 					[]() {
 						return mpp::matrix<int, 1, 1>{ 0 };
 					},
@@ -188,7 +188,7 @@ int main()
 						return mpp::matrix<int, 1, 1>{ 1 };
 					},
 					std::strong_ordering::less);
-				test_elements_compare(
+				test_cmp_elems(
 					[]() {
 						return mpp::matrix<int, 2, 3>{ { 1, 2, 3 }, { 5, 6, 8 } };
 					},
@@ -196,7 +196,7 @@ int main()
 						return mpp::matrix{ { 1, 2, 3 }, { 5, 6, 7 } };
 					},
 					std::strong_ordering::greater);
-				test_elements_compare(
+				test_cmp_elems(
 					[]() {
 						return mpp::matrix<int>{};
 					},
@@ -204,7 +204,7 @@ int main()
 						return mpp::matrix<int>{};
 					},
 					std::strong_ordering::equivalent);
-				test_elements_compare(
+				test_cmp_elems(
 					[]() {
 						return mpp::matrix<float>{ 1, 1, 5.F / 3.F };
 					},
