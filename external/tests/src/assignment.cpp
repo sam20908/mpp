@@ -56,29 +56,28 @@ int main()
 		// Test insertion machinery
 
 		when("Given a 2D initializer list") = []() {
-			const auto big_range_2d =
-				std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
+			const auto big_rn = std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
 
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			auto matrix_3 = mpp::matrix<int, 10, mpp::dynamic>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 10>{};
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			auto mat_3 = mpp::matrix<int, 10, mpp::dynamic>{};
+			auto mat_4 = mpp::matrix<int, mpp::dynamic, 10>{};
 
-			matrix_2 = big_range_2d;
-			matrix_3 = big_range_2d;
-			matrix_4 = big_range_2d;
+			mat_2 = big_rn;
+			mat_3 = big_rn;
+			mat_4 = big_rn;
 
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 
 		when("Given a 2D vector") = []() {
@@ -93,17 +92,17 @@ int main()
 				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
 				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
 
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			auto matrix_3 = mpp::matrix<int, 10, mpp::dynamic>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 10>{};
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			auto mat_3 = mpp::matrix<int, 10, mpp::dynamic>{};
+			auto mat_4 = mpp::matrix<int, mpp::dynamic, 10>{};
 
-			matrix_2 = big_range_2d;
-			matrix_3 = big_range_2d;
-			matrix_4 = big_range_2d;
+			mat_2 = big_range_2d;
+			mat_3 = big_range_2d;
+			mat_4 = big_range_2d;
 
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 	};
 
@@ -240,39 +239,39 @@ int main()
 		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		when("Copy assigning a fully static matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, 2, 3>{};
+			const auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d };
+			auto mat_2       = mpp::matrix<int, 2, 3>{};
 
-			matrix_2 = matrix_1;
+			mat_2 = mat_1;
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Copy assigning a fully dynamic matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			const auto mat_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+			auto mat_2       = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
 
-			matrix_2 = matrix_1;
+			mat_2 = mat_1;
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Copy assigning a dynamic rows matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, mpp::dynamic, 3>{};
+			const auto mat_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+			auto mat_2       = mpp::matrix<int, mpp::dynamic, 3>{};
 
-			matrix_2 = matrix_1;
+			mat_2 = mat_1;
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Copy assigning a dynamic columns matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, 2, mpp::dynamic>{};
+			const auto mat_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
+			auto mat_2       = mpp::matrix<int, 2, mpp::dynamic>{};
 
-			matrix_2 = matrix_1;
+			mat_2 = mat_1;
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 	};
 
@@ -280,62 +279,62 @@ int main()
 		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		when("Move assigning a fully static matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, 2, 3>{};
+			auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d };
+			auto mat_2 = mpp::matrix<int, 2, 3>{};
 
-			matrix_2 = std::move(matrix_1);
+			mat_2 = std::move(mat_1);
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Move assigning a fully dynamic matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			auto mat_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
 
-			matrix_2 = std::move(matrix_1);
+			mat_2 = std::move(mat_1);
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Move assigning a dynamic rows matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, 3>{};
+			auto mat_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, 3>{};
 
-			matrix_2 = std::move(matrix_1);
+			mat_2 = std::move(mat_1);
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 
 		when("Move assigning a dynamic columns matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, 2, mpp::dynamic>{};
+			auto mat_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
+			auto mat_2 = mpp::matrix<int, 2, mpp::dynamic>{};
 
-			matrix_2 = std::move(matrix_1);
+			mat_2 = std::move(mat_1);
 
-			MatrixApprover::verify(matrix_2);
+			MatrixApprover::verify(mat_2);
 		};
 	};
 
 	feature("Different matrix type assignment") = []() {
-		const auto matrix_1 = mpp::matrix<int, 0, 0>{};
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-		const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+		const auto mat_1 = mpp::matrix<int, 0, 0>{};
+		const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+		const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+		const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0>{};
 
-		auto matrix_1_dummy = mpp::matrix<int, 0, 0>{ std::move(matrix_4) };
-		auto matrix_2_dummy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3) };
-		auto matrix_3_dummy = mpp::matrix<int, 0, mpp::dynamic>{ std::move(matrix_2) };
-		auto matrix_4_dummy = mpp::matrix<int, mpp::dynamic, 0>{ std::move(matrix_1) };
+		auto mat_1_dummy = mpp::matrix<int, 0, 0>{ std::move(mat_4) };
+		auto mat_2_dummy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(mat_3) };
+		auto mat_3_dummy = mpp::matrix<int, 0, mpp::dynamic>{ std::move(mat_2) };
+		auto mat_4_dummy = mpp::matrix<int, mpp::dynamic, 0>{ std::move(mat_1) };
 
-		matrix_1_dummy = matrix_4;
-		matrix_2_dummy = matrix_3;
-		matrix_3_dummy = matrix_2;
-		matrix_4_dummy = matrix_1;
+		mat_1_dummy = mat_4;
+		mat_2_dummy = mat_3;
+		mat_3_dummy = mat_2;
+		mat_4_dummy = mat_1;
 
-		MatrixApprover::verify(matrix_1_dummy);
-		MatrixApprover::verify(matrix_2_dummy);
-		MatrixApprover::verify(matrix_3_dummy);
-		MatrixApprover::verify(matrix_4_dummy);
+		MatrixApprover::verify(mat_1_dummy);
+		MatrixApprover::verify(mat_2_dummy);
+		MatrixApprover::verify(mat_3_dummy);
+		MatrixApprover::verify(mat_4_dummy);
 	};
 
 	return 0;

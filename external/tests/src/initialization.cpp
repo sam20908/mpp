@@ -57,40 +57,40 @@ int main()
 
 	feature("Default initialization") = []() {
 		when("We do specify a custom allocator as a type") = []() {
-			const auto matrix_1 = mpp::matrix<int, 0, 0>{};
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+			const auto mat_1 = mpp::matrix<int, 0, 0>{};
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0>{};
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 
 		when("We do specify a custom allocator as a type") = []() {
-			const auto matrix_1 = mpp::matrix<int, 0, 0, custom_allocator<int>>{};
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
-			const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
+			const auto mat_1 = mpp::matrix<int, 0, 0, custom_allocator<int>>{};
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
+			const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 	};
 
 	feature("Initialize with custom allocator") = []() {
 		const auto allocator = custom_allocator<int>{};
 
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ allocator };
-		const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ allocator };
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ allocator };
+		const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ allocator };
+		const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ allocator };
+		const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ allocator };
 
-		MatrixApprover::verify(matrix_2);
-		MatrixApprover::verify(matrix_3);
-		MatrixApprover::verify(matrix_4);
+		MatrixApprover::verify(mat_2);
+		MatrixApprover::verify(mat_3);
+		MatrixApprover::verify(mat_4);
 	};
 
 	feature("2D range initialization") = []() {
@@ -98,27 +98,27 @@ int main()
 			const auto range_2d = std::initializer_list<std::initializer_list<float>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 			when("We don't use unsafe") = [&]() {
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-				const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-				const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+				const auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d };
+				const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+				const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
+				const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
 
-				MatrixApprover::verify(matrix_1);
-				MatrixApprover::verify(matrix_2);
-				MatrixApprover::verify(matrix_3);
-				MatrixApprover::verify(matrix_4);
+				MatrixApprover::verify(mat_1);
+				MatrixApprover::verify(mat_2);
+				MatrixApprover::verify(mat_3);
+				MatrixApprover::verify(mat_4);
 			};
 
 			when("We do use unsafe") = [&]() {
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d, mpp::unsafe };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d, mpp::unsafe };
-				const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d, mpp::unsafe };
-				const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d, mpp::unsafe };
+				const auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d, mpp::unsafe };
+				const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d, mpp::unsafe };
+				const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d, mpp::unsafe };
+				const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d, mpp::unsafe };
 
-				MatrixApprover::verify(matrix_1);
-				MatrixApprover::verify(matrix_2);
-				MatrixApprover::verify(matrix_3);
-				MatrixApprover::verify(matrix_4);
+				MatrixApprover::verify(mat_1);
+				MatrixApprover::verify(mat_2);
+				MatrixApprover::verify(mat_3);
+				MatrixApprover::verify(mat_4);
 			};
 		};
 
@@ -126,27 +126,27 @@ int main()
 			const auto range_2d = std::vector<std::vector<float>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 			when("We don't use unsafe") = [&]() {
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-				const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-				const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+				const auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d };
+				const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
+				const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
+				const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
 
-				MatrixApprover::verify(matrix_1);
-				MatrixApprover::verify(matrix_2);
-				MatrixApprover::verify(matrix_3);
-				MatrixApprover::verify(matrix_4);
+				MatrixApprover::verify(mat_1);
+				MatrixApprover::verify(mat_2);
+				MatrixApprover::verify(mat_3);
+				MatrixApprover::verify(mat_4);
 			};
 
 			when("We do use unsafe") = [&]() {
-				const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d, mpp::unsafe };
-				const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d, mpp::unsafe };
-				const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d, mpp::unsafe };
-				const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d, mpp::unsafe };
+				const auto mat_1 = mpp::matrix<int, 2, 3>{ range_2d, mpp::unsafe };
+				const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d, mpp::unsafe };
+				const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d, mpp::unsafe };
+				const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d, mpp::unsafe };
 
-				MatrixApprover::verify(matrix_1);
-				MatrixApprover::verify(matrix_2);
-				MatrixApprover::verify(matrix_3);
-				MatrixApprover::verify(matrix_4);
+				MatrixApprover::verify(mat_1);
+				MatrixApprover::verify(mat_2);
+				MatrixApprover::verify(mat_3);
+				MatrixApprover::verify(mat_4);
 			};
 		};
 
@@ -173,27 +173,27 @@ int main()
 		const auto range_1d = std::vector<int>{ 1, 2, 3, 4, 5, 6 };
 
 		when("We don't use unsafe") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, 3>{ 2, 3, range_1d };
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, range_1d };
-			const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ 2, 3, range_1d };
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 3, range_1d };
+			const auto mat_1 = mpp::matrix<int, 2, 3>{ 2, 3, range_1d };
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, range_1d };
+			const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ 2, 3, range_1d };
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 3, range_1d };
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 
 		when("We do use unsafe") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, 3>{ 2, 3, range_1d, mpp::unsafe };
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, range_1d, mpp::unsafe };
-			const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ 2, 3, range_1d, mpp::unsafe };
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 3, range_1d, mpp::unsafe };
+			const auto mat_1 = mpp::matrix<int, 2, 3>{ 2, 3, range_1d, mpp::unsafe };
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, range_1d, mpp::unsafe };
+			const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ 2, 3, range_1d, mpp::unsafe };
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 3, range_1d, mpp::unsafe };
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 	};
 
@@ -204,144 +204,144 @@ int main()
 			};
 		};
 
-		const auto matrix_1 = mpp::matrix<int, 2, 3>{ iota_fn() };
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, iota_fn() };
-		const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ 3, iota_fn() };
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, iota_fn() };
+		const auto mat_1 = mpp::matrix<int, 2, 3>{ iota_fn() };
+		const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, iota_fn() };
+		const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ 3, iota_fn() };
+		const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, iota_fn() };
 
-		MatrixApprover::verify(matrix_1);
-		MatrixApprover::verify(matrix_2);
-		MatrixApprover::verify(matrix_3);
-		MatrixApprover::verify(matrix_4);
+		MatrixApprover::verify(mat_1);
+		MatrixApprover::verify(mat_2);
+		MatrixApprover::verify(mat_3);
+		MatrixApprover::verify(mat_4);
 	};
 
 	feature("Value initialization") = []() {
-		const auto matrix_1 = mpp::matrix<int, 2, 3>{ 1 };
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, 1 };
-		const auto matrix_3 = mpp::matrix<int, 2, mpp::dynamic>{ 3, 1 };
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 1 };
+		const auto mat_1 = mpp::matrix<int, 2, 3>{ 1 };
+		const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, 1 };
+		const auto mat_3 = mpp::matrix<int, 2, mpp::dynamic>{ 3, 1 };
+		const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 2, 1 };
 
-		MatrixApprover::verify(matrix_1);
-		MatrixApprover::verify(matrix_2);
-		MatrixApprover::verify(matrix_3);
-		MatrixApprover::verify(matrix_4);
+		MatrixApprover::verify(mat_1);
+		MatrixApprover::verify(mat_2);
+		MatrixApprover::verify(mat_3);
+		MatrixApprover::verify(mat_4);
 	};
 
 	feature("Constructing identity matrices") = []() {
 		when("We don't use unsafe") = []() {
-			const auto matrix_1 = mpp::matrix<int, 3, 3>{ mpp::identity };
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity };
-			const auto matrix_3 = mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity };
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity };
+			const auto mat_1 = mpp::matrix<int, 3, 3>{ mpp::identity };
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity };
+			const auto mat_3 = mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity };
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity };
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 
 		when("We do use unsafe") = []() {
-			const auto matrix_1 = mpp::matrix<int, 3, 3>{ mpp::identity, mpp::unsafe };
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity, mpp::unsafe };
-			const auto matrix_3 = mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity, mpp::unsafe };
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity, mpp::unsafe };
+			const auto mat_1 = mpp::matrix<int, 3, 3>{ mpp::identity, mpp::unsafe };
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity, mpp::unsafe };
+			const auto mat_3 = mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity, mpp::unsafe };
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity, mpp::unsafe };
 
-			MatrixApprover::verify(matrix_1);
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
+			MatrixApprover::verify(mat_1);
+			MatrixApprover::verify(mat_2);
+			MatrixApprover::verify(mat_3);
+			MatrixApprover::verify(mat_4);
 		};
 	};
 
 	feature("Copy initialization") = []() {
 		when("Without custom allocator") = []() {
-			const auto matrix_1 = mpp::matrix<int, 0, 0>{};
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+			const auto mat_1 = mpp::matrix<int, 0, 0>{};
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0>{};
 
-			const auto matrix_1_copy = mpp::matrix<int, 0, 0>{ matrix_1 };
-			const auto matrix_2_copy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ matrix_2 };
-			const auto matrix_3_copy = mpp::matrix<int, 0, mpp::dynamic>{ matrix_3 };
-			const auto matrix_4_copy = mpp::matrix<int, mpp::dynamic, 0>{ matrix_4 };
+			const auto mat_1_copy = mpp::matrix<int, 0, 0>{ mat_1 };
+			const auto mat_2_copy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ mat_2 };
+			const auto mat_3_copy = mpp::matrix<int, 0, mpp::dynamic>{ mat_3 };
+			const auto mat_4_copy = mpp::matrix<int, mpp::dynamic, 0>{ mat_4 };
 
-			MatrixApprover::verify(matrix_1_copy);
-			MatrixApprover::verify(matrix_2_copy);
-			MatrixApprover::verify(matrix_3_copy);
-			MatrixApprover::verify(matrix_4_copy);
+			MatrixApprover::verify(mat_1_copy);
+			MatrixApprover::verify(mat_2_copy);
+			MatrixApprover::verify(mat_3_copy);
+			MatrixApprover::verify(mat_4_copy);
 		};
 
 		when("With custom allocators (dyamic matrices only)") = []() {
 			const auto allocator = custom_allocator<int>{};
 
-			const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
-			const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
-			const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
+			const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
+			const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
+			const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
 
-			const auto matrix_2_copy =
-				mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ matrix_2, allocator };
-			const auto matrix_3_copy = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ matrix_3, allocator };
-			const auto matrix_4_copy = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ matrix_4, allocator };
+			const auto mat_2_copy =
+				mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ mat_2, allocator };
+			const auto mat_3_copy = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ mat_3, allocator };
+			const auto mat_4_copy = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ mat_4, allocator };
 
-			MatrixApprover::verify(matrix_2_copy);
-			MatrixApprover::verify(matrix_3_copy);
-			MatrixApprover::verify(matrix_4_copy);
+			MatrixApprover::verify(mat_2_copy);
+			MatrixApprover::verify(mat_3_copy);
+			MatrixApprover::verify(mat_4_copy);
 		};
 	};
 
 	feature("Move initialization") = []() {
 		when("Without custom allocator") = []() {
-			auto matrix_1 = mpp::matrix<int, 0, 0>{};
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+			auto mat_1 = mpp::matrix<int, 0, 0>{};
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+			auto mat_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+			auto mat_4 = mpp::matrix<int, mpp::dynamic, 0>{};
 
-			const auto matrix_1_move = mpp::matrix<int, 0, 0>{ std::move(matrix_1) };
-			const auto matrix_2_move = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(matrix_2) };
-			const auto matrix_3_move = mpp::matrix<int, 0, mpp::dynamic>{ std::move(matrix_3) };
-			const auto matrix_4_move = mpp::matrix<int, mpp::dynamic, 0>{ std::move(matrix_4) };
+			const auto mat_1_move = mpp::matrix<int, 0, 0>{ std::move(mat_1) };
+			const auto mat_2_move = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(mat_2) };
+			const auto mat_3_move = mpp::matrix<int, 0, mpp::dynamic>{ std::move(mat_3) };
+			const auto mat_4_move = mpp::matrix<int, mpp::dynamic, 0>{ std::move(mat_4) };
 
-			MatrixApprover::verify(matrix_1_move);
-			MatrixApprover::verify(matrix_2_move);
-			MatrixApprover::verify(matrix_3_move);
-			MatrixApprover::verify(matrix_4_move);
+			MatrixApprover::verify(mat_1_move);
+			MatrixApprover::verify(mat_2_move);
+			MatrixApprover::verify(mat_3_move);
+			MatrixApprover::verify(mat_4_move);
 		};
 
 		when("With custom allocators (dyamic matrices only)") = []() {
 			const auto allocator = custom_allocator<int>{};
 
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
-			auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
+			auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{};
+			auto mat_3 = mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{};
+			auto mat_4 = mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{};
 
-			const auto matrix_2_move =
-				mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::move(matrix_2), allocator };
-			const auto matrix_3_move =
-				mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ std::move(matrix_3), allocator };
-			const auto matrix_4_move =
-				mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ std::move(matrix_4), allocator };
+			const auto mat_2_move =
+				mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::move(mat_2), allocator };
+			const auto mat_3_move =
+				mpp::matrix<int, 0, mpp::dynamic, custom_allocator<int>>{ std::move(mat_3), allocator };
+			const auto mat_4_move =
+				mpp::matrix<int, mpp::dynamic, 0, custom_allocator<int>>{ std::move(mat_4), allocator };
 
-			MatrixApprover::verify(matrix_2_move);
-			MatrixApprover::verify(matrix_3_move);
-			MatrixApprover::verify(matrix_4_move);
+			MatrixApprover::verify(mat_2_move);
+			MatrixApprover::verify(mat_3_move);
+			MatrixApprover::verify(mat_4_move);
 		};
 	};
 
 	feature("Different matrix type initialization") = []() {
-		const auto matrix_1 = mpp::matrix<int, 0, 0>{};
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-		const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
+		const auto mat_1 = mpp::matrix<int, 0, 0>{};
+		const auto mat_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+		const auto mat_3 = mpp::matrix<int, 0, mpp::dynamic>{};
+		const auto mat_4 = mpp::matrix<int, mpp::dynamic, 0>{};
 
-		const auto matrix_1_dummy = mpp::matrix<int, 0, 0>{ std::move(matrix_4) };
-		const auto matrix_2_dummy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3) };
-		const auto matrix_3_dummy = mpp::matrix<int, 0, mpp::dynamic>{ std::move(matrix_2) };
-		const auto matrix_4_dummy = mpp::matrix<int, mpp::dynamic, 0>{ std::move(matrix_1) };
+		const auto mat_1_dummy = mpp::matrix<int, 0, 0>{ std::move(mat_4) };
+		const auto mat_2_dummy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(mat_3) };
+		const auto mat_3_dummy = mpp::matrix<int, 0, mpp::dynamic>{ std::move(mat_2) };
+		const auto mat_4_dummy = mpp::matrix<int, mpp::dynamic, 0>{ std::move(mat_1) };
 
-		MatrixApprover::verify(matrix_1_dummy);
-		MatrixApprover::verify(matrix_2_dummy);
-		MatrixApprover::verify(matrix_3_dummy);
-		MatrixApprover::verify(matrix_4_dummy);
+		MatrixApprover::verify(mat_1_dummy);
+		MatrixApprover::verify(mat_2_dummy);
+		MatrixApprover::verify(mat_3_dummy);
+		MatrixApprover::verify(mat_4_dummy);
 	};
 
 	return 0;

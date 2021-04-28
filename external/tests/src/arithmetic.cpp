@@ -46,18 +46,18 @@ template<typename LeftValue,
 	std::size_t RightRows,
 	std::size_t RightColumns,
 	typename Approver>
-void test_matrix_op(const auto& range_2d, const auto& binary_op)
+void test_mat_op(const auto& rng, const auto& binary_op)
 {
-	const auto matrix_1 = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ range_2d };
-	const auto matrix_2 = mpp::matrix<RightValue, RightRows, RightColumns>{ range_2d };
+	const auto mat_1 = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ rng };
+	const auto mat_2 = mpp::matrix<RightValue, RightRows, RightColumns>{ rng };
 
-	Approver::verify(binary_op(matrix_1, matrix_2));
+	Approver::verify(binary_op(mat_1, mat_2));
 }
 
 template<typename Value, std::size_t Rows, std::size_t Columns, typename Approver>
-void test_number_op(const auto& range_2d, const auto& number, const auto& binary_op)
+void test_num_op(const auto& rng, const auto& number, const auto& binary_op)
 {
-	const auto matrix = mpp::matrix<Value, Rows, Columns>{ range_2d };
+	const auto matrix = mpp::matrix<Value, Rows, Columns>{ rng };
 
 	Approver::verify(binary_op(matrix, number));
 }
@@ -69,12 +69,12 @@ template<typename LeftValue,
 	std::size_t RightRows,
 	std::size_t RightColumns,
 	typename Approver>
-void test_matrix_multiplication_op(const auto& left_range_2d, const auto& right_range_2d, const auto& binary_op)
+void test_mat_mul_op(const auto& left_rng, const auto& right_rng, const auto& binary_op)
 {
-	const auto matrix_1 = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ left_range_2d };
-	const auto matrix_2 = mpp::matrix<RightValue, RightRows, RightColumns>{ right_range_2d };
+	const auto mat_1 = mpp::matrix<LeftValue, LeftRows, LeftColumns>{ left_rng };
+	const auto mat_2 = mpp::matrix<RightValue, RightRows, RightColumns>{ right_rng };
 
-	Approver::verify(binary_op(matrix_1, matrix_2));
+	Approver::verify(binary_op(mat_1, mat_2));
 }
 
 int main()
@@ -89,17 +89,17 @@ int main()
 	// Tracked by:https://github.com/approvals/ApprovalTests.cpp/issues/177
 
 	feature("Adding matrices") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+		const auto rng = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		when("We don't evaluate the full result") = [&]() {
 			auto op = [](const auto& left, const auto& right) {
 				return left + right;
 			};
 
-			test_matrix_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(range_2d, op);
+			test_mat_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(rng, op);
 		};
 
 		when("We do evaluate the full result") = [&]() {
@@ -108,26 +108,26 @@ int main()
 					return mpp::matrix{ left + right };
 				};
 
-				test_matrix_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(range_2d, op);
+				test_mat_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(rng, op);
 			};
 		};
 	};
 
 	feature("Subtracting matrices") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+		const auto rng = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		when("We don't evaluate the full result") = [&]() {
 			auto op = [](const auto& left, const auto& right) {
 				return left - right;
 			};
 
-			test_matrix_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-			test_matrix_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(range_2d, op);
+			test_mat_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(rng, op);
+			test_mat_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(rng, op);
 		};
 
 		when("We do evaluate the full result") = [&]() {
@@ -136,26 +136,26 @@ int main()
 					return mpp::matrix{ left - right };
 				};
 
-				test_matrix_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(range_2d, op);
-				test_matrix_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(range_2d, op);
+				test_mat_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, mpp::dynamic, mpp::dynamic, 2, 3, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, mpp::dynamic, 3, 2, mpp::dynamic, MatrixExtentApprover>(rng, op);
+				test_mat_op<int, int, 2, mpp::dynamic, mpp::dynamic, 3, MatrixExtentApprover>(rng, op);
 			};
 		};
 	};
 
 	feature("Multiplying matrices with a number") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+		const auto rng = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		given("We don't evaluate the full result") = [&]() {
 			auto op = [](const auto& left, const auto& right) {
 				return left * right;
 			};
 
-			test_number_op<int, 2, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, 2, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
+			test_num_op<int, 2, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, 2, mpp::dynamic, MatrixApprover>(rng, 2, op);
 		};
 
 		given("We do evaluate the full result") = [&]() {
@@ -163,34 +163,26 @@ int main()
 				return mpp::matrix{ left * right };
 			};
 
-			test_number_op<int, 2, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, 2, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
+			test_num_op<int, 2, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, 2, mpp::dynamic, MatrixApprover>(rng, 2, op);
 		};
 	};
 
 	feature("Multiplying matrices with another matrix") = []() {
-		const auto left_range_2d  = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-		const auto right_range_2d = std::vector<std::vector<int>>{ { 3 }, { 6 }, { 9 } };
+		const auto left_rng  = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+		const auto right_rng = std::vector<std::vector<int>>{ { 3 }, { 6 }, { 9 } };
 
 		given("We don't evaluate the full result") = [&]() {
 			auto op = [](const auto& left, const auto& right) {
 				return left * right;
 			};
 
-			test_matrix_multiplication_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, mpp::dynamic, mpp::dynamic, 3, 1, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, mpp::dynamic, 3, 3, mpp::dynamic, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, 2, mpp::dynamic, mpp::dynamic, 1, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
+			test_mat_mul_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, mpp::dynamic, mpp::dynamic, 3, 1, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, mpp::dynamic, 3, 3, mpp::dynamic, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, 2, mpp::dynamic, mpp::dynamic, 1, MatrixApprover>(left_rng, right_rng, op);
 		};
 
 		given("We do evaluate the full result") = [&]() {
@@ -198,33 +190,25 @@ int main()
 				return mpp::matrix{ left * right };
 			};
 
-			test_matrix_multiplication_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, mpp::dynamic, mpp::dynamic, 3, 1, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, mpp::dynamic, 3, 3, mpp::dynamic, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
-			test_matrix_multiplication_op<int, int, 2, mpp::dynamic, mpp::dynamic, 1, MatrixApprover>(left_range_2d,
-				right_range_2d,
-				op);
+			test_mat_mul_op<int, int, 2, 3, mpp::dynamic, mpp::dynamic, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, mpp::dynamic, mpp::dynamic, 3, 1, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, mpp::dynamic, 3, 3, mpp::dynamic, MatrixApprover>(left_rng, right_rng, op);
+			test_mat_mul_op<int, int, 2, mpp::dynamic, mpp::dynamic, 1, MatrixApprover>(left_rng, right_rng, op);
 		};
 	};
 
 	feature("Dividing matrices with a number") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
+		const auto rng = std::vector<std::vector<int>>{ { 2, 4, 6 }, { 8, 10, 12 } };
 
 		given("We don't evaluate the full result") = [&]() {
 			auto op = [](const auto& left, const auto& right) {
 				return left / right;
 			};
 
-			test_number_op<int, 2, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, 2, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
+			test_num_op<int, 2, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, 2, mpp::dynamic, MatrixApprover>(rng, 2, op);
 		};
 
 		given("We do evaluate the full result") = [&]() {
@@ -232,10 +216,10 @@ int main()
 				return mpp::matrix{ left / right };
 			};
 
-			test_number_op<int, 2, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, mpp::dynamic, 3, MatrixApprover>(range_2d, 2, op);
-			test_number_op<int, 2, mpp::dynamic, MatrixApprover>(range_2d, 2, op);
+			test_num_op<int, 2, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, mpp::dynamic, MatrixApprover>(rng, 2, op);
+			test_num_op<int, mpp::dynamic, 3, MatrixApprover>(rng, 2, op);
+			test_num_op<int, 2, mpp::dynamic, MatrixApprover>(rng, 2, op);
 		};
 	};
 
