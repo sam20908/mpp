@@ -71,29 +71,28 @@ void test_cmp_size(const auto& left_matrix_creator,
 	const auto& right_matrix_creator,
 	std::partial_ordering row_ordering,
 	std::partial_ordering column_ordering,
-	bool compare_rows,
-	bool compare_columns)
+	bool cmp_rows,
+	bool cmp_columns)
 {
-	const auto left  = left_matrix_creator();
-	const auto right = right_matrix_creator();
-	const auto [compare_row_ordering, compare_column_ordering] =
-		mpp::size_compare(left, right, compare_rows, compare_columns);
+	const auto left                                    = left_matrix_creator();
+	const auto right                                   = right_matrix_creator();
+	const auto [cmp_row_ordering, cmp_column_ordering] = mpp::size_compare(left, right, cmp_rows, cmp_columns);
 
-	expect(row_ordering == compare_row_ordering);
-	expect(column_ordering == compare_column_ordering);
+	expect(row_ordering == cmp_row_ordering);
+	expect(column_ordering == cmp_column_ordering);
 }
 
 template<typename CompareThreeWay = std::compare_three_way>
 void test_cmp_elems(auto&& left_matrix_creator,
 	auto&& right_matrix_creator,
 	auto ordering,
-	CompareThreeWay compare_three_way_fn = {})
+	CompareThreeWay cmp_three_way_fn = {})
 {
-	const auto left             = left_matrix_creator();
-	const auto right            = right_matrix_creator();
-	const auto compare_ordering = mpp::elements_compare(left, right, compare_three_way_fn);
+	const auto left         = left_matrix_creator();
+	const auto right        = right_matrix_creator();
+	const auto cmp_ordering = mpp::elements_compare(left, right, cmp_three_way_fn);
 
-	expect(compare_ordering == ordering);
+	expect(cmp_ordering == ordering);
 }
 
 int main()
