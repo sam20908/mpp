@@ -35,7 +35,7 @@ function(_create_test TEST_FILENAME)
 
     add_dependencies("tests" ${TEST_NAME})
 
-    target_compile_definitions(${TEST_NAME} PRIVATE -DTEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_definitions(${TEST_NAME} PRIVATE -DTEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test_data")
 endfunction()
 
 _create_test("customization")
