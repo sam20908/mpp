@@ -67,7 +67,7 @@ void test_det(const std::string& filename)
 template<typename From, typename To>
 void test_transformation(const std::string& filename, const auto& transform_fn)
 {
-	const auto result        = parse_mats_out<From, To>(get_filepath(filename));
+	const auto result        = parse_mats_out<mat_t, From, To>(get_filepath(filename), mat_fn);
 	const auto& mat          = std::get<0>(result);
 	const auto& expected_out = std::get<1>(result);
 
@@ -114,7 +114,7 @@ void test_block(const std::string& filename)
 template<typename From, typename To>
 void test_lu(const std::string& filename)
 {
-	const auto result          = parse_mats_out<From, To, To>(get_filepath(filename));
+	const auto result          = parse_mats_out<mat_t, From, To, To>(get_filepath(filename), mat_fn);
 	const auto& mat            = std::get<0>(result);
 	const auto& expected_left  = std::get<1>(result);
 	const auto& expected_right = std::get<2>(result);
@@ -137,7 +137,7 @@ void test_lu(const std::string& filename)
 template<typename AValue, typename BValue, typename XValue>
 void test_sub(const std::string& filename, const auto& fn)
 {
-	const auto result      = parse_mats_out<AValue, BValue, XValue>(get_filepath(filename));
+	const auto result      = parse_mats_out<mat_t, AValue, BValue, XValue>(get_filepath(filename), mat_fn);
 	const auto& a          = std::get<0>(result);
 	const auto& b          = std::get<1>(result);
 	const auto& expected_x = std::get<2>(result);

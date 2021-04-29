@@ -82,13 +82,20 @@ auto str_fn()
 	}
 }
 
-template<typename T>
-auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, std::size_t columns) -> mpp::matrix<T>
-{
-	auto data          = std::vector<T>{};
-	auto from_value_fn = str_fn<T>();
+inline auto mat_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
+	return mpp::matrix<T>{ std::forward<decltype(data)>(data) };
+};
 
-	data.reserve(rows * columns);
+template<typename T>
+using mat_t = mpp::matrix<T>;
+
+template<typename T>
+auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, std::size_t columns, const auto& fn)
+{
+	auto data   = std::vector<std::vector<T>>{};
+	auto val_fn = str_fn<T>();
+
+	data.reserve(rows);
 
 	while (std::getline(file, line))
 	{
@@ -97,28 +104,33 @@ auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, s
 			break;
 		}
 
-		auto value_string = std::string{};
-		auto line_stream  = std::istringstream{ line };
+		auto val_str = std::string{};
+		auto stream  = std::istringstream{ line };
+		auto row     = std::vector<T>{};
 
-		while (std::getline(line_stream, value_string, ' '))
+		row.reserve(columns);
+
+		while (std::getline(stream, val_str, ' '))
 		{
-			data.push_back(from_value_fn(value_string));
+			row.push_back(val_fn(val_str));
 		}
+
+		data.push_back(std::move(row));
 	}
 
-	return mpp::matrix<T>{ rows, columns, std::move(data) };
+	return fn.template operator()<T>(rows, columns, std::move(data));
 }
 
 template<typename T>
-auto parse_mat_with_dims(std::ifstream& file, std::string& line) -> mpp::matrix<T>
+auto parse_mat_with_dims(std::ifstream& file, std::string& line, const auto& fn)
 {
 	std::size_t rows, columns;
 	std::getline(file, line);
 
-	auto line_stream = std::istringstream{ line };
-	line_stream >> rows >> columns;
+	auto stream = std::istringstream{ line };
+	stream >> rows >> columns;
 
-	return parse_mat_elems<T>(file, line, rows, columns);
+	return parse_mat_elems<T>(file, line, rows, columns, fn);
 }
 
 template<typename From, typename To>
@@ -135,7 +147,7 @@ auto parse_num_out(const std::filesystem::path& path) -> num_out<From, To>
 	auto line       = std::string{};
 	auto num_val_fn = str_fn<To>();
 
-	auto mat = parse_mat_with_dims<From>(data_file, line);
+	auto mat = parse_mat_with_dims<From>(data_file, line, mat_fn);
 
 	std::getline(data_file, line);
 	const auto out = num_val_fn(line);
@@ -167,7 +179,7 @@ auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 	auto line      = std::string{};
 	auto blocks    = std::vector<block<To>>{};
 
-	auto mat = parse_mat_with_dims<From>(data_file, line);
+	auto mat = parse_mat_with_dims<From>(data_file, line, mat_fn);
 	std::size_t row_start, column_start, row_end, column_end;
 
 	while (std::getline(data_file, line))
@@ -179,39 +191,37 @@ auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 		}
 
 		// Parse the block
-		auto block_ = parse_mat_elems<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1);
+		auto block_ =
+			parse_mat_elems<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1, mat_fn);
 		blocks.push_back(block<To>{ row_start, column_start, row_end, column_end, block_ });
 	}
 
 	return { std::move(mat), std::move(blocks) };
 }
 
-template<typename... Ts>
-using mats_out = std::tuple<mpp::matrix<Ts>...>;
-
-template<std::size_t I, std::size_t Size, typename Tup>
-auto parse_mats_out_impl(std::ifstream& file, std::string& line, Tup& out)
+template<std::size_t I, std::size_t Size, typename... Ts>
+auto parse_mats_out_impl(std::ifstream& file, std::string& line, auto& out, const auto& fn)
 {
-	if constexpr (I == Size)
+	if constexpr (I + 1 > Size)
 	{
 		return out;
 	}
 	else
 	{
-		using mat_val_t = typename std::tuple_element_t<I, Tup>::value_type;
+		using val_t = std::tuple_element_t<I, std::tuple<Ts...>>;
 
-		std::get<I>(out) = parse_mat_with_dims<mat_val_t>(file, line);
+		std::get<I>(out) = parse_mat_with_dims<val_t>(file, line, fn);
 
-		return parse_mats_out_impl<I + 1, Size>(file, line, out);
+		return parse_mats_out_impl<I + 1, Size, Ts...>(file, line, out, fn);
 	}
 }
 
-template<typename... Ts>
-auto parse_mats_out(const std::filesystem::path& path) -> mats_out<Ts...>
+template<template<typename> typename Ret, typename... Ts>
+auto parse_mats_out(const std::filesystem::path& path, const auto& fn)
 {
-	auto out  = mats_out<Ts...>{};
+	auto out  = std::tuple<Ret<Ts>...>{};
 	auto line = std::string{};
 	auto file = std::ifstream(path);
 
-	return parse_mats_out_impl<0, sizeof...(Ts)>(file, line, out);
+	return parse_mats_out_impl<0, sizeof...(Ts), Ts...>(file, line, out, fn);
 }
