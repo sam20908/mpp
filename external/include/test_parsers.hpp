@@ -82,16 +82,45 @@ auto str_fn()
 	}
 }
 
+inline auto get_filepath(const std::string& filename) -> std::filesystem::path
+{
+	return std::filesystem::path(TEST_DATA_PATH) / filename;
+}
+
 inline auto mat_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
 	return mpp::matrix<T>{ std::forward<decltype(data)>(data) };
+};
+
+inline auto vec2d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
+	return data;
 };
 
 template<typename T>
 using mat_t = mpp::matrix<T>;
 
 template<typename T>
+using vec2d_t = std::vector<std::vector<T>>;
+
+template<typename... Ts>
+struct types
+{
+	static constexpr auto size = sizeof...(Ts);
+};
+
+template<template<typename> typename... Ts>
+struct temp_types
+{
+	static constexpr auto size = sizeof...(Ts);
+};
+
+template<typename T>
 auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, std::size_t columns, const auto& fn)
 {
+	/**
+	 * put the result into a 2D vector because it allows you to make a matrix out of it and extract a 1D vector out of
+	 * it (just vec[0]). This was meant to be as generic as possible
+	 */
+
 	auto data   = std::vector<std::vector<T>>{};
 	auto val_fn = str_fn<T>();
 
@@ -199,8 +228,13 @@ auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 	return { std::move(mat), std::move(blocks) };
 }
 
-template<std::size_t I, std::size_t Size, typename... Ts>
-auto parse_mats_out_impl(std::ifstream& file, std::string& line, auto& out, const auto& fn)
+template<std::size_t I, std::size_t Size, template<typename> typename... TempTs, typename... ValTs>
+auto parse_mats_out_impl(std::ifstream& file,
+	std::string& line,
+	auto& out,
+	const auto& fn,
+	temp_types<TempTs...> temp_ts,
+	types<ValTs...> val_ts)
 {
 	if constexpr (I + 1 > Size)
 	{
@@ -208,20 +242,29 @@ auto parse_mats_out_impl(std::ifstream& file, std::string& line, auto& out, cons
 	}
 	else
 	{
-		using val_t = std::tuple_element_t<I, std::tuple<Ts...>>;
+		using val_t = std::tuple_element_t<I, std::tuple<ValTs...>>;
 
 		std::get<I>(out) = parse_mat_with_dims<val_t>(file, line, fn);
 
-		return parse_mats_out_impl<I + 1, Size, Ts...>(file, line, out, fn);
+		return parse_mats_out_impl<I + 1, Size>(file, line, out, fn, temp_ts, val_ts);
 	}
 }
 
-template<template<typename> typename Ret, typename... Ts>
+template<typename TempTs, typename ValTs>
 auto parse_mats_out(const std::filesystem::path& path, const auto& fn)
 {
-	auto out  = std::tuple<Ret<Ts>...>{};
+	static_assert(TempTs::size == ValTs::size, "Number of type aliases and value types must be the same!");
+
+	auto out = []<template<typename> typename... TempTs2, typename... ValTs2>(temp_types<TempTs2...>, types<ValTs2...>)
+	{
+		// Lambda to expand out arguments packed inside temp_types and types
+
+		return std::tuple<TempTs2<ValTs2>...>{};
+	}
+	(TempTs{}, ValTs{});
+
 	auto line = std::string{};
 	auto file = std::ifstream(path);
 
-	return parse_mats_out_impl<0, sizeof...(Ts), Ts...>(file, line, out, fn);
+	return parse_mats_out_impl<0, TempTs::size>(file, line, out, fn, TempTs{}, ValTs{});
 }
