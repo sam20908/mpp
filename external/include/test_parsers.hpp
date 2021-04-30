@@ -92,7 +92,7 @@ inline auto mat_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
 };
 
 inline auto vec2d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
-	return data;
+	return std::move(data);
 };
 
 inline auto vec1d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
