@@ -95,11 +95,18 @@ inline auto vec2d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
 	return data;
 };
 
+inline auto vec1d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
+	return data[0];
+};
+
 template<typename T>
 using mat_t = mpp::matrix<T>;
 
 template<typename T>
 using vec2d_t = std::vector<std::vector<T>>;
+
+template<typename T>
+using vec1d_t = std::vector<T>;
 
 template<typename... Ts>
 struct types
@@ -228,11 +235,11 @@ auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 	return { std::move(mat), std::move(blocks) };
 }
 
-template<std::size_t I, std::size_t Size, template<typename> typename... TempTs, typename... ValTs>
+template<std::size_t I, std::size_t Size, template<typename> typename... TempTs, typename... ValTs, typename... Fns>
 auto parse_mats_out_impl(std::ifstream& file,
 	std::string& line,
 	auto& out,
-	const auto& fn,
+	const std::tuple<Fns...>& fns,
 	temp_types<TempTs...> temp_ts,
 	types<ValTs...> val_ts)
 {
@@ -244,17 +251,15 @@ auto parse_mats_out_impl(std::ifstream& file,
 	{
 		using val_t = std::tuple_element_t<I, std::tuple<ValTs...>>;
 
-		std::get<I>(out) = parse_mat_with_dims<val_t>(file, line, fn);
+		std::get<I>(out) = parse_mat_with_dims<val_t>(file, line, std::get<I>(fns));
 
-		return parse_mats_out_impl<I + 1, Size>(file, line, out, fn, temp_ts, val_ts);
+		return parse_mats_out_impl<I + 1, Size>(file, line, out, fns, temp_ts, val_ts);
 	}
 }
 
-template<typename TempTs, typename ValTs>
-auto parse_mats_out(const std::filesystem::path& path, const auto& fn)
+template<typename TempTs, typename ValTs, typename... Fns>
+auto parse_mats_out(const std::filesystem::path& path, const std::tuple<Fns...>& fns)
 {
-	static_assert(TempTs::size == ValTs::size, "Number of type aliases and value types must be the same!");
-
 	auto out = []<template<typename> typename... TempTs2, typename... ValTs2>(temp_types<TempTs2...>, types<ValTs2...>)
 	{
 		// Lambda to expand out arguments packed inside temp_types and types
@@ -266,5 +271,5 @@ auto parse_mats_out(const std::filesystem::path& path, const auto& fn)
 	auto line = std::string{};
 	auto file = std::ifstream(path);
 
-	return parse_mats_out_impl<0, TempTs::size>(file, line, out, fn, TempTs{}, ValTs{});
+	return parse_mats_out_impl<0, TempTs::size>(file, line, out, fns, TempTs{}, ValTs{});
 }
