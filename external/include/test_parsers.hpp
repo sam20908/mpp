@@ -242,6 +242,11 @@ auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
 	return { std::move(mat), std::move(blocks) };
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100) // @NOTE: MSVC Bug with unreferenced parameters when it clearly references them
+#endif
+
 template<std::size_t I, std::size_t Size, template<typename> typename... TempTs, typename... ValTs, typename... Fns>
 auto parse_mats_out_impl(std::ifstream& file,
 	std::string& line,
@@ -263,6 +268,10 @@ auto parse_mats_out_impl(std::ifstream& file,
 		return parse_mats_out_impl<I + 1, Size>(file, line, out, fns, temp_ts, val_ts);
 	}
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 // @NOTE: MSVC bug when this is a lambda because it doesn't like extracting class template packs inside lambda template
 // syntax
