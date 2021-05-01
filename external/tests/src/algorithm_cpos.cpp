@@ -157,8 +157,8 @@ int main()
 {
 	feature("Determinant") = []() {
 		test_det<int, int>("algorithm/det/0x0.txt");
-		test_det<long, long>("algorithm/det/1x1.txt"); // @NOTE: MSVC requires long but other compilers don't
-		test_det<int, long>("algorithm/det/2x2.txt");
+		test_det<int, int>("algorithm/det/1x1.txt");
+		test_det<int, double>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
 		test_det<int, int>("algorithm/det/3x3.txt");
 		test_det<int, double>("algorithm/det/10x10.txt");
 	};
