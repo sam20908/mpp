@@ -34,6 +34,8 @@
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
+#include "utility.hpp"
+
 #include <compare>
 #include <cstddef>
 #include <functional>
@@ -50,11 +52,6 @@ struct overloaded : Ts...
 
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
-
-template<typename>
-struct type
-{
-};
 
 template<typename Fn, typename... BackArgs>
 struct bind_back_wrap
@@ -96,7 +93,7 @@ using dyn_mats_t = std::tuple<mpp::matrix<Val, mpp::dynamic, mpp::dynamic, Ts...
 	mpp::matrix<Val, Rows, mpp::dynamic, Ts...>,
 	mpp::matrix<Val, mpp::dynamic, Columns, Ts...>>;
 
-inline auto fwd_args = []<typename T>(::type<T>, auto&&... args) {
+inline auto fwd_args = []<typename T>(types<T>, auto&&... args) {
 	return T{ args... };
 };
 
@@ -194,7 +191,7 @@ auto create_mats(const auto& fn)
 
 	const auto tup = [&]<std::size_t... Idx>(std::index_sequence<Idx...>)
 	{
-		return std::tuple{ fn(::type<std::tuple_element_t<Idx, tup_t>>{})... };
+		return std::tuple{ fn(types<std::tuple_element_t<Idx, tup_t>>{})... };
 	}
 	(std::make_index_sequence<std::tuple_size_v<tup_t>>{});
 

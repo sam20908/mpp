@@ -175,16 +175,16 @@ int main()
 
 		const auto out = parse_vec2d_out("initialization/2x3_iota.txt");
 		const auto tup =
-			create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](type<mpp::matrix<int, 2, 3>>) {
+			create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
 																   return mpp::matrix<int, 2, 3>{ iota_fn() };
 															   },
-				[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+				[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 					return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, iota_fn() };
 				},
-				[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+				[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 					return mpp::matrix<int, mpp::dynamic, 3>{ 2, iota_fn() };
 				},
-				[&](type<mpp::matrix<int, 2, mpp::dynamic>>) {
+				[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
 					return mpp::matrix<int, 2, mpp::dynamic>{ 3, iota_fn() };
 				} }));
 
@@ -195,16 +195,16 @@ int main()
 
 	feature("Value initialization") = []() {
 		const auto out = parse_vec2d_out("initialization/2x3_val_init.txt");
-		const auto tup = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](type<mpp::matrix<int, 2, 3>>) {
+		const auto tup = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
 																				return mpp::matrix<int, 2, 3>{ 1 };
 																			},
-			[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 				return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, 1 };
 			},
-			[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 				return mpp::matrix<int, mpp::dynamic, 3>{ 2, 1 };
 			},
-			[&](type<mpp::matrix<int, 2, mpp::dynamic>>) {
+			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
 				return mpp::matrix<int, 2, mpp::dynamic>{ 3, 1 };
 			} }));
 
@@ -218,16 +218,16 @@ int main()
 
 		when("We don't use unsafe") = [&]() {
 			const auto tup =
-				create_mats<int, 3, 3, all_mats_t>(args(overloaded{ [&](type<mpp::matrix<int, 3, 3>>) {
+				create_mats<int, 3, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 3, 3>>) {
 																	   return mpp::matrix<int, 3, 3>{ mpp::identity };
 																   },
-					[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity };
 					},
-					[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 						return mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity };
 					},
-					[&](type<mpp::matrix<int, 3, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, 3, mpp::dynamic>>) {
 						return mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity };
 					} }));
 
@@ -238,16 +238,16 @@ int main()
 
 		when("We do use unsafe") = [&]() {
 			const auto tup = create_mats<int, 3, 3, all_mats_t>(
-				args(overloaded{ [&](type<mpp::matrix<int, 3, 3>>) {
+				args(overloaded{ [&](types<mpp::matrix<int, 3, 3>>) {
 									return mpp::matrix<int, 3, 3>{ mpp::identity, mpp::unsafe };
 								},
-					[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity, mpp::unsafe };
 					},
-					[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 						return mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity, mpp::unsafe };
 					},
-					[&](type<mpp::matrix<int, 3, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, 3, mpp::dynamic>>) {
 						return mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity, mpp::unsafe };
 					} }));
 
@@ -261,16 +261,16 @@ int main()
 		when("Without custom allocator") = [&]() {
 			const auto tup      = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
 			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](type<mpp::matrix<int, 2, 3>>) {
+				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
 									return mpp::matrix<int, 2, 3>{ std::get<0>(tup) };
 								},
-					[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::get<1>(tup) };
 					},
-					[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 						return mpp::matrix<int, mpp::dynamic, 3>{ std::get<2>(tup) };
 					},
-					[&](type<mpp::matrix<int, 2, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
 						return mpp::matrix<int, 2, mpp::dynamic>{ std::get<3>(tup) };
 					} }));
 
@@ -283,14 +283,14 @@ int main()
 			const auto allocator = custom_allocator<int>{};
 			const auto tup       = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
 			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(overloaded{
-                [&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
                     return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::get<0>(tup),
                         allocator };
                 },
-                [&](type<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
                     return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::get<1>(tup), allocator };
                 },
-                [&](type<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
                     return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::get<2>(tup), allocator };
                 } }));
 
@@ -304,16 +304,16 @@ int main()
 		when("Without custom allocator") = [&]() {
 			auto tup            = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
 			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](type<mpp::matrix<int, 2, 3>>) {
+				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
 									return mpp::matrix<int, 2, 3>{ std::move(std::get<0>(tup)) };
 								},
-					[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(std::get<1>(tup)) };
 					},
-					[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 						return mpp::matrix<int, mpp::dynamic, 3>{ std::move(std::get<2>(tup)) };
 					},
-					[&](type<mpp::matrix<int, 2, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
 						return mpp::matrix<int, 2, mpp::dynamic>{ std::move(std::get<3>(tup)) };
 					} }));
 
@@ -326,17 +326,17 @@ int main()
 			const auto allocator = custom_allocator<int>{};
 			auto tup             = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
 			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(
-                args(overloaded{ [&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
+                args(overloaded{ [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
                                     return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{
                                         std::move(std::get<0>(tup)),
                                         allocator
                                     };
                                 },
-                    [&](type<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
+                    [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
                         return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::move(std::get<1>(tup)),
                             allocator };
                     },
-                    [&](type<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
+                    [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
                         return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::move(std::get<2>(tup)),
                             allocator };
                     } }));
@@ -351,16 +351,16 @@ int main()
 		when("Without custom allocator") = [&]() {
 			const auto tup      = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
 			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](type<mpp::matrix<int, 2, 3>>) {
+				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
 									return mpp::matrix<int, 2, 3>{ std::get<3>(tup) };
 								},
-					[&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
 						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::get<2>(tup) };
 					},
-					[&](type<mpp::matrix<int, mpp::dynamic, 3>>) {
+					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
 						return mpp::matrix<int, mpp::dynamic, 3>{ std::get<1>(tup) };
 					},
-					[&](type<mpp::matrix<int, 2, mpp::dynamic>>) {
+					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
 						return mpp::matrix<int, 2, mpp::dynamic>{ std::get<0>(tup) };
 					} }));
 
@@ -373,14 +373,14 @@ int main()
 			const auto allocator = custom_allocator<int>{};
 			const auto tup       = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
 			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(overloaded{
-                [&](type<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
                     return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::get<2>(tup),
                         allocator };
                 },
-                [&](type<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
                     return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::get<0>(tup), allocator };
                 },
-                [&](type<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
+                [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
                     return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::get<1>(tup), allocator };
                 } }));
 

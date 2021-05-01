@@ -121,7 +121,7 @@ int main()
 		return a - b;
 	});
 
-	test_mat_op<int, 2, 3, int, 3, 1, int, 2, 1>("arithmetic/2x3*3x1.txt", [](const auto& a, const auto& b) {
+	test_mat_op<int, 2, 3, int, 3, 1, int, 2, 1>("arithmetic/2x3_3x1_multiply.txt", [](const auto& a, const auto& b) {
 		return a * b;
 	});
 
