@@ -99,6 +99,10 @@ inline auto vec1d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
 	return data[0];
 };
 
+inline auto val_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
+	return data[0][0];
+};
+
 template<typename T>
 using mat_t = mpp::matrix<T>;
 
@@ -107,6 +111,9 @@ using vec2d_t = std::vector<std::vector<T>>;
 
 template<typename T>
 using vec1d_t = std::vector<T>;
+
+template<typename T>
+using val_t = T;
 
 template<typename... Ts>
 struct types
