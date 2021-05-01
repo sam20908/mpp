@@ -1,7 +1,0 @@
-RowsExtent: 2
-ColumnsExtent: 3
-Rows: 2
-Columns: 3
-2 4 6
-8 10 12
-
