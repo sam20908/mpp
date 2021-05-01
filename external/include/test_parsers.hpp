@@ -135,8 +135,8 @@ auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, s
 	 * it (just vec[0]). This was meant to be as generic as possible
 	 */
 
-	auto data   = std::vector<std::vector<T>>{};
-	auto val_fn = str_fn<T>();
+	auto data       = std::vector<std::vector<T>>{};
+	auto str_val_fn = str_fn<T>();
 
 	data.reserve(rows);
 
@@ -155,7 +155,7 @@ auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, s
 
 		while (std::getline(stream, val_str, ' '))
 		{
-			row.push_back(val_fn(val_str));
+			row.push_back(str_val_fn(val_str));
 		}
 
 		data.push_back(std::move(row));
