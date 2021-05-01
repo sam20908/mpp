@@ -86,7 +86,7 @@ namespace mpp
 
 			// We can't directly cast because that would round down floating points
 			// @TODO: Analyze if other algorithms that uses determinant need this treatment
-			return static_cast<To>(det);
+			return static_cast<To>(std::round(det));
 		}
 	} // namespace detail
 
