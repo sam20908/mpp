@@ -52,7 +52,7 @@ if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
-        EXECUTABLE "" # Invoke nothing to avoid test failure workarounds (which would have return code of NOT 0)
+        EXECUTABLE lit bin/tests # @FIXME: Find a way to workaround failures of tests
         EXCLUDE "${PROJECT_SOURCE_DIR}/external/*"
         DEPENDENCIES "tests")
 endif()
