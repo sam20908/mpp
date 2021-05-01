@@ -264,16 +264,18 @@ auto parse_mats_out_impl(std::ifstream& file,
 	}
 }
 
+// @NOTE: MSVC bug when this is a lambda because it doesn't like extracting class template packs inside lambda template
+// syntax
+template<template<typename> typename... TempTs2, typename... ValTs2>
+auto create_corresponding_tup(temp_types<TempTs2...>, types<ValTs2...>)
+{
+	return std::tuple<TempTs2<ValTs2>...>{};
+}
+
 template<typename TempTs, typename ValTs, typename... Fns>
 auto parse_mats_out(const std::filesystem::path& path, const std::tuple<Fns...>& fns)
 {
-	auto out = []<template<typename> typename... TempTs2, typename... ValTs2>(temp_types<TempTs2...>, types<ValTs2...>)
-	{
-		// Lambda to expand out arguments packed inside temp_types and types
-
-		return std::tuple<TempTs2<ValTs2>...>{};
-	}
-	(TempTs{}, ValTs{});
+	auto out = create_corresponding_tup(TempTs{}, ValTs{});
 
 	auto line = std::string{};
 	auto file = std::ifstream(path);
