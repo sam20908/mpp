@@ -70,7 +70,7 @@ jobs:
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -101,7 +101,7 @@ jobs:
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -135,7 +135,7 @@ jobs:
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -168,7 +168,7 @@ jobs:
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
