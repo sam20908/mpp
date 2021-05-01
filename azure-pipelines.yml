@@ -4,7 +4,7 @@ jobs:
   - job: FormatValidation
     displayName: Format Validation
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -20,7 +20,7 @@ jobs:
     displayName: Code Coverage
 
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -52,7 +52,7 @@ jobs:
     displayName: Ubuntu GCC 10
 
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -83,7 +83,7 @@ jobs:
     displayName: Ubuntu Clang 11
 
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
