@@ -33,14 +33,6 @@
 #include <memory>
 #include <vector>
 
-namespace boost::ut
-{
-	constexpr auto operator""_bf(const char*, decltype(sizeof("")))
-	{
-		return detail::integral_constant<false>{};
-	}
-} // namespace boost::ut
-
 int main()
 {
 	// @NOTE: Comparisons are covered by utility_cpos.cpp
@@ -164,10 +156,10 @@ int main()
 	};
 
 	feature(".empty()") = [&]() {
-		expect(mat_1.empty() == "false"_bf);
-		expect(mat_2.empty() == "false"_bf);
-		expect(mat_3.empty() == "false"_bf);
-		expect(mat_4.empty() == "false"_bf);
+		expect(mat_1.empty() != "true"_b);
+		expect(mat_2.empty() != "true"_b);
+		expect(mat_3.empty() != "true"_b);
+		expect(mat_4.empty() != "true"_b);
 	};
 
 	feature(".max_size()") = [&]() {
