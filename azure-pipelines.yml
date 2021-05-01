@@ -95,7 +95,6 @@ jobs:
 
   - job: WindowsMSVC
     # @TODO: Remove this condition once #245 is resolved (VS 16.10.2 is shipped in CI)
-    condition: false
     displayName: Windows MSVC 19.28 (VS 16.9.0)
 
     pool:
