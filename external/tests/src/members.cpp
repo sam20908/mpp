@@ -69,6 +69,8 @@ int main()
 
 	feature(".front()") = [&]() {
 		given("We're only reading the data") = [&]() {
+			::boost::ut::log << mat_1.front();
+			::boost::ut::log << mat_1(0, 1);
 			expect(mat_1.front() == 1_i);
 			expect(mat_2.front() == 1_i);
 			expect(mat_3.front() == 1_i);
