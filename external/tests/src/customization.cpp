@@ -129,7 +129,7 @@ int main()
 	using namespace boost::ut::bdd;
 	using namespace boost::ut;
 
-	"customization"_test = []() {
+	feature("Customization") = []() {
 		when("I check the new extents through the default matrix type") = []() {
 			expect(constant<mpp::matrix<int>::rows_extent() == 10_ul>);
 			expect(constant<mpp::matrix<int>::columns_extent() == 10_ul>);

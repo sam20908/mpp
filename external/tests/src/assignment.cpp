@@ -22,8 +22,7 @@
 #pragma warning(disable : 4459)
 #endif
 
-#define APPROVALS_UT
-#include <ApprovalTests.hpp>
+#include <boost/ut.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -31,312 +30,205 @@
 
 #include <mpp/matrix.hpp>
 
-#include "../../include/approvals_string_maker.hpp"
+#include "../../include/test_parsers.hpp"
+#include "../../include/utility.hpp"
 
 #include <initializer_list>
 #include <vector>
+
+using namespace boost::ut::bdd;
+
+template<typename Val, template<typename> typename Mat>
+static void test_assign_rng(const std::string& file)
+{
+	const auto result = parse_mats_out<temp_types<mat_t, vec2d_t, mat_t>, types<Val, Val, Val>>(get_filepath(file),
+		std::tuple{ mat_fn, vec2d_fn, mat_fn });
+	auto expand_rng   = std::get<1>(result);
+	const auto end    = std::get<2>(result);
+
+	when("Copy assignment") = [&]() {
+		auto start = std::get<0>(result);
+		start      = expand_rng;
+		cmp_mat_to_expr_like(start, end);
+	};
+
+	when("Move assignment") = [&]() {
+		auto start = std::get<0>(result);
+		start      = std::move(expand_rng);
+		cmp_mat_to_expr_like(start, end);
+	};
+}
+
+template<typename Val>
+static void test_assign_mat(const std::string& file)
+{
+	const auto result = parse_mats_out<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
+		std::tuple{ vec2d_fn, vec2d_fn });
+
+	const auto rng          = std::get<0>(result);
+	const auto expected_rng = std::get<1>(result);
+	auto tup                = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
+
+	when("Copy assignment") = [&]() {
+		const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
+																					 auto temp =
+																						 mpp::matrix<int, 2, 3>{};
+																					 temp = std::get<0>(tup);
+																					 return temp;
+																				 },
+			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+				temp      = std::get<1>(tup);
+				return temp;
+			},
+			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, 3>{};
+				temp      = std::get<2>(tup);
+				return temp;
+			},
+			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, 2, mpp::dynamic>{};
+				temp      = std::get<3>(tup);
+				return temp;
+			} }));
+
+		for_each_in_tup(tup_copy, [&](const auto& mat) {
+			cmp_mat_to_rng(mat, expected_rng);
+		});
+	};
+
+	when("Move assignment") = [&]() {
+		const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
+																					 auto temp =
+																						 mpp::matrix<int, 2, 3>{};
+																					 temp = std::move(std::get<0>(tup));
+																					 return temp;
+																				 },
+			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+				temp      = std::move(std::get<1>(tup));
+				return temp;
+			},
+			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, 3>{};
+				temp      = std::move(std::get<2>(tup));
+				return temp;
+			},
+			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, 2, mpp::dynamic>{};
+				temp      = std::move(std::get<3>(tup));
+				return temp;
+			} }));
+
+		for_each_in_tup(tup_copy, [&](const auto& mat) {
+			cmp_mat_to_rng(mat, expected_rng);
+		});
+	};
+}
+
+template<typename Val>
+static void test_assign_mat_different(const std::string& file)
+{
+	// Similar to test_assign_mat_different but assigning to different kinds of matrices
+
+	const auto result = parse_mats_out<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
+		std::tuple{ vec2d_fn, vec2d_fn });
+
+	const auto rng          = std::get<0>(result);
+	const auto expected_rng = std::get<1>(result);
+	auto tup                = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
+
+	when("Copy assignment") = [&]() {
+		const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
+																					 auto temp =
+																						 mpp::matrix<int, 2, 3>{};
+																					 temp = std::get<3>(tup);
+																					 return temp;
+																				 },
+			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+				temp      = std::get<2>(tup);
+				return temp;
+			},
+			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, 3>{};
+				temp      = std::get<1>(tup);
+				return temp;
+			},
+			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, 2, mpp::dynamic>{};
+				temp      = std::get<0>(tup);
+				return temp;
+			} }));
+
+		for_each_in_tup(tup_copy, [&](const auto& mat) {
+			cmp_mat_to_rng(mat, expected_rng);
+		});
+	};
+
+	when("Move assignment") = [&]() {
+		const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
+																					 auto temp =
+																						 mpp::matrix<int, 2, 3>{};
+																					 temp = std::move(std::get<3>(tup));
+																					 return temp;
+																				 },
+			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
+				temp      = std::move(std::get<2>(tup));
+				return temp;
+			},
+			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
+				auto temp = mpp::matrix<int, mpp::dynamic, 3>{};
+				temp      = std::move(std::get<1>(tup));
+				return temp;
+			},
+			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
+				auto temp = mpp::matrix<int, 2, mpp::dynamic>{};
+				temp      = std::move(std::get<0>(tup));
+				return temp;
+			} }));
+
+		for_each_in_tup(tup_copy, [&](const auto& mat) {
+			cmp_mat_to_rng(mat, expected_rng);
+		});
+	};
+}
+
+template<typename T>
+using fixed_mat_t = mpp::matrix<T, 2, 3>;
+
+template<typename T>
+using dyn_mat_t = mpp::matrix<T>;
+
+template<typename T>
+using dyn_row_mat_t = mpp::matrix<T, mpp::dynamic, 3>;
+
+template<typename T>
+using dyn_column_mat_t = mpp::matrix<T, 2, mpp::dynamic>;
 
 int main()
 {
 	// @NOTE: This covers copy and move assignment from rule of five (2/5)
 
-	using namespace boost::ut::bdd;
-	using namespace ApprovalTests;
-
-	using MatrixApprover       = TApprovals<ToStringCompileTimeOptions<expr_string_maker<false>>>;
-	using MatrixExtentApprover = TApprovals<ToStringCompileTimeOptions<expr_string_maker<true>>>;
-
-	auto subdirectory_disposer = Approvals::useApprovalsSubdirectory("../approval_tests");
-
-	// @NOTE: We need to define the range in the lambdas because the topmost lambda can't have captured notation,
-	// otherwise ApprovalTests can't find the source file
-	// Tracked by:https://github.com/approvals/ApprovalTests.cpp/issues/177
-
-	scenario("Assigning from a bigger 2D range") = []() {
-		// Test insertion machinery
-
-		when("Given a 2D initializer list") = []() {
-			const auto big_range_2d =
-				std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
-
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			auto matrix_3 = mpp::matrix<int, 10, mpp::dynamic>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 10>{};
-
-			matrix_2 = big_range_2d;
-			matrix_3 = big_range_2d;
-			matrix_4 = big_range_2d;
-
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
-		};
-
-		when("Given a 2D vector") = []() {
-			const auto big_range_2d = std::vector<std::vector<int>>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
-
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-			auto matrix_3 = mpp::matrix<int, 10, mpp::dynamic>{};
-			auto matrix_4 = mpp::matrix<int, mpp::dynamic, 10>{};
-
-			matrix_2 = big_range_2d;
-			matrix_3 = big_range_2d;
-			matrix_4 = big_range_2d;
-
-			MatrixApprover::verify(matrix_2);
-			MatrixApprover::verify(matrix_3);
-			MatrixApprover::verify(matrix_4);
-		};
+	feature("Expanding dynamic matrices") = []() {
+		test_assign_rng<int, dyn_mat_t>("assignment/expand_dyn_mat.txt");
+		test_assign_rng<int, dyn_row_mat_t>("assignment/expand_dyn_row_mat.txt");
+		test_assign_rng<int, dyn_column_mat_t>("assignment/expand_dyn_column_mat.txt");
 	};
 
-	// These shrinking tests are also assignment tests
-
-	when("Shrinking a fully dynamic matrix") = []() {
-		const auto big_range_2d = std::vector<std::vector<int>>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
-
-		const auto small_range_2d = std::vector<std::vector<int>>{};
-
-		auto matrix = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ big_range_2d };
-		matrix      = small_range_2d;
-
-		MatrixApprover::verify(matrix);
+	feature("Expanding dynamic matrices") = []() {
+		test_assign_rng<int, dyn_mat_t>("assignment/shrink_dyn_mat.txt");
+		test_assign_rng<int, dyn_row_mat_t>("assignment/shrink_dyn_row_mat.txt");
+		test_assign_rng<int, dyn_column_mat_t>("assignment/shrink_dyn_column_mat.txt");
 	};
 
-	when("Shrinking a dynamic rows matrix") = []() {
-		const auto big_range_2d = std::vector<std::vector<int>>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
-
-		const auto small_range_2d = std::vector<std::vector<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
-
-		auto matrix = mpp::matrix<int, mpp::dynamic, 10>{ big_range_2d };
-		matrix      = small_range_2d;
-
-		MatrixApprover::verify(matrix);
+	feature("Assigning for fixed matrices") = []() {
+		test_assign_rng<int, fixed_mat_t>("assignment/assign_fixed_mat.txt");
 	};
 
-	when("Shrinking a dynamic columns matrix") = []() {
-		const auto big_range_2d = std::vector<std::vector<int>>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-			{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
-
-		const auto small_range_2d =
-			std::vector<std::vector<int>>{ { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
-
-		auto matrix = mpp::matrix<int, 10, mpp::dynamic>{ big_range_2d };
-		matrix      = small_range_2d;
-
-		MatrixApprover::verify(matrix);
-	};
-
-	when("Assigning a fully static matrix") = []() {
-		given("A 2D initializer list") = []() {
-			const auto initializer_list_2d =
-				std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-					{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
-
-			auto matrix = mpp::matrix<int, 10, 10>{};
-			matrix      = initializer_list_2d;
-
-			MatrixExtentApprover::verify(matrix);
-		};
-
-		given("A 2D array") = []() {
-			auto range_2d = std::array<std::array<int, 10>, 10>{ { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } } };
-
-			then("We copy assign it") = [&]() {
-				auto matrix = mpp::matrix<int, 10, 10>{};
-				matrix      = range_2d;
-
-				MatrixExtentApprover::verify(matrix);
-			};
-
-			then("We move assign it") = [&]() {
-				auto matrix = mpp::matrix<int, 10, 10>{};
-				matrix      = std::move(range_2d);
-
-				MatrixExtentApprover::verify(matrix);
-			};
-		};
-
-		given("A 2D vector") = []() {
-			const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 11, 22, 33, 44, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
-				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } };
-
-			auto matrix = mpp::matrix<int, 10, 10>{};
-			matrix      = range_2d;
-
-			MatrixExtentApprover::verify(matrix);
-		};
-	};
-
-	feature("Copy assignment") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-		when("Copy assigning a fully static matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, 2, 3>{};
-
-			matrix_2 = matrix_1;
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Copy assigning a fully dynamic matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-
-			matrix_2 = matrix_1;
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Copy assigning a dynamic rows matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, mpp::dynamic, 3>{};
-
-			matrix_2 = matrix_1;
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Copy assigning a dynamic columns matrix") = [&]() {
-			const auto matrix_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-			auto matrix_2       = mpp::matrix<int, 2, mpp::dynamic>{};
-
-			matrix_2 = matrix_1;
-
-			MatrixApprover::verify(matrix_2);
-		};
-	};
-
-	feature("Move assignment") = []() {
-		const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-		when("Move assigning a fully static matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, 2, 3>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, 2, 3>{};
-
-			matrix_2 = std::move(matrix_1);
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Move assigning a fully dynamic matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-
-			matrix_2 = std::move(matrix_1);
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Move assigning a dynamic rows matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, mpp::dynamic, 3>{};
-
-			matrix_2 = std::move(matrix_1);
-
-			MatrixApprover::verify(matrix_2);
-		};
-
-		when("Move assigning a dynamic columns matrix") = [&]() {
-			auto matrix_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-			auto matrix_2 = mpp::matrix<int, 2, mpp::dynamic>{};
-
-			matrix_2 = std::move(matrix_1);
-
-			MatrixApprover::verify(matrix_2);
-		};
-	};
-
-	feature("Different matrix type assignment") = []() {
-		const auto matrix_1 = mpp::matrix<int, 0, 0>{};
-		const auto matrix_2 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{};
-		const auto matrix_3 = mpp::matrix<int, 0, mpp::dynamic>{};
-		const auto matrix_4 = mpp::matrix<int, mpp::dynamic, 0>{};
-
-		auto matrix_1_dummy = mpp::matrix<int, 0, 0>{ std::move(matrix_4) };
-		auto matrix_2_dummy = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(matrix_3) };
-		auto matrix_3_dummy = mpp::matrix<int, 0, mpp::dynamic>{ std::move(matrix_2) };
-		auto matrix_4_dummy = mpp::matrix<int, mpp::dynamic, 0>{ std::move(matrix_1) };
-
-		matrix_1_dummy = matrix_4;
-		matrix_2_dummy = matrix_3;
-		matrix_3_dummy = matrix_2;
-		matrix_4_dummy = matrix_1;
-
-		MatrixApprover::verify(matrix_1_dummy);
-		MatrixApprover::verify(matrix_2_dummy);
-		MatrixApprover::verify(matrix_3_dummy);
-		MatrixApprover::verify(matrix_4_dummy);
-	};
+	test_assign_mat<int>("assignment/assign_mat.txt");
+	test_assign_mat_different<int>("assignment/assign_mat.txt");
 
 	return 0;
 }

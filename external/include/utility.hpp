@@ -30,77 +30,170 @@
 #pragma warning(pop)
 #endif
 
+
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
+#include "utility.hpp"
+
 #include <compare>
 #include <cstddef>
+#include <functional>
+#include <tuple>
 #include <type_traits>
 
 using namespace boost::ut;
 
-void compare_matrix_to_range_2d(const auto& matrix, const auto& range_2d, std::size_t rows, std::size_t columns)
+template<class... Ts>
+struct overloaded : Ts...
 {
-	expect(matrix.rows() == rows);
-	expect(matrix.columns() == columns);
+	using Ts::operator()...;
+};
 
-	using matrix_value_t   = typename std::remove_cvref_t<decltype(matrix)>::value_type;
-	using range_2d_value_t = typename std::remove_cvref_t<decltype(range_2d)>::value_type::value_type;
-	using ordering_type    = std::compare_three_way_result_t<matrix_value_t, range_2d_value_t>;
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
 
-	auto all_elems_equal = true;
+template<typename Fn, typename... BackArgs>
+struct bind_back_wrap
+{
+	/**
+	 * @NOTE: Cannot use abbreviated function template parameters
+	 * Issue tracked at https://github.com/microsoft/vscode-cpptools/issues/7446
+	 */
 
-	for (auto row = std::size_t{}; row < rows; ++row)
+	const Fn& fn;
+	std::tuple<BackArgs...> back_args;
+
+	template<typename... Args>
+	constexpr bind_back_wrap(const Fn& fn, Args&&... args) : fn(fn), back_args{ std::forward<Args>(args)... }
 	{
-		for (auto column = std::size_t{}; column < columns; ++column)
+	}
+
+	template<typename... Args>
+	constexpr auto operator()(Args&&... args) const
+	{
+		return std::apply(fn, std::tuple_cat(std::forward_as_tuple(std::forward<Args>(args)...), back_args));
+	}
+};
+
+template<typename Fn, typename... Args>
+constexpr auto bind_back(const Fn& fn, Args&&... args)
+{
+	return bind_back_wrap<Fn, Args...>(fn, std::forward<Args>(args)...);
+}
+
+template<typename Val, std::size_t Rows, std::size_t Columns, typename... Ts>
+using all_mats_t = std::tuple<mpp::matrix<Val, Rows, Columns, Ts...>,
+	mpp::matrix<Val, mpp::dynamic, mpp::dynamic, Ts...>,
+	mpp::matrix<Val, Rows, mpp::dynamic, Ts...>,
+	mpp::matrix<Val, mpp::dynamic, Columns, Ts...>>;
+
+template<typename Val, std::size_t Rows, std::size_t Columns, typename... Ts>
+using dyn_mats_t = std::tuple<mpp::matrix<Val, mpp::dynamic, mpp::dynamic, Ts...>,
+	mpp::matrix<Val, Rows, mpp::dynamic, Ts...>,
+	mpp::matrix<Val, mpp::dynamic, Columns, Ts...>>;
+
+inline auto fwd_args = []<typename T>(types<T>, auto&&... args) {
+	return T{ args... };
+};
+
+inline auto args = [](const auto& fn, auto&&... args) {
+	return bind_back(fn, std::forward<decltype(args)>(args)...);
+};
+
+void cmp_mat_to_rng(const auto& mat, const auto& rng)
+{
+	using mat_val_t = typename std::remove_cvref_t<decltype(mat)>::value_type;
+	using rng_val_t = typename std::remove_cvref_t<decltype(rng)>::value_type::value_type;
+	using ordering  = std::compare_three_way_result_t<mat_val_t, rng_val_t>;
+
+	const auto expected_rows    = rng.size();
+	const auto expected_columns = expected_rows == 0 ? 0 : rng[0].size();
+
+	const auto rows_is_eq    = mat.rows() == expected_rows;
+	const auto columns_is_eq = mat.columns() == expected_columns;
+
+	expect(rows_is_eq);
+	expect(columns_is_eq);
+
+	if (!rows_is_eq || !columns_is_eq)
+	{
+		return; // Avoid accessing out of bounds
+	}
+
+	for (auto row = std::size_t{}; row < expected_rows; ++row)
+	{
+		for (auto column = std::size_t{}; column < expected_columns; ++column)
 		{
-			if (mpp::floating_point_compare(matrix(row, column), range_2d[row][column]) != ordering_type::equivalent)
+			if (mpp::floating_point_compare(mat(row, column), rng[row][column]) != ordering::equivalent)
 			{
-				all_elems_equal = false;
+				expect(false); // Elements are not equal
 				break;
 			}
 		}
 	}
 
-	expect(all_elems_equal);
+	expect(true);
 }
 
-void compare_expr_to_range_2d(const auto& expr, const auto& range_2d, std::size_t rows, std::size_t columns)
+
+void cmp_mat_to_expr_like(const auto& mat, const auto& expr)
 {
-	expect(expr.rows() == rows);
-	expect(expr.columns() == columns);
+	using mat_val_t  = typename std::remove_cvref_t<decltype(mat)>::value_type;
+	using expr_val_t = typename std::remove_cvref_t<decltype(expr)>::value_type;
+	using ordering   = std::compare_three_way_result_t<mat_val_t, expr_val_t>;
 
-	using expr_value_t     = typename std::remove_cvref_t<decltype(expr)>::value_type;
-	using range_2d_value_t = typename std::remove_cvref_t<decltype(range_2d)>::value_type::value_type;
-	using ordering_type    = std::compare_three_way_result_t<expr_value_t, range_2d_value_t>;
+	const auto rows_is_eq    = mat.rows() == expr.rows();
+	const auto columns_is_eq = mat.columns() == expr.columns();
 
-	auto all_elems_equal = true;
+	expect(rows_is_eq);
+	expect(columns_is_eq);
 
-	for (auto row = std::size_t{}; row < rows; ++row)
+	if (!rows_is_eq || !columns_is_eq)
 	{
-		for (auto column = std::size_t{}; column < columns; ++column)
+		return; // Avoid accessing out of bounds
+	}
+
+	for (auto row = std::size_t{}; row < expr.rows(); ++row)
+	{
+		for (auto column = std::size_t{}; column < expr.columns(); ++column)
 		{
-			if (mpp::floating_point_compare(expr(row, column), range_2d[row][column]) != ordering_type::equivalent)
+			if (mpp::floating_point_compare(mat(row, column), expr(row, column)) != ordering::equivalent)
 			{
-				all_elems_equal = false;
+				expect(false); // Elements are not equal
 				break;
 			}
 		}
 	}
 
-	expect(all_elems_equal);
+	expect(true);
 }
 
-void compare_matrix_to_matrix(const auto& left_matrix, const auto& right_matrix)
+template<typename... Ts>
+void for_each_in_tup(const std::tuple<Ts...>& tup, const auto& fn)
 {
-	const auto [row_ordering, column_ordering] = mpp::size_compare(left_matrix, right_matrix, true, true);
+	[&]<std::size_t... Idx>(std::index_sequence<Idx...>)
+	{
+		(fn(std::get<Idx>(tup)), ...);
+	}
+	(std::index_sequence_for<Ts...>{});
+}
 
-	expect(row_ordering == std::partial_ordering::equivalent);
-	expect(column_ordering == std::partial_ordering::equivalent);
+template<typename Val,
+	std::size_t Rows,
+	std::size_t Columns,
+	template<typename, std::size_t, std::size_t, typename...>
+	typename mats_t,
+	typename... Ts>
+auto create_mats(const auto& fn)
+{
+	using tup_t = mats_t<Val, Rows, Columns, Ts...>;
 
-	using ordering_type =
-		std::compare_three_way_result_t<typename std::remove_cvref_t<decltype(left_matrix)>::value_type,
-			typename std::remove_cvref_t<decltype(right_matrix)>::value_type>;
+	const auto tup = [&]<std::size_t... Idx>(std::index_sequence<Idx...>)
+	{
+		return std::tuple{ fn(types<std::tuple_element_t<Idx, tup_t>>{})... };
+	}
+	(std::make_index_sequence<std::tuple_size_v<tup_t>>{});
 
-	expect(mpp::elements_compare(left_matrix, right_matrix, mpp::floating_point_compare) == ordering_type::equivalent);
+	return tup;
 }

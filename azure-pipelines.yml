@@ -4,7 +4,7 @@ jobs:
   - job: FormatValidation
     displayName: Format Validation
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -13,19 +13,14 @@ jobs:
           git clone https://github.com/Sarcasm/run-clang-format
         displayName: Clone run-clang-format
 
-      - script: |
-          sudo apt-get update
-          sudo apt-get install clang-format-11
-        displayName: Install Clang-Format 11
-
       - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include --style file --clang-format-executable=clang-format-11
         displayName: Validate
 
-  - job: UbuntuGCC
-    displayName: Ubuntu GCC 10
+  - job: CodeCoverage
+    displayName: Code Coverage
 
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -42,23 +37,9 @@ jobs:
         displayName: Install GCC Gcovr
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -B build
-          cmake --build build --target tests
-        displayName: Configure and Build Tests
-
-      - script: |
-          cd build/bin/tests
-          lit . --xunit-xml-output results.xml
-        displayName: Run Tests
-
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: JUnit
-          testResultsFiles: "**/results.xml"
-        displayName: Publish Tests Results
-
-      - script: cmake --build build --target mpp_code_coverage
-        displayName: Generate Code Coverage
+          cmake -DMPP_BUILD_TESTS=TRUE -DMPP_CODE_COVERAGE=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -DCMAKE_BUILD_TYPE=Debug -B build
+          cmake --build build --target mpp_code_coverage --config Debug
+        displayName: Configure and Build Code Coverage
 
       - task: PublishCodeCoverageResults@1
         inputs:
@@ -67,11 +48,11 @@ jobs:
           pathToSources: $(Build.SourcesDirectory)
         displayName: Publish Code Coverage
 
-  - job: UbuntuClang
-    displayName: Ubuntu Clang 11
+  - job: UbuntuGCC
+    displayName: Ubuntu GCC 10
 
     pool:
-      vmImage: ubuntu-20.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
@@ -83,13 +64,44 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -B build
-          cmake --build build --target tests
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -DCMAKE_BUILD_TYPE=Release -B build
+          cmake --build build --target tests --config Release
         displayName: Configure and Build Tests
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
+        displayName: Run Tests
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: "**/results.xml"
+        displayName: Publish Tests Results
+
+  - job: UbuntuClang
+    displayName: Ubuntu Clang 11
+
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      # @TODO: Don't install release candidate once LLVM 12 officially releases
+      - script: |
+          pip3 install lit==12.0.0rc1 --no-warn-script-location
+          echo '##vso[task.prependpath]$(HOME)/.local/bin'
+        displayName: Install Python LLVM Lit
+
+      - script: |
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -DCMAKE_BUILD_TYPE=Release -B build
+          cmake --build build --target tests --config Release
+        displayName: Configure and Build Tests
+
+      - script: |
+          cd build/bin/tests
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -100,7 +112,6 @@ jobs:
 
   - job: WindowsMSVC
     # @TODO: Remove this condition once #245 is resolved (VS 16.10.2 is shipped in CI)
-    condition: false
     displayName: Windows MSVC 19.28 (VS 16.9.0)
 
     pool:
@@ -118,13 +129,13 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -B build
-          cmake --build build --target tests
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -B build
+          cmake --build build --target tests --config Release
         displayName: Configure and Build Tests
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2
@@ -151,13 +162,13 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -G Ninja -B build
-          cmake --build build --target tests
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Release -G Ninja -B build
+          cmake --build build --target tests --config Release
         displayName: Configure and Build Tests
 
       - script: |
           cd build/bin/tests
-          lit . --xunit-xml-output results.xml
+          lit . --xunit-xml-output results.xml -v
         displayName: Run Tests
 
       - task: PublishTestResults@2

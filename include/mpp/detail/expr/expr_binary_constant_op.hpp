@@ -38,45 +38,45 @@ namespace mpp::detail
 			RowsExtent,
 			ColumnsExtent>
 	{
-		const Obj& _obj;
-		Value _constant; // Store the constant by copy to handle literals
+		const Obj& obj_;
+		Value val_; // Store the constant by copy to handle literals
 
-		const Op& _op;
+		const Op& op_;
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
-		std::size_t _result_rows;
-		std::size_t _result_columns;
+		std::size_t result_rows_;
+		std::size_t result_columns_;
 
 	public:
 		using value_type = Value;
 
 		expr_binary_constant_op(const Obj& obj,
-			Value constant,
+			Value val,
 			std::size_t result_rows,
 			std::size_t result_columns,
 			const Op& op) // @TODO: ISSUE #20
 			:
-			_obj(obj),
-			_constant(constant),
-			_op(op),
-			_result_rows(result_rows),
-			_result_columns(result_columns)
+			obj_(obj),
+			val_(val),
+			op_(op),
+			result_rows_(result_rows),
+			result_columns_(result_columns)
 		{
 		}
 
 		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _result_rows;
+			return result_rows_;
 		}
 
 		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
 		{
-			return _result_columns;
+			return result_columns_;
 		}
 
 		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
 		{
-			if (row_index >= _result_rows || col_index >= _result_columns)
+			if (row_index >= result_rows_ || col_index >= result_columns_)
 			{
 				throw std::out_of_range("Access out of range!");
 			}
@@ -87,7 +87,7 @@ namespace mpp::detail
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
 			-> value_type // @TODO: ISSUE #20
 		{
-			return _op(_obj, _constant, row_index, col_index);
+			return op_(obj_, val_, row_index, col_index);
 		}
 	};
 } // namespace mpp::detail
