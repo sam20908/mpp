@@ -44,7 +44,10 @@ namespace mpp
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			bool compare_rows,
-			bool compare_columns) -> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
+			bool compare_columns) noexcept(noexcept(std::pair{
+			compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
+			compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered }))
+			-> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
 		{
 			return std::pair{ compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
 				compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered };
@@ -65,7 +68,12 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(elements_compare_t,
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
-			CompareThreeway compare_three_way_fn = {}) // @TODO: ISSUE #20
+			CompareThreeway
+				compare_three_way_fn = {}) noexcept(noexcept(std::lexicographical_compare_three_way(left.begin(),
+			left.end(),
+			right.begin(),
+			right.end(),
+			compare_three_way_fn))) // @TODO: ISSUE #20
 		{
 			return std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
@@ -85,7 +93,7 @@ namespace mpp
 	namespace detail
 	{
 		template<typename T>
-		constexpr auto constexpr_abs(T t) -> T
+		constexpr auto constexpr_abs(T t) noexcept -> T
 		{
 			if (std::is_constant_evaluated())
 			{
@@ -96,8 +104,8 @@ namespace mpp
 		}
 	} // namespace detail
 
-	inline constexpr auto floating_point_compare = []<typename T, typename U>(const T& left,
-													   const U& right) -> std::compare_three_way_result_t<T, U> {
+	inline constexpr auto floating_point_compare =
+		[]<typename T, typename U>(const T& left, const U& right) noexcept -> std::compare_three_way_result_t<T, U> {
 		using common_type   = std::common_type_t<T, U>;
 		using ordering_type = std::compare_three_way_result_t<common_type, common_type>;
 

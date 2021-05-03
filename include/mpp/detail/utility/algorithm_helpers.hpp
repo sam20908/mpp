@@ -31,7 +31,8 @@
 
 namespace mpp::detail
 {
-	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) -> std::size_t
+	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) noexcept
+		-> std::size_t
 	{
 		if (left_extent != dynamic || right_extent != dynamic)
 		{
@@ -106,6 +107,6 @@ namespace mpp::detail
 			}
 		}
 
-		return static_cast<To>(std::round(det));
+		return static_cast<To>(det);
 	}
 } // namespace mpp::detail

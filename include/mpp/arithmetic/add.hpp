@@ -34,8 +34,8 @@ namespace mpp
 		inline constexpr auto add_op = [](const auto& left,
 										   const auto& right,
 										   std::size_t row_index,
-										   std::size_t col_index) -> decltype(left(row_index, col_index) +
-																			  right(row_index, col_index)) {
+										   std::size_t col_index) noexcept -> decltype(left(row_index, col_index) +
+																					   right(row_index, col_index)) {
 			return left(row_index, col_index) + right(row_index, col_index);
 		};
 	} // namespace detail
@@ -49,7 +49,7 @@ namespace mpp
 		std::size_t RightColumnsExtent>
 	[[nodiscard]] inline auto operator+(
 		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
-		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right)
+		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right) noexcept
 		-> detail::expr_binary_op<detail::prefer_static_extent(LeftRowsExtent, RightRowsExtent),
 			detail::prefer_static_extent(LeftColumnsExtent, RightColumnsExtent),
 			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
