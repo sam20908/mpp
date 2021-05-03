@@ -68,12 +68,14 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(elements_compare_t,
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
-			CompareThreeway
-				compare_three_way_fn = {}) noexcept(noexcept(std::lexicographical_compare_three_way(left.begin(),
-			left.end(),
-			right.begin(),
-			right.end(),
-			compare_three_way_fn))) // @TODO: ISSUE #20
+			CompareThreeway compare_three_way_fn = {})
+#ifndef __clang__ // Testing if Clang crashes with this noexcept specification
+			noexcept(noexcept(std::lexicographical_compare_three_way(left.begin(),
+				left.end(),
+				right.begin(),
+				right.end(),
+				compare_three_way_fn)))
+#endif // @TODO: ISSUE #20
 		{
 			return std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
