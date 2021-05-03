@@ -27,7 +27,9 @@ namespace mpp::detail
 	struct cpo_base
 	{
 		template<typename... Args>
-		[[nodiscard]] auto operator()(Args&&... args) const -> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+		[[nodiscard]] auto operator()(Args&&... args) const
+			noexcept(noexcept(tag_invoke_cpo(CPO{}, std::forward<Args>(args)...)))
+				-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
 		{
 			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
 			return tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
