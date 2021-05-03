@@ -390,8 +390,8 @@ namespace mpp::detail
 		using size_type              = std::size_t;
 
 		matrix_base(const matrix_base&) noexcept(
-			std::is_nothrow_copy_constructible_v<Value>)                              = default; // @TODO: ISSUE #20
-		matrix_base(matrix_base&&) noexcept(std::is_nothrow_move_assignable_v<Value>) = default; // @TODO: ISSUE #20
+			std::is_nothrow_copy_constructible_v<Value>)                                 = default; // @TODO: ISSUE #20
+		matrix_base(matrix_base&&) noexcept(std::is_nothrow_move_constructible_v<Value>) = default; // @TODO: ISSUE #20
 
 		auto operator       =(const matrix_base&) noexcept(std::is_nothrow_copy_assignable_v<Value>)
 			-> matrix_base& = default; // @TODO: ISSUE #20
