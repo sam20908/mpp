@@ -46,13 +46,14 @@ namespace mpp::detail
 		using iterator_category = std::contiguous_iterator_tag; // STL doesn't use contiguous iterator tag explicitly,
 																// but we do meet its requirements
 
-		explicit matrix_iterator(Iterator current, std::size_t columns) :
+		explicit matrix_iterator(Iterator current, std::size_t columns) noexcept(
+			std::is_nothrow_copy_constructible_v<Iterator>) :
 			current_(current),
 			columns_(columns) // @TODO: ISSUE #20
 		{
 		}
 
-		matrix_iterator() = default; // @TODO: ISSUE #20
+		matrix_iterator() noexcept(std::is_nothrow_default_constructible_v<Iterator>) = default; // @TODO: ISSUE #20
 
 		[[nodiscard]] auto operator*() -> reference // @TODO: ISSUE #20
 		{
@@ -64,13 +65,13 @@ namespace mpp::detail
 			return *current_;
 		}
 
-		auto operator++() -> matrix_iterator& // @TODO: ISSUE #20
+		auto operator++() noexcept -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			++current_;
 			return *this;
 		}
 
-		auto operator++(int) -> matrix_iterator // @TODO: ISSUE #20
+		auto operator++(int) noexcept -> matrix_iterator // @TODO: ISSUE #20
 		{
 			auto old = matrix_iterator<Iterator>(current_, columns_);
 
@@ -78,7 +79,7 @@ namespace mpp::detail
 			return old;
 		}
 
-		auto operator+=(difference_type n) -> matrix_iterator& // @TODO: ISSUE #20
+		auto operator+=(difference_type n) noexcept -> matrix_iterator& // @TODO: ISSUE #20
 		{
 			current_ += n;
 			return *this;
@@ -151,7 +152,8 @@ namespace mpp::detail
 		[[nodiscard]] auto operator!=(const matrix_iterator&) const -> bool                  = default;
 		[[nodiscard]] auto operator<=>(const matrix_iterator&) const -> std::strong_ordering = default;
 
-		friend inline void swap(matrix_iterator<Iterator>& left, matrix_iterator<Iterator> right) // @TODO: ISSUE #20
+		friend inline void swap(matrix_iterator<Iterator>& left,
+			matrix_iterator<Iterator> right) noexcept // @TODO: ISSUE #20
 		{
 			using std::swap;
 

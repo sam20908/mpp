@@ -54,7 +54,7 @@ namespace mpp::detail
 			const Right& right,
 			std::size_t result_rows,
 			std::size_t result_columns,
-			const Op& op) // @TODO: ISSUE #20
+			const Op& op) noexcept // @TODO: ISSUE #20
 			:
 			left_(left),
 			right_(right),
@@ -64,12 +64,12 @@ namespace mpp::detail
 		{
 		}
 
-		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
 			return result_rows_;
 		}
 
-		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
 			return result_columns_;
 		}
@@ -84,7 +84,7 @@ namespace mpp::detail
 			return operator()(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const noexcept
 			-> value_type // @TODO: ISSUE #20
 		{
 			return op_(left_, right_, row_index, col_index);

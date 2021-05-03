@@ -34,16 +34,16 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline constexpr auto mul_constant_op = [](const auto& left,
-													const auto& right,
-													std::size_t row_index,
-													std::size_t col_index) -> decltype(left(row_index, col_index) *
-																					   right) {
+		inline constexpr auto mul_constant_op =
+			[](const auto& left,
+				const auto& right,
+				std::size_t row_index,
+				std::size_t col_index) noexcept -> decltype(left(row_index, col_index) * right) {
 			return left(row_index, col_index) * right;
 		};
 
 		inline constexpr auto mul_op =
-			[](const auto& left, const auto& right, std::size_t row_index, std::size_t col_index) ->
+			[](const auto& left, const auto& right, std::size_t row_index, std::size_t col_index) noexcept ->
 			typename std::decay_t<decltype(left)>::value_type {
 				using value_type = typename std::decay_t<decltype(left)>::value_type;
 
@@ -61,7 +61,7 @@ namespace mpp
 
 	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
 	[[nodiscard]] inline auto operator*(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant) -> detail::expr_binary_constant_op<RowsExtent,
+		Value constant) noexcept -> detail::expr_binary_constant_op<RowsExtent,
 		ColumnsExtent,
 		detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
 		Value,

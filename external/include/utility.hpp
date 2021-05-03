@@ -44,6 +44,10 @@
 
 using namespace boost::ut;
 
+// Forward declared from test_parsers.hpp
+template<typename...>
+struct types;
+
 template<class... Ts>
 struct overloaded : Ts...
 {
@@ -94,7 +98,7 @@ using dyn_mats_t = std::tuple<mpp::matrix<Val, mpp::dynamic, mpp::dynamic, Ts...
 	mpp::matrix<Val, mpp::dynamic, Columns, Ts...>>;
 
 inline auto fwd_args = []<typename T>(types<T>, auto&&... args) {
-	return T{ args... };
+	return T{ std::forward<decltype(args)>(args)... };
 };
 
 inline auto args = [](const auto& fn, auto&&... args) {

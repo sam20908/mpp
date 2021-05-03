@@ -50,9 +50,9 @@ namespace mpp
 	public:
 		using base::operator=;
 
-		matrix() : base(RowsExtent, 0, Allocator{}) {} // @TODO: ISSUE #20
+		matrix() noexcept(noexcept(Allocator())) : base(RowsExtent, 0, Allocator{}) {} // @TODO: ISSUE #20
 
-		explicit matrix(const Allocator& allocator) : base(RowsExtent, 0, allocator) {} // @TODO: ISSUE #20
+		explicit matrix(const Allocator& allocator) noexcept : base(RowsExtent, 0, allocator) {} // @TODO: ISSUE #20
 
 		matrix(const matrix& right, const Allocator& allocator) :
 			base(right.rows_, right.columns_, right.buffer_, allocator) // @TODO: ISSUE #20

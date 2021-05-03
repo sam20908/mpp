@@ -30,7 +30,7 @@ namespace mpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(square_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> bool // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) noexcept -> bool // @TODO: ISSUE #20
 		{
 			return obj.rows() == obj.columns();
 		}

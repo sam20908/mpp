@@ -31,12 +31,12 @@ namespace mpp::detail
 	class [[nodiscard]] expr_base
 	{
 	protected:
-		[[nodiscard]] constexpr auto expr_obj() const -> const Expr&
+		[[nodiscard]] constexpr auto expr_obj() const noexcept -> const Expr&
 		{
 			return static_cast<const Expr&>(*this);
 		}
 
-		[[nodiscard]] constexpr auto expr_mutable_obj() -> Expr&
+		[[nodiscard]] constexpr auto expr_mutable_obj() noexcept -> Expr&
 		{
 			return static_cast<Expr&>(*this);
 		}
@@ -44,22 +44,22 @@ namespace mpp::detail
 	public:
 		using value_type = Value;
 
-		[[nodiscard]] auto rows() const -> std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto rows() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
 			return expr_obj().rows();
 		}
 
-		[[nodiscard]] auto columns() const -> std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto columns() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
 			return expr_obj().columns();
 		}
 
-		[[nodiscard]] constexpr static auto rows_extent() -> std::size_t
+		[[nodiscard]] constexpr static auto rows_extent() noexcept -> std::size_t
 		{
 			return RowsExtent;
 		}
 
-		[[nodiscard]] constexpr static auto columns_extent() -> std::size_t
+		[[nodiscard]] constexpr static auto columns_extent() noexcept -> std::size_t
 		{
 			return ColumnsExtent;
 		}
@@ -74,7 +74,7 @@ namespace mpp::detail
 			return expr_obj().at(row_index, col_index);
 		}
 
-		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const
+		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const noexcept
 			-> value_type // @TODO: ISSUE #20
 		{
 			return expr_obj()(row_index, col_index);

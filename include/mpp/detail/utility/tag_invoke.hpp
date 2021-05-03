@@ -32,7 +32,8 @@ namespace mpp::detail
 	{
 		template<typename CPO, typename... Args>
 		[[nodiscard]] auto operator()(CPO&& cpo, Args&&... args) const
-			-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+			noexcept(noexcept(tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...)))
+				-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
 		{
 			return tag_invoke(std::forward<CPO>(cpo), std::forward<Args>(args)...);
 		}
