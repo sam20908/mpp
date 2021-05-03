@@ -64,8 +64,8 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -DCMAKE_BUILD_TYPE=Release -B build
-          cmake --build build --target tests --config Release
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/g++-10 -DCMAKE_BUILD_TYPE=Debug -B build
+          cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
       - script: |
@@ -95,8 +95,8 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -DCMAKE_BUILD_TYPE=Release -B build
-          cmake --build build --target tests --config Release
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -DCMAKE_BUILD_TYPE=Debug -B build
+          cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
       - script: |
@@ -129,8 +129,8 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Release -B build
-          cmake --build build --target tests --config Release
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=cl -DCMAKE_BUILD_TYPE=Debug -B build
+          cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
       - script: |
@@ -162,8 +162,8 @@ jobs:
       - script: |
           call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Release -G Ninja -B build
-          cmake --build build --target tests --config Release
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -G Ninja -B build
+          cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
       - script: |
