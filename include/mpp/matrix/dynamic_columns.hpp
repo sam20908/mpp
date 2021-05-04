@@ -71,19 +71,23 @@ namespace mpp
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
+			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
+			const auto mat_columns = std::forward<Matrix>(matrix).columns();
+
 			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_safe>(std::forward<Matrix>(matrix).rows(),
-				std::forward<Matrix>(matrix).columns(),
-				std::forward<Matrix>(matrix));
+				detail::configuration_use_safe>(mat_rows, mat_columns, std::forward<Matrix>(matrix));
 		}
 
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
-			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
-				std::forward<Matrix>(matrix).columns(),
+			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
+			const auto mat_columns = std::forward<Matrix>(matrix).columns();
+
+			base::template assign_and_insert_from_1d_range<false, false, false>(mat_rows,
+				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
 
@@ -245,18 +249,22 @@ namespace mpp
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		void assign(Matrix&& matrix)
 		{
+			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
+			const auto mat_columns = std::forward<Matrix>(matrix).columns();
+
 			base::template assign_and_insert_from_1d_range<detail::configuration_use_safe,
 				false,
-				detail::configuration_use_safe>(std::forward<Matrix>(matrix).rows(),
-				std::forward<Matrix>(matrix).columns(),
-				std::forward<Matrix>(matrix));
+				detail::configuration_use_safe>(mat_rows, mat_columns, std::forward<Matrix>(matrix));
 		}
 
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
 		void assign(Matrix&& matrix, unsafe_tag)
 		{
-			base::template assign_and_insert_from_1d_range<false, false, false>(std::forward<Matrix>(matrix).rows(),
-				std::forward<Matrix>(matrix).columns(),
+			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
+			const auto mat_columns = std::forward<Matrix>(matrix).columns();
+
+			base::template assign_and_insert_from_1d_range<false, false, false>(mat_rows,
+				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
 	};
