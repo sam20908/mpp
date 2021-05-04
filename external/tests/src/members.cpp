@@ -123,7 +123,7 @@ int main()
 		};
 	};
 
-#if !defined(_MSC_VER) || !defined(__clang__) // @NOTE: .data() in clang-cl is somehow incorrect
+	// #if !defined(_MSC_VER) || !defined(__clang__) // @NOTE: .data() in clang-cl is somehow incorrect
 	feature(".data()") = [&]() {
 		given("We're only reading the data") = [&]() {
 			expect(*mat_1.data() == 1_i);
@@ -150,7 +150,7 @@ int main()
 			*mut(mat_4).data() = 1;
 		};
 	};
-#endif
+	// #endif
 
 	feature(".size()") = [&]() {
 		expect(mat_1.size() == 6_ul);
