@@ -53,18 +53,31 @@ void test_det(const std::string& filename, auto... allocator_args)
 	const auto expected_num = result.num;
 
 	test(filename) = [&]() {
+		using ordering_type = std::compare_three_way_result_t<To, To>;
+
 		To num;
 
-		if constexpr (SpecifyToViaTypeIdentity)
-		{
-			num = mpp::determinant(std::type_identity<To>{}, mat, allocator_args...);
-		}
-		else
-		{
-			num = mpp::determinant(mat, allocator_args...);
-		}
+		when("Not using unsafe") = [&]() {
+			if constexpr (SpecifyToViaTypeIdentity)
+			{
+				num = mpp::determinant(std::type_identity<To>{}, mat, allocator_args...);
+			}
+			else
+			{
+				num = mpp::determinant(mat, allocator_args...);
+			}
+		};
 
-		using ordering_type = std::compare_three_way_result_t<To, To>;
+		when("Using unsafe") = [&]() {
+			if constexpr (SpecifyToViaTypeIdentity)
+			{
+				num = mpp::determinant(std::type_identity<To>{}, mat, mpp::unsafe, allocator_args...);
+			}
+			else
+			{
+				num = mpp::determinant(mat, mpp::unsafe, allocator_args...);
+			}
+		};
 
 		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent);
 	};
