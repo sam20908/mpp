@@ -37,8 +37,14 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator>
-		[[nodiscard]] inline auto inverse_impl(const auto& obj)
+		template<bool Check,
+			typename To,
+			typename ToAllocator,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator>
+		[[nodiscard]] inline auto inverse_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
@@ -192,11 +198,8 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_impl<detail::configuration_use_safe,
-				detail::default_floating_type,
-				RowsExtent,
-				ColumnsExtent,
-				ToAllocator>(obj);
+			return detail::inverse_impl<detail::configuration_use_safe, detail::default_floating_type, ToAllocator>(
+				obj);
 		}
 
 		template<typename Value,
@@ -211,8 +214,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_impl<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(
-				obj);
+			return detail::inverse_impl<false, detail::default_floating_type, ToAllocator>(obj);
 		}
 
 		template<std::floating_point To,
@@ -227,8 +229,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_impl<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(
-				obj);
+			return detail::inverse_impl<detail::configuration_use_safe, To, ToAllocator>(obj);
 		}
 
 		template<std::floating_point To,
@@ -244,7 +245,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inverse_impl<false, To, ToAllocator>(obj);
 		}
 	};
 
