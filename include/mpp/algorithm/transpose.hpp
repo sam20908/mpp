@@ -26,21 +26,27 @@
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace mpp
 {
 	struct transpose_t : public detail::cpo_base<transpose_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename TransposeAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
-			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<TransposeAllocator> = {})
+			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
 		{
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 			const auto data    = obj.data();
 
-			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent>;
+			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>;
 			using transposed_buffer_t = typename transposed_t::buffer_type;
 			auto transposed_buffer    = transposed_buffer_t{};
 			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});

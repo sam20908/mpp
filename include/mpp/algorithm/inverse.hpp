@@ -30,21 +30,16 @@
 #include <mpp/matrix.hpp>
 
 #include <concepts>
-#include <future>
+#include <memory>
 #include <type_traits>
 
 namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check,
-			typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator>
-		[[nodiscard]] inline auto inverse_lu_decomp(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+		template<bool Check, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		[[nodiscard]] inline auto inverse_lu_decomp(const auto& obj)
+			-> matrix<To, RowsExtent, ColumnsExtent, Allocator> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{
@@ -57,8 +52,11 @@ namespace mpp
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			using lu_buffer_t  = typename matrix<default_floating_type, RowsExtent, ColumnsExtent>::buffer_type;
-			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent>;
+			using fp_allocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<default_floating_type>;
+			using lu_buffer_t =
+				typename matrix<default_floating_type, RowsExtent, ColumnsExtent, fp_allocator>::buffer_type;
+			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent, Allocator>;
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
@@ -163,7 +161,7 @@ namespace mpp
 					identity_column_buffer[last_column_index] = default_floating_type{};
 					identity_column_buffer[row]               = default_floating_type{ 1 };
 
-					auto l_x_buffer = forward_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(l_buffer,
+					auto l_x_buffer = forward_subst_on_buffer<RowsExtent, 1, false, fp_allocator>(l_buffer,
 						identity_column_buffer,
 						rows);
 
@@ -171,9 +169,7 @@ namespace mpp
 					// part_inverse_buffer now corresponds to a column of the inverse matrix
 
 					auto part_inverse_buffer =
-						back_subst_on_buffer<default_floating_type, RowsExtent, 1, false>(u_buffer,
-							std::move(l_x_buffer),
-							rows);
+						back_subst_on_buffer<RowsExtent, 1, false, fp_allocator>(u_buffer, std::move(l_x_buffer), rows);
 
 					for (auto column = std::size_t{}; auto&& value : part_inverse_buffer)
 					{
@@ -188,35 +184,70 @@ namespace mpp
 
 	struct inverse_t : public detail::cpo_base<inverse_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(inverse_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
-		{
-			return detail::inverse_lu_decomp<detail::configuration_use_safe, detail::default_floating_type>(obj);
-		}
-
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename ToAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			unsafe_tag) -> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<ToAllocator> = {})
+			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<false, detail::default_floating_type>(obj);
+			return detail::inverse_lu_decomp<detail::configuration_use_safe,
+				detail::default_floating_type,
+				RowsExtent,
+				ColumnsExtent,
+				ToAllocator>(obj);
 		}
 
-		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto
-		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename ToAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			unsafe_tag,
+			std::type_identity<ToAllocator> = {})
+			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<detail::configuration_use_safe, To>(obj);
+			return detail::
+				inverse_lu_decomp<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 
-		template<std::floating_point To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto
-		tag_invoke(inverse_t, std::type_identity<To>, const matrix<Value, RowsExtent, ColumnsExtent>& obj, unsafe_tag)
-			-> matrix<To, RowsExtent, ColumnsExtent> // @TODO: ISSUE #20
+		template<std::floating_point To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
+		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
+			std::type_identity<To>,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<ToAllocator> = {})
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<false, To>(obj);
+			return detail::
+				inverse_lu_decomp<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+		}
+
+		template<std::floating_point To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
+		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
+			std::type_identity<To>,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			unsafe_tag,
+			std::type_identity<ToAllocator> = {})
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+		{
+			return detail::inverse_lu_decomp<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 	};
 

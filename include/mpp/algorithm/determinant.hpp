@@ -28,6 +28,7 @@
 #include <mpp/matrix.hpp>
 
 #include <cmath>
+#include <memory>
 
 namespace mpp
 {
@@ -37,6 +38,7 @@ namespace mpp
 
 		template<bool CheckSquare,
 			typename To,
+			typename LUAllocator,
 			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
@@ -72,7 +74,7 @@ namespace mpp
 				return ad - bc;
 			}
 
-			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
+			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, LUAllocator>;
 			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
 			auto u_buffer = lu_decomp_buffer_t{};
@@ -92,36 +94,62 @@ namespace mpp
 
 	struct determinant_t : public detail::cpo_base<determinant_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t, const matrix<Value, RowsExtent, ColumnsExtent>& obj)
-			-> Value // @TODO: ISSUE #20
-		{
-			return detail::det_lu_decomp<detail::configuration_use_safe, Value>(obj);
-		}
-
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename LUAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			unsafe_tag) -> Value // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
 		{
-			return detail::det_lu_decomp<false, Value>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_safe, Value, LUAllocator>(obj);
 		}
 
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename LUAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			unsafe_tag,
+			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
+		{
+			return detail::det_lu_decomp<false, Value, LUAllocator>(obj);
+		}
+
+		template<typename To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename LUAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> To // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_lu_decomp<detail::configuration_use_safe, To>(obj);
+			return detail::det_lu_decomp<detail::configuration_use_safe, To, LUAllocator>(obj);
 		}
 
-		template<typename To, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename To,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename LUAllocator =
+				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			unsafe_tag) -> To // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			unsafe_tag,
+			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_lu_decomp<false, To>(obj);
+			return detail::det_lu_decomp<false, To, LUAllocator>(obj);
 		}
 	};
 

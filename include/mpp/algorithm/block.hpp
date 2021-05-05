@@ -77,13 +77,19 @@ namespace mpp
 	{
 		// @TODO: Support fixed block matrix with certain preconditions (#225)
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
-			std::size_t bottom_column_index) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
+			std::size_t bottom_column_index,
+			std::type_identity<BlockAllocator> block_allocator = {})
+			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
 		{
 			// The result matrix is always dynamic because function parameters are always treated as runtime
 			// expressions, which means it's impossible to change the extent to resized extent
@@ -104,22 +110,29 @@ namespace mpp
 				top_column_index,
 				bottom_row_index,
 				bottom_column_index,
-				unsafe);
+				unsafe,
+				block_allocator);
 		}
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
 			std::size_t bottom_column_index,
-			unsafe_tag) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
+			unsafe_tag,
+			std::type_identity<BlockAllocator> = {})
+			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
 		{
 			const auto columns = obj.columns();
 			const auto begin   = obj.begin();
 
-			using block_matrix_t  = matrix<Value, dynamic, dynamic>;
+			using block_matrix_t  = matrix<Value, dynamic, dynamic, BlockAllocator>;
 			using block_buffer_t  = typename block_matrix_t::buffer_type;
 			using difference_type = typename block_matrix_t::difference_type;
 
