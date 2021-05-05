@@ -176,7 +176,19 @@ int main()
 		};
 
 		when("Passing other allocator type") = []() {
+			using cust_alloc = custom_allocator<mpp::detail::default_floating_type>;
+
+			test_det<int, int, false>("algorithm/det/0x0.txt", std::type_identity<cust_alloc>{});
+			test_det<int, int, false>("algorithm/det/1x1.txt", std::type_identity<cust_alloc>{});
+			test_det<int, double, true>("algorithm/det/2x2.txt",
+				std::type_identity<cust_alloc>{}); // @NOTE: MSVC with stol would be out of range
+			test_det<int, int, true>("algorithm/det/3x3.txt", std::type_identity<cust_alloc>{});
+			test_det<int, double, true>("algorithm/det/10x10.txt", std::type_identity<cust_alloc>{});
+		};
+
+		when("Passing instance of different allocator") = []() {
 			const auto cust_alloc = custom_allocator<mpp::detail::default_floating_type>{};
+
 			test_det<int, int, false>("algorithm/det/0x0.txt", cust_alloc);
 			test_det<int, int, false>("algorithm/det/1x1.txt", cust_alloc);
 			test_det<int, double, true>("algorithm/det/2x2.txt",
