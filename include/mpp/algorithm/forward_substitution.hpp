@@ -34,7 +34,7 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<std::size_t RowsExtent, std::size_t ColumnsExtent, bool Check, typename Allocator>
+		template<bool Check, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		inline auto forward_subst_on_buffer(const auto& a, const auto& b, std::size_t n) -> // @TODO: ISSUE #20
 			typename matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>::buffer_type
 		{
@@ -84,9 +84,9 @@ namespace mpp
 			return x_buffer;
 		}
 
-		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, bool Check, typename Allocator>
+		template<bool Check, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator>
 		inline auto forward_subst_matrix(const auto& a, const auto& b)
-			-> matrix<To, RowsExtent, ColumnsExtent, Allocator> // @TODO: ISSUE #20
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			// @FIXME: Find best message to error about a.rows() != b.rows()
 			if constexpr (Check)
@@ -102,12 +102,12 @@ namespace mpp
 				}
 			}
 
-			return matrix<To, RowsExtent, ColumnsExtent, Allocator>{ a.rows(),
+			return matrix<To, RowsExtent, ColumnsExtent, ToAllocator>{ a.rows(),
 				1,
-				forward_subst_on_buffer<RowsExtent,
+				forward_subst_on_buffer<Check,
+					RowsExtent,
 					ColumnsExtent,
-					Check,
-					typename std::allocator_traits<Allocator>::template rebind_alloc<default_floating_type>>(a.data(),
+					typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>(a.data(),
 					b.data(),
 					a.rows()),
 				unsafe };
@@ -137,10 +137,10 @@ namespace mpp
 			ToAllocator> // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<To,
+			return detail::forward_subst_matrix<detail::configuration_use_safe,
+				To,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
-				detail::configuration_use_safe,
 				ToAllocator>(a, b);
 		}
 
@@ -166,10 +166,10 @@ namespace mpp
 			ToAllocator> // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<To,
+			return detail::forward_subst_matrix<false,
+				To,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
-				false,
 				ToAllocator>(a, b);
 		}
 
@@ -191,10 +191,10 @@ namespace mpp
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::forward_subst_matrix<std::common_type_t<AValue, BValue>,
+			return detail::forward_subst_matrix<detail::configuration_use_safe,
+				std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
-				detail::configuration_use_safe,
 				ToAllocator>(a, b);
 		}
 
@@ -217,10 +217,10 @@ namespace mpp
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::forward_subst_matrix<std::common_type_t<AValue, BValue>,
+			return detail::forward_subst_matrix<false,
+				std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
-				false,
 				ToAllocator>(a, b);
 		}
 	};

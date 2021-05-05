@@ -33,16 +33,9 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To,
-			bool CheckSquare,
-			typename ToAllocator,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator>
-		auto lu_decomposition_func(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
-			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+		template<bool CheckSquare, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator>
+		auto lu_impl(const auto& obj) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
+			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
 			if constexpr (CheckSquare)
 			{
@@ -52,17 +45,19 @@ namespace mpp
 				}
 			}
 
-			using calc_matrix_t   = matrix<default_floating_type,
-                RowsExtent,
-                ColumnsExtent,
-                typename std::allocator_traits<Allocator>::template rebind_alloc<default_floating_type>>;
+			using lu_matrix_t = matrix<default_floating_type,
+				RowsExtent,
+				ColumnsExtent,
+				typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>;
+			using lu_buffer_t = typename lu_matrix_t::buffer_type;
+
 			using result_matrix_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			auto l_buffer = typename calc_matrix_t::buffer_type{};
-			auto u_buffer = typename calc_matrix_t::buffer_type{};
+			auto l_buffer = lu_buffer_t{};
+			auto u_buffer = lu_buffer_t{};
 
 			// @TODO: Should do a direct copy initialization instead
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
@@ -89,7 +84,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {}) -> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
 			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
-			return detail::lu_decomposition_func<Value, detail::configuration_use_safe, ToAllocator>(obj);
+			return detail::lu_impl<detail::configuration_use_safe, Value, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 
 		template<typename Value,
@@ -104,7 +99,7 @@ namespace mpp
 			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
-			return detail::lu_decomposition_func<Value, false, ToAllocator>(obj);
+			return detail::lu_impl<false, Value, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 
 		template<typename To,
@@ -120,7 +115,7 @@ namespace mpp
 			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
-			return detail::lu_decomposition_func<To, detail::configuration_use_safe, ToAllocator>(obj);
+			return detail::lu_impl<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 
 
@@ -138,7 +133,7 @@ namespace mpp
 			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
-			return detail::lu_decomposition_func<To, false, ToAllocator>(obj);
+			return detail::lu_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 	};
 

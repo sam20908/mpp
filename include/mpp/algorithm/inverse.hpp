@@ -37,9 +37,9 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		[[nodiscard]] inline auto inverse_lu_decomp(const auto& obj)
-			-> matrix<To, RowsExtent, ColumnsExtent, Allocator> // @TODO: ISSUE #20
+		template<bool Check, typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator>
+		[[nodiscard]] inline auto inverse_impl(const auto& obj)
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{
@@ -52,11 +52,11 @@ namespace mpp
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			using fp_allocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<default_floating_type>;
-			using lu_buffer_t =
-				typename matrix<default_floating_type, RowsExtent, ColumnsExtent, fp_allocator>::buffer_type;
-			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent, Allocator>;
+			using lu_allocator =
+				typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>;
+			using lu_matrix_t  = matrix<default_floating_type, RowsExtent, ColumnsExtent, lu_allocator>;
+			using lu_buffer_t  = typename lu_matrix_t::buffer_type;
+			using inv_matrix_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
@@ -112,11 +112,8 @@ namespace mpp
 
 			if (rows >= 3)
 			{
-				using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent>;
-				using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
-
-				auto l_buffer = lu_decomp_buffer_t{};
-				auto u_buffer = lu_decomp_buffer_t{};
+				auto l_buffer = lu_buffer_t{};
+				auto u_buffer = lu_buffer_t{};
 
 				// @TODO: Should do a direct copy initialization instead
 				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
@@ -161,7 +158,7 @@ namespace mpp
 					identity_column_buffer[last_column_index] = default_floating_type{};
 					identity_column_buffer[row]               = default_floating_type{ 1 };
 
-					auto l_x_buffer = forward_subst_on_buffer<RowsExtent, 1, false, fp_allocator>(l_buffer,
+					auto l_x_buffer = forward_subst_on_buffer<false, RowsExtent, 1, lu_allocator>(l_buffer,
 						identity_column_buffer,
 						rows);
 
@@ -169,7 +166,7 @@ namespace mpp
 					// part_inverse_buffer now corresponds to a column of the inverse matrix
 
 					auto part_inverse_buffer =
-						back_subst_on_buffer<RowsExtent, 1, false, fp_allocator>(u_buffer, std::move(l_x_buffer), rows);
+						back_subst_on_buffer<false, RowsExtent, 1, lu_allocator>(u_buffer, std::move(l_x_buffer), rows);
 
 					for (auto column = std::size_t{}; auto&& value : part_inverse_buffer)
 					{
@@ -195,7 +192,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<detail::configuration_use_safe,
+			return detail::inverse_impl<detail::configuration_use_safe,
 				detail::default_floating_type,
 				RowsExtent,
 				ColumnsExtent,
@@ -214,8 +211,8 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::
-				inverse_lu_decomp<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inverse_impl<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(
+				obj);
 		}
 
 		template<std::floating_point To,
@@ -230,8 +227,8 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::
-				inverse_lu_decomp<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inverse_impl<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(
+				obj);
 		}
 
 		template<std::floating_point To,
@@ -247,7 +244,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inverse_lu_decomp<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inverse_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
 		}
 	};
 

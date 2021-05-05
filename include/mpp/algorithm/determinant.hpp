@@ -94,6 +94,8 @@ namespace mpp
 
 	struct determinant_t : public detail::cpo_base<determinant_t>
 	{
+		// @TODO: Determine if customizing LUAllocator for determinant is a good approach...
+
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
