@@ -43,7 +43,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator>
-		[[nodiscard]] inline auto det_lu(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
+		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
 			-> To // @TODO: ISSUE #20
 		{
 			if constexpr (CheckSquare)
@@ -106,7 +106,7 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
 		{
-			return detail::det_lu<detail::configuration_use_safe, Value, LUAllocator>(obj);
+			return detail::det_impl<detail::configuration_use_safe, Value, LUAllocator>(obj);
 		}
 
 		template<typename Value,
@@ -120,7 +120,7 @@ namespace mpp
 			unsafe_tag,
 			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
 		{
-			return detail::det_lu<false, Value, LUAllocator>(obj);
+			return detail::det_impl<false, Value, LUAllocator>(obj);
 		}
 
 		template<typename To,
@@ -135,7 +135,7 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_lu<detail::configuration_use_safe, To, LUAllocator>(obj);
+			return detail::det_impl<detail::configuration_use_safe, To, LUAllocator>(obj);
 		}
 
 		template<typename To,
@@ -151,7 +151,7 @@ namespace mpp
 			unsafe_tag,
 			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_lu<false, To, LUAllocator>(obj);
+			return detail::det_impl<false, To, LUAllocator>(obj);
 		}
 	};
 
