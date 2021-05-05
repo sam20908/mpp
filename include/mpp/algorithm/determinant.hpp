@@ -42,9 +42,10 @@ namespace mpp
 			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
-			typename Allocator>
+			typename Allocator,
+			typename... Args>
 		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const auto&... alloc_args) -> To // @TODO: ISSUE #20
+			const Args&... alloc_args) -> To // @TODO: ISSUE #20
 		{
 			if constexpr (CheckSquare)
 			{
