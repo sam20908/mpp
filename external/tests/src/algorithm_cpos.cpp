@@ -32,26 +32,37 @@
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
+#include "../../include/custom_allocator.hpp"
 #include "../../include/test_parsers.hpp"
 
 #include <compare>
 #include <filesystem>
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
 
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<typename From, typename To>
-void test_det(const std::string& filename)
+template<typename From, typename To, bool SpecifyToViaTypeIdentity>
+void test_det(const std::string& filename, auto... allocator_args)
 {
 	const auto result       = parse_num_out<From, To>(get_filepath(filename));
 	const auto& mat         = result.mat;
 	const auto expected_num = result.num;
 
 	test(filename) = [&]() {
-		const auto num = mpp::determinant(std::type_identity<To>{}, mat);
+		To num;
+
+		if constexpr (SpecifyToViaTypeIdentity)
+		{
+			num = mpp::determinant(std::type_identity<To>{}, mat, allocator_args...);
+		}
+		else
+		{
+			num = mpp::determinant(mat, allocator_args...);
+		}
 
 		using ordering_type = std::compare_three_way_result_t<To, To>;
 
@@ -156,11 +167,23 @@ void test_sub(const std::string& filename, const auto& fn)
 int main()
 {
 	feature("Determinant") = []() {
-		test_det<int, int>("algorithm/det/0x0.txt");
-		test_det<int, int>("algorithm/det/1x1.txt");
-		test_det<int, double>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
-		test_det<int, int>("algorithm/det/3x3.txt");
-		test_det<int, double>("algorithm/det/10x10.txt");
+		when("Passing deduced allocator type") = []() {
+			test_det<int, int, false>("algorithm/det/0x0.txt");
+			test_det<int, int, false>("algorithm/det/1x1.txt");
+			test_det<int, double, true>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
+			test_det<int, int, true>("algorithm/det/3x3.txt");
+			test_det<int, double, true>("algorithm/det/10x10.txt");
+		};
+
+		when("Passing other allocator type") = []() {
+			const auto cust_alloc = custom_allocator<mpp::detail::default_floating_type>{};
+			test_det<int, int, false>("algorithm/det/0x0.txt", cust_alloc);
+			test_det<int, int, false>("algorithm/det/1x1.txt", cust_alloc);
+			test_det<int, double, true>("algorithm/det/2x2.txt",
+				cust_alloc); // @NOTE: MSVC with stol would be out of range
+			test_det<int, int, true>("algorithm/det/3x3.txt", cust_alloc);
+			test_det<int, double, true>("algorithm/det/10x10.txt", cust_alloc);
+		};
 	};
 
 	feature("Transpose") = []() {
