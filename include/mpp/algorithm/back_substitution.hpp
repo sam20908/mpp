@@ -117,10 +117,9 @@ namespace mpp
 			auto&& x_buf  = back_subst_on_buffer<Check,
                 RowsExtent,
                 ColumnsExtent,
-                typename std::allocator_traits<ToAllocator>::template rebind_alloc<To>>(a.data(),
+                typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>(a.data(),
                 b.data(),
-                rows,
-                alloc_args...);
+                rows);
 
 			return [&]() {
 				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))

@@ -333,12 +333,17 @@ int main()
 	};
 
 	feature("Forward substitution") = []() {
+		// @TODO: Add testcase where a, b, and x matrix have different value type to test with PassToAsIdentityObj =
+		// true
+
 		test_sub<int, int, int, custom_allocator<int>, false>("algorithm/fwd_sub/4x4_4x1.txt",
 			mpp::forward_substitution);
 	};
 
 	feature("Back substitution") = []() {
-		test_sub<int, int, double, custom_allocator<double>, true>("algorithm/back_sub/3x3_3x1.txt",
+		// @TODO: Add testcase where a, b, and x matrix have same value type to test with PassToAsIdentityObj = false
+
+		test_sub<int, int, float, custom_allocator<float>, true>("algorithm/back_sub/3x3_3x1.txt",
 			mpp::back_substitution);
 	};
 
