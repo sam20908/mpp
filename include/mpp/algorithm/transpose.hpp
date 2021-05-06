@@ -32,13 +32,14 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename Value,
+		template<typename TransposeAllocator,
+			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
-			typename TransposeAllocator,
+			typename Allocator,
 			typename... Args>
-		[[nodiscard]] auto trps_impl(const auto& obj, const Args&... alloc_args)
-			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
+		[[nodiscard]] auto trps_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			const Args&... alloc_args) -> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
 		{
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
@@ -77,7 +78,7 @@ namespace mpp
 			std::type_identity<TransposeAllocator> = {})
 			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
 		{
-			return detail::trps_impl<Value, RowsExtent, ColumnsExtent, TransposeAllocator>(obj);
+			return detail::trps_impl<TransposeAllocator>(obj);
 		}
 
 		template<typename Value,
@@ -90,7 +91,7 @@ namespace mpp
 			const TransposeAllocator& trps_alloc)
 			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
 		{
-			return detail::trps_impl<Value, RowsExtent, ColumnsExtent, TransposeAllocator>(obj, trps_alloc);
+			return detail::trps_impl<TransposeAllocator>(obj, trps_alloc);
 		}
 	};
 
