@@ -36,7 +36,7 @@ namespace mpp
 	{
 		inline static constexpr auto dummy_variable = ' ';
 
-		template<bool CheckSquare,
+		template<bool Check,
 			typename To,
 			typename LUAllocator,
 			typename Value,
@@ -47,7 +47,7 @@ namespace mpp
 		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			const Args&... alloc_args) -> To // @TODO: ISSUE #20
 		{
-			if constexpr (CheckSquare)
+			if constexpr (Check)
 			{
 				if (!square(obj))
 				{
