@@ -78,7 +78,16 @@ namespace mpp
 			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, LUAllocator>;
 			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
-			auto u_buffer = lu_decomp_buffer_t{ alloc_args... };
+			auto u_buffer = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return lu_decomp_buffer_t{ alloc_args... };
+				}
+				else
+				{
+					return lu_decomp_buffer_t{};
+				}
+			}();
 
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buffer.begin());

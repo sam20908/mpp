@@ -64,8 +64,26 @@ namespace mpp
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			auto l_buffer = lu_buffer_t{};
-			auto u_buffer = lu_buffer_t{};
+			auto l_buffer = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return lu_buffer_t{ alloc_args... };
+				}
+				else
+				{
+					return lu_buffer_t{};
+				}
+			}();
+			auto u_buffer = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return lu_buffer_t{ alloc_args... };
+				}
+				else
+				{
+					return lu_buffer_t{};
+				}
+			}();
 
 			// @TODO: Should do a direct copy initialization instead
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
@@ -75,8 +93,26 @@ namespace mpp
 
 			lu_generic<default_floating_type, true, false>(rows, columns, l_buffer, u_buffer);
 
-			return { result_matrix_t{ rows, columns, std::move(l_buffer), unsafe, alloc_args... },
-				result_matrix_t{ rows, columns, std::move(u_buffer), unsafe, alloc_args... } };
+			return { [&]() {
+						if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+						{
+							return result_matrix_t{ rows, columns, std::move(l_buffer), unsafe, alloc_args... };
+						}
+						else
+						{
+							return result_matrix_t{ rows, columns, std::move(l_buffer), unsafe };
+						}
+					}(),
+				[&]() {
+					if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+					{
+						return result_matrix_t{ rows, columns, std::move(u_buffer), unsafe, alloc_args... };
+					}
+					else
+					{
+						return result_matrix_t{ rows, columns, std::move(u_buffer), unsafe };
+					}
+				}() };
 		}
 	} // namespace detail
 

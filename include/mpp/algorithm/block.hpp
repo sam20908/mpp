@@ -107,7 +107,16 @@ namespace mpp
 			using block_buf_t     = typename block_mat_t::buffer_type;
 			using difference_type = typename block_mat_t::difference_type;
 
-			auto block_buf               = block_buf_t{};
+			auto block_buf = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return block_buf_t{ alloc_args... };
+				}
+				else
+				{
+					return block_buf_t{};
+				}
+			}();
 			auto block_buf_back_inserter = std::back_inserter(block_buf);
 
 			const auto block_rows    = bottom_row_index - top_row_index + 1;
@@ -123,7 +132,16 @@ namespace mpp
 				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buf_back_inserter);
 			}
 
-			return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe, alloc_args... };
+			return [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe, alloc_args... };
+				}
+				else
+				{
+					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe };
+				}
+			}();
 		}
 	} // namespace detail
 

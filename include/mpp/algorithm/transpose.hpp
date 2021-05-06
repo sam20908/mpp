@@ -48,7 +48,16 @@ namespace mpp
 			using trps_mat_t = matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>;
 			using trps_buf_t = typename trps_mat_t::buffer_type;
 
-			auto transposed_buffer = trps_buf_t{};
+			auto transposed_buffer = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return trps_buf_t{ alloc_args... };
+				}
+				else
+				{
+					return trps_buf_t{};
+				}
+			}();
 			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
 			for (auto column = std::size_t{}; column < columns; ++column)
@@ -62,7 +71,16 @@ namespace mpp
 				}
 			}
 
-			return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe, alloc_args... };
+			return [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe, alloc_args... };
+				}
+				else
+				{
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe };
+				}
+			}();
 		}
 	} // namespace detail
 
