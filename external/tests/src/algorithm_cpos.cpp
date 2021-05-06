@@ -98,16 +98,16 @@ void test_transformation(const std::string& filename, const auto& transform_fn)
 	using ordering_type = std::compare_three_way_result_t<To, To>;
 
 	const auto do_cmp = [&](const auto&... args) {
-		decltype(transform_fn(mat)) out;
-
-		if constexpr (PassToAsIdentityObj)
-		{
-			out = transform_fn(std::type_identity<To>{}, mat, args...);
-		}
-		else
-		{
-			out = transform_fn(mat, args...);
-		}
+		const auto out = [&]() {
+			if constexpr (PassToAsIdentityObj)
+			{
+				return transform_fn(std::type_identity<To>{}, mat, args...);
+			}
+			else
+			{
+				return transform_fn(mat, args...);
+			}
+		}();
 
 		expect(out.rows() == expected_out.rows());
 		expect(out.columns() == expected_out.columns());
@@ -135,15 +135,32 @@ void test_transformation(const std::string& filename, const auto& transform_fn)
 	};
 }
 
-template<typename From, typename To>
+template<typename From, typename To, typename CustAlloc>
 void test_block(const std::string& filename)
 {
 	const auto result  = parse_block_out<From, To>(get_filepath(filename));
 	const auto& mat    = result.mat;
 	const auto& blocks = result.blocks;
 
+	using ordering_type = std::compare_three_way_result_t<To, To>;
+
+	const auto do_cmp = [&](const auto& expected_block,
+							std::size_t top_row_index,
+							std::size_t top_column_index,
+							std::size_t bottom_row_index,
+							std::size_t bottom_column_index,
+							const auto&... args) {
+		const auto block =
+			mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, args...);
+
+		expect(block.rows() == expected_block.rows());
+		expect(block.columns() == expected_block.columns());
+
+		expect(mpp::elements_compare(block, expected_block, mpp::floating_point_compare) == ordering_type::equivalent);
+	};
+
 	test(filename) = [&]() {
-		using ordering_type = std::compare_three_way_result_t<To, To>;
+		const auto cust_alloc = CustAlloc{};
 
 		for (const auto& block : blocks)
 		{
@@ -154,11 +171,23 @@ void test_block(const std::string& filename)
 			const auto block_          = mpp::block(mat, row_start, column_start, row_end, column_end);
 			const auto& expected_block = block.mat;
 
-			expect(block_.rows() == expected_block.rows());
-			expect(block_.columns() == expected_block.columns());
+			when("Not using unsafe") = [&]() {
+				do_cmp(expected_block, row_start, column_start, row_end, column_end);
+				do_cmp(expected_block, row_start, column_start, row_end, column_end, std::type_identity<CustAlloc>{});
+				do_cmp(expected_block, row_start, column_start, row_end, column_end, cust_alloc);
+			};
 
-			expect(mpp::elements_compare(block_, expected_block, mpp::floating_point_compare) ==
-				   ordering_type::equivalent);
+			when("Using unsafe") = [&]() {
+				do_cmp(expected_block, row_start, column_start, row_end, column_end, mpp::unsafe);
+				do_cmp(expected_block,
+					row_start,
+					column_start,
+					row_end,
+					column_end,
+					mpp::unsafe,
+					std::type_identity<CustAlloc>{});
+				do_cmp(expected_block, row_start, column_start, row_end, column_end, mpp::unsafe, cust_alloc);
+			};
 		}
 	};
 }
@@ -238,9 +267,9 @@ int main()
 			mpp::inverse);
 	};
 
-	// feature("Block") = []() {
-	// 	test_block<int, int>("algorithm/block/4x4.txt");
-	// };
+	feature("Block") = []() {
+		test_block<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
+	};
 
 	// feature("Forward substitution") = []() {
 	// 	auto fwd_sub_fn = std::bind_front(mpp::forward_substitution, std::type_identity<int>{});
