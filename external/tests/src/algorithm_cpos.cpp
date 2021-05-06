@@ -45,41 +45,45 @@
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<typename From, typename To, bool SpecifyToViaTypeIdentity>
-void test_det(const std::string& filename, auto... allocator_args)
+template<typename From, typename To>
+void test_det(const std::string& filename)
 {
 	const auto result       = parse_num_out<From, To>(get_filepath(filename));
 	const auto& mat         = result.mat;
 	const auto expected_num = result.num;
 
-	test(filename) = [&]() {
-		using ordering_type = std::compare_three_way_result_t<To, To>;
+	using ordering_type = std::compare_three_way_result_t<To, To>;
+	using cust_alloc_t  = custom_allocator<mpp::detail::default_floating_type>;
 
+	const auto do_cmp = [&](const auto&... args) {
 		To num;
 
+		if constexpr (!std::is_same_v<From, To>)
+		{
+			num = mpp::determinant(std::type_identity<To>{}, mat, args...);
+		}
+		else
+		{
+			num = mpp::determinant(mat, args...);
+		}
+
+		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent);
+	};
+
+	test(filename) = [&]() {
+		const auto cust_alloc = cust_alloc_t{};
+
 		when("Not using unsafe") = [&]() {
-			if constexpr (SpecifyToViaTypeIdentity)
-			{
-				num = mpp::determinant(std::type_identity<To>{}, mat, allocator_args...);
-			}
-			else
-			{
-				num = mpp::determinant(mat, allocator_args...);
-			}
+			do_cmp();
+			do_cmp(std::type_identity<cust_alloc_t>{});
+			do_cmp(cust_alloc);
 		};
 
 		when("Using unsafe") = [&]() {
-			if constexpr (SpecifyToViaTypeIdentity)
-			{
-				num = mpp::determinant(std::type_identity<To>{}, mat, mpp::unsafe, allocator_args...);
-			}
-			else
-			{
-				num = mpp::determinant(mat, mpp::unsafe, allocator_args...);
-			}
+			do_cmp(mpp::unsafe);
+			do_cmp(mpp::unsafe, std::type_identity<cust_alloc_t>{});
+			do_cmp(mpp::unsafe, cust_alloc);
 		};
-
-		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent);
 	};
 }
 
@@ -180,35 +184,11 @@ void test_sub(const std::string& filename, const auto& fn)
 int main()
 {
 	feature("Determinant") = []() {
-		when("Passing deduced allocator type") = []() {
-			test_det<int, int, false>("algorithm/det/0x0.txt");
-			test_det<int, int, false>("algorithm/det/1x1.txt");
-			test_det<int, double, true>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
-			test_det<int, int, true>("algorithm/det/3x3.txt");
-			test_det<int, double, true>("algorithm/det/10x10.txt");
-		};
-
-		when("Passing other allocator type") = []() {
-			using cust_alloc = custom_allocator<mpp::detail::default_floating_type>;
-
-			test_det<int, int, false>("algorithm/det/0x0.txt", std::type_identity<cust_alloc>{});
-			test_det<int, int, false>("algorithm/det/1x1.txt", std::type_identity<cust_alloc>{});
-			test_det<int, double, true>("algorithm/det/2x2.txt",
-				std::type_identity<cust_alloc>{}); // @NOTE: MSVC with stol would be out of range
-			test_det<int, int, true>("algorithm/det/3x3.txt", std::type_identity<cust_alloc>{});
-			test_det<int, double, true>("algorithm/det/10x10.txt", std::type_identity<cust_alloc>{});
-		};
-
-		when("Passing instance of different allocator") = []() {
-			const auto cust_alloc = custom_allocator<mpp::detail::default_floating_type>{};
-
-			test_det<int, int, false>("algorithm/det/0x0.txt", cust_alloc);
-			test_det<int, int, false>("algorithm/det/1x1.txt", cust_alloc);
-			test_det<int, double, true>("algorithm/det/2x2.txt",
-				cust_alloc); // @NOTE: MSVC with stol would be out of range
-			test_det<int, int, true>("algorithm/det/3x3.txt", cust_alloc);
-			test_det<int, double, true>("algorithm/det/10x10.txt", cust_alloc);
-		};
+		test_det<int, int>("algorithm/det/0x0.txt");
+		test_det<int, int>("algorithm/det/1x1.txt");
+		test_det<int, double>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
+		test_det<int, int>("algorithm/det/3x3.txt");
+		test_det<int, double>("algorithm/det/10x10.txt");
 	};
 
 	feature("Transpose") = []() {
