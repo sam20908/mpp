@@ -26,23 +26,38 @@
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace mpp
 {
-	struct transpose_t : public detail::cpo_base<transpose_t>
+	namespace detail
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
-			-> matrix<Value, ColumnsExtent, RowsExtent> // @TODO: ISSUE #20
+		template<typename TransposeAllocator,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename... Args>
+		[[nodiscard]] auto trps_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			const Args&... alloc_args) -> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
 		{
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 			const auto data    = obj.data();
 
-			using transposed_t        = matrix<Value, ColumnsExtent, RowsExtent>;
-			using transposed_buffer_t = typename transposed_t::buffer_type;
-			auto transposed_buffer    = transposed_buffer_t{};
+			using trps_mat_t = matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>;
+			using trps_buf_t = typename trps_mat_t::buffer_type;
+
+			auto transposed_buffer = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return trps_buf_t{ alloc_args... };
+				}
+				else
+				{
+					return trps_buf_t{};
+				}
+			}();
 			detail::allocate_buffer_if_vector(transposed_buffer, columns, rows, Value{});
 
 			for (auto column = std::size_t{}; column < columns; ++column)
@@ -56,7 +71,45 @@ namespace mpp
 				}
 			}
 
-			return transposed_t{ columns, rows, std::move(transposed_buffer) };
+			return [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe, alloc_args... };
+				}
+				else
+				{
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe };
+				}
+			}();
+		}
+	} // namespace detail
+
+	struct transpose_t : public detail::cpo_base<transpose_t>
+	{
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename TransposeAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::type_identity<TransposeAllocator> = {})
+			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
+		{
+			return detail::trps_impl<TransposeAllocator>(obj);
+		}
+
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename TransposeAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			const TransposeAllocator& trps_alloc)
+			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
+		{
+			return detail::trps_impl<TransposeAllocator>(obj, trps_alloc);
 		}
 	};
 

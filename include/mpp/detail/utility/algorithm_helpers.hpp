@@ -19,7 +19,6 @@
 
 #pragma once
 
-
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/utility/comparison.hpp>

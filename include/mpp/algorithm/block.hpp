@@ -71,64 +71,57 @@ namespace mpp
 				throw std::invalid_argument(BLOCK_TOP_COLUMN_INDEX_BIGGER_THAN_BOTTOM_COLUMN_INDEX);
 			}
 		}
-	} // namespace detail
 
-	struct block_t : public detail::cpo_base<block_t>
-	{
-		// @TODO: Support fixed block matrix with certain preconditions (#225)
-
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+		template<bool Check,
+			typename BlockAllocator,
+			typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename... Args>
+		[[nodiscard]] inline auto block_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
-			std::size_t bottom_column_index) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
+			std::size_t bottom_column_index,
+			const Args&... alloc_args) -> matrix<Value, RowsExtent, ColumnsExtent, BlockAllocator> // @TODO: ISSUE #20
 		{
 			// The result matrix is always dynamic because function parameters are always treated as runtime
 			// expressions, which means it's impossible to change the extent to resized extent
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
-
-			detail::validate_block_index_boundaries(rows,
-				columns,
-				top_row_index,
-				top_column_index,
-				bottom_row_index,
-				bottom_column_index);
-
-			return tag_invoke(block_t{},
-				obj,
-				top_row_index,
-				top_column_index,
-				bottom_row_index,
-				bottom_column_index,
-				unsafe);
-		}
-
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
-			unsafe_tag) -> matrix<Value, dynamic, dynamic> // @TODO: ISSUE #20
-		{
-			const auto columns = obj.columns();
 			const auto begin   = obj.begin();
 
-			using block_matrix_t  = matrix<Value, dynamic, dynamic>;
-			using block_buffer_t  = typename block_matrix_t::buffer_type;
-			using difference_type = typename block_matrix_t::difference_type;
+			if constexpr (Check)
+			{
+				detail::validate_block_index_boundaries(rows,
+					columns,
+					top_row_index,
+					top_column_index,
+					bottom_row_index,
+					bottom_column_index);
+			}
 
-			auto block_buffer               = block_buffer_t{};
-			auto block_buffer_back_inserter = std::back_inserter(block_buffer);
+			using block_mat_t     = matrix<Value, dynamic, dynamic, BlockAllocator>;
+			using block_buf_t     = typename block_mat_t::buffer_type;
+			using difference_type = typename block_mat_t::difference_type;
+
+			auto block_buf = [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return block_buf_t{ alloc_args... };
+				}
+				else
+				{
+					return block_buf_t{};
+				}
+			}();
+			auto block_buf_back_inserter = std::back_inserter(block_buf);
 
 			const auto block_rows    = bottom_row_index - top_row_index + 1;
 			const auto block_columns = bottom_column_index - top_column_index + 1;
-			block_buffer.reserve(block_rows * block_columns);
+			block_buf.reserve(block_rows * block_columns);
 
 			for (auto row = top_row_index; row <= bottom_row_index; ++row)
 			{
@@ -136,10 +129,110 @@ namespace mpp
 					static_cast<difference_type>(detail::index_2d_to_1d(columns, row, top_column_index));
 				auto row_begin = std::next(begin, row_begin_index);
 
-				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buffer_back_inserter);
+				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buf_back_inserter);
 			}
 
-			return block_matrix_t{ block_rows, block_columns, std::move(block_buffer) };
+			return [&]() {
+				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
+				{
+					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe, alloc_args... };
+				}
+				else
+				{
+					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe };
+				}
+			}();
+		}
+	} // namespace detail
+
+	struct block_t : public detail::cpo_base<block_t>
+	{
+		// @TODO: Support fixed block matrix with certain preconditions (#225)
+
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			std::type_identity<BlockAllocator> = {})
+			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+		{
+			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index);
+		}
+
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			const BlockAllocator& block_alloc) -> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+		{
+			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index,
+				block_alloc);
+		}
+
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			unsafe_tag,
+			std::type_identity<BlockAllocator> = {})
+			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+		{
+			return detail::block_impl<false, BlockAllocator>(obj,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index);
+		}
+
+		template<typename Value,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			typename Allocator,
+			typename BlockAllocator = Allocator>
+		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			unsafe_tag,
+			const BlockAllocator& block_alloc) -> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+		{
+			return detail::block_impl<false, BlockAllocator>(obj,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index,
+				block_alloc);
 		}
 	};
 
