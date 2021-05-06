@@ -97,7 +97,7 @@ namespace mpp
 				const auto ad = element_4 * element_1;
 				const auto bc = element_2 * element_3;
 
-				const auto det = std::round(ad - bc);
+				const auto det = ad - bc;
 
 				if constexpr (Check)
 				{
