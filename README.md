@@ -8,7 +8,7 @@ A C++20 and later matrix library
 
 - GCC 10
 - Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
-- MSVC 19.29 (VS 2019 16.10.2)
+- MSVC 19.28
 
 ## How to Include:
 
