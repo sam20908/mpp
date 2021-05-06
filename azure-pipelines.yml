@@ -111,8 +111,7 @@ jobs:
         displayName: Publish Tests Results
 
   - job: WindowsMSVC
-    # @TODO: Remove this condition once #245 is resolved (VS 16.10.2 is shipped in CI)
-    displayName: Windows MSVC 19.28 (VS 16.9.0)
+    displayName: Windows MSVC 19.28
 
     pool:
       vmImage: windows-latest
