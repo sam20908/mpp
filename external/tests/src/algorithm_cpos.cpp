@@ -87,7 +87,7 @@ void test_det(const std::string& filename)
 	};
 }
 
-template<typename From, typename To, typename CustAlloc, bool HasUnsafeOverload>
+template<typename From, typename To, typename CustAlloc, bool HasUnsafeOverload, bool PassToAsIdentityObj>
 void test_transformation(const std::string& filename, const auto& transform_fn)
 {
 	const auto result =
@@ -100,7 +100,7 @@ void test_transformation(const std::string& filename, const auto& transform_fn)
 	const auto do_cmp = [&](const auto&... args) {
 		decltype(transform_fn(mat)) out;
 
-		if constexpr (!std::is_same_v<From, To>)
+		if constexpr (PassToAsIdentityObj)
 		{
 			out = transform_fn(std::type_identity<To>{}, mat, args...);
 		}
@@ -220,8 +220,8 @@ int main()
 	};
 
 	feature("Transpose") = []() {
-		test_transformation<int, int, custom_allocator<int>, false>("algorithm/t/25x25.txt", mpp::transpose);
-		test_transformation<int, int, custom_allocator<int>, false>("algorithm/t/50x2.txt", mpp::transpose);
+		test_transformation<int, int, custom_allocator<int>, false, false>("algorithm/t/25x25.txt", mpp::transpose);
+		test_transformation<int, int, custom_allocator<int>, false, false>("algorithm/t/50x2.txt", mpp::transpose);
 	};
 
 	// feature("LU Decomposition") = []() {
@@ -229,14 +229,14 @@ int main()
 	// 	test_lu<int, double>("algorithm/lu/3x3.txt");
 	// };
 
-	// feature("Inverse") = []() {
-	// 	auto inv_fn = std::bind_front(mpp::inverse, std::type_identity<double>{});
-
-	// 	test_transformation<int, double>("algorithm/inv/2x2.txt", inv_fn);
-	// 	test_transformation<int, double>("algorithm/inv/3x3.txt", inv_fn);
-	// 	test_transformation<int, double>("algorithm/inv/3x3_int.txt", inv_fn);
-	// 	test_transformation<double, double>("algorithm/inv/10x10.txt", inv_fn);
-	// };
+	feature("Inverse") = []() {
+		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/2x2.txt", mpp::inverse);
+		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/3x3.txt", mpp::inverse);
+		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/3x3_int.txt",
+			mpp::inverse);
+		test_transformation<double, double, custom_allocator<double>, true, true>("algorithm/inv/10x10.txt",
+			mpp::inverse);
+	};
 
 	// feature("Block") = []() {
 	// 	test_block<int, int>("algorithm/block/4x4.txt");

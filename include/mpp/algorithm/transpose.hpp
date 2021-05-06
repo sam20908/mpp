@@ -37,7 +37,7 @@ namespace mpp
 			std::size_t ColumnsExtent,
 			typename TransposeAllocator,
 			typename... Args>
-		auto trps_impl(const auto& obj, const Args&... alloc_args)
+		[[nodiscard]] auto trps_impl(const auto& obj, const Args&... alloc_args)
 			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
 		{
 			const auto rows    = obj.rows();
@@ -61,7 +61,7 @@ namespace mpp
 				}
 			}
 
-			return trps_mat_t{ columns, rows, std::move(transposed_buffer), mpp::unsafe, alloc_args... };
+			return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe, alloc_args... };
 		}
 	} // namespace detail
 
