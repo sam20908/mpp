@@ -252,7 +252,7 @@ void test_lu(const std::string& filename)
 	};
 }
 
-template<typename AValue, typename BValue, typename XValue>
+template<typename AValue, typename BValue, typename XValue, typename CustAlloc, bool PassToAsIdentityObj>
 void test_sub(const std::string& filename, const auto& fn)
 {
 	const auto result =
@@ -262,15 +262,40 @@ void test_sub(const std::string& filename, const auto& fn)
 	const auto& b          = std::get<1>(result);
 	const auto& expected_x = std::get<2>(result);
 
-	test(filename) = [&]() {
-		const auto x = fn(a, b);
+	using ordering_type = std::compare_three_way_result_t<XValue, XValue>;
+
+	const auto do_cmp = [&](const auto&... args) {
+		const auto x = [&]() {
+			if constexpr (PassToAsIdentityObj)
+			{
+				return fn(std::type_identity<XValue>{}, a, b, args...);
+			}
+			else
+			{
+				return fn(a, b, args...);
+			}
+		}();
 
 		expect(x.rows() == expected_x.rows());
 		expect(x.columns() == expected_x.columns());
 
-		using ordering_type = std::compare_three_way_result_t<XValue, XValue>;
-
 		expect(mpp::elements_compare(x, expected_x, mpp::floating_point_compare) == ordering_type::equivalent);
+	};
+
+	test(filename) = [&]() {
+		const auto cust_alloc = CustAlloc{};
+
+		when("Not using unsafe") = [&]() {
+			do_cmp();
+			do_cmp(std::type_identity<CustAlloc>{});
+			do_cmp(cust_alloc);
+		};
+
+		when("Using unsafe") = [&]() {
+			do_cmp(mpp::unsafe);
+			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
+			do_cmp(mpp::unsafe, cust_alloc);
+		};
 	};
 }
 
@@ -307,17 +332,15 @@ int main()
 		test_block<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
 	};
 
-	// feature("Forward substitution") = []() {
-	// 	auto fwd_sub_fn = std::bind_front(mpp::forward_substitution, std::type_identity<int>{});
+	feature("Forward substitution") = []() {
+		test_sub<int, int, int, custom_allocator<int>, false>("algorithm/fwd_sub/4x4_4x1.txt",
+			mpp::forward_substitution);
+	};
 
-	// 	test_sub<int, int, int>("algorithm/fwd_sub/4x4_4x1.txt", fwd_sub_fn);
-	// };
-
-	// feature("Back substitution") = []() {
-	// 	auto back_sub_fn = std::bind_front(mpp::back_substitution, std::type_identity<double>{});
-
-	// 	test_sub<int, int, double>("algorithm/back_sub/3x3_3x1.txt", back_sub_fn);
-	// };
+	feature("Back substitution") = []() {
+		test_sub<int, int, double, custom_allocator<double>, true>("algorithm/back_sub/3x3_3x1.txt",
+			mpp::back_substitution);
+	};
 
 	return 0;
 }
