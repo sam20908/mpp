@@ -192,7 +192,7 @@ void test_block(const std::string& filename)
 	};
 }
 
-template<typename From, typename To>
+template<typename From, typename To, typename CustAlloc, bool PassToAsIdentityObj>
 void test_lu(const std::string& filename)
 {
 	const auto result = parse_mats_out<temp_types<mat_t, mat_t, mat_t>, types<From, To, To>>(get_filepath(filename),
@@ -201,18 +201,54 @@ void test_lu(const std::string& filename)
 	const auto& expected_left  = std::get<1>(result);
 	const auto& expected_right = std::get<2>(result);
 
+	using ordering_type = std::compare_three_way_result_t<To, To>;
+
+	const auto do_cmp = [&](const auto&... args) {
+		const auto result = [&]() {
+			if constexpr (PassToAsIdentityObj)
+			{
+				return mpp::lu_decomposition(std::type_identity<To>{}, mat, args...);
+			}
+			else
+			{
+				return mpp::lu_decomposition(mat, args...);
+			}
+		}();
+
+		const auto& left  = result.first;
+		const auto& right = result.second;
+
+		given("L matrix") = [&]() {
+			expect(left.rows() == expected_left.rows());
+			expect(left.columns() == expected_left.columns());
+
+			expect(
+				mpp::elements_compare(left, expected_left, mpp::floating_point_compare) == ordering_type::equivalent);
+		};
+
+		given("U matrix") = [&]() {
+			expect(right.rows() == expected_right.rows());
+			expect(right.columns() == expected_right.columns());
+
+			expect(
+				mpp::elements_compare(right, expected_right, mpp::floating_point_compare) == ordering_type::equivalent);
+		};
+	};
+
 	test(filename) = [&]() {
-		const auto [left, right] = mpp::lu_decomposition(std::type_identity<To>{}, mat);
+		const auto cust_alloc = CustAlloc{};
 
-		expect(left.rows() == expected_left.rows());
-		expect(left.columns() == expected_left.columns());
-		expect(right.rows() == expected_right.rows());
-		expect(right.columns() == expected_right.columns());
+		when("Not using unsafe") = [&]() {
+			do_cmp();
+			do_cmp(std::type_identity<CustAlloc>{});
+			do_cmp(cust_alloc);
+		};
 
-		using ordering_type = std::compare_three_way_result_t<To, To>;
-
-		expect(mpp::elements_compare(left, expected_left, mpp::floating_point_compare) == ordering_type::equivalent);
-		expect(mpp::elements_compare(right, expected_right, mpp::floating_point_compare) == ordering_type::equivalent);
+		when("Using unsafe") = [&]() {
+			do_cmp(mpp::unsafe);
+			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
+			do_cmp(mpp::unsafe, cust_alloc);
+		};
 	};
 }
 
@@ -253,10 +289,10 @@ int main()
 		test_transformation<int, int, custom_allocator<int>, false, false>("algorithm/t/50x2.txt", mpp::transpose);
 	};
 
-	// feature("LU Decomposition") = []() {
-	// 	test_lu<int, double>("algorithm/lu/2x2.txt");
-	// 	test_lu<int, double>("algorithm/lu/3x3.txt");
-	// };
+	feature("LU Decomposition") = []() {
+		test_lu<int, double, custom_allocator<double>, true>("algorithm/lu/2x2.txt");
+		test_lu<int, double, custom_allocator<double>, true>("algorithm/lu/3x3.txt");
+	};
 
 	feature("Inverse") = []() {
 		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/2x2.txt", mpp::inverse);
