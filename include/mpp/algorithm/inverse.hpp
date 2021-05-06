@@ -39,12 +39,14 @@ namespace mpp
 	{
 		template<bool Check,
 			typename To,
+			typename ToAllocator,
+			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
-			typename ToAllocator,
+			typename Allocator,
 			typename... Args>
-		[[nodiscard]] inline auto inv_impl(const auto& obj, const Args&... alloc_args)
-			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+		[[nodiscard]] inline auto inv_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			const Args&... alloc_args) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{
@@ -197,11 +199,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<detail::configuration_use_safe,
-				detail::default_floating_type,
-				RowsExtent,
-				ColumnsExtent,
-				ToAllocator>(obj);
+			return detail::inv_impl<detail::configuration_use_safe, detail::default_floating_type, ToAllocator>(obj);
 		}
 
 		template<typename Value,
@@ -216,7 +214,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inv_impl<false, detail::default_floating_type, ToAllocator>(obj);
 		}
 
 		template<typename Value,
@@ -249,8 +247,7 @@ namespace mpp
 			const ToAllocator& to_alloc)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<false, detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator>(obj,
-				to_alloc);
+			return detail::inv_impl<false, detail::default_floating_type, ToAllocator>(obj, to_alloc);
 		}
 
 		template<std::floating_point To,
@@ -265,7 +262,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<detail::configuration_use_safe, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inv_impl<detail::configuration_use_safe, To, ToAllocator>(obj);
 		}
 
 		template<std::floating_point To,
@@ -281,7 +278,7 @@ namespace mpp
 			std::type_identity<ToAllocator> = {})
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj);
+			return detail::inv_impl<false, To, ToAllocator>(obj);
 		}
 
 		template<std::floating_point To,
@@ -295,7 +292,7 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			const ToAllocator& to_alloc) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj, to_alloc);
+			return detail::inv_impl<false, To, ToAllocator>(obj, to_alloc);
 		}
 
 		template<std::floating_point To,
@@ -310,7 +307,7 @@ namespace mpp
 			unsafe_tag,
 			const ToAllocator& to_alloc) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<false, To, RowsExtent, ColumnsExtent, ToAllocator>(obj, to_alloc);
+			return detail::inv_impl<false, To, ToAllocator>(obj, to_alloc);
 		}
 	};
 
