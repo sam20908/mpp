@@ -40,7 +40,7 @@ namespace mpp
 		{
 			using x_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>;
 			using x_buffer_t = typename x_matrix_t::buffer_type;
-			auto x_buffer    = return x_buffer_t{};
+			auto x_buffer    = x_buffer_t{};
 
 			// @TODO: Any way to make this utilize push_back?
 			allocate_buffer_if_vector(x_buffer, n, 1, default_floating_type{});
