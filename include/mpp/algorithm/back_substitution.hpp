@@ -34,23 +34,13 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator, typename... Args>
-		inline auto back_subst_on_buffer(const auto& a, const auto& b, std::size_t n, const Args&... alloc_args)
-			-> // @TODO: ISSUE #20
+		template<bool Check, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
+		inline auto back_subst_on_buffer(const auto& a, const auto& b, std::size_t n) -> // @TODO: ISSUE #20
 			typename matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>::buffer_type
 		{
 			using x_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>;
 			using x_buffer_t = typename x_matrix_t::buffer_type;
-			auto x_buffer    = [&]() {
-                if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-                {
-                    return x_buffer_t{ alloc_args... };
-                }
-                else
-                {
-                    return x_buffer_t{};
-                }
-			}();
+			auto x_buffer    = return x_buffer_t{};
 
 			// @TODO: Any way to make this utilize push_back?
 			allocate_buffer_if_vector(x_buffer, n, 1, default_floating_type{});

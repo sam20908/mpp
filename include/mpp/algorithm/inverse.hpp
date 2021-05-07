@@ -71,16 +71,7 @@ namespace mpp
 				return inv_mat_t{};
 			}
 
-			auto inv_buffer = [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return lu_buf_t{ alloc_args... };
-				}
-				else
-				{
-					return lu_buf_t{};
-				}
-			}();
+			auto inv_buffer = lu_buf_t{};
 			allocate_buffer_if_vector(inv_buffer, rows, columns, default_floating_type{});
 
 			if (rows == 1)
