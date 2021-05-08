@@ -66,6 +66,7 @@ namespace mpp::detail
 
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
+			// Micro-optimization: allow other indexes to reference this instead of multi-step calculation
 			const auto diag_front_index = index_2d_to_1d(columns, row, std::size_t{});
 			const auto diag_index       = diag_front_index + row;
 			const auto diag_elem        = u_buffer[diag_index];
@@ -77,8 +78,9 @@ namespace mpp::detail
 
 				for (auto column = row; column < columns; ++column)
 				{
-					const auto inner_row_current_index = inner_front_index + column;
+					const auto inner_row_current_index = index_2d_to_1d(columns, inner_row, column);
 
+					// row as column parameter means accessing diagnoal element
 					const auto inner_row_current_elem      = u_buffer[inner_row_current_index];
 					const auto diag_row_corresponding_elem = u_buffer[diag_front_index + column];
 
