@@ -70,6 +70,7 @@ namespace mpp::detail
 			const auto diag_front_index = index_2d_to_1d(columns, row, std::size_t{});
 			const auto diag_index       = diag_front_index + row;
 			const auto diag_elem        = u_buffer[diag_index];
+			const auto diag_elem_inv    = 1 / diag_elem;
 
 			for (auto inner_row = row + 1; inner_row < rows; ++inner_row)
 			{
@@ -87,7 +88,7 @@ namespace mpp::detail
 					// inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem
 
 					const auto result_elem =
-						inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem;
+						inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem * diag_elem_inv);
 
 					u_buffer[inner_row_current_index] = result_elem;
 				};
@@ -96,7 +97,7 @@ namespace mpp::detail
 				{
 					// We don't necessarily need to fill the l_buffer if we're only getting the determinant because only
 					// u_buffer will be used
-					l_buffer[inner_front_index] = inner_front_elem / diag_elem;
+					l_buffer[inner_front_index] = inner_front_elem * diag_elem_inv;
 				};
 			}
 
