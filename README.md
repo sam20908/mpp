@@ -145,8 +145,6 @@ Normally with C++20, we could simply provide a `operator<=>` and let the compile
 
 int main()
 {
-  // Note that you can't compare matrices of different value types because it complicates things A LOT
-
   // Size for both of these dynamic matrices are deduced as 2x2
   const auto left = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
   const auto right = mpp::matrix<int>{ { 1, 2 }, { 3, 5 } };
