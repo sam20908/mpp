@@ -110,8 +110,7 @@ If you as a user can make guarantees that the library checks internally (e.g. pr
 
 int main()
 {
-  const auto range_2d = std::vector<std::vector<int>>{ { 1, 1 }, { 1, 1 } }; // 2x2 data
-  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
+  const auto range_2d = std::vector<std::vector<int>>{ { 1, 2 }, { 3, 4 } }; // 2x2 data
 
   /**
    * For constructors, mpp::unsafe will allow avoid checks like these (different depending on type of matrix you are constructing):
@@ -120,12 +119,13 @@ int main()
    * - The 2D initializer's columns matches the ColumnsExtent template parameter for fully static matrices
    * and much more...
    */
-
-  const auto inv = mpp::inverse(matrix, mpp::unsafe);
+  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
 
   /**
    * For mpp::inverse, mpp::unsafe allows avoid checking if the determinant of the matrix is 0, which we guaranteed with our range_2d
+   * The actual determinant of our range_2d is -2
    */
+  const auto inv = mpp::inverse(matrix, mpp::unsafe);
 
   return 0;
 }
