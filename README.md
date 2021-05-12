@@ -8,6 +8,12 @@ A C++20 and later matrix library
 
 * GCC 10
 * Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
+  + NOTE: **Only works on Windows**, as Linux builds fail with this error (I haven't figured out how to fix this error):
+
+``` txt
+/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/ranges:3392:19: error: missing 'typename' prior to dependent type name 'iterator_traits<iterator_t<_Base>>::iterator_category'
+```
+
 * MSVC 19.28
 
 ## How to Include:
