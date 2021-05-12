@@ -45,16 +45,16 @@ namespace mpp
 
 		static constexpr auto use_unsafe = false;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
 		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
 
-		template<typename Value, std::size_t, std::size_t>
-		using dynamic_buffer = std::vector<Value>;
+		template<typename Value, std::size_t, std::size_t, typename Alloc>
+		using dynamic_buffer = std::vector<Value, Alloc>;
 
-		template<typename Value, std::size_t, std::size_t ColumnsExtent>
-		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent>;
+		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
+		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t>
-		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1>;
+		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
+		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>;
 	};
 } // namespace mpp

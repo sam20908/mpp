@@ -34,14 +34,14 @@ namespace mpp
 	template<detail::arithmetic Value, std::size_t ColumnsExtent, typename Allocator>
 	class matrix<Value, dynamic, ColumnsExtent, Allocator> :
 		public detail::matrix_dynamic_base<matrix<Value, dynamic, ColumnsExtent, Allocator>,
-			typename configuration<override>::dynamic_rows_buffer<Value, 1, ColumnsExtent>,
+			typename configuration<override>::dynamic_rows_buffer<Value, 1, ColumnsExtent, Allocator>,
 			Value,
 			dynamic,
 			ColumnsExtent,
 			Allocator>
 	{
 		using base = detail::matrix_dynamic_base<matrix<Value, dynamic, ColumnsExtent, Allocator>,
-			typename configuration<override>::dynamic_rows_buffer<Value, 1, ColumnsExtent>,
+			typename configuration<override>::dynamic_rows_buffer<Value, 1, ColumnsExtent, Allocator>,
 			Value,
 			dynamic,
 			ColumnsExtent,

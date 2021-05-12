@@ -38,14 +38,14 @@ namespace mpp
 	template<detail::arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 	class matrix :
 		public detail::matrix_base<matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
-			typename configuration<override>::static_buffer<Value, RowsExtent, ColumnsExtent>,
+			typename configuration<override>::static_buffer<Value, RowsExtent, ColumnsExtent, Allocator>,
 			Value,
 			RowsExtent,
 			ColumnsExtent,
 			Allocator>
 	{
 		using base = detail::matrix_base<matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
-			typename configuration<override>::static_buffer<Value, RowsExtent, ColumnsExtent>,
+			typename configuration<override>::static_buffer<Value, RowsExtent, ColumnsExtent, Allocator>,
 			Value,
 			RowsExtent,
 			ColumnsExtent,
