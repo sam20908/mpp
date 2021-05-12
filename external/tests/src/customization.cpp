@@ -19,6 +19,9 @@
 
 #include <mpp/utility/configuration.hpp>
 
+#include <array>
+#include <vector>
+
 namespace mpp
 {
 	template<>
@@ -31,6 +34,18 @@ namespace mpp
 		static constexpr std::size_t columns_extent = 10;
 
 		static constexpr bool use_unsafe = true;
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
+		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
+
+		template<typename Value, std::size_t, std::size_t>
+		using dynamic_buffer = std::vector<Value>;
+
+		template<typename Value, std::size_t, std::size_t ColumnsExtent>
+		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent>;
+
+		template<typename Value, std::size_t RowsExtent, std::size_t>
+		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1>;
 	};
 } // namespace mpp
 
