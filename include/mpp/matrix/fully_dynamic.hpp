@@ -34,14 +34,14 @@ namespace mpp
 	template<detail::arithmetic Value, typename Allocator>
 	class matrix<Value, dynamic, dynamic, Allocator> :
 		public detail::matrix_dynamic_base<matrix<Value, dynamic, dynamic, Allocator>,
-			typename configuration<override>::template dynamic_buffer<Value, dynamic, dynamic, Allocator>,
+			typename configuration<override>::dynamic_buffer<Value, dynamic, dynamic, Allocator>,
 			Value,
 			dynamic,
 			dynamic,
 			Allocator>
 	{
 		using base = detail::matrix_dynamic_base<matrix<Value, dynamic, dynamic, Allocator>,
-			typename configuration<override>::template dynamic_buffer<Value, dynamic, dynamic, Allocator>,
+			typename configuration<override>::dynamic_buffer<Value, dynamic, dynamic, Allocator>,
 			Value,
 			dynamic,
 			dynamic,
