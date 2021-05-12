@@ -81,6 +81,7 @@ jobs:
 
   - job: UbuntuClang
     displayName: Ubuntu Clang 11
+    condition: false
 
     pool:
       vmImage: ubuntu-latest
