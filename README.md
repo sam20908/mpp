@@ -217,16 +217,16 @@ namespace mpp
      */
 
     template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
-		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>; // mpp::matrix<int, 1, 2>
+    using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>; // mpp::matrix<int, 1, 2>
 
-		template<typename Value, std::size_t, std::size_t, typename Alloc>
-		using dynamic_buffer = std::vector<Value, Alloc>; // mpp::matrix<int>
+    template<typename Value, std::size_t, std::size_t, typename Alloc>
+    using dynamic_buffer = std::vector<Value, Alloc>; // mpp::matrix<int>
 
-		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
-		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>; // mpp::matrix<int, mpp::dynamic, 2>
+    template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
+    using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>; // mpp::matrix<int, mpp::dynamic, 2>
 
-		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
-		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>; // mpp::matrix<int, 1, mpp::dynamic>
+    template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
+    using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>; // mpp::matrix<int, 1, mpp::dynamic>
   };
 } // namespace mpp
 
