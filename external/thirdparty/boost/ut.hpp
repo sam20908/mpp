@@ -5,7 +5,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-#if defined(__cpp_modules)
+#if 0 // defined(__cpp_modules)
 export module boost.ut;
 export import std;
 #else
@@ -83,7 +83,7 @@ auto operator>=(TLhs, TRhs) -> bool;
 #endif
 #endif
 
-#if defined(__cpp_modules)
+#if 0 // defined(__cpp_modules)
 export namespace boost::inline ext::ut {
 #else
 namespace boost {
@@ -2555,7 +2555,7 @@ template <bool Constant>
   using operators::operator>>;
   }  // namespace v1_1_8
 }  // namespace ut
-#if !defined(__cpp_modules)
+#if 1 // !defined(__cpp_modules)
 }  // namespace inline ext
 }  // namespace boost
 #endif

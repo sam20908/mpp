@@ -8,6 +8,12 @@ A C++20 and later matrix library
 
 * GCC 10
 * Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
+  + NOTE: **Only works on Windows**, as Linux builds fail with this error (I haven't figured out how to fix this error):
+
+``` txt
+/usr/bin/../lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/ranges:3392:19: error: missing 'typename' prior to dependent type name 'iterator_traits<iterator_t<_Base>>::iterator_category'
+```
+
 * MSVC 19.28
 
 ## How to Include:
@@ -190,6 +196,9 @@ Customizations of options that affect the library globally can be changed via sp
 ``` cpp
 #include <mpp/utility/configuration.hpp>
 
+#include <array>
+#include <vector>
+
 namespace mpp
 {
   template<>
@@ -202,6 +211,22 @@ namespace mpp
     static constexpr std::size_t columns_extent = 10;
 
     static constexpr bool use_unsafe = true;
+
+    /**
+     * These are the default buffer type aliases the library will use, but you can customize them
+     */
+
+    template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
+		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>; // mpp::matrix<int, 1, 2>
+
+		template<typename Value, std::size_t, std::size_t, typename Alloc>
+		using dynamic_buffer = std::vector<Value, Alloc>; // mpp::matrix<int>
+
+		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
+		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>; // mpp::matrix<int, mpp::dynamic, 2>
+
+		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
+		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>; // mpp::matrix<int, 1, mpp::dynamic>
   };
 } // namespace mpp
 

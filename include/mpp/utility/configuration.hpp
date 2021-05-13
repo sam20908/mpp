@@ -22,8 +22,10 @@
 // @TODO: Export std::allocator for modules
 #include <mpp/detail/utility/public.hpp>
 
+#include <array>
 #include <cstddef>
 #include <memory>
+#include <vector>
 
 namespace mpp
 {
@@ -42,5 +44,17 @@ namespace mpp
 		static constexpr auto columns_extent = dynamic;
 
 		static constexpr auto use_unsafe = false;
+
+		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
+		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
+
+		template<typename Value, std::size_t, std::size_t, typename Alloc>
+		using dynamic_buffer = std::vector<Value, Alloc>;
+
+		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
+		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>;
+
+		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
+		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>;
 	};
 } // namespace mpp
