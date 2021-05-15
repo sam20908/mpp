@@ -72,96 +72,177 @@ namespace mpp
 			}
 		}
 
+		template<typename Val,
+			typename Alloc,
+			std::size_t RowsExtent,
+			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex>
+		using block_mat_ret_t = matrix<Val,
+			any_extent_is_dynamic(RowsExtent, TopRowIndex, BottomRowIndex) ? dynamic : BottomRowIndex - TopRowIndex + 1,
+			any_extent_is_dynamic(ColumnsExtent, TopColumnIndex, BottomColumnIndex)
+				? dynamic
+				: BottomColumnIndex - TopColumnIndex + 1,
+			Alloc>;
+
+		template<typename BlockMat, typename... Args>
+		auto block_impl_fixed(const auto& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index) -> BlockMat // @TODO: ISSUE #20
+		{
+			using diff_t = typename BlockMat::difference_type;
+			using buf_t  = typename BlockMat::buffer_type;
+
+			auto buf = buf_t{};
+
+			auto buf_begin = buf.begin();
+			auto obj_begin = obj.begin();
+
+			const auto rows          = obj.rows();
+			const auto columns       = obj.columns();
+			const auto block_rows    = bottom_row_index - top_row_index + 1;
+			const auto block_columns = bottom_column_index - top_column_index + 1;
+
+			for (auto row = top_row_index; row <= bottom_row_index; ++row)
+			{
+				auto row_begin_index = static_cast<diff_t>(index_2d_to_1d(columns, row, top_column_index));
+				auto row_begin       = std::next(obj.begin(), row_begin_index);
+
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), buf_begin);
+
+				std::advance(buf_begin, block_columns);
+			}
+
+			return BlockMat{ block_rows, block_columns, std::move(buf), unsafe };
+		}
+
+		template<typename BlockMat, typename... Args>
+		auto block_impl_dyn(const auto& obj,
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			const Args&... alloc_args) -> BlockMat // @TODO: ISSUE #20
+		{
+			using diff_t = typename BlockMat::difference_type;
+			using buf_t  = typename BlockMat::buffer_type;
+
+			const auto rows          = obj.rows();
+			const auto columns       = obj.columns();
+			const auto block_rows    = bottom_row_index - top_row_index + 1;
+			const auto block_columns = bottom_column_index - top_column_index + 1;
+
+			auto buf = buf_t{ alloc_args... };
+			buf.reserve(block_rows * block_columns);
+
+			auto inserter = std::back_inserter(buf);
+
+			for (auto row = top_row_index; row <= bottom_row_index; ++row)
+			{
+				auto row_begin_index = static_cast<diff_t>(index_2d_to_1d(columns, row, top_column_index));
+				auto row_begin       = std::next(obj.begin(), row_begin_index);
+
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), inserter);
+			}
+
+			return BlockMat{ block_rows, block_columns, std::move(buf), unsafe, alloc_args... };
+		}
+
 		template<bool Check,
 			typename BlockAllocator,
 			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex,
 			typename Allocator,
 			typename... Args>
 		[[nodiscard]] inline auto block_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
-			const Args&... alloc_args) -> matrix<Value, RowsExtent, ColumnsExtent, BlockAllocator> // @TODO: ISSUE #20
+			constant<TopRowIndex> top_row_index,
+			constant<TopColumnIndex> top_column_index,
+			constant<BottomRowIndex> bottom_row_index,
+			constant<BottomColumnIndex> bottom_column_index,
+			const Args&... alloc_args) -> block_mat_ret_t<Value,
+			BlockAllocator,
+			RowsExtent,
+			ColumnsExtent,
+			TopRowIndex,
+			TopColumnIndex,
+			BottomRowIndex,
+			BottomColumnIndex> // @TODO: ISSUE #20
 		{
-			// The result matrix is always dynamic because function parameters are always treated as runtime
-			// expressions, which means it's impossible to change the extent to resized extent
-
-			const auto rows    = obj.rows();
-			const auto columns = obj.columns();
-			const auto begin   = obj.begin();
-
 			if constexpr (Check)
 			{
-				detail::validate_block_index_boundaries(rows,
-					columns,
-					top_row_index,
-					top_column_index,
-					bottom_row_index,
-					bottom_column_index);
+				detail::validate_block_index_boundaries(obj.rows(),
+					obj.columns(),
+					top_row_index.val,
+					top_column_index.val,
+					bottom_row_index.val,
+					bottom_column_index.val);
 			}
 
-			using block_mat_t     = matrix<Value, dynamic, dynamic, BlockAllocator>;
-			using block_buf_t     = typename block_mat_t::buffer_type;
-			using difference_type = typename block_mat_t::difference_type;
+			using block_mat_t = block_mat_ret_t<Value,
+				BlockAllocator,
+				RowsExtent,
+				ColumnsExtent,
+				TopRowIndex,
+				TopColumnIndex,
+				BottomRowIndex,
+				BottomColumnIndex>;
 
-			auto block_buf = [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return block_buf_t{ alloc_args... };
-				}
-				else
-				{
-					return block_buf_t{};
-				}
-			}();
-			auto block_buf_back_inserter = std::back_inserter(block_buf);
+			constexpr auto buf_is_vec = any_extent_is_dynamic(RowsExtent, ColumnsExtent);
 
-			const auto block_rows    = bottom_row_index - top_row_index + 1;
-			const auto block_columns = bottom_column_index - top_column_index + 1;
-			block_buf.reserve(block_rows * block_columns);
-
-			for (auto row = top_row_index; row <= bottom_row_index; ++row)
+			if constexpr (buf_is_vec)
 			{
-				auto row_begin_index =
-					static_cast<difference_type>(detail::index_2d_to_1d(columns, row, top_column_index));
-				auto row_begin = std::next(begin, row_begin_index);
-
-				std::ranges::copy_n(row_begin, static_cast<difference_type>(block_columns), block_buf_back_inserter);
+				return block_impl_dyn<block_mat_t>(obj,
+					top_row_index.val,
+					top_column_index.val,
+					bottom_row_index.val,
+					bottom_column_index.val,
+					alloc_args...);
 			}
-
-			return [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe, alloc_args... };
-				}
-				else
-				{
-					return block_mat_t{ block_rows, block_columns, std::move(block_buf), unsafe };
-				}
-			}();
+			else
+			{
+				return block_impl_fixed<block_mat_t>(obj,
+					top_row_index.val,
+					top_column_index.val,
+					bottom_row_index.val,
+					bottom_column_index.val);
+			}
 		}
 	} // namespace detail
 
 	struct block_t : public detail::cpo_base<block_t>
 	{
-		// @TODO: Support fixed block matrix with certain preconditions (#225)
-
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex,
 			typename Allocator,
 			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
-			std::type_identity<BlockAllocator> = {})
-			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+			constant<TopRowIndex> top_row_index,
+			constant<TopColumnIndex> top_column_index,
+			constant<BottomRowIndex> bottom_row_index,
+			constant<BottomColumnIndex> bottom_column_index,
+			std::type_identity<BlockAllocator> = {}) -> detail::block_mat_ret_t<Value,
+			BlockAllocator,
+			RowsExtent,
+			ColumnsExtent,
+			TopRowIndex,
+			TopColumnIndex,
+			BottomRowIndex,
+			BottomColumnIndex> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
 				top_row_index,
@@ -173,15 +254,26 @@ namespace mpp
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex,
 			typename Allocator,
 			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
-			const BlockAllocator& block_alloc) -> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+			constant<TopRowIndex> top_row_index,
+			constant<TopColumnIndex> top_column_index,
+			constant<BottomRowIndex> bottom_row_index,
+			constant<BottomColumnIndex> bottom_column_index,
+			const BlockAllocator& block_alloc) -> detail::block_mat_ret_t<Value,
+			BlockAllocator,
+			RowsExtent,
+			ColumnsExtent,
+			TopRowIndex,
+			TopColumnIndex,
+			BottomRowIndex,
+			BottomColumnIndex> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
 				top_row_index,
@@ -194,17 +286,27 @@ namespace mpp
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex,
 			typename Allocator,
 			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
+			constant<TopRowIndex> top_row_index,
+			constant<TopColumnIndex> top_column_index,
+			constant<BottomRowIndex> bottom_row_index,
+			constant<BottomColumnIndex> bottom_column_index,
 			unsafe_tag,
-			std::type_identity<BlockAllocator> = {})
-			-> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+			std::type_identity<BlockAllocator> = {}) -> detail::block_mat_ret_t<Value,
+			BlockAllocator,
+			RowsExtent,
+			ColumnsExtent,
+			TopRowIndex,
+			TopColumnIndex,
+			BottomRowIndex,
+			BottomColumnIndex> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<false, BlockAllocator>(obj,
 				top_row_index,
@@ -216,16 +318,27 @@ namespace mpp
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
+			std::size_t TopRowIndex,
+			std::size_t TopColumnIndex,
+			std::size_t BottomRowIndex,
+			std::size_t BottomColumnIndex,
 			typename Allocator,
 			typename BlockAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::size_t top_row_index,
-			std::size_t top_column_index,
-			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
+			constant<TopRowIndex> top_row_index,
+			constant<TopColumnIndex> top_column_index,
+			constant<BottomRowIndex> bottom_row_index,
+			constant<BottomColumnIndex> bottom_column_index,
 			unsafe_tag,
-			const BlockAllocator& block_alloc) -> matrix<Value, dynamic, dynamic, BlockAllocator> // @TODO: ISSUE #20
+			const BlockAllocator& block_alloc) -> detail::block_mat_ret_t<Value,
+			BlockAllocator,
+			RowsExtent,
+			ColumnsExtent,
+			TopRowIndex,
+			TopColumnIndex,
+			BottomRowIndex,
+			BottomColumnIndex> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<false, BlockAllocator>(obj,
 				top_row_index,
