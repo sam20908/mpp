@@ -155,10 +155,10 @@ void test_block(const std::string& filename)
 							std::size_t bottom_column_index,
 							const auto&... args) {
 		const auto block = mpp::block(mat,
-			c{ top_row_index },
-			c{ top_column_index },
-			c{ bottom_row_index },
-			c{ bottom_column_index },
+			c<>{ top_row_index },
+			c<>{ top_column_index },
+			c<>{ bottom_row_index },
+			c<>{ bottom_column_index },
 			args...);
 
 		expect(block.rows() == expected_block.rows());
