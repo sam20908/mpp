@@ -131,7 +131,6 @@ namespace mpp
 			using diff_t = typename BlockMat::difference_type;
 			using buf_t  = typename BlockMat::buffer_type;
 
-			const auto rows          = obj.rows();
 			const auto columns       = obj.columns();
 			const auto block_rows    = bottom_row_index - top_row_index + 1;
 			const auto block_columns = bottom_column_index - top_column_index + 1;
