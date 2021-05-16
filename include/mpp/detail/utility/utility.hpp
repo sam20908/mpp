@@ -35,7 +35,8 @@ namespace mpp::detail
 		return row_index * columns + column_index;
 	}
 
-	[[nodiscard]] constexpr auto any_extent_is_dynamic(auto... args) noexcept -> std::size_t
+	template<typename... Args>
+	[[nodiscard]] constexpr auto any_extent_is_dynamic(Args... args) noexcept -> std::size_t
 	{
 		return ((args == dynamic) || ...);
 	}
