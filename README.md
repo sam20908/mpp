@@ -39,6 +39,9 @@ Here is a _super_ broken down example that showcases the API and functionality m
 
 #include <iostream>
 
+template<std::size_t Val = mpp::dynamic>
+using c = mpp::constant<Val>; // Shorthand alias for mpp::constant
+
 int main()
 {
   /**
@@ -78,6 +81,13 @@ int main()
    */
   auto det = mpp::determinant(m_fully_static);
   auto inv = mpp::inverse(m_fully_dynamic);
+
+  // mpp::block takes a mpp::constant, which allows it to produce (partial) static matrices if the following are met:
+  // - If input matrix's rows, top row index, and bottom row index are all compile time specified, then resulting rows will also be compile time specified
+  // ^ same for columns
+
+  auto block_static = mpp::block(m_fully_static, c<0>{}, c<0>{}, c<1>{}, c<1>{}); // matrix<int, 2, 2> 2x2
+  auto block_dyn = mpp::block(m_fully_static, c{ 0 }, c{ 0 }, c{ 1 }, c{ 1 }); // matrix<int, dynamic, dynamic> 2x2
 
   /**
    * Utilities
