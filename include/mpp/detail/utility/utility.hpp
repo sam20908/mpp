@@ -35,10 +35,10 @@ namespace mpp::detail
 		return row_index * columns + column_index;
 	}
 
-	[[nodiscard]] constexpr auto any_extent_is_dynamic(std::size_t row_extent, std::size_t column_extent) noexcept
-		-> std::size_t
+	template<typename... Args>
+	[[nodiscard]] constexpr auto any_extent_is_dynamic(Args... args) noexcept -> std::size_t
 	{
-		return row_extent == dynamic || column_extent == dynamic;
+		return ((args == dynamic) || ...);
 	}
 
 	static constexpr auto configuration_use_unsafe = configuration<override>::use_unsafe;
