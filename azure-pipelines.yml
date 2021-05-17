@@ -79,8 +79,6 @@ jobs:
 
   - job: UbuntuClang
     displayName: Ubuntu Clang 11
-    # @TODO: Allow this when the bug is somehow identified...
-    condition: false
 
     pool:
       vmImage: ubuntu-latest
