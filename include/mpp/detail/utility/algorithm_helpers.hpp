@@ -23,6 +23,8 @@
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/utility/comparison.hpp>
 
+#include "Tracy.hpp"
+
 #include <cmath>
 #include <compare>
 #include <cstddef>
@@ -55,6 +57,8 @@ namespace mpp::detail
 	inline auto lu_generic(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
 		-> To // @TODO: ISSUE #20
 	{
+		ZoneScopedS(20);
+
 		// Shortcut method from
 		// https://medium.com/linear-algebra-basics/lu-decomposition-c8f9b75ddeff
 
