@@ -29,8 +29,6 @@
 #include <memory>
 #include <utility>
 
-#include "Tracy.hpp"
-
 namespace mpp
 {
 	namespace detail
@@ -47,8 +45,6 @@ namespace mpp
 			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
 				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
-			ZoneScopedS(20);
-
 			if constexpr (Check)
 			{
 				if (!square(obj))
