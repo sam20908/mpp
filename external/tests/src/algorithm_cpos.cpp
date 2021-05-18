@@ -29,6 +29,7 @@
 #endif
 
 #include <mpp/utility/comparison.hpp>
+#include <mpp/utility/type.hpp>
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
 
@@ -44,6 +45,9 @@
 
 using namespace boost::ut::bdd;
 using namespace boost::ut;
+
+template<std::size_t Val = mpp::dynamic>
+using c = mpp::constant<Val>;
 
 template<typename From, typename To>
 void test_det(const std::string& filename)
@@ -150,8 +154,12 @@ void test_block(const std::string& filename)
 							std::size_t bottom_row_index,
 							std::size_t bottom_column_index,
 							const auto&... args) {
-		const auto block =
-			mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, args...);
+		const auto block = mpp::block(mat,
+			c<>{ top_row_index },
+			c<>{ top_column_index },
+			c<>{ bottom_row_index },
+			c<>{ bottom_column_index },
+			args...);
 
 		expect(block.rows() == expected_block.rows());
 		expect(block.columns() == expected_block.columns());
@@ -168,7 +176,6 @@ void test_block(const std::string& filename)
 			const auto column_start    = block.column_start;
 			const auto row_end         = block.row_end;
 			const auto column_end      = block.column_end;
-			const auto block_          = mpp::block(mat, row_start, column_start, row_end, column_end);
 			const auto& expected_block = block.mat;
 
 			when("Not using unsafe") = [&]() {
@@ -189,6 +196,56 @@ void test_block(const std::string& filename)
 				do_cmp(expected_block, row_start, column_start, row_end, column_end, mpp::unsafe, cust_alloc);
 			};
 		}
+	};
+}
+
+template<typename From,
+	typename To,
+	typename CustAlloc,
+	std::size_t TopRowIndex,
+	std::size_t TopColumnIndex,
+	std::size_t BottomRowIndex,
+	std::size_t BottomColumnIndex>
+void test_block_fixed(const std::string& filename)
+{
+	const auto result =
+		parse_mats_out<temp_types<mat_t, mat_t>, types<From, To>>(get_filepath(filename), std::tuple{ mat_fn, mat_fn });
+	const auto& mat = std::get<0>(result);
+	const auto& out = std::get<1>(result);
+
+	using ordering_type = std::compare_three_way_result_t<To, To>;
+
+	const auto do_cmp = [&](const auto&... args) {
+		const auto block = mpp::block(mat,
+			c<TopRowIndex>{},
+			c<TopColumnIndex>{},
+			c<BottomRowIndex>{},
+			c<BottomColumnIndex>{},
+			args...);
+
+		expect(block.rows() == out.rows());
+		expect(block.columns() == out.columns());
+
+		// expect(mpp::type(block) == mpp::matrix_type::fully_static); @TODO: Enable this once test facility is extended
+		// to support creating static matrices
+
+		expect(mpp::elements_compare(block, out, mpp::floating_point_compare) == ordering_type::equivalent);
+	};
+
+	test(filename) = [&]() {
+		const auto cust_alloc = CustAlloc{};
+
+		when("Not using unsafe") = [&]() {
+			do_cmp();
+			do_cmp(std::type_identity<CustAlloc>{});
+			do_cmp(cust_alloc);
+		};
+
+		when("Using unsafe") = [&]() {
+			do_cmp(mpp::unsafe);
+			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
+			do_cmp(mpp::unsafe, cust_alloc);
+		};
 	};
 }
 
@@ -330,6 +387,10 @@ int main()
 
 	feature("Block") = []() {
 		test_block<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
+		test_block_fixed<int, int, custom_allocator<int>, 0, 0, 0, 0>("algorithm/block/3x3_fixed.txt");
+
+		expect(type<std::invoke_result_t<mpp::block_t, mpp::matrix<int, 2, 3>, c<0>, c<0>, c<0>, c<0>>> ==
+			   type<mpp::matrix<int, 1, 1>>); // Test if block produces static matrix with requirements met
 	};
 
 	feature("Forward substitution") = []() {

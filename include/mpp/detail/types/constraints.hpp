@@ -22,7 +22,13 @@
 #include <array>
 #include <concepts>
 #include <iterator>
+
+#if !defined(__linux__) || !defined(__clang__)
+// There is a big with Clang compiling libstdc++'s <ranges> header, where it'll complain about a missing "typename"
+// here: <ranges>:3392 using _Cat = iterator_traits<iterator_t<_Base>>::iterator_category;
 #include <ranges>
+#endif
+
 #include <type_traits>
 
 namespace mpp
@@ -46,6 +52,14 @@ namespace mpp
 	template<detail::arithmetic, std::size_t, std::size_t, typename>
 	class matrix;
 
+	template<typename Range>
+	using rng_val_t =
+#if !defined(__linux__) || !defined(__clang__)
+		typename std::iter_value_t<decltype(std::declval<Range>().begin())>;
+#else
+		std::ranges::range_value_t<Range>;
+#endif
+
 	namespace detail
 	{
 		template<typename Iterator, typename Value>
@@ -61,13 +75,13 @@ namespace mpp
 			std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
 
 		template<typename Range>
-		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
+		using range_2d_value_t = rng_val_t<rng_val_t<Range>>;
 
 		template<typename Range, typename Value>
 		concept range_2d_with_value_type_convertible_to = std::convertible_to<range_2d_value_t<Range>, Value>;
 
 		template<typename Range, typename Value>
-		concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
+		concept range_1d_with_value_type_convertible_to = std::convertible_to<rng_val_t<Range>, Value>;
 
 		// matrix_with_value_convertible_to
 

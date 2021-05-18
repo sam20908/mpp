@@ -598,6 +598,7 @@ namespace mpp::detail
 		using base = matrix_base<Derived, Buffer, Value, RowsExtent, ColumnsExtent, Allocator>;
 
 	protected:
+		// @FIXME: Add noexcept specification here
 		template<typename... Args>
 		matrix_dynamic_base(std::size_t rows, std::size_t columns, Args&&... args) :
 			base(rows, columns, std::forward<Args>(args)...)

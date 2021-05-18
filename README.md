@@ -6,15 +6,15 @@ A C++20 and later matrix library
 
 #### Tested Compilers to Compile Tests:
 
-- GCC 10
-- Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
-- MSVC 19.28
+* GCC 10
+* Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
+* MSVC 19.28
 
 ## How to Include:
 
 All you need to do is just add it as a subdirectory and link the target:
 
-```cmake
+``` cmake
 add_subdirectory("mpp")
 
 target_link_libraries(your_target mpp::mpp)
@@ -26,12 +26,15 @@ target_link_libraries(your_target mpp::mpp)
 
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
-```cpp
+``` cpp
 #include <mpp/matrix.h>
 #include <mpp/algorithms.hpp>
 #include <mpp/utility.hpp>
 
 #include <iostream>
+
+template<std::size_t Val = mpp::dynamic>
+using c = mpp::constant<Val>; // Shorthand alias for mpp::constant
 
 int main()
 {
@@ -73,6 +76,13 @@ int main()
   auto det = mpp::determinant(m_fully_static);
   auto inv = mpp::inverse(m_fully_dynamic);
 
+  // mpp::block takes a mpp::constant, which allows it to produce (partial) static matrices if the following are met:
+  // - If input matrix's rows, top row index, and bottom row index are all compile time specified, then resulting rows will also be compile time specified
+  // ^ same for columns
+
+  auto block_static = mpp::block(m_fully_static, c<0>{}, c<0>{}, c<1>{}, c<1>{}); // matrix<int, 2, 2> 2x2
+  auto block_dyn = mpp::block(m_fully_static, c{ 0 }, c{ 0 }, c{ 1 }, c{ 1 }); // matrix<int, dynamic, dynamic> 2x2
+
   /**
    * Utilities
    */
@@ -102,7 +112,7 @@ One of the main things to take away is the concept of **"extents"** for dimensio
 
 If you as a user can make guarantees that the library checks internally (e.g. properly initialize the matrix with valid parameters), then you can pass `mpp::unsafe` as a parameter to avoid them. **Note that only some operations allow unsafe because they are the ones that needs to validate their arguments.**
 
-```cpp
+``` cpp
 #include <mpp/algorithm/inverse.hpp>
 #include <mpp/matrix.hpp>
 
@@ -110,8 +120,7 @@ If you as a user can make guarantees that the library checks internally (e.g. pr
 
 int main()
 {
-  const auto range_2d = std::vector<std::vector<int>>{ { 1, 1 }, { 1, 1 } }; // 2x2 data
-  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
+  const auto range_2d = std::vector<std::vector<int>>{ { 1, 2 }, { 3, 4 } }; // 2x2 data
 
   /**
    * For constructors, mpp::unsafe will allow avoid checks like these (different depending on type of matrix you are constructing):
@@ -120,12 +129,13 @@ int main()
    * - The 2D initializer's columns matches the ColumnsExtent template parameter for fully static matrices
    * and much more...
    */
-
-  const auto inv = mpp::inverse(matrix, mpp::unsafe);
+  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
 
   /**
    * For mpp::inverse, mpp::unsafe allows avoid checking if the determinant of the matrix is 0, which we guaranteed with our range_2d
+   * The actual determinant of our range_2d is -2
    */
+  const auto inv = mpp::inverse(matrix, mpp::unsafe);
 
   return 0;
 }
@@ -135,21 +145,21 @@ Not all of the operations that support unsafe is shown here, but you can look fo
 
 #### Comparisons
 
-**Note: comparisons only work for matrices of the same value type!**
-
 Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
 
-```cpp
+`operator<=>` was also provided if you know you'll compare matrices with the same value type (therefore no need to use `mpp::elements_compare` ).
+
+``` cpp
 #include <mpp/matrix.hpp>
 #include <mpp/utility/comparison.hpp>
 
 int main()
 {
-  // Note that you can't compare matrices of different value types because it complicates things A LOT
-
   // Size for both of these dynamic matrices are deduced as 2x2
   const auto left = mpp::matrix<int>{ { 1, 2 }, { 3, 4 } };
   const auto right = mpp::matrix<int>{ { 1, 2 }, { 3, 5 } };
+
+  const auto ordering = left <=> right; // std::strong_ordering::less
 
   /**
    * Comparing dimensions
@@ -187,8 +197,11 @@ int main()
 
 Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
-```cpp
+``` cpp
 #include <mpp/utility/configuration.hpp>
+
+#include <array>
+#include <vector>
 
 namespace mpp
 {
@@ -202,6 +215,22 @@ namespace mpp
     static constexpr std::size_t columns_extent = 10;
 
     static constexpr bool use_unsafe = true;
+
+    /**
+     * These are the default buffer type aliases the library will use, but you can customize them
+     */
+
+    template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
+    using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>; // mpp::matrix<int, 1, 2>
+
+    template<typename Value, std::size_t, std::size_t, typename Alloc>
+    using dynamic_buffer = std::vector<Value, Alloc>; // mpp::matrix<int>
+
+    template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
+    using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>; // mpp::matrix<int, mpp::dynamic, 2>
+
+    template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
+    using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>; // mpp::matrix<int, 1, mpp::dynamic>
   };
 } // namespace mpp
 
@@ -222,7 +251,7 @@ int main()
 
 Finally, note that **all algorithms and utilities** are _customization point objects_. It means that you can customize them by overloading with `tag_invoke` and it will detect your customization.
 
-```cpp
+``` cpp
 namespace ns
 {
   struct dumb_matrix {};
@@ -252,7 +281,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 
 Custom iterators are used to make navigating matrices easier. They also meet `contiguous_iterator` requirement.
 
-```cpp
+``` cpp
 #include <mpp/matrix.hpp>
 
 int main()
@@ -289,4 +318,4 @@ You can find more APIs that are not mentioned in this README in the (upcoming) d
 
 #### Why `tag_invoke` for customization?
 
-`tag_invoke` allows putting all the overloads into a single name, `tag_invoke`. With customization by overload resolution, name clashes are reduced down to bare minimum.
+`tag_invoke` allows putting all the overloads into a single name, `tag_invoke` . With customization by overload resolution, name clashes are reduced down to bare minimum.
