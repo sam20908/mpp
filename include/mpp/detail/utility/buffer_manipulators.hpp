@@ -64,30 +64,14 @@ namespace mpp::detail
 			validate_dimensions_for_identity_matrix(rows, columns);
 		}
 
-		const auto total_size           = rows * columns;
-		constexpr auto buffer_is_vector = is_vector<Buffer>::value;
-
-		if constexpr (buffer_is_vector)
+		if constexpr (is_vector<Buffer>::value)
 		{
-			buffer.reserve(total_size);
+			buffer.resize(rows * columns, zero_value);
 		}
 
-		auto diagnoal_index = std::size_t{};
-		for (auto index = std::size_t{}; index < total_size; ++index)
+		for (auto index = std::size_t{}; index < rows; ++index)
 		{
-			if constexpr (buffer_is_vector)
-			{
-				buffer.push_back((index == diagnoal_index) ? one_value : zero_value);
-			}
-			else
-			{
-				buffer[index] = (index == diagnoal_index) ? one_value : zero_value;
-			}
-
-			if ((index + 1) % columns == 0)
-			{
-				diagnoal_index += columns + 1;
-			}
+			buffer[index_2d_to_1d(columns, index, index)] = one_value;
 		}
 	}
 } // namespace mpp::detail
