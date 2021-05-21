@@ -39,20 +39,20 @@ namespace mpp
 	{
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(type_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) noexcept -> matrix_type // @TODO: ISSUE #20
+			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>&) noexcept -> matrix_type // @TODO: ISSUE #20
 		{
-			auto row_is_dynamic    = obj.rows_extent() == dynamic;
-			auto column_is_dynamic = obj.columns_extent() == dynamic;
+			constexpr auto row_is_dynamic    = RowsExtent == dynamic;
+			constexpr auto column_is_dynamic = ColumnsExtent == dynamic;
 
-			if (!row_is_dynamic && !column_is_dynamic)
+			if constexpr (!row_is_dynamic && !column_is_dynamic)
 			{
 				return matrix_type::fully_static;
 			}
-			else if (row_is_dynamic && column_is_dynamic)
+			else if constexpr (row_is_dynamic && column_is_dynamic)
 			{
 				return matrix_type::fully_dynamic;
 			}
-			else if (row_is_dynamic && !column_is_dynamic)
+			else if constexpr (row_is_dynamic && !column_is_dynamic)
 			{
 				return matrix_type::dynamic_rows;
 			}
