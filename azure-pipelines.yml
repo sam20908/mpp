@@ -170,3 +170,33 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+
+  - job: WindowsMinGW64GCC
+    displayName: Windows MinGW64 GCC 10
+
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - checkout: self
+
+      - script: |
+          pip install lit==12.0.0 --no-warn-script-location
+          echo '##vso[task.prependpath]$(HOME)/.local/bin'
+        displayName: Install Python LLVM Lit
+
+      - script: |
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_BUILD_TYPE=Debug -G MinGW Makefiles -B build
+          cmake --build build --target tests --config Debug
+        displayName: Configure and Build Tests
+
+      - script: |
+          cd build/bin/tests
+          lit . --xunit-xml-output results.xml -v
+        displayName: Run Tests
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: "**/results.xml"
+        displayName: Publish Tests Results
