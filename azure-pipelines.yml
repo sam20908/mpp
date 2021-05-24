@@ -186,7 +186,7 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_BUILD_TYPE=Debug -G MinGW Makefiles -B build
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -B build
           cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
