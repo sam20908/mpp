@@ -22,6 +22,7 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 function(_setup_target target binary_dir)
     target_link_libraries(${target} PRIVATE ${PROJECT_NAME}::${PROJECT_NAME})
+    target_compile_definitions(${target} PRIVATE -DBOOST_UT_DISABLE_MODULE)
 
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${binary_dir}"
