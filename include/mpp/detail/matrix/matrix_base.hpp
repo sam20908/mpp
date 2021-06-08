@@ -501,6 +501,7 @@ namespace mpp::detail
 			return operator()(row_index, column_index);
 		}
 
+		// @TODO: Make this conditionally noexcept
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) noexcept
 			-> reference // @TODO: ISSUE #20
 		{
@@ -509,6 +510,7 @@ namespace mpp::detail
 			return buffer_[index];
 		}
 
+		// @TODO: Make this conditionally noexcept
 		[[nodiscard]] auto operator()(std::size_t row_index,
 			std::size_t col_index) const noexcept -> const_reference // @TODO: ISSUE #20
 		{
