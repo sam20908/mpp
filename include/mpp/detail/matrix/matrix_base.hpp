@@ -501,6 +501,7 @@ namespace mpp::detail
 			return operator()(row_index, column_index);
 		}
 
+		// @TODO: Make this conditionally noexcept
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) noexcept
 			-> reference // @TODO: ISSUE #20
 		{
@@ -509,11 +510,22 @@ namespace mpp::detail
 			return buffer_[index];
 		}
 
+		// @TODO: Make this conditionally noexcept
 		[[nodiscard]] auto operator()(std::size_t row_index,
 			std::size_t col_index) const noexcept -> const_reference // @TODO: ISSUE #20
 		{
 			const auto index = index_2d_to_1d(columns_, row_index, col_index);
 
+			return buffer_[index];
+		}
+
+		[[nodiscard]] auto operator[](std::size_t index) noexcept(noexcept(buffer_[index])) -> reference
+		{
+			return buffer_[index];
+		}
+
+		[[nodiscard]] auto operator[](std::size_t index) const noexcept(noexcept(buffer_[index])) -> const_reference
+		{
 			return buffer_[index];
 		}
 
