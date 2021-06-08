@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <mpp/detail/types/constraints.hpp>
 #include <mpp/detail/utility/public.hpp>
 #include <mpp/utility/configuration.hpp>
 
