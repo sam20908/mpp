@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <mpp/detail/utility/public.hpp>
 #include <mpp/utility/configuration.hpp>
 
 #include <cstddef>
@@ -39,6 +40,19 @@ namespace mpp::detail
 	[[nodiscard]] constexpr auto any_extent_is_dynamic(Args... args) noexcept -> std::size_t
 	{
 		return ((args == dynamic) || ...);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr auto get_constant_val_or_dynamic() noexcept -> std::size_t
+	{
+		if constexpr (is_constant<T>::value)
+		{
+			return T::tmp_val();
+		}
+		else
+		{
+			return dynamic;
+		}
 	}
 
 	static constexpr auto configuration_use_unsafe = configuration<override>::use_unsafe;

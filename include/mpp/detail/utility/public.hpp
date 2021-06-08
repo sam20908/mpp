@@ -31,11 +31,17 @@ namespace mpp
 	template<std::size_t Val = dynamic>
 	struct constant
 	{
-		std::size_t val{ Val }; // Default initialize to Val template parameter to allow default initialization when
-								// passing comile time value (e.g. constant<3>{})
+		std::size_t val{ Val };
 
-		constexpr constant() noexcept = default;
-		constexpr constant(std::size_t val) noexcept : val{ val } {} // Intentionally non-explicit
+		constexpr explicit operator std::size_t() const
+		{
+			return val;
+		}
+
+		[[nodiscard]] static constexpr auto tmp_val() noexcept -> std::size_t
+		{
+			return Val;
+		}
 	};
 
 	/**
