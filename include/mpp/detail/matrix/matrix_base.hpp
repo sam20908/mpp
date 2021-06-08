@@ -517,6 +517,16 @@ namespace mpp::detail
 			return buffer_[index];
 		}
 
+		[[nodiscard]] auto operator[](std::size_t index) noexcept(noexcept(buffer_[index])) -> reference
+		{
+			return buffer_[index];
+		}
+
+		[[nodiscard]] auto operator[](std::size_t index) const noexcept(noexcept(buffer_[index])) -> const_reference
+		{
+			return buffer_[index];
+		}
+
 		[[nodiscard]] auto rows() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
 			return rows_;
