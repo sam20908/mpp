@@ -176,24 +176,26 @@ namespace mpp
 			get_constant_val_or_dynamic<BottomRowIndex>(),
 			get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
 		{
+			// The static_cast are to trigger the explicit conversion operator for mpp::constant objects
+
 			if constexpr (Check)
 			{
 				validate_block_index_boundaries(obj.rows(),
 					obj.columns(),
-					top_row_index.val,
-					top_column_index.val,
-					bottom_row_index.val,
-					bottom_column_index.val);
+					static_cast<std::size_t>(top_row_index),
+					static_cast<std::size_t>(top_column_index),
+					static_cast<std::size_t>(bottom_row_index),
+					static_cast<std::size_t>(bottom_column_index));
 			}
 
 			using block_mat_t = block_mat_ret_t<Value,
 				BlockAllocator,
 				RowsExtent,
 				ColumnsExtent,
-				TopRowIndex,
-				TopColumnIndex,
-				BottomRowIndex,
-				BottomColumnIndex>;
+				get_constant_val_or_dynamic<TopRowIndex>(),
+				get_constant_val_or_dynamic<TopColumnIndex>(),
+				get_constant_val_or_dynamic<BottomRowIndex>(),
+				get_constant_val_or_dynamic<BottomColumnIndex>()>;
 
 			constexpr auto buf_is_vec = any_extent_is_dynamic(RowsExtent, ColumnsExtent);
 
