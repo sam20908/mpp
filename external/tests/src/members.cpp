@@ -54,10 +54,57 @@ int main()
 	const auto mat_4    = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
 
 	feature("operator()") = [&]() {
-		expect(mat_1(1, 1) == 5_i);
-		expect(mat_2(1, 1) == 5_i);
-		expect(mat_3(1, 1) == 5_i);
-		expect(mat_4(1, 1) == 5_i);
+		given("We're only reading the data") = [&]() {
+			expect(mat_1(1, 1) == 5_i);
+			expect(mat_2(1, 1) == 5_i);
+			expect(mat_3(1, 1) == 5_i);
+			expect(mat_4(1, 1) == 5_i);
+		};
+
+		given("We're modifying the data") = [&]() {
+			mut(mat_1)(1, 1) = 10;
+			mut(mat_2)(1, 1) = 10;
+			mut(mat_3)(1, 1) = 10;
+			mut(mat_4)(1, 1) = 10;
+
+			expect(mat_1(1, 1) == 10_i);
+			expect(mat_2(1, 1) == 10_i);
+			expect(mat_3(1, 1) == 10_i);
+			expect(mat_4(1, 1) == 10_i);
+
+			// Reset values for following tests
+			mut(mat_1)(1, 1) = 5;
+			mut(mat_2)(1, 1) = 5;
+			mut(mat_3)(1, 1) = 5;
+			mut(mat_4)(1, 1) = 5;
+		};
+	};
+
+	feature("operator[]") = [&]() {
+		given("We're only reading the data") = [&]() {
+			expect(mat_1[4] == 5_i);
+			expect(mat_2[4] == 5_i);
+			expect(mat_3[4] == 5_i);
+			expect(mat_4[4] == 5_i);
+		};
+
+		given("We're modifying the data") = [&]() {
+			mut(mat_1)[4] = 10;
+			mut(mat_2)[4] = 10;
+			mut(mat_3)[4] = 10;
+			mut(mat_4)[4] = 10;
+
+			expect(mat_1[4] == 10_i);
+			expect(mat_2[4] == 10_i);
+			expect(mat_3[4] == 10_i);
+			expect(mat_4[4] == 10_i);
+
+			// Reset values for following tests
+			mut(mat_1)[4] = 5;
+			mut(mat_2)[4] = 5;
+			mut(mat_3)[4] = 5;
+			mut(mat_4)[4] = 5;
+		};
 	};
 
 	feature(".at()") = [&]() {
