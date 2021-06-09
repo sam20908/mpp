@@ -10,11 +10,6 @@ jobs:
       - checkout: self
 
       - script: |
-          sudo apt-get update
-          sudo apt-get install clang-format-12
-        displayName: Install Clang-format 12
-
-      - script: |
           git clone https://github.com/Sarcasm/run-clang-format
         displayName: Clone run-clang-format
 
