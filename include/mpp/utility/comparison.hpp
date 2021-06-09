@@ -44,8 +44,8 @@ namespace mpp
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			bool compare_rows,
-			bool compare_columns) noexcept(noexcept(std::pair{
-			compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
+			bool compare_columns) noexcept(noexcept(std::pair{ compare_rows ? left.rows() <=> right.rows()
+																			: std::partial_ordering::unordered,
 			compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered }))
 			-> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
 		{
