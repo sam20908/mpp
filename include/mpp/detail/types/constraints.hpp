@@ -112,7 +112,7 @@ namespace mpp
 		};
 
 		template<typename T>
-		concept constant_or_assignable_to_size_t =
-			is_constant<std::remove_cvref_t<T>>::value || std::is_assignable_v<std::remove_cvref_t<T>, std::size_t>;
+		concept constant_or_convertible_to_size_t =
+			is_constant<std::remove_cvref_t<T>>::value || std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
 	} // namespace detail
 } // namespace mpp
