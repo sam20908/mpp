@@ -52,6 +52,9 @@ namespace mpp
 	template<detail::arithmetic, std::size_t, std::size_t, typename>
 	class matrix;
 
+	template<std::size_t>
+	struct constant;
+
 	template<typename Range>
 	using rng_val_t =
 #if !defined(__linux__) || !defined(__clang__)
@@ -72,7 +75,7 @@ namespace mpp
 
 		template<typename Callable, typename Return, typename... Args>
 		concept invocable_with_return_type =
-			std::invocable<Callable, Args...>&& std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+			std::invocable<Callable, Args...> && std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
 
 		template<typename Range>
 		using range_2d_value_t = rng_val_t<rng_val_t<Range>>;
@@ -97,5 +100,19 @@ namespace mpp
 		template<typename T, typename To>
 		concept matrix_with_value_convertible_to =
 			std::convertible_to<typename matrix_value<std::remove_cvref_t<T>>::type, To>;
+
+		template<typename>
+		struct is_constant : std::false_type
+		{
+		};
+
+		template<std::size_t Val>
+		struct is_constant<constant<Val>> : std::true_type
+		{
+		};
+
+		template<typename T>
+		concept constant_or_convertible_to_size_t =
+			is_constant<std::remove_cvref_t<T>>::value || std::convertible_to<std::remove_cvref_t<T>, std::size_t>;
 	} // namespace detail
 } // namespace mpp

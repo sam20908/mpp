@@ -13,7 +13,7 @@ jobs:
           git clone https://github.com/Sarcasm/run-clang-format
         displayName: Clone run-clang-format
 
-      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include --style file --clang-format-executable=clang-format-11
+      - script: python ./run-clang-format/run-clang-format.py -r include external/tests external/include --style file --clang-format-executable=clang-format-12
         displayName: Validate
 
   - job: CodeCoverage

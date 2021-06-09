@@ -46,9 +46,6 @@
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<std::size_t Val = mpp::dynamic>
-using c = mpp::constant<Val>;
-
 template<typename From, typename To>
 void test_det(const std::string& filename)
 {
@@ -139,8 +136,10 @@ void test_transformation(const std::string& filename, const auto& transform_fn)
 	};
 }
 
+// @FIXME: Revamp block test suite
+
 template<typename From, typename To, typename CustAlloc>
-void test_block(const std::string& filename)
+void test_block_dyn(const std::string& filename)
 {
 	const auto result  = parse_block_out<From, To>(get_filepath(filename));
 	const auto& mat    = result.mat;
@@ -154,12 +153,8 @@ void test_block(const std::string& filename)
 							std::size_t bottom_row_index,
 							std::size_t bottom_column_index,
 							const auto&... args) {
-		const auto block = mpp::block(mat,
-			c<>{ top_row_index },
-			c<>{ top_column_index },
-			c<>{ bottom_row_index },
-			c<>{ bottom_column_index },
-			args...);
+		const auto block =
+			mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, args...);
 
 		expect(block.rows() == expected_block.rows());
 		expect(block.columns() == expected_block.columns());
@@ -217,18 +212,16 @@ void test_block_fixed(const std::string& filename)
 
 	const auto do_cmp = [&](const auto&... args) {
 		const auto block = mpp::block(mat,
-			c<TopRowIndex>{},
-			c<TopColumnIndex>{},
-			c<BottomRowIndex>{},
-			c<BottomColumnIndex>{},
+			mpp::constant<TopRowIndex>{},
+			mpp::constant<TopColumnIndex>{},
+			mpp::constant<BottomRowIndex>{},
+			mpp::constant<BottomColumnIndex>{},
 			args...);
 
 		expect(block.rows() == out.rows());
 		expect(block.columns() == out.columns());
 
-		// expect(mpp::type(block) == mpp::matrix_type::fully_static); @TODO: Enable this once test facility is extended
-		// to support creating static matrices
-
+		// expect(mpp::type(block) == mpp::matrix_type::fully_static);
 		expect(mpp::elements_compare(block, out, mpp::floating_point_compare) == ordering_type::equivalent);
 	};
 
@@ -386,10 +379,21 @@ int main()
 	};
 
 	feature("Block") = []() {
-		test_block<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
-		test_block_fixed<int, int, custom_allocator<int>, 0, 0, 0, 0>("algorithm/block/3x3_fixed.txt");
+		given("Runtime indices") = []() {
+			test_block_dyn<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
+		};
 
-		expect(type<std::invoke_result_t<mpp::block_t, mpp::matrix<int, 2, 3>, c<0>, c<0>, c<0>, c<0>>> ==
+		given("Compile time indices") = []() {
+			test_block_fixed<int, int, custom_allocator<int>, 0, 0, 0, 0>("algorithm/block/3x3_fixed.txt");
+		};
+
+		// @FIXME: Remove this test once block test is revamped
+		expect(type<std::invoke_result_t<mpp::block_t,
+				   mpp::matrix<int, 2, 3>,
+				   mpp::constant<0>,
+				   mpp::constant<0>,
+				   mpp::constant<0>,
+				   mpp::constant<0>>> ==
 			   type<mpp::matrix<int, 1, 1>>); // Test if block produces static matrix with requirements met
 	};
 
