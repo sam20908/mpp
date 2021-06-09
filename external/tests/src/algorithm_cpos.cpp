@@ -387,14 +387,14 @@ int main()
 			test_block_fixed<int, int, custom_allocator<int>, 0, 0, 0, 0>("algorithm/block/3x3_fixed.txt");
 		};
 
-
-		// expect(type<std::invoke_result_t<mpp::block_t,
-		// 		   mpp::matrix<int, 2, 3>,
-		// 		   mpp::constant<0>,
-		// 		   mpp::constant<0>,
-		// 		   mpp::constant<0>,
-		// 		   mpp::constant<0>>> ==
-		// 	   type<mpp::matrix<int, 1, 1>>); // Test if block produces static matrix with requirements met
+		// @FIXME: Remove this test once block test is revamped
+		expect(type<std::invoke_result_t<mpp::block_t,
+				   mpp::matrix<int, 2, 3>,
+				   mpp::constant<0>,
+				   mpp::constant<0>,
+				   mpp::constant<0>,
+				   mpp::constant<0>>> ==
+			   type<mpp::matrix<int, 1, 1>>); // Test if block produces static matrix with requirements met
 	};
 
 	feature("Forward substitution") = []() {
