@@ -76,6 +76,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: UbuntuClang
     displayName: Ubuntu Clang 11
@@ -106,6 +107,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: WindowsMSVC
     displayName: Windows MSVC 19.28
@@ -138,6 +140,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: WindowsClang
     displayName: Windows Clang 11
@@ -170,3 +173,4 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
