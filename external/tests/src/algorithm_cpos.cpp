@@ -17,16 +17,16 @@
  * under the License.
  */
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
+// #ifdef _MSC_VER
+// #pragma warning(push)
+// #pragma warning(disable : 4459)
+// #endif
 
 #include <boost/ut.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+// #ifdef _MSC_VER
+// #pragma warning(pop)
+// #endif
 
 #include <mpp/utility/comparison.hpp>
 #include <mpp/utility/type.hpp>
@@ -37,379 +37,328 @@
 #include "../../include/test_parsers.hpp"
 
 #include <compare>
-#include <filesystem>
-#include <functional>
-#include <memory>
-#include <string>
+#include <type_traits>
 #include <utility>
 
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<typename From, typename To>
-void test_det(const std::string& filename)
+template<typename From, typename To, typename... DetArgs>
+void test_det(const std::string& filename, const DetArgs&... fn_args)
 {
-	const auto result       = parse_num_out<From, To>(get_filepath(filename));
-	const auto& mat         = result.mat;
-	const auto expected_num = result.num;
-
 	using ordering_type = std::compare_three_way_result_t<To, To>;
-	using cust_alloc_t  = custom_allocator<mpp::detail::default_floating_type>;
 
-	const auto do_cmp = [&](const auto&... args) {
-		To num;
+	const auto [mat, expected_num] = parse_test(filename, parse_mat<From>(), parse_val<To>);
 
-		if constexpr (!std::is_same_v<From, To>)
+	To num;
+
+	if constexpr (!std::is_same_v<From, To>)
+	{
+		num = mpp::determinant(std::type_identity<To>{}, mat, fn_args...);
+	}
+	else
+	{
+		num = mpp::determinant(mat, fn_args...);
+	}
+
+	test(filename.c_str()) = [&]() {
+		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent)
+			<< "Output is" << num << "but expected output is" << expected_num;
+	};
+}
+
+template<typename From, typename To, bool CmpAlloc, typename Fn, typename Alloc, typename... FnArgs>
+void test_fn(const std::string& filename,
+	const Fn& fn,
+	mpp::matrix_type expected_type,
+	[[maybe_unused]] const Alloc& alloc_obj,
+	const FnArgs&... fn_args)
+{
+	using from_val_t    = typename From::value_type;
+	using to_val_t      = typename To::value_type;
+	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
+
+	const auto [mat, expected_mat] = parse_test(filename, parse_mat<From>(), parse_mat<To>());
+
+	auto out = [&]() {
+		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 		{
-			num = mpp::determinant(std::type_identity<To>{}, mat, args...);
+			return fn(std::type_identity<to_val_t>{}, mat, fn_args...);
 		}
 		else
 		{
-			num = mpp::determinant(mat, args...);
+			return fn(mat, fn_args...);
 		}
+	}();
 
-		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent);
-	};
+	test(filename.c_str()) = [&]() {
+		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
+		expect(mpp::elements_compare(out, expected_mat) == ordering_type::equivalent) << "Matrices aren't equal";
 
-	test(filename) = [&]() {
-		const auto cust_alloc = cust_alloc_t{};
-
-		when("Not using unsafe") = [&]() {
-			do_cmp();
-			do_cmp(std::type_identity<cust_alloc_t>{});
-			do_cmp(cust_alloc);
-		};
-
-		when("Using unsafe") = [&]() {
-			do_cmp(mpp::unsafe);
-			do_cmp(mpp::unsafe, std::type_identity<cust_alloc_t>{});
-			do_cmp(mpp::unsafe, cust_alloc);
-		};
-	};
-}
-
-template<typename From, typename To, typename CustAlloc, bool HasUnsafeOverload, bool PassToAsIdentityObj>
-void test_transformation(const std::string& filename, const auto& transform_fn)
-{
-	const auto result =
-		parse_mats_out<temp_types<mat_t, mat_t>, types<From, To>>(get_filepath(filename), std::tuple{ mat_fn, mat_fn });
-	const auto& mat          = std::get<0>(result);
-	const auto& expected_out = std::get<1>(result);
-
-	using ordering_type = std::compare_three_way_result_t<To, To>;
-
-	const auto do_cmp = [&](const auto&... args) {
-		const auto out = [&]() {
-			if constexpr (PassToAsIdentityObj)
-			{
-				return transform_fn(std::type_identity<To>{}, mat, args...);
-			}
-			else
-			{
-				return transform_fn(mat, args...);
-			}
-		}();
-
-		expect(out.rows() == expected_out.rows());
-		expect(out.columns() == expected_out.columns());
-
-		expect(mpp::elements_compare(out, expected_out, mpp::floating_point_compare) == ordering_type::equivalent);
-	};
-
-	test(filename) = [&]() {
-		const auto cust_alloc = CustAlloc{};
-
-		when("Not using unsafe") = [&]() {
-			do_cmp();
-			do_cmp(std::type_identity<CustAlloc>{});
-			do_cmp(cust_alloc);
-		};
-
-		if constexpr (HasUnsafeOverload)
+		if constexpr (CmpAlloc)
 		{
-			when("Using unsafe") = [&]() {
-				do_cmp(mpp::unsafe);
-				do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
-				do_cmp(mpp::unsafe, cust_alloc);
-			};
+			expect(type<typename std::remove_cvref_t<decltype(out)>::allocator_type> == type<Alloc>)
+				<< "Type of allocators aren't equal";
+			expect(out.get_allocator() == alloc_obj) << "Allocators aren't equal";
 		}
 	};
 }
 
-// @FIXME: Revamp block test suite
-
-template<typename From, typename To, typename CustAlloc>
-void test_block_dyn(const std::string& filename)
+template<typename MatA, typename MatB, typename MatX, bool CmpAlloc, typename Fn, typename Alloc, typename... FnArgs>
+void test_sub(const std::string& filename,
+	const Fn& fn,
+	mpp::matrix_type expected_type,
+	[[maybe_unused]] const Alloc& alloc_obj,
+	const FnArgs&... fn_args)
 {
-	const auto result  = parse_block_out<From, To>(get_filepath(filename));
-	const auto& mat    = result.mat;
-	const auto& blocks = result.blocks;
+	using from_val_t    = std::common_type_t<typename MatA::value_type, typename MatB::value_type>;
+	using to_val_t      = typename MatX::value_type;
+	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	using ordering_type = std::compare_three_way_result_t<To, To>;
+	const auto [mat_a, mat_b, expected_out] =
+		parse_test(filename, parse_mat<MatA>(), parse_mat<MatB>(), parse_mat<MatX>());
 
-	const auto do_cmp = [&](const auto& expected_block,
-							std::size_t top_row_index,
-							std::size_t top_column_index,
-							std::size_t bottom_row_index,
-							std::size_t bottom_column_index,
-							const auto&... args) {
-		const auto block =
-			mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, args...);
-
-		expect(block.rows() == expected_block.rows());
-		expect(block.columns() == expected_block.columns());
-
-		expect(mpp::elements_compare(block, expected_block, mpp::floating_point_compare) == ordering_type::equivalent);
-	};
-
-	test(filename) = [&]() {
-		const auto cust_alloc = CustAlloc{};
-
-		for (const auto& block : blocks)
+	auto out = [&]() {
+		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 		{
-			const auto row_start       = block.row_start;
-			const auto column_start    = block.column_start;
-			const auto row_end         = block.row_end;
-			const auto column_end      = block.column_end;
-			const auto& expected_block = block.mat;
+			return fn(std::type_identity<to_val_t>{}, mat_a, mat_b, fn_args...);
+		}
+		else
+		{
+			return fn(mat_a, mat_b, fn_args...);
+		}
+	}();
 
-			when("Not using unsafe") = [&]() {
-				do_cmp(expected_block, row_start, column_start, row_end, column_end);
-				do_cmp(expected_block, row_start, column_start, row_end, column_end, std::type_identity<CustAlloc>{});
-				do_cmp(expected_block, row_start, column_start, row_end, column_end, cust_alloc);
-			};
+	test(filename.c_str()) = [&]() {
+		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
+		expect(mpp::elements_compare(out, expected_out) == ordering_type::equivalent) << "Matrices aren't equal";
 
-			when("Using unsafe") = [&]() {
-				do_cmp(expected_block, row_start, column_start, row_end, column_end, mpp::unsafe);
-				do_cmp(expected_block,
-					row_start,
-					column_start,
-					row_end,
-					column_end,
-					mpp::unsafe,
-					std::type_identity<CustAlloc>{});
-				do_cmp(expected_block, row_start, column_start, row_end, column_end, mpp::unsafe, cust_alloc);
-			};
+		if constexpr (CmpAlloc)
+		{
+			expect(type<typename std::remove_cvref_t<decltype(out)>::allocator_type> == type<Alloc>)
+				<< "Type of allocators aren't equal";
+			expect(out.get_allocator() == alloc_obj) << "Allocators aren't equal";
 		}
 	};
 }
 
-template<typename From,
-	typename To,
-	typename CustAlloc,
-	std::size_t TopRowIndex,
-	std::size_t TopColumnIndex,
-	std::size_t BottomRowIndex,
-	std::size_t BottomColumnIndex>
-void test_block_fixed(const std::string& filename)
+template<typename Mat, typename MatL, typename MatU, bool CmpAlloc, typename Alloc, typename... FnArgs>
+void test_lu(const std::string& filename,
+	mpp::matrix_type expected_type,
+	[[maybe_unused]] const Alloc& alloc_obj,
+	const FnArgs&... fn_args)
 {
-	const auto result =
-		parse_mats_out<temp_types<mat_t, mat_t>, types<From, To>>(get_filepath(filename), std::tuple{ mat_fn, mat_fn });
-	const auto& mat = std::get<0>(result);
-	const auto& out = std::get<1>(result);
+	using from_val_t    = typename Mat::value_type;
+	using to_val_t      = std::common_type_t<typename MatL::value_type, typename MatU::value_type>;
+	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	using ordering_type = std::compare_three_way_result_t<To, To>;
+	const auto [mat, expected_l, expected_u] =
+		parse_test(filename, parse_mat<Mat>(), parse_mat<MatL>(), parse_mat<MatU>());
 
-	const auto do_cmp = [&](const auto&... args) {
-		const auto block = mpp::block(mat,
-			mpp::constant<TopRowIndex>{},
-			mpp::constant<TopColumnIndex>{},
-			mpp::constant<BottomRowIndex>{},
-			mpp::constant<BottomColumnIndex>{},
-			args...);
+	auto [out_l, out_u] = [&]() {
+		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+		{
+			return mpp::lu_decomposition(std::type_identity<to_val_t>{}, mat, fn_args...);
+		}
+		else
+		{
+			return mpp::lu_decomposition(mat, fn_args...);
+		}
+	}();
 
-		expect(block.rows() == out.rows());
-		expect(block.columns() == out.columns());
+	test(filename.c_str()) = [&]() {
+		scenario("Testing L matrix") = [&]() {
+			expect(mpp::type(out_l) == expected_type) << "Matrix type doesn't match";
+			expect(mpp::elements_compare(out_l, expected_l) == ordering_type::equivalent) << "Matrices aren't equal";
 
-		// expect(mpp::type(block) == mpp::matrix_type::fully_static);
-		expect(mpp::elements_compare(block, out, mpp::floating_point_compare) == ordering_type::equivalent);
-	};
-
-	test(filename) = [&]() {
-		const auto cust_alloc = CustAlloc{};
-
-		when("Not using unsafe") = [&]() {
-			do_cmp();
-			do_cmp(std::type_identity<CustAlloc>{});
-			do_cmp(cust_alloc);
+			if constexpr (CmpAlloc)
+			{
+				expect(type<typename std::remove_cvref_t<decltype(out_l)>::allocator_type> == type<Alloc>)
+					<< "Type of allocators aren't equal";
+				expect(out_l.get_allocator() == alloc_obj) << "Allocators aren't equal";
+			}
 		};
 
-		when("Using unsafe") = [&]() {
-			do_cmp(mpp::unsafe);
-			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
-			do_cmp(mpp::unsafe, cust_alloc);
+		scenario("Testing U matrix") = [&]() {
+			expect(mpp::type(out_u) == expected_type) << "Matrix type doesn't match";
+			expect(mpp::elements_compare(out_u, expected_u) == ordering_type::equivalent) << "Matrices aren't equal";
+
+			if constexpr (CmpAlloc)
+			{
+				expect(type<typename std::remove_cvref_t<decltype(out_u)>::allocator_type> == type<Alloc>)
+					<< "Type of allocators aren't equal";
+				expect(out_u.get_allocator() == alloc_obj) << "Allocators aren't equal";
+			}
 		};
 	};
 }
 
-template<typename From, typename To, typename CustAlloc, bool PassToAsIdentityObj>
-void test_lu(const std::string& filename)
+template<typename Mat,
+	typename Block,
+	bool CmpAlloc,
+	typename TopRowIndex,
+	typename TopColumnIndex,
+	typename BottomRowIndex,
+	typename BottomColumnIndex,
+	typename Alloc,
+	typename... FnArgs>
+void test_block(const std::string& filename,
+	TopRowIndex top_row_index,
+	TopColumnIndex top_column_index,
+	BottomRowIndex bottom_row_index,
+	BottomColumnIndex bottom_column_index,
+	mpp::matrix_type expected_type,
+	[[maybe_unused]] const Alloc& alloc_obj,
+	const FnArgs&... fn_args)
 {
-	const auto result = parse_mats_out<temp_types<mat_t, mat_t, mat_t>, types<From, To, To>>(get_filepath(filename),
-		std::tuple{ mat_fn, mat_fn, mat_fn });
-	const auto& mat   = std::get<0>(result);
-	const auto& expected_left  = std::get<1>(result);
-	const auto& expected_right = std::get<2>(result);
+	using from_val_t    = typename Mat::value_type;
+	using to_val_t      = typename Block::value_type;
+	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	using ordering_type = std::compare_three_way_result_t<To, To>;
+	const auto [mat, expected_block] = parse_test(filename, parse_mat<Mat>(), parse_mat<Block>());
 
-	const auto do_cmp = [&](const auto&... args) {
-		const auto result = [&]() {
-			if constexpr (PassToAsIdentityObj)
-			{
-				return mpp::lu_decomposition(std::type_identity<To>{}, mat, args...);
-			}
-			else
-			{
-				return mpp::lu_decomposition(mat, args...);
-			}
-		}();
+	auto out = [&]() {
+		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+		{
+			return mpp::block(std::type_identity<to_val_t>{},
+				mat,
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index,
+				fn_args...);
+		}
+		else
+		{
+			return mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, fn_args...);
+		}
+	}();
 
-		const auto& left  = result.first;
-		const auto& right = result.second;
+	test(filename.c_str()) = [&]() {
+		using out_decayed_t = std::remove_cvref_t<decltype(out)>;
 
-		given("L matrix") = [&]() {
-			expect(left.rows() == expected_left.rows());
-			expect(left.columns() == expected_left.columns());
+		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
+		expect(mpp::elements_compare(out, expected_block) == ordering_type::equivalent) << "Matrices aren't equal";
 
-			expect(
-				mpp::elements_compare(left, expected_left, mpp::floating_point_compare) == ordering_type::equivalent);
-		};
+		constexpr auto out_is_dyn =
+			out_decayed_t::rows_extent() == mpp::dynamic && out_decayed_t::columns_extent() == mpp::dynamic;
 
-		given("U matrix") = [&]() {
-			expect(right.rows() == expected_right.rows());
-			expect(right.columns() == expected_right.columns());
-
-			expect(
-				mpp::elements_compare(right, expected_right, mpp::floating_point_compare) == ordering_type::equivalent);
-		};
-	};
-
-	test(filename) = [&]() {
-		const auto cust_alloc = CustAlloc{};
-
-		when("Not using unsafe") = [&]() {
-			do_cmp();
-			do_cmp(std::type_identity<CustAlloc>{});
-			do_cmp(cust_alloc);
-		};
-
-		when("Using unsafe") = [&]() {
-			do_cmp(mpp::unsafe);
-			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
-			do_cmp(mpp::unsafe, cust_alloc);
-		};
-	};
-}
-
-template<typename AValue, typename BValue, typename XValue, typename CustAlloc, bool PassToAsIdentityObj>
-void test_sub(const std::string& filename, const auto& fn)
-{
-	const auto result =
-		parse_mats_out<temp_types<mat_t, mat_t, mat_t>, types<AValue, BValue, XValue>>(get_filepath(filename),
-			std::tuple{ mat_fn, mat_fn, mat_fn });
-	const auto& a          = std::get<0>(result);
-	const auto& b          = std::get<1>(result);
-	const auto& expected_x = std::get<2>(result);
-
-	using ordering_type = std::compare_three_way_result_t<XValue, XValue>;
-
-	const auto do_cmp = [&](const auto&... args) {
-		const auto x = [&]() {
-			if constexpr (PassToAsIdentityObj)
-			{
-				return fn(std::type_identity<XValue>{}, a, b, args...);
-			}
-			else
-			{
-				return fn(a, b, args...);
-			}
-		}();
-
-		expect(x.rows() == expected_x.rows());
-		expect(x.columns() == expected_x.columns());
-
-		expect(mpp::elements_compare(x, expected_x, mpp::floating_point_compare) == ordering_type::equivalent);
-	};
-
-	test(filename) = [&]() {
-		const auto cust_alloc = CustAlloc{};
-
-		when("Not using unsafe") = [&]() {
-			do_cmp();
-			do_cmp(std::type_identity<CustAlloc>{});
-			do_cmp(cust_alloc);
-		};
-
-		when("Using unsafe") = [&]() {
-			do_cmp(mpp::unsafe);
-			do_cmp(mpp::unsafe, std::type_identity<CustAlloc>{});
-			do_cmp(mpp::unsafe, cust_alloc);
-		};
+		if constexpr (out_is_dyn && CmpAlloc)
+		{
+			expect(type<typename out_decayed_t::allocator_type> == type<Alloc>) << "Type of allocators aren't equal";
+			expect(out.get_allocator() == alloc_obj) << "Allocators aren't equal";
+		}
 	};
 }
 
 int main()
 {
-	feature("Determinant") = []() {
-		test_det<int, int>("algorithm/det/0x0.txt");
-		test_det<int, int>("algorithm/det/1x1.txt");
-		test_det<int, double>("algorithm/det/2x2.txt"); // @NOTE: MSVC with stol would be out of range
-		test_det<int, int>("algorithm/det/3x3.txt");
-		test_det<int, double>("algorithm/det/10x10.txt");
+	using namespace mpp;
+
+	using alloc_t       = custom_allocator<double>;
+	auto alloc_identity = std::type_identity<alloc_t>{};
+	auto alloc_obj      = alloc_t{};
+
+	// @FIXME: Remove tests with `alloc_identity` once #323 has resolved
+
+	feature("Determinant") = [&]() {
+		test_det<matrix<int, 0, 0>, int>("algorithm/det/0x0.txt");
+		test_det<matrix<int>, int>("algorithm/det/1x1.txt", alloc_identity);
+		test_det<matrix<int>, double>("algorithm/det/2x2.txt", alloc_obj);
+		test_det<matrix<int>, int>("algorithm/det/3x3.txt", unsafe);
+		test_det<matrix<int>, double>("algorithm/det/10x10.txt", unsafe, alloc_identity);
+		test_det<matrix<int>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
 	};
 
-	feature("Transpose") = []() {
-		test_transformation<int, int, custom_allocator<int>, false, false>("algorithm/t/25x25.txt", mpp::transpose);
-		test_transformation<int, int, custom_allocator<int>, false, false>("algorithm/t/50x2.txt", mpp::transpose);
+	feature("Transpose") = [&]() { // @FIXME: Test other overloads
+		test_fn<matrix<int, 25, 25>, matrix<int, 25, 25>, false>("algorithm/trps/25x25.txt",
+			transpose,
+			matrix_type::fully_static,
+			alloc_obj);
+		test_fn<matrix<double>, matrix<double, dynamic, dynamic, custom_allocator<double>>, true>(
+			"algorithm/trps/50x2.txt",
+			transpose,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			alloc_identity);
 	};
 
-	feature("LU Decomposition") = []() {
-		test_lu<int, double, custom_allocator<double>, true>("algorithm/lu/2x2.txt");
-		test_lu<int, double, custom_allocator<double>, true>("algorithm/lu/3x3.txt");
+	feature("Inverse") = [&]() {
+		test_fn<matrix<double, 0, 0>, matrix<double, 0, 0>, false>("algorithm/inv/0x0.txt",
+			inverse,
+			matrix_type::fully_static,
+			alloc_obj);
+		test_fn<matrix<double>, matrix<double, dynamic, dynamic, custom_allocator<double>>, true>(
+			"algorithm/inv/1x1.txt",
+			inverse,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			alloc_identity);
+		test_fn<matrix<double>, matrix<double, dynamic, dynamic, custom_allocator<double>>, true>(
+			"algorithm/inv/2x2.txt",
+			inverse,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			alloc_obj);
+		test_fn<matrix<double, 3, 3>, matrix<double, 3, 3>, false>("algorithm/inv/3x3.txt",
+			inverse,
+			matrix_type::fully_static,
+			alloc_obj,
+			unsafe);
+		test_fn<matrix<int>, matrix<int>, true>("algorithm/inv/3x3_int.txt",
+			inverse,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			unsafe,
+			alloc_identity);
+		test_fn<matrix<double>, matrix<double>, true>("algorithm/inv/10x10.txt",
+			inverse,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			unsafe,
+			alloc_obj);
 	};
 
-	feature("Inverse") = []() {
-		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/2x2.txt", mpp::inverse);
-		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/3x3.txt", mpp::inverse);
-		test_transformation<int, double, custom_allocator<double>, true, true>("algorithm/inv/3x3_int.txt",
-			mpp::inverse);
-		test_transformation<double, double, custom_allocator<double>, true, true>("algorithm/inv/10x10.txt",
-			mpp::inverse);
+	feature("Forward substitution") = [&]() { // @FIXME: Test other overloads
+		test_sub<matrix<int, 4, 4>, matrix<int, 4, 1>, matrix<int, 4, 1>, false>("algorithm/fwd_sub/4x4_4x1.txt",
+			mpp::forward_substitution,
+			matrix_type::fully_static,
+			alloc_obj);
 	};
 
-	feature("Block") = []() {
-		given("Runtime indices") = []() {
-			test_block_dyn<int, int, custom_allocator<int>>("algorithm/block/4x4.txt");
-		};
-
-		given("Compile time indices") = []() {
-			test_block_fixed<int, int, custom_allocator<int>, 0, 0, 0, 0>("algorithm/block/3x3_fixed.txt");
-		};
-
-		// @FIXME: Remove this test once block test is revamped
-		expect(type<std::invoke_result_t<mpp::block_t,
-				   mpp::matrix<int, 2, 3>,
-				   mpp::constant<0>,
-				   mpp::constant<0>,
-				   mpp::constant<0>,
-				   mpp::constant<0>>> ==
-			   type<mpp::matrix<int, 1, 1>>); // Test if block produces static matrix with requirements met
+	feature("Backward substitution") = [&]() { // @FIXME: Test other overloads
+		test_sub<matrix<int, 3, 3>, matrix<int, 3, 1>, matrix<int, 3, 1>, false>("algorithm/back_sub/3x3_3x1.txt",
+			mpp::back_substitution,
+			matrix_type::fully_static,
+			alloc_obj);
 	};
 
-	feature("Forward substitution") = []() {
-		// @TODO: Add testcase where a, b, and x matrix have different value type to test with PassToAsIdentityObj =
-		// true
-
-		test_sub<int, int, int, custom_allocator<int>, false>("algorithm/fwd_sub/4x4_4x1.txt",
-			mpp::forward_substitution);
+	feature("LU Decomposition") = [&]() { // @FIXME: Test other overloads
+		test_lu<matrix<int, 2, 2>, matrix<int, 2, 2>, matrix<int, 2, 2>, false>("algorithm/lu/2x2.txt",
+			matrix_type::fully_static,
+			alloc_obj);
+		test_lu<matrix<double>, matrix<double>, matrix<double>, true>("algorithm/lu/3x3.txt",
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			alloc_identity);
 	};
 
-	feature("Back substitution") = []() {
-		// @TODO: Add testcase where a, b, and x matrix have same value type to test with PassToAsIdentityObj = false
-
-		test_sub<int, int, float, custom_allocator<float>, true>("algorithm/back_sub/3x3_3x1.txt",
-			mpp::back_substitution);
+	feature("Block") = [&]() { // @FIXME: Test other overloads
+		test_block<matrix<int, 3, 3>, matrix<int, 1, 1>, false>("algorithm/block/3x3.txt",
+			mpp::constant<0>{},
+			mpp::constant<0>{},
+			mpp::constant<0>{},
+			mpp::constant<0>{},
+			matrix_type::fully_static,
+			alloc_obj);
+		test_block<matrix<double>, matrix<double>, false>("algorithm/block/4x4.txt",
+			3,
+			2,
+			3,
+			2,
+			matrix_type::fully_dynamic,
+			alloc_obj,
+			alloc_identity);
 	};
 
 	return 0;

@@ -32,6 +32,8 @@
 template<typename T>
 auto str_fn()
 {
+	// @NOTE: Could improve performance by using from_chars (but will need GCC 11 for FP)
+
 	if constexpr (std::is_same_v<T, double>)
 	{
 		return [](const std::string& str) {
@@ -82,63 +84,73 @@ auto str_fn()
 	}
 }
 
-inline auto get_filepath(const std::string& filename) -> std::filesystem::path
+inline auto get_path_str(const std::string& filename)
 {
-	return std::filesystem::path(TEST_DATA_PATH) / filename;
+	return std::filesystem::path(TEST_DATA_PATH).append(filename).string();
 }
 
-inline auto mat_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
-	return mpp::matrix<T>{ std::forward<decltype(data)>(data) };
-};
+template<typename Mat>
+inline auto parse_mat = [](const auto&... args) {
+	return [... args = args](std::ifstream& file, std::string& line) {
+		using value_type = typename Mat::value_type;
 
-inline auto vec2d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
-	return std::move(data);
-};
+		auto data             = std::vector<std::vector<value_type>>{};
+		const auto str_val_fn = str_fn<value_type>();
 
-inline auto vec1d_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
-	return data[0];
-};
+		while (std::getline(file, line))
+		{
+			if (line == "=")
+			{
+				break;
+			}
 
-inline auto val_fn = []<typename T>(std::size_t, std::size_t, auto&& data) {
-	return data[0][0];
-};
+			auto row     = std::vector<value_type>{};
+			auto val_str = std::string{};
+			auto stream  = std::istringstream{ line };
 
-template<typename T>
-using mat_t = mpp::matrix<T>;
+			while (std::getline(stream, val_str, ' '))
+			{
+				row.push_back(str_val_fn(val_str));
+			}
 
-template<typename T>
-using vec2d_t = std::vector<std::vector<T>>;
+			data.push_back(std::move(row));
+		}
 
-template<typename T>
-using vec1d_t = std::vector<T>;
-
-template<typename T>
-using val_t = T;
-
-template<typename... Ts>
-struct types
-{
-	static constexpr auto size = sizeof...(Ts);
-};
-
-template<template<typename> typename... Ts>
-struct temp_types
-{
-	static constexpr auto size = sizeof...(Ts);
+		return Mat{ std::move(data), args... };
+	};
 };
 
 template<typename T>
-auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, std::size_t columns, const auto& fn)
-{
-	/**
-	 * put the result into a 2D vector because it allows you to make a matrix out of it and extract a 1D vector out of
-	 * it (just vec[0]). This was meant to be as generic as possible
-	 */
+inline auto parse_vec2d = [](std::ifstream& file, std::string& line) {
+	auto data             = std::vector<std::vector<T>>{};
+	const auto str_val_fn = str_fn<T>();
 
-	auto data       = std::vector<std::vector<T>>{};
-	auto str_val_fn = str_fn<T>();
+	while (std::getline(file, line))
+	{
+		if (line == "=")
+		{
+			break;
+		}
 
-	data.reserve(rows);
+		auto row     = std::vector<T>{};
+		auto val_str = std::string{};
+		auto stream  = std::istringstream{ line };
+
+		while (std::getline(stream, val_str, ' '))
+		{
+			row.push_back(str_val_fn(val_str));
+		}
+
+		data.push_back(std::move(row));
+	}
+
+	return data;
+};
+
+template<typename T>
+inline auto parse_vec1d = [](std::ifstream& file, std::string& line) {
+	auto data             = std::vector<T>{};
+	const auto str_val_fn = str_fn<T>();
 
 	while (std::getline(file, line))
 	{
@@ -149,145 +161,57 @@ auto parse_mat_elems(std::ifstream& file, std::string& line, std::size_t rows, s
 
 		auto val_str = std::string{};
 		auto stream  = std::istringstream{ line };
-		auto row     = std::vector<T>{};
-
-		row.reserve(columns);
 
 		while (std::getline(stream, val_str, ' '))
 		{
-			row.push_back(str_val_fn(val_str));
+			data.push_back(str_val_fn(val_str));
 		}
-
-		data.push_back(std::move(row));
 	}
 
-	return fn.template operator()<T>(rows, columns, std::move(data));
-}
-
-template<typename T>
-auto parse_mat_with_dims(std::ifstream& file, std::string& line, const auto& fn)
-{
-	std::size_t rows, columns;
-	std::getline(file, line);
-
-	auto stream = std::istringstream{ line };
-	stream >> rows >> columns;
-
-	return parse_mat_elems<T>(file, line, rows, columns, fn);
-}
-
-template<typename From, typename To>
-struct num_out
-{
-	mpp::matrix<From> mat;
-	To num;
+	return data;
 };
 
-template<typename From, typename To>
-auto parse_num_out(const std::filesystem::path& path) -> num_out<From, To>
-{
-	auto data_file  = std::ifstream{ path };
-	auto line       = std::string{};
-	auto num_val_fn = str_fn<To>();
+template<typename T>
+inline auto parse_val = [](std::ifstream& file, std::string& line) {
+	std::getline(file, line);
 
-	auto mat = parse_mat_with_dims<From>(data_file, line, mat_fn);
+	const auto str_val_fn = str_fn<T>();
+	const auto val        = str_val_fn(line);
 
-	std::getline(data_file, line);
-	const auto out = num_val_fn(line);
+	std::getline(file, line); // to skip '='
 
-	return { std::move(mat), out };
-}
+	return val;
+};
 
-template<typename To>
-struct block
+template<typename Mat>
+struct block_result
 {
 	std::size_t row_start;
 	std::size_t column_start;
 	std::size_t row_end;
 	std::size_t column_end;
-	mpp::matrix<To> mat;
+	Mat mat;
 };
 
-template<typename From, typename To>
-struct block_out
+template<typename T>
+concept has_value_type_member = requires
 {
-	mpp::matrix<From> mat;
-	std::vector<block<To>> blocks;
+	typename T::value_type;
 };
 
-template<typename From, typename To>
-auto parse_block_out(const std::filesystem::path& path) -> block_out<From, To>
+template<typename Cont, typename Fn>
+auto parse_test_impl(std::ifstream& file, std::string& line, const Fn& fn)
 {
-	auto data_file = std::ifstream{ path };
-	auto line      = std::string{};
-	auto blocks    = std::vector<block<To>>{};
+	using val_t = std::conditional_t<has_value_type_member<Cont>, typename Cont::value_type, Cont>;
 
-	auto mat = parse_mat_with_dims<From>(data_file, line, mat_fn);
-	std::size_t row_start, column_start, row_end, column_end;
-
-	while (std::getline(data_file, line))
-	{
-		// Parse the block indices
-		{
-			auto line_stream = std::istringstream{ line };
-			line_stream >> row_start >> column_start >> row_end >> column_end;
-		}
-
-		// Parse the block
-		auto block_ =
-			parse_mat_elems<To>(data_file, line, row_end - row_start + 1, column_end - column_start + 1, mat_fn);
-		blocks.push_back(block<To>{ row_start, column_start, row_end, column_end, block_ });
-	}
-
-	return { std::move(mat), std::move(blocks) };
+	return parse_dims<val_t>(file, line, fn);
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100) // @NOTE: MSVC Bug with unreferenced parameters when it clearly references them
-#endif
-
-template<std::size_t I, std::size_t Size, template<typename> typename... TempTs, typename... ValTs, typename... Fns>
-auto parse_mats_out_impl(std::ifstream& file,
-	std::string& line,
-	auto& out,
-	const std::tuple<Fns...>& fns,
-	temp_types<TempTs...> temp_ts,
-	types<ValTs...> val_ts)
+template<typename... Fns>
+auto parse_test(const std::string& filename, const Fns&... fns)
 {
-	if constexpr (I + 1 > Size)
-	{
-		return out;
-	}
-	else
-	{
-		using val_t = std::tuple_element_t<I, std::tuple<ValTs...>>;
-
-		std::get<I>(out) = parse_mat_with_dims<val_t>(file, line, std::get<I>(fns));
-
-		return parse_mats_out_impl<I + 1, Size>(file, line, out, fns, temp_ts, val_ts);
-	}
-}
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-// @NOTE: MSVC bug when this is a lambda because it doesn't like extracting class template packs inside lambda template
-// syntax
-template<template<typename> typename... TempTs2, typename... ValTs2>
-auto create_corresponding_tup(temp_types<TempTs2...>, types<ValTs2...>)
-{
-	return std::tuple<TempTs2<ValTs2>...>{};
-}
-
-template<typename TempTs, typename ValTs, typename... Fns>
-auto parse_mats_out(const std::filesystem::path& path, const std::tuple<Fns...>& fns)
-{
-	auto out = create_corresponding_tup(TempTs{}, ValTs{});
-
 	auto line = std::string{};
-	auto file = std::ifstream(path);
+	auto file = std::ifstream(get_path_str(filename));
 
-	return parse_mats_out_impl<0, TempTs::size>(file, line, out, fns, TempTs{}, ValTs{});
+	return std::tuple{ fns(file, line)... };
 }

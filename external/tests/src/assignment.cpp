@@ -41,7 +41,7 @@ using namespace boost::ut::bdd;
 template<typename Val, template<typename> typename Mat>
 static void test_assign_rng(const std::string& file)
 {
-	const auto result = parse_mats_out<temp_types<mat_t, vec2d_t, mat_t>, types<Val, Val, Val>>(get_filepath(file),
+	const auto result = parse_test<temp_types<mat_t, vec2d_t, mat_t>, types<Val, Val, Val>>(get_filepath(file),
 		std::tuple{ mat_fn, vec2d_fn, mat_fn });
 	auto expand_rng   = std::get<1>(result);
 	const auto end    = std::get<2>(result);
@@ -62,7 +62,7 @@ static void test_assign_rng(const std::string& file)
 template<typename Val>
 static void test_assign_mat(const std::string& file)
 {
-	const auto result = parse_mats_out<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
+	const auto result = parse_test<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
 		std::tuple{ vec2d_fn, vec2d_fn });
 
 	const auto rng          = std::get<0>(result);
@@ -131,7 +131,7 @@ static void test_assign_mat_different(const std::string& file)
 {
 	// Similar to test_assign_mat_different but assigning to different kinds of matrices
 
-	const auto result = parse_mats_out<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
+	const auto result = parse_test<temp_types<vec2d_t, vec2d_t>, types<Val, Val>>(get_filepath(file),
 		std::tuple{ vec2d_fn, vec2d_fn });
 
 	const auto rng          = std::get<0>(result);

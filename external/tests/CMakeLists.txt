@@ -38,14 +38,16 @@ function(_create_test TEST_FILENAME)
     target_compile_definitions(${TEST_NAME} PRIVATE -DTEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test_data")
 endfunction()
 
-_create_test("customization")
-_create_test("utility_cpos")
-_create_test("iterator")
+# @FIXME: Revamp and uncomment rest of the tests
+
+# _create_test("customization")
+# _create_test("utility_cpos")
+# _create_test("iterator")
 _create_test("algorithm_cpos")
-_create_test("initialization")
-_create_test("assignment")
-_create_test("arithmetic")
-_create_test("members")
+# _create_test("initialization")
+# _create_test("assignment")
+# _create_test("arithmetic")
+# _create_test("members")
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
     include("../thirdparty/CodeCoverage.cmake")

@@ -42,7 +42,7 @@
 
 static auto parse_vec2d_out(const std::string& file)
 {
-	const auto result = parse_mats_out<temp_types<vec2d_t>, types<int>>(get_filepath(file), std::tuple{ vec2d_fn });
+	const auto result = parse_test<temp_types<vec2d_t>, types<int>>(get_filepath(file), std::tuple{ vec2d_fn });
 	const auto out    = std::get<0>(result);
 
 	return out;
