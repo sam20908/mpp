@@ -90,8 +90,8 @@ inline auto get_path_str(const std::string& filename)
 }
 
 template<typename Mat>
-inline auto parse_mat = [](const auto&... args) {
-	return [... args = args](std::ifstream& file, std::string& line) {
+inline auto parse_mat = [](auto... args) {
+	return [=](std::ifstream& file, std::string& line) {
 		using value_type = typename Mat::value_type;
 
 		auto data             = std::vector<std::vector<value_type>>{};
