@@ -102,7 +102,6 @@ namespace mpp
 			auto buf_begin = buf.begin();
 			auto obj_begin = obj.begin();
 
-			const auto rows          = obj.rows();
 			const auto columns       = obj.columns();
 			const auto block_rows    = bottom_row_index - top_row_index + 1;
 			const auto block_columns = bottom_column_index - top_column_index + 1;
@@ -110,7 +109,7 @@ namespace mpp
 			for (auto row = top_row_index; row <= bottom_row_index; ++row)
 			{
 				auto row_begin_index = static_cast<diff_t>(index_2d_to_1d(columns, row, top_column_index));
-				auto row_begin       = std::next(obj.begin(), row_begin_index);
+				auto row_begin       = std::next(obj_begin, row_begin_index);
 
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), buf_begin);
 
