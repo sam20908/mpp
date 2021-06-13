@@ -87,9 +87,8 @@ template<typename Val,
 	std::size_t Columns3>
 void test_num_op(const std::string& filename, const auto& op)
 {
-	const auto result =
-		parse_test<temp_types<vec2d_t, val_t, vec2d_t>, types<Val, Val2, Val3>>(get_filepath(filename),
-			std::tuple{ vec2d_fn, val_fn, vec2d_fn });
+	const auto result = parse_test<temp_types<vec2d_t, val_t, vec2d_t>, types<Val, Val2, Val3>>(get_filepath(filename),
+		std::tuple{ vec2d_fn, val_fn, vec2d_fn });
 
 	const auto num          = std::get<1>(result);
 	const auto mat_tup      = create_mats<Val, Rows, Columns, all_mats_t>(args(fwd_args, std::get<0>(result)));
