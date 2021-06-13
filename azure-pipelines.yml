@@ -108,7 +108,7 @@ jobs:
         displayName: Publish Tests Results
 
   - job: WindowsMSVC
-    displayName: Windows MSVC 19.28
+    displayName: Windows MSVC 19.29
 
     pool:
       vmImage: windows-latest
