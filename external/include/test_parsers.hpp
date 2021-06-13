@@ -26,6 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <vector>
 
@@ -84,7 +85,7 @@ auto str_fn()
 	}
 }
 
-inline auto get_path_str(const std::string& filename)
+inline auto get_path_str(std::string_view filename)
 {
 	return std::filesystem::path(TEST_DATA_PATH).append(filename).string();
 }
@@ -208,7 +209,7 @@ auto parse_test_impl(std::ifstream& file, std::string& line, const Fn& fn)
 }
 
 template<typename... Fns>
-auto parse_test(const std::string& filename, const Fns&... fns)
+auto parse_test(std::string_view filename, const Fns&... fns)
 {
 	auto line = std::string{};
 	auto file = std::ifstream(get_path_str(filename));

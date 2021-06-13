@@ -37,6 +37,7 @@
 #include "../../include/test_parsers.hpp"
 
 #include <compare>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -44,31 +45,31 @@ using namespace boost::ut::bdd;
 using namespace boost::ut;
 
 template<typename From, typename To, typename... DetArgs>
-void test_det(const std::string& filename, const DetArgs&... fn_args)
+void test_det(std::string_view filename, const DetArgs&... fn_args)
 {
 	using ordering_type = std::compare_three_way_result_t<To, To>;
 
-	const auto [mat, expected_num] = parse_test(filename, parse_mat<From>(), parse_val<To>);
+	test(filename.data()) = [=]() {
+		const auto [mat, expected_num] = parse_test(filename, parse_mat<From>(), parse_val<To>);
 
-	To num;
+		To num;
 
-	if constexpr (!std::is_same_v<From, To>)
-	{
-		num = mpp::determinant(std::type_identity<To>{}, mat, fn_args...);
-	}
-	else
-	{
-		num = mpp::determinant(mat, fn_args...);
-	}
+		if constexpr (!std::is_same_v<From, To>)
+		{
+			num = mpp::determinant(std::type_identity<To>{}, mat, fn_args...);
+		}
+		else
+		{
+			num = mpp::determinant(mat, fn_args...);
+		}
 
-	test(filename.c_str()) = [&]() {
 		expect(mpp::floating_point_compare(num, expected_num) == ordering_type::equivalent)
 			<< "Output is" << num << "but expected output is" << expected_num;
 	};
 }
 
 template<typename From, typename To, bool CmpAlloc, typename Fn, typename Alloc, typename... FnArgs>
-void test_fn(const std::string& filename,
+void test_fn(std::string_view filename,
 	const Fn& fn,
 	mpp::matrix_type expected_type,
 	[[maybe_unused]] const Alloc& alloc_obj,
@@ -78,22 +79,22 @@ void test_fn(const std::string& filename,
 	using to_val_t      = typename To::value_type;
 	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	const auto [mat, expected_mat] = parse_test(filename, parse_mat<From>(), parse_mat<To>());
+	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
+		const auto [mat, expected_out] = parse_test(filename, parse_mat<From>(), parse_mat<To>());
 
-	auto out = [&]() {
-		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
-		{
-			return fn(std::type_identity<to_val_t>{}, mat, fn_args...);
-		}
-		else
-		{
-			return fn(mat, fn_args...);
-		}
-	}();
+		auto out = [&]() {
+			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+			{
+				return fn(std::type_identity<to_val_t>{}, mat, fn_args...);
+			}
+			else
+			{
+				return fn(mat, fn_args...);
+			}
+		}();
 
-	test(filename.c_str()) = [&]() {
 		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
-		expect(mpp::elements_compare(out, expected_mat) == ordering_type::equivalent) << "Matrices aren't equal";
+		expect(mpp::elements_compare(out, expected_out) == ordering_type::equivalent) << "Matrices aren't equal";
 
 		if constexpr (CmpAlloc)
 		{
@@ -105,7 +106,7 @@ void test_fn(const std::string& filename,
 }
 
 template<typename MatA, typename MatB, typename MatX, bool CmpAlloc, typename Fn, typename Alloc, typename... FnArgs>
-void test_sub(const std::string& filename,
+void test_sub(std::string_view filename,
 	const Fn& fn,
 	mpp::matrix_type expected_type,
 	[[maybe_unused]] const Alloc& alloc_obj,
@@ -115,21 +116,21 @@ void test_sub(const std::string& filename,
 	using to_val_t      = typename MatX::value_type;
 	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	const auto [mat_a, mat_b, expected_out] =
-		parse_test(filename, parse_mat<MatA>(), parse_mat<MatB>(), parse_mat<MatX>());
+	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
+		const auto [mat_a, mat_b, expected_out] =
+			parse_test(filename, parse_mat<MatA>(), parse_mat<MatB>(), parse_mat<MatX>());
 
-	auto out = [&]() {
-		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
-		{
-			return fn(std::type_identity<to_val_t>{}, mat_a, mat_b, fn_args...);
-		}
-		else
-		{
-			return fn(mat_a, mat_b, fn_args...);
-		}
-	}();
+		auto out = [&]() {
+			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+			{
+				return fn(std::type_identity<to_val_t>{}, mat_a, mat_b, fn_args...);
+			}
+			else
+			{
+				return fn(mat_a, mat_b, fn_args...);
+			}
+		}();
 
-	test(filename.c_str()) = [&]() {
 		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
 		expect(mpp::elements_compare(out, expected_out) == ordering_type::equivalent) << "Matrices aren't equal";
 
@@ -143,7 +144,7 @@ void test_sub(const std::string& filename,
 }
 
 template<typename Mat, typename MatL, typename MatU, bool CmpAlloc, typename Alloc, typename... FnArgs>
-void test_lu(const std::string& filename,
+void test_lu(std::string_view filename,
 	mpp::matrix_type expected_type,
 	[[maybe_unused]] const Alloc& alloc_obj,
 	const FnArgs&... fn_args)
@@ -152,22 +153,22 @@ void test_lu(const std::string& filename,
 	using to_val_t      = std::common_type_t<typename MatL::value_type, typename MatU::value_type>;
 	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	const auto [mat, expected_l, expected_u] =
-		parse_test(filename, parse_mat<Mat>(), parse_mat<MatL>(), parse_mat<MatU>());
+	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
+		const auto [mat, expected_l, expected_u] =
+			parse_test(filename, parse_mat<Mat>(), parse_mat<MatL>(), parse_mat<MatU>());
 
-	auto [out_l, out_u] = [&]() {
-		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
-		{
-			return mpp::lu_decomposition(std::type_identity<to_val_t>{}, mat, fn_args...);
-		}
-		else
-		{
-			return mpp::lu_decomposition(mat, fn_args...);
-		}
-	}();
+		auto [out_l, out_u] = [&]() {
+			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+			{
+				return mpp::lu_decomposition(std::type_identity<to_val_t>{}, mat, fn_args...);
+			}
+			else
+			{
+				return mpp::lu_decomposition(mat, fn_args...);
+			}
+		}();
 
-	test(filename.c_str()) = [&]() {
-		scenario("Testing L matrix") = [&]() {
+		scenario("Testing L matrix") = [=, expected_l = std::move(expected_l)]() {
 			expect(mpp::type(out_l) == expected_type) << "Matrix type doesn't match";
 			expect(mpp::elements_compare(out_l, expected_l) == ordering_type::equivalent) << "Matrices aren't equal";
 
@@ -179,7 +180,7 @@ void test_lu(const std::string& filename,
 			}
 		};
 
-		scenario("Testing U matrix") = [&]() {
+		scenario("Testing U matrix") = [=, expected_l = std::move(expected_l)]() {
 			expect(mpp::type(out_u) == expected_type) << "Matrix type doesn't match";
 			expect(mpp::elements_compare(out_u, expected_u) == ordering_type::equivalent) << "Matrices aren't equal";
 
@@ -202,7 +203,7 @@ template<typename Mat,
 	typename BottomColumnIndex,
 	typename Alloc,
 	typename... FnArgs>
-void test_block(const std::string& filename,
+void test_block(std::string_view filename,
 	TopRowIndex top_row_index,
 	TopColumnIndex top_column_index,
 	BottomRowIndex bottom_row_index,
@@ -215,26 +216,31 @@ void test_block(const std::string& filename,
 	using to_val_t      = typename Block::value_type;
 	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
 
-	const auto [mat, expected_block] = parse_test(filename, parse_mat<Mat>(), parse_mat<Block>());
+	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
+		const auto [mat, expected_block] = parse_test(filename, parse_mat<Mat>(), parse_mat<Block>());
 
-	auto out = [&]() {
-		if constexpr (!std::is_same_v<from_val_t, to_val_t>)
-		{
-			return mpp::block(std::type_identity<to_val_t>{},
-				mat,
-				top_row_index,
-				top_column_index,
-				bottom_row_index,
-				bottom_column_index,
-				fn_args...);
-		}
-		else
-		{
-			return mpp::block(mat, top_row_index, top_column_index, bottom_row_index, bottom_column_index, fn_args...);
-		}
-	}();
+		auto out = [&]() {
+			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
+			{
+				return mpp::block(std::type_identity<to_val_t>{},
+					mat,
+					top_row_index,
+					top_column_index,
+					bottom_row_index,
+					bottom_column_index,
+					fn_args...);
+			}
+			else
+			{
+				return mpp::block(mat,
+					top_row_index,
+					top_column_index,
+					bottom_row_index,
+					bottom_column_index,
+					fn_args...);
+			}
+		}();
 
-	test(filename.c_str()) = [&]() {
 		using out_decayed_t = std::remove_cvref_t<decltype(out)>;
 
 		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
