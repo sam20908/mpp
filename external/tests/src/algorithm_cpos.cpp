@@ -82,7 +82,7 @@ void test_fn(std::string_view filename,
 	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
 		const auto [mat, expected_out] = parse_test(filename, parse_mat<From>(), parse_mat<To>());
 
-		auto out = [&]() {
+		auto out = [=, mat = std::move(mat)]() {
 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 			{
 				return fn(std::type_identity<to_val_t>{}, mat, fn_args...);
@@ -120,7 +120,7 @@ void test_sub(std::string_view filename,
 		const auto [mat_a, mat_b, expected_out] =
 			parse_test(filename, parse_mat<MatA>(), parse_mat<MatB>(), parse_mat<MatX>());
 
-		auto out = [&]() {
+		auto out = [=, mat = std::move(mat)]() {
 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 			{
 				return fn(std::type_identity<to_val_t>{}, mat_a, mat_b, fn_args...);
@@ -219,7 +219,7 @@ void test_block(std::string_view filename,
 	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
 		const auto [mat, expected_block] = parse_test(filename, parse_mat<Mat>(), parse_mat<Block>());
 
-		auto out = [&]() {
+		auto out = [=, mat = std::move(mat)]() {
 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 			{
 				return mpp::block(std::type_identity<to_val_t>{},
