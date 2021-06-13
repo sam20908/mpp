@@ -140,7 +140,6 @@ jobs:
         displayName: Publish Tests Results
 
   - job: WindowsClang
-    condition: false
     displayName: Windows Clang 12
 
     pool:

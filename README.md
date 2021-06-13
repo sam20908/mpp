@@ -7,14 +7,14 @@ A C++20 and later matrix library
 #### Tested Compilers to Compile Tests:
 
 * GCC 10
-* Clang 11 with libstdc++ (Clang 11 has a ICE for noexcept specification for `mpp::elements_compare`, so the noexcept specification doesn't exist for that CPO for Clang 11)
+* Clang 12 with libstdc++
 * MSVC 19.28
 
 ## How to Include:
 
 All you need to do is just add it as a subdirectory and link the target:
 
-``` cmake
+```cmake
 add_subdirectory("mpp")
 
 target_link_libraries(your_target mpp::mpp)
@@ -26,7 +26,7 @@ target_link_libraries(your_target mpp::mpp)
 
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
-``` cpp
+```cpp
 #include <mpp/matrix.h>
 #include <mpp/algorithms.hpp>
 #include <mpp/utility.hpp>
@@ -111,7 +111,7 @@ One of the main things to take away is the concept of **"extents"** for dimensio
 
 If you as a user can make guarantees that the library checks internally (e.g. properly initialize the matrix with valid parameters), then you can pass `mpp::unsafe` as a parameter to avoid them. **Note that only some operations allow unsafe because they are the ones that needs to validate their arguments.**
 
-``` cpp
+```cpp
 #include <mpp/algorithm/inverse.hpp>
 #include <mpp/matrix.hpp>
 
@@ -148,7 +148,7 @@ Normally with C++20, we could simply provide a `operator<=>` and let the compile
 
 `operator<=>` was also provided if you know you'll compare matrices with the same value type (therefore no need to use `mpp::elements_compare` ).
 
-``` cpp
+```cpp
 #include <mpp/matrix.hpp>
 #include <mpp/utility/comparison.hpp>
 
@@ -196,7 +196,7 @@ int main()
 
 Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
-``` cpp
+```cpp
 #include <mpp/utility/configuration.hpp>
 
 #include <array>
@@ -250,7 +250,7 @@ int main()
 
 Finally, note that **all algorithms and utilities** are _customization point objects_. It means that you can customize them by overloading with `tag_invoke` and it will detect your customization.
 
-``` cpp
+```cpp
 namespace ns
 {
   struct dumb_matrix {};
@@ -280,7 +280,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 
 Custom iterators are used to make navigating matrices easier. They also meet `contiguous_iterator` requirement.
 
-``` cpp
+```cpp
 #include <mpp/matrix.hpp>
 
 int main()

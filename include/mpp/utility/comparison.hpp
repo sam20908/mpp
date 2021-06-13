@@ -69,15 +69,11 @@ namespace mpp
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			CompareThreeway compare_three_way_fn = {}) // @TODO: ISSUE #20
-#if defined(__clang__) && __clang_major__ > 11
-			// Clang 11 and below crashes if this function had any noexcept specification
-			// @NOTE: It's fixed with Clang 12+
 			noexcept(noexcept(std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
 				right.begin(),
 				right.end(),
 				compare_three_way_fn)))
-#endif
 		{
 			return std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
