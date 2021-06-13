@@ -157,7 +157,7 @@ void test_lu(std::string_view filename,
 		const auto [mat, expected_l, expected_u] =
 			parse_test(filename, parse_mat<Mat>(), parse_mat<MatL>(), parse_mat<MatU>());
 
-		auto [out_l, out_u] = [&]() {
+		auto [out_l, out_u] = [=, mat = std::move(mat)]() {
 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 			{
 				return mpp::lu_decomposition(std::type_identity<to_val_t>{}, mat, fn_args...);
