@@ -120,7 +120,7 @@ void test_sub(std::string_view filename,
 		const auto [mat_a, mat_b, expected_out] =
 			parse_test(filename, parse_mat<MatA>(), parse_mat<MatB>(), parse_mat<MatX>());
 
-		auto out = [=, mat = std::move(mat)]() {
+		auto out = [=, mat_a = std::move(mat_a), mat_b = std::move(mat_b)]() {
 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
 			{
 				return fn(std::type_identity<to_val_t>{}, mat_a, mat_b, fn_args...);
