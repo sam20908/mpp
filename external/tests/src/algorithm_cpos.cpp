@@ -168,7 +168,7 @@ void test_lu(std::string_view filename,
 			}
 		}();
 
-		scenario("Testing L matrix") = [=, expected_l = std::move(expected_l)]() {
+		scenario("Testing L matrix") = [=, out_l = std::move(out_l), expected_l = std::move(expected_l)]() {
 			expect(mpp::type(out_l) == expected_type) << "Matrix type doesn't match";
 			expect(mpp::elements_compare(out_l, expected_l) == ordering_type::equivalent) << "Matrices aren't equal";
 
@@ -180,7 +180,7 @@ void test_lu(std::string_view filename,
 			}
 		};
 
-		scenario("Testing U matrix") = [=, expected_l = std::move(expected_l)]() {
+		scenario("Testing U matrix") = [=, out_u = std::move(out_u), expected_u = std::move(expected_u)]() {
 			expect(mpp::type(out_u) == expected_type) << "Matrix type doesn't match";
 			expect(mpp::elements_compare(out_u, expected_u) == ordering_type::equivalent) << "Matrices aren't equal";
 
