@@ -207,7 +207,7 @@ int main()
 		test_cmp_size<matrix<int, 4, dynamic>, matrix<int, 4, 4>>("utility/cmp_size/4x4_4x4.txt");
 	};
 
-	feature("Elements compare") = []() { // @TODO: Test elements that return other ordering type
+	feature("Elements compare") = []() {
 		test_cmp_elems<matrix<int, 0, 0>, matrix<double, 0, dynamic>, std::strong_ordering>(
 			"utility/cmp_elems/0x0_0x0.txt");
 		test_cmp_elems<matrix<int>, matrix<int, dynamic, 1>, std::strong_ordering>("utility/cmp_elems/1x1_1x1.txt");
