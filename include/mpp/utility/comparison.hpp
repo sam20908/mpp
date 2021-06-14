@@ -49,7 +49,7 @@ namespace mpp
 			compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered }))
 			-> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
 		{
-			return std::pair{ compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
+			return { compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
 				compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered };
 		}
 	};

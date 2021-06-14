@@ -17,16 +17,7 @@
  * under the License.
  */
 
-// #ifdef _MSC_VER
-// #pragma warning(push)
-// #pragma warning(disable : 4459)
-// #endif
-
 #include <boost/ut.hpp>
-
-// #ifdef _MSC_VER
-// #pragma warning(pop)
-// #endif
 
 #include <mpp/utility/comparison.hpp>
 #include <mpp/utility/type.hpp>

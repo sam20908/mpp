@@ -44,7 +44,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: true
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '<(boost|ApprovalTests).*>'
+  - Regex:           '<boost/ut\.hpp>'
     Priority:        0
   - Regex:           '<mpp/.*/.*\.hpp>'
     Priority:        1

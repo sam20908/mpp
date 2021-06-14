@@ -17,203 +17,189 @@
  * under the License.
  */
 
-// @TODO: Move cast to algorithms when #162 is being worked on
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 #include <mpp/utility.hpp>
 
-#include <compare>
-#include <cstddef>
-#include <utility>
-#include <vector>
+#include "../../include/custom_allocator.hpp"
+#include "../../include/test_parsers.hpp"
 
-using namespace boost::ut::literals;
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <iostream>
+#include <utility>
+
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_type(mpp::matrix_type type)
+auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
 {
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{};
+	switch (mat_type)
+	{
+	case mpp::matrix_type::fully_static:
+		os << "fully_static";
+		break;
+	case mpp::matrix_type::fully_dynamic:
+		os << "fully_dynamic";
+		break;
+	case mpp::matrix_type::dynamic_rows:
+		os << "dynamic_rows";
+		break;
+	case mpp::matrix_type::dynamic_columns:
+		os << "dynamic_columns";
+		break;
+	}
 
-	expect(mpp::type(matrix) == type);
+	return os;
 }
 
-template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_sq(auto... dimension_args)
-{
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ dimension_args... };
+template<typename T>
+concept ordering_type = std::same_as<T, std::strong_ordering> || std::same_as<T, std::weak_ordering> ||
+	std::same_as<T, std::partial_ordering>;
 
-	expect(mpp::square(matrix));
+template<ordering_type Ordering>
+auto operator<<(std::ostream& os, Ordering ordering) -> std::ostream&
+{
+	if constexpr (std::is_same_v<Ordering, std::strong_ordering>)
+	{
+		if (ordering == std::strong_ordering::greater)
+		{
+			os << "strong_ordering::greater";
+		}
+		else if (ordering == std::strong_ordering::less)
+		{
+			os << "strong_ordering::less";
+		}
+		else if (ordering == std::strong_ordering::equivalent)
+		{
+			os << "strong_ordering::equivalent";
+		}
+	}
+	else if constexpr (std::is_same_v<Ordering, std::weak_ordering>)
+	{
+		if (ordering == std::weak_ordering::greater)
+		{
+			os << "weak_ordering::greater";
+		}
+		else if (ordering == std::weak_ordering::less)
+		{
+			os << "weak_ordering::less";
+		}
+		else if (ordering == std::weak_ordering::equivalent)
+		{
+			os << "weak_ordering::equivalent";
+		}
+	}
+	else if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
+	{
+		if (ordering == std::partial_ordering::greater)
+		{
+			os << "partial_ordering::greater";
+		}
+		else if (ordering == std::partial_ordering::less)
+		{
+			os << "partial_ordering::less";
+		}
+		else if (ordering == std::partial_ordering::equivalent)
+		{
+			os << "partial_ordering::equivalent";
+		}
+		else if (ordering == std::partial_ordering::unordered)
+		{
+			os << "partial_ordering::unordered";
+		}
+	}
+
+	return os;
 }
 
-template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_sg(auto val, bool is_singular, auto... dimension_args)
+template<typename Mat, typename Val, typename Fn>
+void test_fn(std::string_view filename, const Fn& fn)
 {
-	const auto matrix = mpp::matrix<int, RowsExtent, ColumnsExtent>{ dimension_args..., val };
+	test(filename.data()) = [=]() {
+		const auto [mat, expected_val] = parse_test(filename, parse_mat<Mat>(), parse_val<Val>);
+		const auto out                 = fn(mat);
 
-	expect(mpp::singular(matrix) == is_singular);
+		expect(out == expected_val) << "Output is" << out << "but expected output is" << expected_val;
+	};
 }
 
-void test_cmp_size(const auto& left_matrix_creator,
-	const auto& right_matrix_creator,
-	std::partial_ordering row_ordering,
-	std::partial_ordering column_ordering,
-	bool cmp_rows,
-	bool cmp_columns)
+template<typename Mat, typename Mat2>
+void test_cmp_size(std::string_view filename)
 {
-	const auto left                                    = left_matrix_creator();
-	const auto right                                   = right_matrix_creator();
-	const auto [cmp_row_ordering, cmp_column_ordering] = mpp::size_compare(left, right, cmp_rows, cmp_columns);
+	test(filename.data()) = [=]() {
+		const auto [mat, mat2, cmp_rows, cmp_cols, expected_row_ordering, expected_col_ordering] = parse_test(filename,
+			parse_mat<Mat>(),
+			parse_mat<Mat2>(),
+			parse_val<bool>,
+			parse_val<bool>,
+			parse_ordering<std::partial_ordering>,
+			parse_ordering<std::partial_ordering>);
 
-	expect(row_ordering == cmp_row_ordering);
-	expect(column_ordering == cmp_column_ordering);
+		const auto [out_row_ordering, out_col_ordering] = mpp::size_compare(mat, mat2, cmp_rows, cmp_cols);
+
+		expect(out_row_ordering == expected_row_ordering)
+			<< "Output is" << out_row_ordering << "but expected output is" << expected_row_ordering;
+		expect(out_col_ordering == expected_col_ordering)
+			<< "Output is" << out_col_ordering << "but expected output is" << expected_col_ordering;
+	};
 }
 
-template<typename CompareThreeWay = std::compare_three_way>
-void test_cmp_elems(auto&& left_matrix_creator,
-	auto&& right_matrix_creator,
-	auto ordering,
-	CompareThreeWay cmp_three_way_fn = {})
+template<typename Mat, typename Mat2, typename Ordering>
+void test_cmp_elems(std::string_view filename)
 {
-	const auto left         = left_matrix_creator();
-	const auto right        = right_matrix_creator();
-	const auto cmp_ordering = mpp::elements_compare(left, right, cmp_three_way_fn);
+	test(filename.data()) = [=]() {
+		const auto [mat, mat2, expected_ordering] =
+			parse_test(filename, parse_mat<Mat>(), parse_mat<Mat2>(), parse_ordering<Ordering>);
 
-	expect(cmp_ordering == ordering);
+		const auto out_ordering = mpp::elements_compare(mat, mat2, mpp::floating_point_compare);
+
+		expect(out_ordering == expected_ordering)
+			<< "Output is" << out_ordering << "but expected output is" << expected_ordering;
+	};
 }
 
 int main()
 {
-	feature("utility CPOs") = []() {
-		feature("type") = []() {
-			test_type<1, 1>(mpp::matrix_type::fully_static);
-			test_type<mpp::dynamic, mpp::dynamic>(mpp::matrix_type::fully_dynamic);
-			test_type<mpp::dynamic, 1>(mpp::matrix_type::dynamic_rows);
-			test_type<1, mpp::dynamic>(mpp::matrix_type::dynamic_columns);
-		};
+	using namespace mpp;
 
-		feature("suare") = []() {
-			test_sq<1, 1>();
-			test_sq<mpp::dynamic, mpp::dynamic>(1ul, 1ul);
-			test_sq<mpp::dynamic, 1>(1ul);
-			test_sq<1, mpp::dynamic>(1ul);
-		};
+	feature("Type") = []() {
+		test_fn<matrix<int, 0, 0>, matrix_type>("utility/type/fixed.txt", mpp::type);
+		test_fn<matrix<int>, matrix_type>("utility/type/dyn.txt", mpp::type);
+		test_fn<matrix<int, dynamic, 0>, matrix_type>("utility/type/dyn_rows.txt", mpp::type);
+		test_fn<matrix<int, 0, dynamic>, matrix_type>("utility/type/dyn_cols.txt", mpp::type);
+	};
 
-		feature("singular") = []() {
-			// Most common scenario for singular matrices is all elements are 0
+	feature("Square") = []() {
+		test_fn<matrix<int, 1, 1>, bool>("utility/sq/1x1.txt", square);
+		test_fn<matrix<int>, bool>("utility/sq/1x2.txt", square);
+		test_fn<matrix<int, dynamic, 3>, bool>("utility/sq/3x3.txt", square);
+		test_fn<matrix<int, 3, dynamic>, bool>("utility/sq/3x2.txt", square);
+	};
 
-			when("checking against non-singular matrices") = []() {
-				test_sg<1, 1>(1, false);
-				test_sg<mpp::dynamic, mpp::dynamic>(1, false, 1ul, 1ul);
-				test_sg<mpp::dynamic, 1>(1, false, 1ul);
-				test_sg<1, mpp::dynamic>(1, false, 1ul);
-			};
+	feature("Singular") = []() {
+		test_fn<matrix<int, 0, 0>, bool>("utility/sg/0x0.txt", mpp::singular);
+		test_fn<matrix<int>, bool>("utility/sg/1x1.txt", mpp::singular);
+		test_fn<matrix<int, dynamic, 2>, bool>("utility/sg/2x2.txt", mpp::singular);
+		test_fn<matrix<int, 3, dynamic>, bool>("utility/sg/3x3.txt", mpp::singular);
+	};
 
-			when("checking against singular matrices") = []() {
-				test_sg<1, 1>(0, true);
-				test_sg<mpp::dynamic, mpp::dynamic>(0, true, 1ul, 1ul);
-				test_sg<mpp::dynamic, 1>(0, true, 1ul);
-				test_sg<1, mpp::dynamic>(0, true, 1ul);
-			};
-		};
+	feature("Size comparison") = []() {
+		test_cmp_size<matrix<int, 0, 0>, matrix<double, 0, dynamic>>("utility/cmp_size/0x0_0x0.txt");
+		test_cmp_size<matrix<int>, matrix<int, dynamic, 2>>("utility/cmp_size/1x1_1x2.txt");
+		test_cmp_size<matrix<int, dynamic, 4>, matrix<int>>("utility/cmp_size/3x4_3x3.txt");
+		test_cmp_size<matrix<int, 4, dynamic>, matrix<int, 4, 4>>("utility/cmp_size/4x4_4x4.txt");
+	};
 
-		feature("comparison CPOs") = []() {
-			feature("size_compare") = []() {
-				test_cmp_size(
-					[]() {
-						return mpp::matrix<int, 1, 1>{};
-					},
-					[]() {
-						return mpp::matrix<int, 1, 1>{};
-					},
-					std::partial_ordering::equivalent,
-					std::partial_ordering::equivalent,
-					true,
-					true);
-				test_cmp_size(
-					[]() {
-						return mpp::matrix<int, 1, 1>{};
-					},
-					[]() {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
-					},
-					std::partial_ordering::unordered,
-					std::partial_ordering::unordered,
-					false,
-					false);
-				test_cmp_size(
-					[]() {
-						return mpp::matrix<int, 1, 1>{};
-					},
-					[]() {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 3 };
-					},
-					std::partial_ordering::unordered,
-					std::partial_ordering::less,
-					false,
-					true);
-				test_cmp_size(
-					[]() {
-						return mpp::matrix<int, 2, 1>{};
-					},
-					[]() {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 1, 1 };
-					},
-					std::partial_ordering::greater,
-					std::partial_ordering::unordered,
-					true,
-					false);
-			};
-
-			feature("elements_compare") = []() {
-				test_cmp_elems(
-					[]() {
-						return mpp::matrix<int, 1, 1>{ 0 };
-					},
-					[]() {
-						return mpp::matrix<int, 1, 1>{ 1 };
-					},
-					std::strong_ordering::less);
-				test_cmp_elems(
-					[]() {
-						return mpp::matrix<int, 2, 3>{ { 1, 2, 3 }, { 5, 6, 8 } };
-					},
-					[]() {
-						return mpp::matrix{ { 1, 2, 3 }, { 5, 6, 7 } };
-					},
-					std::strong_ordering::greater);
-				test_cmp_elems(
-					[]() {
-						return mpp::matrix<int>{};
-					},
-					[]() {
-						return mpp::matrix<int>{};
-					},
-					std::strong_ordering::equivalent);
-				test_cmp_elems(
-					[]() {
-						return mpp::matrix<float>{ 1, 1, 5.F / 3.F };
-					},
-					[]() {
-						return mpp::matrix<float>{ 1, 1, 1.F };
-					},
-					std::partial_ordering::greater,
-					mpp::floating_point_compare);
-			};
-		};
+	feature("Elements compare") = []() { // @TODO: Test elements that return other ordering type
+		test_cmp_elems<matrix<int, 0, 0>, matrix<double, 0, dynamic>, std::strong_ordering>(
+			"utility/cmp_elems/0x0_0x0.txt");
+		test_cmp_elems<matrix<int>, matrix<int, dynamic, 1>, std::strong_ordering>("utility/cmp_elems/1x1_1x1.txt");
+		test_cmp_elems<matrix<int, dynamic, 3>, matrix<int>, std::strong_ordering>("utility/cmp_elems/3x3_3x3.txt");
+		test_cmp_elems<matrix<double, 4, dynamic>, matrix<double, 4, 4>, std::partial_ordering>(
+			"utility/cmp_elems/4x4_4x4.txt");
 	};
 
 	return 0;

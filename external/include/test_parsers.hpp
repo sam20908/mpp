@@ -25,10 +25,17 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <variant>
 #include <vector>
+
+namespace mpp
+{
+	enum class matrix_type;
+}
 
 template<typename T>
 auto str_fn()
@@ -81,6 +88,19 @@ auto str_fn()
 	{
 		return [](const std::string& str) {
 			return std::stoi(str);
+		};
+	}
+	else if constexpr (std::is_same_v<T, bool>)
+	{
+		return [](const std::string& str) {
+			return static_cast<bool>(std::stoi(str));
+		};
+	}
+
+	else if constexpr (std::is_same_v<T, mpp::matrix_type>)
+	{
+		return [](const std::string& str) {
+			return static_cast<mpp::matrix_type>(std::stoi(str));
 		};
 	}
 }
@@ -182,6 +202,51 @@ inline auto parse_val = [](std::ifstream& file, std::string& line) {
 	std::getline(file, line); // to skip '='
 
 	return val;
+};
+
+struct unknown_ordering_t
+{
+};
+
+template<typename Ordering>
+inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
+	std::getline(file, line);
+
+	auto ordering = [&]() -> std::variant<Ordering, unknown_ordering_t> {
+		if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
+		{
+			if (line == "unordered")
+			{
+				return std::partial_ordering::unordered;
+			}
+		}
+
+		if (line == "greater")
+		{
+			return Ordering::greater;
+		}
+		else if (line == "less")
+		{
+			return Ordering::less;
+		}
+		else if (line == "equivalent")
+		{
+			return Ordering::equivalent;
+		}
+		else
+		{
+			return unknown_ordering_t{};
+		}
+	}();
+
+	std::getline(file, line); // to skip '='
+
+	if (ordering.index() == 1)
+	{
+		throw std::runtime_error("Unknown ordering for current ordering type");
+	}
+
+	return std::get<0>(ordering);
 };
 
 template<typename Mat>
