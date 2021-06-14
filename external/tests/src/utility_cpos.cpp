@@ -28,109 +28,119 @@
 #include <compare>
 #include <concepts>
 #include <cstddef>
-#include <iostream>
 #include <utility>
 
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
-{
+inline auto stringify_type = [](mpp::matrix_type mat_type) {
 	switch (mat_type)
 	{
 	case mpp::matrix_type::fully_static:
-		os << "fully_static";
+		return "matrix_type::fully_static";
 		break;
 	case mpp::matrix_type::fully_dynamic:
-		os << "fully_dynamic";
+		return "matrix_type::fully_dynamic";
 		break;
 	case mpp::matrix_type::dynamic_rows:
-		os << "dynamic_rows";
+		return "matrix_type::dynamic_rows";
 		break;
 	case mpp::matrix_type::dynamic_columns:
-		os << "dynamic_columns";
+		return "matrix_type::dynamic_columns";
 		break;
+		[[unlikely]] default : return "unknown";
 	}
+};
 
-	return os;
-}
+inline auto stringify_ordering = [](auto ordering) {
+	using ordering_t = std::remove_cvref_t<decltype(ordering)>;
 
-template<typename T>
-concept ordering_type = std::same_as<T, std::strong_ordering> || std::same_as<T, std::weak_ordering> ||
-	std::same_as<T, std::partial_ordering>;
-
-template<ordering_type Ordering>
-auto operator<<(std::ostream& os, Ordering ordering) -> std::ostream&
-{
-	if constexpr (std::is_same_v<Ordering, std::strong_ordering>)
+	if constexpr (std::is_same_v<ordering_t, std::strong_ordering>)
 	{
 		if (ordering == std::strong_ordering::greater)
 		{
-			os << "strong_ordering::greater";
+			return "strong_ordering::greater";
 		}
 		else if (ordering == std::strong_ordering::less)
 		{
-			os << "strong_ordering::less";
+			return "strong_ordering::less";
 		}
 		else if (ordering == std::strong_ordering::equivalent)
 		{
-			os << "strong_ordering::equivalent";
+			return "strong_ordering::equivalent";
+		}
+		else [[unlikely]]
+		{
+			return "unknown";
 		}
 	}
-	else if constexpr (std::is_same_v<Ordering, std::weak_ordering>)
+	else if constexpr (std::is_same_v<ordering_t, std::weak_ordering>)
 	{
 		if (ordering == std::weak_ordering::greater)
 		{
-			os << "weak_ordering::greater";
+			return "weak_ordering::greater";
 		}
 		else if (ordering == std::weak_ordering::less)
 		{
-			os << "weak_ordering::less";
+			return "weak_ordering::less";
 		}
 		else if (ordering == std::weak_ordering::equivalent)
 		{
-			os << "weak_ordering::equivalent";
+			return "weak_ordering::equivalent";
+		}
+		else [[unlikely]]
+		{
+			return "";
 		}
 	}
-	else if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
+	else if constexpr (std::is_same_v<ordering_t, std::partial_ordering>)
 	{
 		if (ordering == std::partial_ordering::greater)
 		{
-			os << "partial_ordering::greater";
+			return "partial_ordering::greater";
 		}
 		else if (ordering == std::partial_ordering::less)
 		{
-			os << "partial_ordering::less";
+			return "partial_ordering::less";
 		}
 		else if (ordering == std::partial_ordering::equivalent)
 		{
-			os << "partial_ordering::equivalent";
+			return "partial_ordering::equivalent";
 		}
 		else if (ordering == std::partial_ordering::unordered)
 		{
-			os << "partial_ordering::unordered";
+			return "partial_ordering::unordered";
+		}
+		else [[unlikely]]
+		{
+			return "unknown";
 		}
 	}
+	else [[unlikely]]
+	{
+		return "unknown";
+	}
+};
 
-	return os;
-}
+inline auto stringify_noop = [](const auto& arg) {
+	return arg;
+};
 
-template<typename Mat, typename Val, typename Fn>
-void test_fn(std::string_view filename, const Fn& fn)
+template<typename Mat, typename Val, typename Fn, typename StringifyFn = decltype(stringify_noop)>
+void test_fn(std::string_view filename, const Fn& fn, const StringifyFn& stringify_fn = stringify_noop)
 {
 	test(filename.data()) = [=]() {
 		const auto [mat, expected_val] = parse_test(filename, parse_mat<Mat>(), parse_val<Val>);
 		const auto out                 = fn(mat);
 
-		expect(out == expected_val) << "Output is" << out << "but expected output is" << expected_val;
+		expect(out == expected_val) << "Output is" << stringify_fn(out) << "but expected output is"
+									<< stringify_fn(expected_val);
 	};
 }
 
 template<typename Mat, typename Mat2>
 void test_cmp_size(std::string_view filename)
 {
-	using ::operator<<;
-
 	test(filename.data()) = [=]() {
 		const auto [mat, mat2, cmp_rows, cmp_cols, expected_row_ordering, expected_col_ordering] = parse_test(filename,
 			parse_mat<Mat>(),
@@ -143,26 +153,25 @@ void test_cmp_size(std::string_view filename)
 		const auto [out_row_ordering, out_col_ordering] = mpp::size_compare(mat, mat2, cmp_rows, cmp_cols);
 
 		expect(out_row_ordering == expected_row_ordering)
-			<< "Output is" << out_row_ordering << "but expected output is" << expected_row_ordering;
+			<< "Output is" << stringify_ordering(out_row_ordering) << "but expected output is"
+			<< stringify_ordering(expected_row_ordering);
 		expect(out_col_ordering == expected_col_ordering)
-			<< "Output is" << out_col_ordering << "but expected output is" << expected_col_ordering;
+			<< "Output is" << stringify_ordering(out_col_ordering) << "but expected output is"
+			<< stringify_ordering(expected_col_ordering);
 	};
 }
 
 template<typename Mat, typename Mat2, typename Ordering>
 void test_cmp_elems(std::string_view filename)
 {
-	using ::operator<<;
-
-
 	test(filename.data()) = [=]() {
 		const auto [mat, mat2, expected_ordering] =
 			parse_test(filename, parse_mat<Mat>(), parse_mat<Mat2>(), parse_ordering<Ordering>);
 
 		const auto out_ordering = mpp::elements_compare(mat, mat2, mpp::floating_point_compare);
 
-		expect(out_ordering == expected_ordering)
-			<< "Output is" << out_ordering << "but expected output is" << expected_ordering;
+		expect(out_ordering == expected_ordering) << "Output is" << stringify_ordering(out_ordering)
+												  << "but expected output is" << stringify_ordering(expected_ordering);
 	};
 }
 
@@ -171,10 +180,10 @@ int main()
 	using namespace mpp;
 
 	feature("Type") = []() {
-		test_fn<matrix<int, 0, 0>, matrix_type>("utility/type/fixed.txt", mpp::type);
-		test_fn<matrix<int>, matrix_type>("utility/type/dyn.txt", mpp::type);
-		test_fn<matrix<int, dynamic, 0>, matrix_type>("utility/type/dyn_rows.txt", mpp::type);
-		test_fn<matrix<int, 0, dynamic>, matrix_type>("utility/type/dyn_cols.txt", mpp::type);
+		test_fn<matrix<int, 0, 0>, matrix_type>("utility/type/fixed.txt", mpp::type, stringify_type);
+		test_fn<matrix<int>, matrix_type>("utility/type/dyn.txt", mpp::type, stringify_type);
+		test_fn<matrix<int, dynamic, 0>, matrix_type>("utility/type/dyn_rows.txt", mpp::type, stringify_type);
+		test_fn<matrix<int, 0, dynamic>, matrix_type>("utility/type/dyn_cols.txt", mpp::type, stringify_type);
 	};
 
 	feature("Square") = []() {
