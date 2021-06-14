@@ -126,8 +126,8 @@ inline auto stringify_noop = [](const auto& arg) {
 	return arg;
 };
 
-template<typename Mat, typename Val, typename Fn, typename StringifyFn = decltype(stringify_noop)>
-void test_fn(std::string_view filename, const Fn& fn, const StringifyFn& stringify_fn = stringify_noop)
+template<typename Mat, typename Val, typename Fn, typename StringifyFn>
+void test_fn(std::string_view filename, const Fn& fn, const StringifyFn& stringify_fn)
 {
 	test(filename.data()) = [=]() {
 		const auto [mat, expected_val] = parse_test(filename, parse_mat<Mat>(), parse_val<Val>);
@@ -187,17 +187,17 @@ int main()
 	};
 
 	feature("Square") = []() {
-		test_fn<matrix<int, 1, 1>, bool>("utility/sq/1x1.txt", square);
-		test_fn<matrix<int>, bool>("utility/sq/1x2.txt", square);
-		test_fn<matrix<int, dynamic, 3>, bool>("utility/sq/3x3.txt", square);
-		test_fn<matrix<int, 3, dynamic>, bool>("utility/sq/3x2.txt", square);
+		test_fn<matrix<int, 1, 1>, bool>("utility/sq/1x1.txt", square, stringify_noop);
+		test_fn<matrix<int>, bool>("utility/sq/1x2.txt", square, stringify_noop);
+		test_fn<matrix<int, dynamic, 3>, bool>("utility/sq/3x3.txt", square, stringify_noop);
+		test_fn<matrix<int, 3, dynamic>, bool>("utility/sq/3x2.txt", square, stringify_noop);
 	};
 
 	feature("Singular") = []() {
-		test_fn<matrix<int, 0, 0>, bool>("utility/sg/0x0.txt", mpp::singular);
-		test_fn<matrix<int>, bool>("utility/sg/1x1.txt", mpp::singular);
-		test_fn<matrix<int, dynamic, 2>, bool>("utility/sg/2x2.txt", mpp::singular);
-		test_fn<matrix<int, 3, dynamic>, bool>("utility/sg/3x3.txt", mpp::singular);
+		test_fn<matrix<int, 0, 0>, bool>("utility/sg/0x0.txt", mpp::singular, stringify_noop);
+		test_fn<matrix<int>, bool>("utility/sg/1x1.txt", mpp::singular, stringify_noop);
+		test_fn<matrix<int, dynamic, 2>, bool>("utility/sg/2x2.txt", mpp::singular, stringify_noop);
+		test_fn<matrix<int, 3, dynamic>, bool>("utility/sg/3x3.txt", mpp::singular, stringify_noop);
 	};
 
 	feature("Size comparison") = []() {
