@@ -34,29 +34,26 @@
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-namespace mpp
+auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
 {
-	auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
+	switch (mat_type)
 	{
-		switch (mat_type)
-		{
-		case mpp::matrix_type::fully_static:
-			os << "fully_static";
-			break;
-		case mpp::matrix_type::fully_dynamic:
-			os << "fully_dynamic";
-			break;
-		case mpp::matrix_type::dynamic_rows:
-			os << "dynamic_rows";
-			break;
-		case mpp::matrix_type::dynamic_columns:
-			os << "dynamic_columns";
-			break;
-		}
-
-		return os;
+	case mpp::matrix_type::fully_static:
+		os << "fully_static";
+		break;
+	case mpp::matrix_type::fully_dynamic:
+		os << "fully_dynamic";
+		break;
+	case mpp::matrix_type::dynamic_rows:
+		os << "dynamic_rows";
+		break;
+	case mpp::matrix_type::dynamic_columns:
+		os << "dynamic_columns";
+		break;
 	}
-} // namespace mpp
+
+	return os;
+}
 
 template<typename T>
 concept ordering_type = std::same_as<T, std::strong_ordering> || std::same_as<T, std::weak_ordering> ||
@@ -132,6 +129,8 @@ void test_fn(std::string_view filename, const Fn& fn)
 template<typename Mat, typename Mat2>
 void test_cmp_size(std::string_view filename)
 {
+	using ::operator<<;
+
 	test(filename.data()) = [=]() {
 		const auto [mat, mat2, cmp_rows, cmp_cols, expected_row_ordering, expected_col_ordering] = parse_test(filename,
 			parse_mat<Mat>(),
@@ -153,6 +152,9 @@ void test_cmp_size(std::string_view filename)
 template<typename Mat, typename Mat2, typename Ordering>
 void test_cmp_elems(std::string_view filename)
 {
+	using ::operator<<;
+
+
 	test(filename.data()) = [=]() {
 		const auto [mat, mat2, expected_ordering] =
 			parse_test(filename, parse_mat<Mat>(), parse_mat<Mat2>(), parse_ordering<Ordering>);
