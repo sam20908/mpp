@@ -69,7 +69,7 @@ inline auto stringify_ordering = [](auto ordering) {
 		{
 			return "strong_ordering::equivalent";
 		}
-		else [[unlikely]]
+		else
 		{
 			return "unknown";
 		}
@@ -88,7 +88,7 @@ inline auto stringify_ordering = [](auto ordering) {
 		{
 			return "weak_ordering::equivalent";
 		}
-		else [[unlikely]]
+		else
 		{
 			return "";
 		}
@@ -111,12 +111,12 @@ inline auto stringify_ordering = [](auto ordering) {
 		{
 			return "partial_ordering::unordered";
 		}
-		else [[unlikely]]
+		else
 		{
 			return "unknown";
 		}
 	}
-	else [[unlikely]]
+	else
 	{
 		return "unknown";
 	}
