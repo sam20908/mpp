@@ -34,26 +34,29 @@
 using namespace boost::ut::bdd;
 using namespace boost::ut;
 
-auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
+namespace mpp
 {
-	switch (mat_type)
+	auto operator<<(std::ostream& os, mpp::matrix_type mat_type) -> std::ostream&
 	{
-	case mpp::matrix_type::fully_static:
-		os << "fully_static";
-		break;
-	case mpp::matrix_type::fully_dynamic:
-		os << "fully_dynamic";
-		break;
-	case mpp::matrix_type::dynamic_rows:
-		os << "dynamic_rows";
-		break;
-	case mpp::matrix_type::dynamic_columns:
-		os << "dynamic_columns";
-		break;
-	}
+		switch (mat_type)
+		{
+		case mpp::matrix_type::fully_static:
+			os << "fully_static";
+			break;
+		case mpp::matrix_type::fully_dynamic:
+			os << "fully_dynamic";
+			break;
+		case mpp::matrix_type::dynamic_rows:
+			os << "dynamic_rows";
+			break;
+		case mpp::matrix_type::dynamic_columns:
+			os << "dynamic_columns";
+			break;
+		}
 
-	return os;
-}
+		return os;
+	}
+} // namespace mpp
 
 template<typename T>
 concept ordering_type = std::same_as<T, std::strong_ordering> || std::same_as<T, std::weak_ordering> ||
