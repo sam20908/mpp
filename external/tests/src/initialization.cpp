@@ -43,6 +43,9 @@ struct overloaded : Ts...
 	using Ts::operator()...;
 };
 
+template<typename... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
 template<typename Mat, typename Rng>
 void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
 {
