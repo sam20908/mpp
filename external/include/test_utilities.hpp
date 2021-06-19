@@ -338,20 +338,6 @@ inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
 	return std::get<0>(ordering);
 };
 
-template<typename T>
-concept has_value_type_member = requires
-{
-	typename T::value_type;
-};
-
-template<typename Cont, typename Fn>
-auto parse_test_impl(std::ifstream& file, std::string& line, const Fn& fn)
-{
-	using val_t = std::conditional_t<has_value_type_member<Cont>, typename Cont::value_type, Cont>;
-
-	return parse_dims<val_t>(file, line, fn);
-}
-
 template<typename... Fns>
 auto parse_test(std::string_view filename, const Fns&... fns)
 {
