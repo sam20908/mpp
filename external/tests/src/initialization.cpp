@@ -85,8 +85,6 @@ void test_init(std::string_view test_name,
 	const Args&... args)
 {
 	test(test_name.data()) = [&, test_name](const auto& mat_identity) {
-		using mat_t = typename std::remove_cvref_t<decltype(mat_identity)>::type;
-
 		const auto [out, expected_rng] = input_fn(test_name, mat_identity, args...);
 
 		const auto stringified_mat = stringify_mat(out);
