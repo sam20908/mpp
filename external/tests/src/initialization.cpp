@@ -156,7 +156,9 @@ void test_init_ctor_move(std::string_view test_name, [[maybe_unused]] const auto
 					const auto res_mat      = mat2_t{ std::move(input_mat2), args... };
 					const auto res_mat_name = stringify_mat(res_mat);
 
-					boost::ut::log << input_mat_name.view() << "initialized with" << res_mat_name.view();
+					boost::ut::log
+						<< input_mat_name.str().c_str() << "initialized with"
+						<< res_mat_name.str().c_str(); // @TODO: Use .view() for GCC when available for compilers
 
 					cmp_mat_to_rng(res_mat, expected_rng);
 
