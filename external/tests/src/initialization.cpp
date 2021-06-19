@@ -215,6 +215,28 @@ int main()
 			alloc_obj);
 	};
 
+	feature("2D initializer list initialization") = [&]() {
+		const auto parse =
+			[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
+				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+				const auto&... args) {
+				const auto [expected_rng] = parse_test(filename, parse_vec2d<T>);
+
+				const auto out = matrix<T, RowsExtent, ColumnsExtent, Alloc>{ { { 1, 2, 3 }, { 4, 5, 6 } }, args... };
+
+				return std::pair{ out, expected_rng };
+			};
+
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt", parse, alloc_obj);
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt",
+			parse,
+			alloc_obj,
+			unsafe,
+			alloc_obj);
+	};
+
 	feature("2D range initialization") = [&]() {
 		const auto parse =
 			[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
