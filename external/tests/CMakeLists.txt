@@ -40,10 +40,10 @@ endfunction()
 # @FIXME: Revamp and uncomment rest of the tests
 
 # _create_test("customization")
-_create_test("utility_cpos")
+# _create_test("utilities")
 # _create_test("iterator")
-_create_test("algorithm_cpos")
-# _create_test("initialization")
+# _create_test("algorithms")
+_create_test("initialization")
 # _create_test("assignment")
 # _create_test("arithmetic")
 # _create_test("members")

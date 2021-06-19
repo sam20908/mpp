@@ -17,35 +17,155 @@
  * under the License.
  */
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
+#include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
 #include "../../include/custom_allocator.hpp"
-#include "../../include/test_parsers.hpp"
-#include "../../include/utility.hpp"
+#include "../../include/test_utilities.hpp"
 
 #include <array>
+#include <compare>
 #include <cstddef>
 #include <initializer_list>
-#include <string>
+#include <string_view>
+#include <tuple>
 #include <vector>
 
-static auto parse_vec2d_out(const std::string& file)
-{
-	const auto result = parse_test<temp_types<vec2d_t>, types<int>>(get_filepath(file), std::tuple{ vec2d_fn });
-	const auto out    = std::get<0>(result);
+using namespace boost::ut;
+using namespace boost::ut::bdd;
+using namespace mpp;
 
-	return out;
+template<typename... Ts>
+struct overloaded : Ts...
+{
+	using Ts::operator()...;
+};
+
+template<typename Mat, typename Rng>
+void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
+{
+	using mat_val_t = typename Mat::value_type;
+	using rng_val_t = typename Rng::value_type::value_type;
+	using ordering  = std::compare_three_way_result_t<mat_val_t, rng_val_t>;
+
+	const auto expected_rows    = rng.size();
+	const auto expected_columns = expected_rows == 0 ? 0 : rng[0].size();
+
+	const auto rows_is_eq    = mat.rows() == expected_rows;
+	const auto columns_is_eq = mat.columns() == expected_columns;
+
+	expect(rows_is_eq) << "Matrix's rows doesn't match expected rows";
+	expect(columns_is_eq) << "Matrix's columns doesn't match expected columns";
+
+	if (!rows_is_eq || !columns_is_eq)
+	{
+		return; // Avoid accessing out of bounds
+	}
+
+	for (auto row = std::size_t{}; row < expected_rows; ++row)
+	{
+		for (auto column = std::size_t{}; column < expected_columns; ++column)
+		{
+			expect(mpp::floating_point_compare(mat(row, column), rng[row][column]) == ordering::equivalent)
+				<< "Output is" << mat(row, column) << "but expected output is" << rng[row][column] << "at index" << row
+				<< column;
+		}
+	}
+}
+
+template<typename Mats, bool CmpAlloc, typename InputFn, typename Alloc, typename... Args>
+void test_init(std::string_view test_name,
+	const InputFn& input_fn,
+	[[maybe_unused]] const Alloc& alloc_obj,
+	const Args&... args)
+{
+	test(test_name.data()) = [&, test_name](const auto& mat_identity) {
+		using mat_t = typename std::remove_cvref_t<decltype(mat_identity)>::type;
+
+		const auto [out, expected_rng] = input_fn(test_name, mat_identity, args...);
+
+		const auto stringified_mat = stringify_mat(out);
+		boost::ut::log << stringified_mat.view();
+
+		cmp_mat_to_rng(out, expected_rng);
+
+		if constexpr (CmpAlloc)
+		{
+			expect(out.get_allocator() == alloc_obj) << "Matrix's allocator object doesn't match";
+		}
+	} | Mats{};
+}
+
+// @TODO: Somehow unify test_init_ctor_copy and test_init_ctor_move?
+
+template<typename Mats, typename Mats2, bool CmpAlloc>
+void test_init_ctor_copy(std::string_view test_name, [[maybe_unused]] const auto& alloc_obj, const auto&... args)
+{
+	test(test_name.data()) =
+		[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
+			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
+			using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+
+			const auto [input_mat, expected_rng] = parse_test(test_name, parse_mat<mat_t>(), parse_vec2d<T>);
+			const auto input_mat_name            = stringify_mat(input_mat);
+
+			test("Cross-testing (copy initialization)") =
+				[&]<typename T2, std::size_t RowsExtent2, std::size_t ColumnsExtent2, typename Alloc2>(
+					std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>) {
+					using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
+
+					const auto res_mat      = mat2_t{ input_mat, args... };
+					const auto res_mat_name = stringify_mat(res_mat);
+
+					boost::ut::log << input_mat_name.view() << "initialized with" << res_mat_name.view();
+
+					cmp_mat_to_rng(res_mat, expected_rng);
+
+					if constexpr (CmpAlloc)
+					{
+						expect(res_mat.get_allocator() == alloc_obj) << "Matrix's allocator object doesn't match";
+					}
+				} |
+				Mats2{};
+		} |
+		Mats{};
+}
+
+template<typename Mats, typename Mats2, bool CmpAlloc>
+void test_init_ctor_move(std::string_view test_name, [[maybe_unused]] const auto& alloc_obj, const auto&... args)
+{
+	test(test_name.data()) =
+		[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
+			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
+			using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+
+			const auto [input_vec2d, expected_rng] = parse_test(test_name, parse_vec2d<T>, parse_vec2d<T>);
+			const auto input_mat                   = mat_t{ input_vec2d };
+			const auto input_mat_name              = stringify_mat(input_mat);
+
+			test("Cross-testing (move initialization)") =
+				[&]<typename T2, std::size_t RowsExtent2, std::size_t ColumnsExtent2, typename Alloc2>(
+					std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>) {
+					using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
+
+					auto input_mat2         = mat_t{ input_vec2d }; // Create local copy to move from
+					const auto res_mat      = mat2_t{ std::move(input_mat2), args... };
+					const auto res_mat_name = stringify_mat(res_mat);
+
+					boost::ut::log << input_mat_name.view() << "initialized with" << res_mat_name.view();
+
+					cmp_mat_to_rng(res_mat, expected_rng);
+
+					if constexpr (CmpAlloc)
+					{
+						expect(res_mat.get_allocator() == alloc_obj) << "Matrix's allocator object doesn't match";
+					}
+				} |
+				Mats2{};
+		} |
+		Mats{};
 }
 
 int main()
@@ -53,341 +173,229 @@ int main()
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 	// @NOTE: This covers copy and move construction from rule of five (2/5)
 
-	using namespace boost::ut::bdd;
-
-	const auto empty_rng = parse_vec2d_out("initialization/default.txt");
-	const auto rng       = parse_vec2d_out("initialization/2x3_rng.txt");
+	using alloc_t        = custom_allocator<double>;
+	const auto alloc_obj = alloc_t{};
 
 	feature("Default initialization") = [&]() {
-		when("We don't specify a custom allocator as a type") = [&]() {
-			const auto tup = create_mats<int, 0, 0, all_mats_t>(args(fwd_args));
+		const auto parse =
+			[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
+				std::string_view filename,
+				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+				const Args&... args)
+		{
+			using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
 
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, empty_rng);
-			});
+			const auto [expected_rng] = parse_test(filename, parse_vec2d<T>);
+
+			const auto out = [&]() {
+				if constexpr (sizeof...(Args) == 0)
+				{
+					mat_t out; // True default initialization (no parenthesis)
+					return out;
+				}
+				else
+				{
+					return mat_t{ args... };
+				}
+			}();
+
+			return std::pair{ out, expected_rng };
 		};
 
-		when("We do specify a custom allocator as a type") = [&]() {
-			const auto tup = create_mats<int, 0, 0, all_mats_t, custom_allocator<int>>(args(fwd_args));
-
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, empty_rng);
-			});
-		};
-	};
-
-	feature("Initialize with custom allocator (dynamic matrices only)") = [&]() {
-		const auto allocator = custom_allocator<int>{};
-		const auto tup       = create_mats<int, 0, 0, dyn_mats_t, custom_allocator<int>>(args(fwd_args, allocator));
-
-		for_each_in_tup(tup, [&](const auto& mat) {
-			cmp_mat_to_rng(mat, empty_rng);
-		});
+		test_init<all_mats_t<int, 0, 0>, false>("initialization/0x0_default.txt", parse, alloc_obj);
+		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_default_fixed.txt", parse, alloc_obj);
+		test_init<dyn_mats_t<double, 0, 0, alloc_t>, true>("initialization/0x0_default.txt",
+			parse,
+			alloc_obj,
+			alloc_obj);
 	};
 
 	feature("2D range initialization") = [&]() {
-		given("We're using a 2D initializer list") = [&]() {
-			const auto init_rng = std::initializer_list<std::initializer_list<float>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+		const auto parse =
+			[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
+				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+				const auto&... args) {
+				const auto [init_rng, expected_rng] = parse_test(filename, parse_arr2d<T, 2, 3>, parse_vec2d<T>);
 
-			when("We don't use unsafe") = [&]() {
-				const auto tup = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, init_rng));
+				const auto out = matrix<T, RowsExtent, ColumnsExtent, Alloc>{ init_rng, args... };
 
-				for_each_in_tup(tup, [&](const auto& mat) {
-					cmp_mat_to_rng(mat, rng);
-				});
+				return std::pair{ out, expected_rng };
 			};
 
-			when("We do use unsafe") = [&]() {
-				const auto tup = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, init_rng, mpp::unsafe));
-
-				for_each_in_tup(tup, [&](const auto& mat) {
-					cmp_mat_to_rng(mat, rng);
-				});
-			};
-		};
-
-		given("We're using a 2D vector") = [&]() {
-			// Use float to test compilation
-			const auto init_rng = std::vector<std::vector<float>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-
-			when("We don't use unsafe") = [&]() {
-				const auto tup = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, init_rng));
-
-				for_each_in_tup(tup, [&](const auto& mat) {
-					cmp_mat_to_rng(mat, rng);
-				});
-			};
-
-			when("We do use unsafe") = [&]() {
-				const auto tup = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, init_rng, mpp::unsafe));
-
-				for_each_in_tup(tup, [&](const auto& mat) {
-					cmp_mat_to_rng(mat, rng);
-				});
-			};
-		};
-
-		given("We're using a 2D array for fully static matrices") = [&]() {
-			auto init_rng = std::array<std::array<float, 3>, 2>{ { { 1, 2, 3 }, { 4, 5, 6 } } };
-
-			then("We copy initialize it") = [&]() {
-				const auto mat = mpp::matrix<int, 2, 3>{ init_rng };
-
-				cmp_mat_to_rng(mat, rng);
-			};
-
-			then("We move initialize it") = [&]() {
-				const auto mat = mpp::matrix<int, 2, 3>{ std::move(init_rng) };
-
-				cmp_mat_to_rng(mat, rng);
-			};
-		};
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt",
+			parse,
+			alloc_obj,
+			unsafe,
+			alloc_obj);
 	};
 
 	feature("1D range initialization") = [&]() {
-		const auto init_rng = std::vector<int>{ 1, 2, 3, 4, 5, 6 };
+		const auto parse = []<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
+							   std::string_view filename,
+							   std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+							   const auto&... args) {
+			const auto [dims, init_rng, expected_rng] =
+				parse_test(filename, parse_dims, parse_vec1d<T>, parse_vec2d<T>);
 
-		when("We don't use unsafe") = [&]() {
-			const auto tup =
-				create_mats<int, 2, 3, all_mats_t>(args(fwd_args, std::size_t{ 2 }, std::size_t{ 3 }, init_rng));
+			const auto out = matrix<T, RowsExtent, ColumnsExtent, Alloc>{ dims.first, dims.second, init_rng, args... };
 
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
+			return std::pair{ out, expected_rng };
 		};
 
-		when("We do use unsafe") = [&]() {
-			const auto tup = create_mats<int, 2, 3, all_mats_t>(
-				args(fwd_args, std::size_t{ 2 }, std::size_t{ 3 }, init_rng, mpp::unsafe));
-
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
+		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt",
+			parse,
+			alloc_obj,
+			unsafe,
+			alloc_obj);
 	};
 
-	feature("Callable for initialization") = []() {
-		auto iota_fn = []() {
-			return [i = 1]() mutable {
-				return i++;
-			};
-		};
-
-		const auto out = parse_vec2d_out("initialization/2x3_iota.txt");
-		const auto tup =
-			create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
-																   return mpp::matrix<int, 2, 3>{ iota_fn() };
-															   },
-				[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-					return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, iota_fn() };
-				},
-				[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-					return mpp::matrix<int, mpp::dynamic, 3>{ 2, iota_fn() };
-				},
-				[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
-					return mpp::matrix<int, 2, mpp::dynamic>{ 3, iota_fn() };
-				} }));
-
-		for_each_in_tup(tup, [&](const auto& mat) {
-			cmp_mat_to_rng(mat, out);
-		});
+	const auto init_mat_extent_dependent = overloaded{
+		// clang-format off
+		[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
+			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+			[[maybe_unused]] std::size_t rows,
+			[[maybe_unused]] std::size_t columns,
+			const auto&... args) {
+			return matrix<T, RowsExtent, ColumnsExtent, Alloc>{ args... };
+		},
+		[]<typename T, typename Alloc>(std::type_identity<matrix<T, dynamic, dynamic, Alloc>>,
+			[[maybe_unused]] std::size_t rows,
+			[[maybe_unused]] std::size_t columns,
+			const auto&... args) {
+			return matrix<T, dynamic, dynamic, Alloc>{ rows, columns, args... };
+		},
+		[]<typename T, std::size_t ColumnsExtent, typename Alloc>(
+			std::type_identity<matrix<T, dynamic, ColumnsExtent, Alloc>>,
+			[[maybe_unused]] std::size_t rows,
+			[[maybe_unused]] std::size_t columns,
+			const auto&... args) {
+			return matrix<T, dynamic, ColumnsExtent, Alloc>{ rows, args... };
+		},
+		[]<typename T, std::size_t RowsExtent, typename Alloc>(
+			std::type_identity<matrix<T, RowsExtent, dynamic, Alloc>>,
+			[[maybe_unused]] std::size_t rows,
+			[[maybe_unused]] std::size_t columns,
+			const auto&... args) {
+			return matrix<T, RowsExtent, dynamic, Alloc>{ columns, args... };
+		}
+		// clang-format on
 	};
 
-	feature("Value initialization") = []() {
-		const auto out = parse_vec2d_out("initialization/2x3_val_init.txt");
-		const auto tup = create_mats<int, 2, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
-																				return mpp::matrix<int, 2, 3>{ 1 };
-																			},
-			[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-				return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 2, 3, 1 };
-			},
-			[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-				return mpp::matrix<int, mpp::dynamic, 3>{ 2, 1 };
-			},
-			[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
-				return mpp::matrix<int, 2, mpp::dynamic>{ 3, 1 };
-			} }));
+	const auto parse_extent_dependent =
+		[&]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
+			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>> identity,
+			const auto&... args) {
+			const auto [dims, expected_rng] = parse_test(filename, parse_dims, parse_vec2d<T>);
 
-		for_each_in_tup(tup, [&](const auto& mat) {
-			cmp_mat_to_rng(mat, out);
-		});
+			const auto out = init_mat_extent_dependent(identity, dims.first, dims.second, args...);
+
+			return std::pair{ out, expected_rng };
+		};
+
+	feature("Initialization via callable return values") = [&]() {
+		const auto fn = []() {
+			return 1.0;
+		};
+
+		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_callable.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			fn);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			fn);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			fn,
+			alloc_obj);
 	};
 
-	feature("Constructing identity matrices") = []() {
-		const auto out = parse_vec2d_out("initialization/3x3_identity.txt");
+	feature("Initialization via value") = [&]() {
+		const auto val = 2.0;
 
-		when("We don't use unsafe") = [&]() {
-			const auto tup =
-				create_mats<int, 3, 3, all_mats_t>(args(overloaded{ [&](types<mpp::matrix<int, 3, 3>>) {
-																	   return mpp::matrix<int, 3, 3>{ mpp::identity };
-																   },
-					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity };
-					},
-					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-						return mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity };
-					},
-					[&](types<mpp::matrix<int, 3, mpp::dynamic>>) {
-						return mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity };
-					} }));
+		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_val.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			val);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			val);
+		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			val,
+			alloc_obj);
+	};
 
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, out);
-			});
-		};
-
-		when("We do use unsafe") = [&]() {
-			const auto tup = create_mats<int, 3, 3, all_mats_t>(
-				args(overloaded{ [&](types<mpp::matrix<int, 3, 3>>) {
-									return mpp::matrix<int, 3, 3>{ mpp::identity, mpp::unsafe };
-								},
-					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ 3, 3, mpp::identity, mpp::unsafe };
-					},
-					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-						return mpp::matrix<int, mpp::dynamic, 3>{ 3, mpp::identity, mpp::unsafe };
-					},
-					[&](types<mpp::matrix<int, 3, mpp::dynamic>>) {
-						return mpp::matrix<int, 3, mpp::dynamic>{ 3, mpp::identity, mpp::unsafe };
-					} }));
-
-			for_each_in_tup(tup, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, out);
-			});
-		};
+	feature("Initialization of identity matrices") = [&]() {
+		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			identity);
+		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			identity);
+		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			identity,
+			unsafe);
+		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
+			parse_extent_dependent,
+			alloc_obj,
+			identity,
+			unsafe,
+			0.0,
+			1.0,
+			alloc_obj);
 	};
 
 	feature("Copy initialization") = [&]() {
-		when("Without custom allocator") = [&]() {
-			const auto tup      = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
-			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
-									return mpp::matrix<int, 2, 3>{ std::get<0>(tup) };
-								},
-					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::get<1>(tup) };
-					},
-					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-						return mpp::matrix<int, mpp::dynamic, 3>{ std::get<2>(tup) };
-					},
-					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
-						return mpp::matrix<int, 2, mpp::dynamic>{ std::get<3>(tup) };
-					} }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
-
-		when("With custom allocators (dyamic matrices only)") = [&]() {
-			const auto allocator = custom_allocator<int>{};
-			const auto tup       = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
-			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(overloaded{
-                [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
-                    return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::get<0>(tup),
-                        allocator };
-                },
-                [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
-                    return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::get<1>(tup), allocator };
-                },
-                [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
-                    return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::get<2>(tup), allocator };
-                } }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
+		test_init_ctor_copy<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj);
+		test_init_ctor_copy<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			alloc_obj);
+		test_init_ctor_copy<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			unsafe);
+		test_init_ctor_copy<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			unsafe,
+			alloc_obj);
 	};
 
 	feature("Move initialization") = [&]() {
-		when("Without custom allocator") = [&]() {
-			auto tup            = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
-			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
-									return mpp::matrix<int, 2, 3>{ std::move(std::get<0>(tup)) };
-								},
-					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::move(std::get<1>(tup)) };
-					},
-					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-						return mpp::matrix<int, mpp::dynamic, 3>{ std::move(std::get<2>(tup)) };
-					},
-					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
-						return mpp::matrix<int, 2, mpp::dynamic>{ std::move(std::get<3>(tup)) };
-					} }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
-
-		when("With custom allocators (dyamic matrices only)") = [&]() {
-			const auto allocator = custom_allocator<int>{};
-			auto tup             = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
-			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(
-                args(overloaded{ [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
-                                    return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{
-                                        std::move(std::get<0>(tup)),
-                                        allocator
-                                    };
-                                },
-                    [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
-                        return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::move(std::get<1>(tup)),
-                            allocator };
-                    },
-                    [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
-                        return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::move(std::get<2>(tup)),
-                            allocator };
-                    } }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
-	};
-
-	feature("Different matrix type initialization") = [&]() {
-		when("Without custom allocator") = [&]() {
-			const auto tup      = create_mats<int, 2, 3, all_mats_t>(args(fwd_args, rng));
-			const auto tup_copy = create_mats<int, 2, 3, all_mats_t>(
-				args(overloaded{ [&](types<mpp::matrix<int, 2, 3>>) {
-									return mpp::matrix<int, 2, 3>{ std::get<3>(tup) };
-								},
-					[&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>) {
-						return mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ std::get<2>(tup) };
-					},
-					[&](types<mpp::matrix<int, mpp::dynamic, 3>>) {
-						return mpp::matrix<int, mpp::dynamic, 3>{ std::get<1>(tup) };
-					},
-					[&](types<mpp::matrix<int, 2, mpp::dynamic>>) {
-						return mpp::matrix<int, 2, mpp::dynamic>{ std::get<0>(tup) };
-					} }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
-
-		when("With custom allocators (dyamic matrices only)") = [&]() {
-			const auto allocator = custom_allocator<int>{};
-			const auto tup       = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(fwd_args, rng));
-			const auto tup_copy  = create_mats<int, 2, 3, dyn_mats_t, custom_allocator<int>>(args(overloaded{
-                [&](types<mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>>) {
-                    return mpp::matrix<int, mpp::dynamic, mpp::dynamic, custom_allocator<int>>{ std::get<2>(tup),
-                        allocator };
-                },
-                [&](types<mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>>) {
-                    return mpp::matrix<int, mpp::dynamic, 3, custom_allocator<int>>{ std::get<0>(tup), allocator };
-                },
-                [&](types<mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>>) {
-                    return mpp::matrix<int, 2, mpp::dynamic, custom_allocator<int>>{ std::get<1>(tup), allocator };
-                } }));
-
-			for_each_in_tup(tup_copy, [&](const auto& mat) {
-				cmp_mat_to_rng(mat, rng);
-			});
-		};
+		test_init_ctor_move<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj);
+		test_init_ctor_move<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			alloc_obj);
+		test_init_ctor_move<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			unsafe);
+		test_init_ctor_move<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+			"initialization/2x3_init_copy_and_move.txt",
+			alloc_obj,
+			unsafe,
+			alloc_obj);
 	};
 
 	return 0;

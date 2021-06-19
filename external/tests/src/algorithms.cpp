@@ -232,17 +232,11 @@ void test_block(std::string_view filename,
 			}
 		}();
 
-		using out_decayed_t = std::remove_cvref_t<decltype(out)>;
-
 		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
 		expect(mpp::elements_compare(out, expected_block) == ordering_type::equivalent) << "Matrices aren't equal";
 
-		constexpr auto out_is_dyn =
-			out_decayed_t::rows_extent() == mpp::dynamic && out_decayed_t::columns_extent() == mpp::dynamic;
-
-		if constexpr (out_is_dyn && CmpAlloc)
+		if constexpr (CmpAlloc)
 		{
-			expect(type<typename out_decayed_t::allocator_type> == type<Alloc>) << "Type of allocators aren't equal";
 			expect(out.get_allocator() == alloc_obj) << "Allocators aren't equal";
 		}
 	};
