@@ -83,7 +83,7 @@ auto stringify_mat(const mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>& mat)
 			   << "x" << mat.columns() << "]\n";
 
 	return str_stream;
-};
+}
 
 template<typename T>
 auto str_fn()
