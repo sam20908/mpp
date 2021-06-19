@@ -87,7 +87,7 @@ void test_init(std::string_view test_name,
 		const auto [out, expected_rng] = input_fn(test_name, mat_identity, args...);
 
 		const auto stringified_mat = stringify_mat(out);
-		boost::ut::log << stringified_mat.view();
+		boost::ut::log << stringified_mat.str().c_str(); // @TODO: Use .view() for GCC when available for compilers
 
 		cmp_mat_to_rng(out, expected_rng);
 
@@ -119,7 +119,9 @@ void test_init_ctor_copy(std::string_view test_name, [[maybe_unused]] const auto
 					const auto res_mat      = mat2_t{ input_mat, args... };
 					const auto res_mat_name = stringify_mat(res_mat);
 
-					boost::ut::log << input_mat_name.view() << "initialized with" << res_mat_name.view();
+					boost::ut::log
+						<< input_mat_name.str().c_str() << "initialized with"
+						<< res_mat_name.str().c_str(); // @TODO: Use .view() for GCC when available for compilers
 
 					cmp_mat_to_rng(res_mat, expected_rng);
 
