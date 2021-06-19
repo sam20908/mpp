@@ -78,6 +78,7 @@ jobs:
         displayName: Publish Tests Results
 
   - job: UbuntuClang
+    condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
     displayName: Ubuntu Clang 12
 
     pool:
@@ -108,7 +109,7 @@ jobs:
         displayName: Publish Tests Results
 
   - job: WindowsMSVC
-    displayName: Windows MSVC 19.29
+    displayName: Windows MSVC
 
     pool:
       vmImage: windows-latest
@@ -140,7 +141,7 @@ jobs:
         displayName: Publish Tests Results
 
   - job: WindowsClang
-    condition: false # @TODO: Remove this once VS comes with Clang 12
+    condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
     displayName: Windows Clang 12
 
     pool:
