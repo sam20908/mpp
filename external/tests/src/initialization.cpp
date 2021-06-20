@@ -173,6 +173,27 @@ void test_init_ctor_move(std::string_view test_name, [[maybe_unused]] const auto
 		Mats{};
 }
 
+template<bool Move>
+inline auto parse_init_arr2d =
+	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
+		std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+		const auto&... args) {
+		auto [init_rng, expected_rng] = parse_test(filename, parse_arr2d<T, 2, 3>, parse_vec2d<T>);
+
+		const auto out = [&]() {
+			if constexpr (Move)
+			{
+				return matrix<T, RowsExtent, ColumnsExtent, Alloc>{ std::move(init_rng), args... };
+			}
+			else
+			{
+				return matrix<T, RowsExtent, ColumnsExtent, Alloc>{ init_rng, args... };
+			}
+		}();
+
+		return std::pair{ out, expected_rng };
+	};
+
 int main()
 {
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
@@ -242,7 +263,7 @@ int main()
 			[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
 				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
 				const auto&... args) {
-				const auto [init_rng, expected_rng] = parse_test(filename, parse_arr2d<T, 2, 3>, parse_vec2d<T>);
+				const auto [init_rng, expected_rng] = parse_test(filename, parse_vec2d<T>, parse_vec2d<T>);
 
 				const auto out = matrix<T, RowsExtent, ColumnsExtent, Alloc>{ init_rng, args... };
 
@@ -257,6 +278,19 @@ int main()
 			alloc_obj,
 			unsafe,
 			alloc_obj);
+	};
+
+	feature("2D array initialization (fixed matrices only)") = [&]() {
+		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<false>, alloc_obj);
+		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
+			parse_init_arr2d<false>,
+			alloc_obj,
+			unsafe);
+		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<true>, alloc_obj);
+		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
+			parse_init_arr2d<true>,
+			alloc_obj,
+			unsafe);
 	};
 
 	feature("1D range initialization") = [&]() {
@@ -314,7 +348,7 @@ int main()
 		// clang-format on
 	};
 
-	const auto parse_extent_dependent =
+	const auto parse_extent_dependent_init =
 		[&]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(std::string_view filename,
 			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>> identity,
 			const auto&... args) {
@@ -331,15 +365,15 @@ int main()
 		};
 
 		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_callable.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			fn);
 		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			fn);
 		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			fn,
 			alloc_obj);
@@ -349,15 +383,15 @@ int main()
 		const auto val = 2.0;
 
 		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_val.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			val);
 		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			val);
 		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			val,
 			alloc_obj);
@@ -365,20 +399,20 @@ int main()
 
 	feature("Initialization of identity matrices") = [&]() {
 		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			identity);
 		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			identity);
 		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			identity,
 			unsafe);
 		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
-			parse_extent_dependent,
+			parse_extent_dependent_init,
 			alloc_obj,
 			identity,
 			unsafe,
