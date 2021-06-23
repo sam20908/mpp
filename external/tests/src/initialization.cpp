@@ -17,8 +17,6 @@
  * under the License.
  */
 
-#include <boost/ut.hpp>
-
 #include <mpp/utility/comparison.hpp>
 #include <mpp/matrix.hpp>
 
@@ -46,38 +44,6 @@ struct overloaded : Ts...
 template<typename... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
-template<typename Mat, typename Rng>
-void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
-{
-	using mat_val_t = typename Mat::value_type;
-	using rng_val_t = typename Rng::value_type::value_type;
-	using ordering  = std::compare_three_way_result_t<mat_val_t, rng_val_t>;
-
-	const auto expected_rows    = rng.size();
-	const auto expected_columns = expected_rows == 0 ? 0 : rng[0].size();
-
-	const auto rows_is_eq    = mat.rows() == expected_rows;
-	const auto columns_is_eq = mat.columns() == expected_columns;
-
-	expect(rows_is_eq) << "Matrix's rows doesn't match expected rows";
-	expect(columns_is_eq) << "Matrix's columns doesn't match expected columns";
-
-	if (!rows_is_eq || !columns_is_eq)
-	{
-		return; // Avoid accessing out of bounds
-	}
-
-	for (auto row = std::size_t{}; row < expected_rows; ++row)
-	{
-		for (auto column = std::size_t{}; column < expected_columns; ++column)
-		{
-			expect(mpp::floating_point_compare(mat(row, column), rng[row][column]) == ordering::equivalent)
-				<< "Output is" << mat(row, column) << "but expected output is" << rng[row][column] << "at index" << row
-				<< column;
-		}
-	}
-}
-
 template<typename Mats, bool CmpAlloc, typename InputFn, typename Alloc, typename... Args>
 void test_init(std::string_view test_name,
 	const InputFn& input_fn,
@@ -87,8 +53,7 @@ void test_init(std::string_view test_name,
 	test(test_name.data()) = [&, test_name](const auto& mat_identity) {
 		const auto [out, expected_rng] = input_fn(test_name, mat_identity, args...);
 
-		const auto stringified_mat = stringify_mat(out);
-		boost::ut::log << stringified_mat.str().c_str(); // @TODO: Use .view() for GCC when available for compilers
+		log_mat(out);
 
 		cmp_mat_to_rng(out, expected_rng);
 
@@ -109,20 +74,19 @@ void test_init_ctor_copy(std::string_view test_name, [[maybe_unused]] const auto
 			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
 			using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
 
-			const auto [input_mat, expected_rng] = parse_test(test_name, parse_mat<mat_t>(), parse_vec2d<T>);
-			const auto input_mat_name            = stringify_mat(input_mat);
+			const auto [input_mat, expected_rng] = parse_test(test_name, parse_mat<mat_t>, parse_vec2d<T>);
+			const auto input_mat_str             = stringify_mat(input_mat);
 
 			test("Cross-testing (copy initialization)") =
 				[&]<typename T2, std::size_t RowsExtent2, std::size_t ColumnsExtent2, typename Alloc2>(
 					std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>) {
 					using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
 
-					const auto res_mat      = mat2_t{ input_mat, args... };
-					const auto res_mat_name = stringify_mat(res_mat);
+					const auto res_mat     = mat2_t{ input_mat, args... };
+					const auto res_mat_str = stringify_mat(res_mat);
 
-					boost::ut::log
-						<< input_mat_name.str().c_str() << "initialized with"
-						<< res_mat_name.str().c_str(); // @TODO: Use .view() for GCC when available for compilers
+					boost::ut::log << input_mat_str.str().c_str() << "initialized with"
+								   << res_mat_str.str().c_str(); // @TODO: Use .view() when available for compilers
 
 					cmp_mat_to_rng(res_mat, expected_rng);
 
@@ -228,9 +192,9 @@ int main()
 			return std::pair{ out, expected_rng };
 		};
 
-		test_init<all_mats_t<int, 0, 0>, false>("initialization/0x0_default.txt", parse, alloc_obj);
-		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_default_fixed.txt", parse, alloc_obj);
-		test_init<dyn_mats_t<double, 0, 0, alloc_t>, true>("initialization/0x0_default.txt",
+		test_init<all_mats<int, 0, 0>, false>("initialization/0x0_default.txt", parse, alloc_obj);
+		test_init<fixed_mat<int, 2, 3>, false>("initialization/2x3_default_fixed.txt", parse, alloc_obj);
+		test_init<dyn_mats<double, 0, 0, alloc_t>, true>("initialization/0x0_default.txt",
 			parse,
 			alloc_obj,
 			alloc_obj);
@@ -248,10 +212,10 @@ int main()
 				return std::pair{ out, expected_rng };
 			};
 
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt", parse, alloc_obj);
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj, unsafe);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt",
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt", parse, alloc_obj);
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_init_list.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_init_list.txt",
 			parse,
 			alloc_obj,
 			unsafe,
@@ -270,10 +234,10 @@ int main()
 				return std::pair{ out, expected_rng };
 			};
 
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj, unsafe);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt",
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt", parse, alloc_obj);
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_rng_2d.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_2d.txt",
 			parse,
 			alloc_obj,
 			unsafe,
@@ -281,13 +245,13 @@ int main()
 	};
 
 	feature("2D array initialization (fixed matrices only)") = [&]() {
-		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<false>, alloc_obj);
-		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
+		test_init<fixed_mat<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<false>, alloc_obj);
+		test_init<fixed_mat<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
 			parse_init_arr2d<false>,
 			alloc_obj,
 			unsafe);
-		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<true>, alloc_obj);
-		test_init<fixed_mat_t<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
+		test_init<fixed_mat<int, 2, 3>, false>("initialization/2x3_arr2d.txt", parse_init_arr2d<true>, alloc_obj);
+		test_init<fixed_mat<int, 2, 3>, false>("initialization/2x3_arr2d.txt",
 			parse_init_arr2d<true>,
 			alloc_obj,
 			unsafe);
@@ -306,10 +270,10 @@ int main()
 			return std::pair{ out, expected_rng };
 		};
 
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
-		test_init<all_mats_t<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj, unsafe);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt",
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt", parse, alloc_obj);
+		test_init<all_mats<int, 2, 3>, false>("initialization/2x3_rng_1d.txt", parse, alloc_obj, unsafe);
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_rng_1d.txt",
 			parse,
 			alloc_obj,
 			unsafe,
@@ -364,15 +328,15 @@ int main()
 			return 1.0;
 		};
 
-		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_callable.txt",
+		test_init<all_mats<double, 2, 3>, false>("initialization/2x3_callable.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			fn);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			fn);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_callable.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			fn,
@@ -382,15 +346,15 @@ int main()
 	feature("Initialization via value") = [&]() {
 		const auto val = 2.0;
 
-		test_init<all_mats_t<double, 2, 3>, false>("initialization/2x3_val.txt",
+		test_init<all_mats<double, 2, 3>, false>("initialization/2x3_val.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			val);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			val);
-		test_init<dyn_mats_t<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
+		test_init<dyn_mats<double, 2, 3, alloc_t>, true>("initialization/2x3_val.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			val,
@@ -398,20 +362,20 @@ int main()
 	};
 
 	feature("Initialization of identity matrices") = [&]() {
-		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
+		test_init<all_mats<double, 3, 3>, false>("initialization/3x3_identity.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			identity);
-		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
+		test_init<dyn_mats<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			identity);
-		test_init<all_mats_t<double, 3, 3>, false>("initialization/3x3_identity.txt",
+		test_init<all_mats<double, 3, 3>, false>("initialization/3x3_identity.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			identity,
 			unsafe);
-		test_init<dyn_mats_t<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
+		test_init<dyn_mats<double, 3, 3, alloc_t>, true>("initialization/3x3_identity.txt",
 			parse_extent_dependent_init,
 			alloc_obj,
 			identity,
@@ -422,18 +386,18 @@ int main()
 	};
 
 	feature("Copy initialization") = [&]() {
-		test_init_ctor_copy<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+		test_init_ctor_copy<all_mats<int, 2, 3>, all_mats<int, 2, 3>, false>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj);
-		test_init_ctor_copy<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+		test_init_ctor_copy<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>, true>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			alloc_obj);
-		test_init_ctor_copy<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+		test_init_ctor_copy<all_mats<int, 2, 3>, all_mats<int, 2, 3>, false>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			unsafe);
-		test_init_ctor_copy<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+		test_init_ctor_copy<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>, true>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			unsafe,
@@ -441,18 +405,18 @@ int main()
 	};
 
 	feature("Move initialization") = [&]() {
-		test_init_ctor_move<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+		test_init_ctor_move<all_mats<int, 2, 3>, all_mats<int, 2, 3>, false>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj);
-		test_init_ctor_move<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+		test_init_ctor_move<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>, true>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			alloc_obj);
-		test_init_ctor_move<all_mats_t<int, 2, 3>, all_mats_t<int, 2, 3>, false>(
+		test_init_ctor_move<all_mats<int, 2, 3>, all_mats<int, 2, 3>, false>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			unsafe);
-		test_init_ctor_move<dyn_mats_t<double, 2, 3, alloc_t>, dyn_mats_t<double, 2, 3, alloc_t>, true>(
+		test_init_ctor_move<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>, true>(
 			"initialization/2x3_init_copy_and_move.txt",
 			alloc_obj,
 			unsafe,

@@ -123,4 +123,20 @@ namespace mpp
 
 		return left_casted <=> right_casted;
 	};
+
+	// @TODO: This is an odd place, maybe look for somewhere else to put it?
+	template<typename T,
+		typename T2,
+		std::size_t RowsExtent,
+		std::size_t RowsExtent2,
+		std::size_t ColumnsExtent,
+		std::size_t ColumnsExtent2,
+		typename Alloc,
+		typename Alloc2>
+	auto operator<=>(const matrix<T, RowsExtent, ColumnsExtent, Alloc>& mat,
+		const matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>& mat2) noexcept(noexcept(elements_compare(mat, mat2)))
+		-> bool
+	{
+		return elements_compare(mat, mat2);
+	}
 } // namespace mpp
