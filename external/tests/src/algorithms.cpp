@@ -36,7 +36,7 @@ using namespace mpp;
 
 namespace
 {
-	template<typename Mats, typename From, typename To>
+	template<typename Mats, typename To>
 	void test_det(std::string_view test_name, const auto&... fn_args)
 	{
 		test(test_name.data()) =
@@ -49,7 +49,7 @@ namespace
 				log_mat(mat);
 
 				auto num = [&]() {
-					if constexpr (!std::is_same_v<From, To>)
+					if constexpr (!std::is_same_v<T, To>)
 					{
 						return mpp::determinant(std::type_identity<To>{}, mat, fn_args...);
 					}
@@ -254,8 +254,6 @@ namespace
 
 int main()
 {
-	using namespace mpp;
-
 	using alloc_t             = custom_allocator<double>;
 	const auto alloc_identity = std::type_identity<alloc_t>{};
 	const auto alloc_obj      = alloc_t{};
@@ -263,12 +261,12 @@ int main()
 	// @FIXME: Remove tests with `alloc_identity` once #323 has resolved
 
 	feature("Determinant") = [&]() {
-		test_det<all_mats<int, 0, 0>, int, int>("algorithm/det/0x0.txt");
-		test_det<all_mats<double, 0, 0, alloc_t>, int, int>("algorithm/det/0x0.txt");
-		test_det<all_mats<double, 0, 0, alloc_t>, int, int>("algorithm/det/0x0.txt", alloc_identity);
-		test_det<all_mats<double, 0, 0, alloc_t>, int, int>("algorithm/det/0x0.txt", alloc_obj);
-		test_det<all_mats<double, 0, 0, alloc_t>, int, int>("algorithm/det/0x0.txt", unsafe, alloc_identity);
-		test_det<all_mats<double, 0, 0, alloc_t>, int, int>("algorithm/det/0x0.txt", unsafe, alloc_obj);
+		test_det<all_mats<int, 0, 0>, double>("algorithm/det/0x0.txt");
+		test_det<all_mats<double, 1, 1, alloc_t>, double>("algorithm/det/1x1.txt");
+		test_det<all_mats<double, 2, 2, alloc_t>, double>("algorithm/det/2x2.txt", alloc_identity);
+		test_det<all_mats<double, 3, 3, alloc_t>, double>("algorithm/det/3x3.txt", alloc_obj);
+		test_det<all_mats<double, 10, 10, alloc_t>, double>("algorithm/det/10x10.txt", unsafe, alloc_identity);
+		test_det<all_mats<double, 20, 20, alloc_t>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
 	};
 
 	feature("Transpose") = [&]() {
