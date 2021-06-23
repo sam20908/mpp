@@ -24,7 +24,7 @@
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
-#include <iostream>
+#include <iosfwd>
 #include <sstream>
 
 namespace mpp
