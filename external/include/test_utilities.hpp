@@ -194,9 +194,6 @@ void cmp_mat_types(const Mat&, const Mat2&)
 template<typename Mat, typename Rng>
 void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
 {
-	using mat_val_t = typename Mat::value_type;
-	using rng_val_t = typename Rng::value_type::value_type;
-
 	const auto expected_rows    = rng.size();
 	const auto expected_columns = expected_rows == 0 ? 0 : rng[0].size();
 
@@ -229,9 +226,6 @@ void cmp_mats(const Mat& mat, const Mat2& mat2)
 template<typename Mat, typename Expr>
 void cmp_mat_to_expr_like(const Mat& mat, const Expr& expr)
 {
-	using mat_val_t  = typename Mat::value_type;
-	using expr_val_t = typename Expr::value_type;
-
 	const auto expected_rows    = expr.rows();
 	const auto expected_columns = expr.columns();
 
