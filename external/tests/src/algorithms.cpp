@@ -261,12 +261,15 @@ int main()
 	// @FIXME: Remove tests with `alloc_identity` once #323 has resolved
 
 	feature("Determinant") = [&]() {
-		test_det<all_mats<int, 0, 0>, double>("algorithm/det/0x0.txt");
-		test_det<all_mats<double, 1, 1, alloc_t>, double>("algorithm/det/1x1.txt", alloc_identity);
-		test_det<all_mats<double, 2, 2, alloc_t>, double>("algorithm/det/2x2.txt", alloc_obj);
-		test_det<all_mats<int, 3, 3>, double>("algorithm/det/3x3.txt");
-		test_det<all_mats<double, 10, 10, alloc_t>, double>("algorithm/det/10x10.txt", unsafe, alloc_identity);
-		test_det<all_mats<double, 20, 20, alloc_t>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
+		test_det<all_mats<int, 0, 0>, int>("algorithm/det/0x0.txt");
+		test_det<all_mats<int, 1, 1>, int>("algorithm/det/1x1.txt", alloc_identity);
+		test_det<all_mats<int, 1, 1>, int>("algorithm/det/1x1.txt", unsafe, alloc_identity);
+		test_det<all_mats<float, 2, 2>, float>("algorithm/det/2x2.txt", alloc_obj);
+		test_det<all_mats<float, 2, 2>, float>("algorithm/det/2x2.txt", unsafe, alloc_obj);
+		test_det<all_mats<float, 3, 3>, double>("algorithm/det/3x3.txt", alloc_identity);
+		test_det<all_mats<float, 3, 3>, double>("algorithm/det/3x3.txt", alloc_obj);
+		test_det<all_mats<float, 10, 10>, double>("algorithm/det/10x10.txt", unsafe, alloc_identity);
+		test_det<all_mats<float, 20, 20>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
 	};
 
 	feature("Transpose") = [&]() {
