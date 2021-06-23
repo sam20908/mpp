@@ -58,11 +58,6 @@ namespace mpp
 	}
 } // namespace mpp
 
-namespace detail
-{
-	std::unordered_map<std::string, void*> cache;
-}
-
 using namespace boost::ut;
 
 template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
@@ -179,16 +174,25 @@ auto stringify_mat(const mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>& mat, 
 template<typename Num, typename Num2>
 void cmp_nums(Num num, Num2 num2)
 {
-	using ordering = std::compare_three_way_result_t<Num, Num2>;
+	using common_val_t = std::common_type_t<Num, Num2>;
+	using ut_val_t     = boost::ut::detail::template value<common_val_t>;
 
-	expect(mpp::floating_point_compare(num, num2) == ordering::equivalent)
-		<< "Output is" << num << "but expected output is" << num2;
+	if constexpr (std::is_floating_point_v<common_val_t>)
+	{
+		static constexpr auto eps = std::numeric_limits<common_val_t>::epsilon();
+
+		expect(eq(num, ut_val_t{ num2, eps }));
+	}
+	else
+	{
+		expect(eq(num, ut_val_t{ num2 }));
+	}
 }
 
 template<typename Mat, typename Mat2>
 void cmp_mat_types(const Mat&, const Mat2&)
 {
-	expect(boost::ut::type<Mat> == boost::ut::type<Mat2>) << "Output type doesn't match expected type";
+	expect(boost::ut::type<Mat> == boost::ut::type<Mat2>);
 }
 
 template<typename Mat, typename Rng>
@@ -220,34 +224,34 @@ void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
 template<typename Mat, typename Mat2>
 void cmp_mats(const Mat& mat, const Mat2& mat2)
 {
-	expect(mat2 % boost::ut::operators::terse::_t == mat);
+	expect(eq(mat, mat2));
 }
 
-template<typename Mat, typename Expr>
-void cmp_mat_to_expr_like(const Mat& mat, const Expr& expr)
-{
-	const auto expected_rows    = expr.rows();
-	const auto expected_columns = expr.columns();
+// template<typename Mat, typename Expr>
+// void cmp_mat_to_expr_like(const Mat& mat, const Expr& expr)
+// {
+// 	const auto expected_rows    = expr.rows();
+// 	const auto expected_columns = expr.columns();
 
-	const auto rows_is_eq    = mat.rows() == expected_rows;
-	const auto columns_is_eq = mat.columns() == expected_columns;
+// 	const auto rows_is_eq    = mat.rows() == expected_rows;
+// 	const auto columns_is_eq = mat.columns() == expected_columns;
 
-	expect(rows_is_eq) << "Matrix's rows doesn't match expected rows";
-	expect(columns_is_eq) << "Matrix's columns doesn't match expected columns";
+// 	expect(rows_is_eq) << "Matrix's rows doesn't match expected rows";
+// 	expect(columns_is_eq) << "Matrix's columns doesn't match expected columns";
 
-	if (!rows_is_eq || !columns_is_eq)
-	{
-		return; // Avoid accessing out of bounds
-	}
+// 	if (!rows_is_eq || !columns_is_eq)
+// 	{
+// 		return; // Avoid accessing out of bounds
+// 	}
 
-	for (auto row = std::size_t{}; row < expected_rows; ++row)
-	{
-		for (auto column = std::size_t{}; column < expected_columns; ++column)
-		{
-			cmp_nums(mat(row, column), expr(row, column));
-		}
-	}
-}
+// 	for (auto row = std::size_t{}; row < expected_rows; ++row)
+// 	{
+// 		for (auto column = std::size_t{}; column < expected_columns; ++column)
+// 		{
+// 			cmp_nums(mat(row, column), expr(row, column));
+// 		}
+// 	}
+// }
 
 // @TODO: Use .view() for log_mats* when available for compilers
 
