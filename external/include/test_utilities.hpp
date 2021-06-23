@@ -196,7 +196,6 @@ void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
 {
 	using mat_val_t = typename Mat::value_type;
 	using rng_val_t = typename Rng::value_type::value_type;
-	using ordering  = std::compare_three_way_result_t<mat_val_t, rng_val_t>;
 
 	const auto expected_rows    = rng.size();
 	const auto expected_columns = expected_rows == 0 ? 0 : rng[0].size();
@@ -232,7 +231,6 @@ void cmp_mat_to_expr_like(const Mat& mat, const Expr& expr)
 {
 	using mat_val_t  = typename Mat::value_type;
 	using expr_val_t = typename Expr::value_type;
-	using ordering   = std::compare_three_way_result_t<mat_val_t, expr_val_t>;
 
 	const auto expected_rows    = expr.rows();
 	const auto expected_columns = expr.columns();
@@ -346,7 +344,7 @@ inline auto get_path_str(std::string_view filename)
 }
 
 template<typename Mat>
-inline auto parse_mat = [&](std::ifstream& file, std::string& line) {
+inline auto parse_mat = [](std::ifstream& file, std::string& line) {
 	using value_type = typename Mat::value_type;
 
 	auto data             = std::vector<std::vector<value_type>>{};
