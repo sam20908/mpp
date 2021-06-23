@@ -22,6 +22,7 @@
 #include <boost/ut.hpp>
 
 #include <mpp/detail/matrix/matrix_def.hpp>
+#include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/public.hpp>
 #include <mpp/matrix.hpp>
 
