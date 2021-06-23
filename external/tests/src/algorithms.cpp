@@ -287,20 +287,41 @@ int main()
 
 	feature("Inverse") = [&]() {
 		test_fn<join_mats_t<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algorithm/inv/0x0.txt", inverse);
-		test_fn<join_mats_t<all_mats<int, 3, 3>, all_mats<double, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
-		test_fn<join_mats_t<dyn_mats<double, 1, 1, alloc_t>, dyn_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
+		test_fn<join_mats_t<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/inv/3x3_int.txt",
 			inverse);
-		test_fn<join_mats_t<dyn_mats<double, 2, 2>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
+		test_fn<join_mats_t<dyn_mats<double, 1, 1, alloc_t>, dyn_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
 			inverse,
 			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>>>("algorithm/inv/3x3.txt",
-			inverse,
-			alloc_obj);
-		test_fn<join_mats_t<dyn_mats<double, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
+		test_fn<join_mats_t<dyn_mats<double, 1, 1, alloc_t>, dyn_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
 			inverse,
 			unsafe,
 			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<double, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
+		test_fn<join_mats_t<dyn_mats<double, 2, 2>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
+			inverse,
+			alloc_obj);
+		test_fn<join_mats_t<dyn_mats<double, 2, 2>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
+			inverse,
+			unsafe,
+			alloc_obj);
+		test_fn<join_mats_t<dyn_mats<int, 3, 3>, dyn_mats<double, 3, 3, alloc_t>>>("algorithm/inv/3x3.txt",
+			inverse,
+			alloc_identity);
+		test_fn<join_mats_t<dyn_mats<int, 3, 3>, dyn_mats<double, 3, 3, alloc_t>>>("algorithm/inv/3x3.txt",
+			inverse,
+			unsafe,
+			alloc_identity);
+		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
+			inverse,
+			alloc_identity);
+		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
+			inverse,
+			unsafe,
+			alloc_identity);
+		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
+			inverse,
+			alloc_obj);
+		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
 			inverse,
 			unsafe,
 			alloc_obj);
@@ -320,13 +341,31 @@ int main()
 		test_sub<join_mats_t<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
 			"algorithm/fwd_sub/4x4_4x1.txt",
 			forward_substitution,
+			unsafe,
+			alloc_identity);
+		test_sub<join_mats_t<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
+			"algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution,
 			alloc_obj);
 		test_sub<join_mats_t<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
 			"algorithm/fwd_sub/4x4_4x1.txt",
 			forward_substitution,
 			unsafe,
+			alloc_obj);
+		test_sub<join_mats_t<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
+			"algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution,
 			alloc_identity);
-		test_sub<join_mats_t<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
+		test_sub<join_mats_t<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
+			"algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution,
+			unsafe,
+			alloc_identity);
+		test_sub<join_mats_t<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
+			"algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution,
+			alloc_obj);
+		test_sub<join_mats_t<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>>(
 			"algorithm/fwd_sub/4x4_4x1.txt",
 			forward_substitution,
 			unsafe,
@@ -347,13 +386,31 @@ int main()
 		test_sub<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
 			"algorithm/back_sub/3x3_3x1.txt",
 			back_substitution,
+			unsafe,
+			alloc_identity);
+		test_sub<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
+			"algorithm/back_sub/3x3_3x1.txt",
+			back_substitution,
 			alloc_obj);
 		test_sub<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
 			"algorithm/back_sub/3x3_3x1.txt",
 			back_substitution,
 			unsafe,
+			alloc_obj);
+		test_sub<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
+			"algorithm/back_sub/3x3_3x1.txt",
+			back_substitution,
 			alloc_identity);
-		test_sub<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
+		test_sub<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
+			"algorithm/back_sub/3x3_3x1.txt",
+			back_substitution,
+			unsafe,
+			alloc_identity);
+		test_sub<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
+			"algorithm/back_sub/3x3_3x1.txt",
+			back_substitution,
+			alloc_obj);
+		test_sub<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 1, 1, alloc_t>>>(
 			"algorithm/back_sub/3x3_3x1.txt",
 			back_substitution,
 			unsafe,
@@ -370,12 +427,26 @@ int main()
 			alloc_identity);
 		test_lu<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
 			"algorithm/lu/3x3.txt",
+			unsafe,
+			alloc_identity);
+		test_lu<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/lu/3x3.txt",
 			alloc_obj);
 		test_lu<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
 			"algorithm/lu/3x3.txt",
 			unsafe,
+			alloc_obj);
+		test_lu<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/lu/3x3.txt",
 			alloc_identity);
-		test_lu<join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+		test_lu<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/lu/3x3.txt",
+			unsafe,
+			alloc_identity);
+		test_lu<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/lu/3x3.txt",
+			alloc_obj);
+		test_lu<join_mats_t<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
 			"algorithm/lu/3x3.txt",
 			unsafe,
 			alloc_obj);
