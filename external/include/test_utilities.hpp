@@ -131,6 +131,32 @@ using all_block_mats = std::tuple<std::type_identity<mpp::detail::block_mat_ret_
 		mpp::detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
 		Alloc...>>>;
 
+template<typename T,
+	std::size_t Rows,
+	std::size_t Columns,
+	typename TopRowIndex,
+	typename TopColumnIndex,
+	typename BottomRowIndex,
+	typename BottomColumnIndex,
+	typename... Alloc>
+using dyn_block_mats = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
+	std::type_identity<mpp::detail::block_mat_ret_t<T,
+		mpp::dynamic,
+		Columns,
+		mpp::detail::get_constant_val_or_dynamic<TopRowIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<TopColumnIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<BottomRowIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+		Alloc...>>,
+	std::type_identity<mpp::detail::block_mat_ret_t<T,
+		Rows,
+		mpp::dynamic,
+		mpp::detail::get_constant_val_or_dynamic<TopRowIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<TopColumnIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<BottomRowIndex>(),
+		mpp::detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+		Alloc...>>>;
+
 template<typename... Mats>
 using mats_tup = std::tuple<std::type_identity<Mats>...>;
 

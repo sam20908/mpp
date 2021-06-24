@@ -193,61 +193,6 @@ namespace
 			};
 		} | Mats{};
 	}
-
-	// template<typename Mats,
-	// 	typename TopRowIndex,
-	// 	typename TopColumnIndex,
-	// 	typename BottomRowIndex,
-	// 	typename BottomColumnIndex,
-	// 	typename Alloc>
-	// void test_block(std::string_view test_name,
-	// 	TopRowIndex top_row_index,
-	// 	TopColumnIndex top_column_index,
-	// 	BottomRowIndex bottom_row_index,
-	// 	BottomColumnIndex bottom_column_index,
-	// 	const auto&... fn_args)
-	// {
-	// 	test(test_name.data()) = [&, test_name]<typename T,
-	// 								 typename T2,
-	// 								 std::size_t RowsExtent,
-	// 								 std::size_t RowsExtent2,
-	// 								 std::size_t ColumnsExtent,
-	// 								 std::size_t ColumnsExtent2,
-	// 								 typename Alloc,
-	// 								 typename Alloc2>(
-	// 								 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-	// 									 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-	// 		using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-	// 		using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
-	// 		const auto [mat, expected_mat] = parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>);
-
-	// 		const auto out = [&]() {
-	// 			if constexpr (!std::is_same_v<T, T2>)
-	// 			{
-	// 				return mpp::block(std::type_identity<T2>{},
-	// 					mat,
-	// 					top_row_index,
-	// 					top_column_index,
-	// 					bottom_row_index,
-	// 					bottom_column_index,
-	// 					fn_args...);
-	// 			}
-	// 			else
-	// 			{
-	// 				return mpp::block(mat,
-	// 					top_row_index,
-	// 					top_column_index,
-	// 					bottom_row_index,
-	// 					bottom_column_index,
-	// 					fn_args...);
-	// 			}
-	// 		}();
-
-	// 		cmp_mat_types(out, expected_mat);
-	// 		cmp_mats(out, expected_mat);
-	// 	} | Mats{};
-	// }
 } // namespace
 
 int main()
@@ -379,34 +324,60 @@ int main()
 	};
 
 	feature("Block") = [&]() {
-		using const_1_t = mpp::constant<1>;
+		using const_0_t = mpp::constant<0>;
+		using const_2_t = mpp::constant<2>;
+		using const_3_t = mpp::constant<3>;
 
-		// test_fn<
-		// 	join_mats_t<all_mats<int, 3, 3>, all_block_mats<int, 3, 3, const_1_t, const_1_t, const_1_t, const_1_t>>>(
-		// 	"algorithm/3x3_1x1.txt",
-		// 	block,
-		// 	const_1_t{},
-		// 	const_1_t{},
-		// 	const_1_t{},
-		// 	const_1_t{});
+		test_fn<join_mats_t<all_mats<double, 3, 3, alloc_t>,
+			all_block_mats<double, 3, 3, const_0_t, const_0_t, const_0_t, const_0_t, alloc_t>>>(
+			"algorithm/block/3x3_1x1_0_0_0_0.txt",
+			block,
+			const_0_t{},
+			const_0_t{},
+			const_0_t{},
+			const_0_t{});
 
-		(void)block(matrix<int, 3, 3>{}, 1, 1, 1, 1);
+		using const_2_3_t_args = join_mats_t<dyn_mats<double, 4, 4>,
+			dyn_block_mats<double, 4, 4, const_2_t, const_2_t, const_3_t, const_3_t, alloc_t>>;
 
-		// 	test_block<matrix<int, 3, 3>, matrix<int, 1, 1>, false>("algorithm/block/3x3.txt",
-		// 		mpp::constant<0>{},
-		// 		mpp::constant<0>{},
-		// 		mpp::constant<0>{},
-		// 		mpp::constant<0>{},
-		// 		matrix_type::fully_static,
-		// 		alloc_obj);
-		// 	test_block<matrix<double>, matrix<double>, false>("algorithm/block/4x4.txt",
-		// 		3,
-		// 		2,
-		// 		3,
-		// 		2,
-		// 		matrix_type::fully_dynamic,
-		// 		alloc_obj,
-		// 		alloc_identity);
+		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
+			block,
+			const_2_t{},
+			const_2_t{},
+			const_3_t{},
+			const_3_t{},
+			alloc_identity);
+		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
+			block,
+			const_2_t{},
+			const_2_t{},
+			const_3_t{},
+			const_3_t{},
+			unsafe,
+			alloc_identity);
+		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
+			block,
+			const_2_t{},
+			const_2_t{},
+			const_3_t{},
+			const_3_t{},
+			alloc_obj);
+		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
+			block,
+			const_2_t{},
+			const_2_t{},
+			const_3_t{},
+			const_3_t{},
+			unsafe,
+			alloc_obj);
+
+		using dyn_2_3_t_args = join_mats_t<dyn_mats<double, 4, 4>,
+			dyn_block_mats<double, 4, 4, std::size_t, std::size_t, std::size_t, std::size_t, alloc_t>>;
+
+		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, alloc_identity);
+		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, unsafe, alloc_identity);
+		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, alloc_obj);
+		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, unsafe, alloc_obj);
 	};
 
 	return 0;

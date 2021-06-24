@@ -188,13 +188,13 @@ namespace mpp
 			}
 
 			using block_mat_t = block_mat_ret_t<Value,
-				BlockAllocator,
 				RowsExtent,
 				ColumnsExtent,
 				get_constant_val_or_dynamic<TopRowIndex>(),
 				get_constant_val_or_dynamic<TopColumnIndex>(),
 				get_constant_val_or_dynamic<BottomRowIndex>(),
-				get_constant_val_or_dynamic<BottomColumnIndex>()>;
+				get_constant_val_or_dynamic<BottomColumnIndex>(),
+				BlockAllocator>;
 
 			constexpr auto buf_is_vec = any_extent_is_dynamic(RowsExtent, ColumnsExtent);
 
