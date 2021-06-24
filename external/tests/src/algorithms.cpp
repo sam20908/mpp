@@ -287,44 +287,24 @@ int main()
 
 	feature("Inverse") = [&]() {
 		test_fn<join_mats_t<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algorithm/inv/0x0.txt", inverse);
-		test_fn<join_mats_t<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>>(
-			"algorithm/inv/3x3_int.txt",
+		test_fn<join_mats_t<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algorithm/inv/1x1.txt", inverse);
+		test_fn<join_mats_t<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
+		test_fn<join_mats_t<dyn_mats<double, 2, 2, alloc_t>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
 			inverse);
-		test_fn<join_mats_t<dyn_mats<double, 1, 1, alloc_t>, dyn_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
-			inverse,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<double, 1, 1, alloc_t>, dyn_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
-			inverse,
-			unsafe,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<double, 2, 2>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
-			inverse,
-			alloc_obj);
-		test_fn<join_mats_t<dyn_mats<double, 2, 2>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
-			inverse,
-			unsafe,
-			alloc_obj);
-		test_fn<join_mats_t<dyn_mats<int, 3, 3>, dyn_mats<double, 3, 3, alloc_t>>>("algorithm/inv/3x3.txt",
-			inverse,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<int, 3, 3>, dyn_mats<double, 3, 3, alloc_t>>>("algorithm/inv/3x3.txt",
-			inverse,
-			unsafe,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
-			inverse,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
-			inverse,
-			unsafe,
-			alloc_identity);
-		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
-			inverse,
-			alloc_obj);
-		test_fn<join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>>("algorithm/inv/10x10.txt",
-			inverse,
-			unsafe,
-			alloc_obj);
+
+		using same_mats_val_t = join_mats_t<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
+
+		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, alloc_identity);
+		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, unsafe, alloc_identity);
+		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, alloc_obj);
+		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, unsafe, alloc_obj);
+
+		using diff_mats_val_t = join_mats_t<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>;
+
+		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, alloc_identity);
+		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, unsafe, alloc_identity);
+		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, alloc_obj);
+		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, unsafe, alloc_obj);
 	};
 
 	feature("Forward substitution") = [&]() {
