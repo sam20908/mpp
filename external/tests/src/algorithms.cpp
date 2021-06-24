@@ -193,64 +193,62 @@ namespace
 			};
 		} | Mats{};
 	}
+
+	// template<typename Mats,
+	// 	typename TopRowIndex,
+	// 	typename TopColumnIndex,
+	// 	typename BottomRowIndex,
+	// 	typename BottomColumnIndex,
+	// 	typename Alloc>
+	// void test_block(std::string_view test_name,
+	// 	TopRowIndex top_row_index,
+	// 	TopColumnIndex top_column_index,
+	// 	BottomRowIndex bottom_row_index,
+	// 	BottomColumnIndex bottom_column_index,
+	// 	const auto&... fn_args)
+	// {
+	// 	test(test_name.data()) = [&, test_name]<typename T,
+	// 								 typename T2,
+	// 								 std::size_t RowsExtent,
+	// 								 std::size_t RowsExtent2,
+	// 								 std::size_t ColumnsExtent,
+	// 								 std::size_t ColumnsExtent2,
+	// 								 typename Alloc,
+	// 								 typename Alloc2>(
+	// 								 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	// 									 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
+	// 		using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+	// 		using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
+
+	// 		const auto [mat, expected_mat] = parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>);
+
+	// 		const auto out = [&]() {
+	// 			if constexpr (!std::is_same_v<T, T2>)
+	// 			{
+	// 				return mpp::block(std::type_identity<T2>{},
+	// 					mat,
+	// 					top_row_index,
+	// 					top_column_index,
+	// 					bottom_row_index,
+	// 					bottom_column_index,
+	// 					fn_args...);
+	// 			}
+	// 			else
+	// 			{
+	// 				return mpp::block(mat,
+	// 					top_row_index,
+	// 					top_column_index,
+	// 					bottom_row_index,
+	// 					bottom_column_index,
+	// 					fn_args...);
+	// 			}
+	// 		}();
+
+	// 		cmp_mat_types(out, expected_mat);
+	// 		cmp_mats(out, expected_mat);
+	// 	} | Mats{};
+	// }
 } // namespace
-
-// template<typename Mat,
-// 	typename Block,
-// 	bool CmpAlloc,
-// 	typename TopRowIndex,
-// 	typename TopColumnIndex,
-// 	typename BottomRowIndex,
-// 	typename BottomColumnIndex,
-// 	typename Alloc,
-// 	typename... FnArgs>
-// void test_block(std::string_view filename,
-// 	TopRowIndex top_row_index,
-// 	TopColumnIndex top_column_index,
-// 	BottomRowIndex bottom_row_index,
-// 	BottomColumnIndex bottom_column_index,
-// 	mpp::matrix_type expected_type,
-// 	[[maybe_unused]] const Alloc& alloc_obj,
-// 	const FnArgs&... fn_args)
-// {
-// 	using from_val_t    = typename Mat::value_type;
-// 	using to_val_t      = typename Block::value_type;
-// 	using ordering_type = std::compare_three_way_result_t<from_val_t, to_val_t>;
-
-// 	test(filename.data()) = [=, alloc_obj = std::move(alloc_obj)]() {
-// 		const auto [mat, expected_block] = parse_test(filename, parse_mat<Mat>(), parse_mat<Block>());
-
-// 		auto out = [=, mat = std::move(mat)]() {
-// 			if constexpr (!std::is_same_v<from_val_t, to_val_t>)
-// 			{
-// 				return mpp::block(std::type_identity<to_val_t>{},
-// 					mat,
-// 					top_row_index,
-// 					top_column_index,
-// 					bottom_row_index,
-// 					bottom_column_index,
-// 					fn_args...);
-// 			}
-// 			else
-// 			{
-// 				return mpp::block(mat,
-// 					top_row_index,
-// 					top_column_index,
-// 					bottom_row_index,
-// 					bottom_column_index,
-// 					fn_args...);
-// 			}
-// 		}();
-
-// 		expect(mpp::type(out) == expected_type) << "Matrix type doesn't match";
-// 		expect(mpp::elements_compare(out, expected_block) == ordering_type::equivalent) << "Matrices aren't equal";
-
-// 		if constexpr (CmpAlloc)
-// 		{
-// 			expect(out.get_allocator() == alloc_obj) << "Allocators aren't equal";
-// 		}
-// 	};
-// }
 
 int main()
 {
@@ -380,23 +378,36 @@ int main()
 		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", unsafe, alloc_obj);
 	};
 
-	// feature("Block") = [&]() { // @FIXME: Test other overloads
-	// 	test_block<matrix<int, 3, 3>, matrix<int, 1, 1>, false>("algorithm/block/3x3.txt",
-	// 		mpp::constant<0>{},
-	// 		mpp::constant<0>{},
-	// 		mpp::constant<0>{},
-	// 		mpp::constant<0>{},
-	// 		matrix_type::fully_static,
-	// 		alloc_obj);
-	// 	test_block<matrix<double>, matrix<double>, false>("algorithm/block/4x4.txt",
-	// 		3,
-	// 		2,
-	// 		3,
-	// 		2,
-	// 		matrix_type::fully_dynamic,
-	// 		alloc_obj,
-	// 		alloc_identity);
-	// };
+	feature("Block") = [&]() {
+		using const_1_t = mpp::constant<1>;
+
+		// test_fn<
+		// 	join_mats_t<all_mats<int, 3, 3>, all_block_mats<int, 3, 3, const_1_t, const_1_t, const_1_t, const_1_t>>>(
+		// 	"algorithm/3x3_1x1.txt",
+		// 	block,
+		// 	const_1_t{},
+		// 	const_1_t{},
+		// 	const_1_t{},
+		// 	const_1_t{});
+
+		(void)block(matrix<int, 3, 3>{}, 1, 1, 1, 1);
+
+		// 	test_block<matrix<int, 3, 3>, matrix<int, 1, 1>, false>("algorithm/block/3x3.txt",
+		// 		mpp::constant<0>{},
+		// 		mpp::constant<0>{},
+		// 		mpp::constant<0>{},
+		// 		mpp::constant<0>{},
+		// 		matrix_type::fully_static,
+		// 		alloc_obj);
+		// 	test_block<matrix<double>, matrix<double>, false>("algorithm/block/4x4.txt",
+		// 		3,
+		// 		2,
+		// 		3,
+		// 		2,
+		// 		matrix_type::fully_dynamic,
+		// 		alloc_obj,
+		// 		alloc_identity);
+	};
 
 	return 0;
 }

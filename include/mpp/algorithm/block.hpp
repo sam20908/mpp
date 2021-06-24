@@ -73,21 +73,21 @@ namespace mpp
 		}
 
 		template<typename Val,
-			typename Alloc,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			std::size_t TopRowIndex,
 			std::size_t TopColumnIndex,
 			std::size_t BottomRowIndex,
-			std::size_t BottomColumnIndex>
+			std::size_t BottomColumnIndex,
+			typename... Alloc>
 		using block_mat_ret_t = matrix<Val,
 			any_extent_is_dynamic(RowsExtent, TopRowIndex, BottomRowIndex) ? dynamic : BottomRowIndex - TopRowIndex + 1,
 			any_extent_is_dynamic(ColumnsExtent, TopColumnIndex, BottomColumnIndex)
 				? dynamic
 				: BottomColumnIndex - TopColumnIndex + 1,
-			Alloc>;
+			Alloc...>;
 
-		template<typename BlockMat, typename... Args>
+		template<typename BlockMat>
 		auto block_impl_fixed(const auto& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
@@ -167,13 +167,13 @@ namespace mpp
 			BottomRowIndex bottom_row_index,
 			BottomColumnIndex bottom_column_index,
 			const Args&... alloc_args) -> block_mat_ret_t<Value,
-			BlockAllocator,
 			RowsExtent,
 			ColumnsExtent,
 			get_constant_val_or_dynamic<TopRowIndex>(),
 			get_constant_val_or_dynamic<TopColumnIndex>(),
 			get_constant_val_or_dynamic<BottomRowIndex>(),
-			get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
+			get_constant_val_or_dynamic<BottomColumnIndex>(),
+			BlockAllocator> // @TODO: ISSUE #20
 		{
 			// The static_cast are to trigger the explicit conversion operator for mpp::constant objects
 
@@ -236,13 +236,13 @@ namespace mpp
 			BottomRowIndex bottom_row_index,
 			BottomColumnIndex bottom_column_index,
 			std::type_identity<BlockAllocator> = {}) -> detail::block_mat_ret_t<Value,
-			BlockAllocator,
 			RowsExtent,
 			ColumnsExtent,
 			detail::get_constant_val_or_dynamic<TopRowIndex>(),
 			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
 			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
+			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+			BlockAllocator> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
 				top_row_index,
@@ -267,13 +267,13 @@ namespace mpp
 			BottomRowIndex bottom_row_index,
 			BottomColumnIndex bottom_column_index,
 			const BlockAllocator& block_alloc) -> detail::block_mat_ret_t<Value,
-			BlockAllocator,
 			RowsExtent,
 			ColumnsExtent,
 			detail::get_constant_val_or_dynamic<TopRowIndex>(),
 			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
 			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
+			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+			BlockAllocator> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
 				top_row_index,
@@ -300,13 +300,13 @@ namespace mpp
 			BottomColumnIndex bottom_column_index,
 			unsafe_tag,
 			std::type_identity<BlockAllocator> = {}) -> detail::block_mat_ret_t<Value,
-			BlockAllocator,
 			RowsExtent,
 			ColumnsExtent,
 			detail::get_constant_val_or_dynamic<TopRowIndex>(),
 			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
 			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
+			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+			BlockAllocator> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<false, BlockAllocator>(obj,
 				top_row_index,
@@ -332,13 +332,13 @@ namespace mpp
 			BottomColumnIndex bottom_column_index,
 			unsafe_tag,
 			const BlockAllocator& block_alloc) -> detail::block_mat_ret_t<Value,
-			BlockAllocator,
 			RowsExtent,
 			ColumnsExtent,
 			detail::get_constant_val_or_dynamic<TopRowIndex>(),
 			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
 			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>()> // @TODO: ISSUE #20
+			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
+			BlockAllocator> // @TODO: ISSUE #20
 		{
 			return detail::block_impl<false, BlockAllocator>(obj,
 				top_row_index,
