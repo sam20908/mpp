@@ -216,9 +216,8 @@ int main()
 	};
 
 	feature("Transpose") = [&]() {
-		test_fn<join_mats_t<all_mats<int, 25, 25>, all_trps_mats<int, 25, 25>>>("algorithm/trps/25x25.txt", transpose);
-		test_fn<join_mats_t<dyn_mats<double, 50, 2, alloc_t>, dyn_trps_mats<double, 50, 2, alloc_t>>>(
-			"algorithm/trps/50x2.txt",
+		test_fn<join_mats_t<all_mats<double, 25, 25, alloc_t>, all_trps_mats<double, 25, 25, alloc_t>>>(
+			"algorithm/trps/25x25.txt",
 			transpose);
 		test_fn<join_mats_t<dyn_mats<double, 50, 2>, dyn_trps_mats<double, 50, 2, alloc_t>>>("algorithm/trps/50x2.txt",
 			transpose,
@@ -229,10 +228,14 @@ int main()
 	};
 
 	feature("Inverse") = [&]() {
-		test_fn<join_mats_t<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algorithm/inv/0x0.txt", inverse);
-		test_fn<join_mats_t<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algorithm/inv/1x1.txt", inverse);
-		test_fn<join_mats_t<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
-		test_fn<join_mats_t<dyn_mats<double, 2, 2, alloc_t>, dyn_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
+		test_fn<join_mats_t<all_mats<double, 0, 0, alloc_t>, all_mats<double, 0, 0, alloc_t>>>("algorithm/inv/0x0.txt",
+			inverse);
+		test_fn<join_mats_t<all_mats<double, 1, 1, alloc_t>, all_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
+			inverse);
+		test_fn<join_mats_t<all_mats<double, 2, 2, alloc_t>, all_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
+			inverse);
+		test_fn<join_mats_t<all_mats<double, 3, 3, alloc_t>, all_mats<double, 3, 3, alloc_t>>>(
+			"algorithm/inv/3x3_int.txt",
 			inverse);
 
 		using same_mats_val_t = join_mats_t<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
@@ -251,12 +254,9 @@ int main()
 	};
 
 	feature("Forward substitution") = [&]() {
-		test_sub<join_mats_t<all_mats<int, 4, 4>, all_mats<int, 4, 1>, all_sub_mats<int, 4, 1, 1>>>(
-			"algorithm/fwd_sub/4x4_4x1.txt",
-			forward_substitution);
-		test_sub<join_mats_t<dyn_mats<double, 4, 4, alloc_t>,
-			dyn_mats<double, 4, 1, alloc_t>,
-			dyn_sub_mats<double, 4, 1, 1, alloc_t>>>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution);
+		test_sub<join_mats_t<all_mats<double, 4, 4, alloc_t>,
+			all_mats<double, 4, 1, alloc_t>,
+			all_sub_mats<double, 4, 1, 1, alloc_t>>>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution);
 
 		using same_mats_val_t =
 			join_mats_t<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>;
@@ -276,12 +276,9 @@ int main()
 	};
 
 	feature("Backward substitution") = [&]() {
-		test_sub<join_mats_t<all_mats<int, 3, 3>, all_mats<int, 3, 1>, all_sub_mats<int, 3, 3, 1>>>(
-			"algorithm/back_sub/3x3_3x1.txt",
-			back_substitution);
-		test_sub<join_mats_t<dyn_mats<double, 3, 3, alloc_t>,
-			dyn_mats<double, 3, 1, alloc_t>,
-			dyn_sub_mats<double, 3, 3, 1, alloc_t>>>("algorithm/back_sub/3x3_3x1.txt", back_substitution);
+		test_sub<join_mats_t<all_mats<double, 3, 3, alloc_t>,
+			all_mats<double, 3, 1, alloc_t>,
+			all_sub_mats<double, 3, 3, 1, alloc_t>>>("algorithm/back_sub/3x3_3x1.txt", back_substitution);
 
 		using same_mats_val_t =
 			join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 3, 1, alloc_t>>;
@@ -301,10 +298,12 @@ int main()
 	};
 
 	feature("LU Decomposition") = [&]() {
-		test_lu<join_mats_t<all_mats<int, 2, 2>, all_mats<int, 2, 2>, all_mats<int, 2, 2>>>("algorithm/lu/2x2.txt");
-		test_lu<join_mats_t<dyn_mats<double, 3, 3, alloc_t>,
-			dyn_mats<double, 3, 3, alloc_t>,
-			dyn_mats<double, 3, 3, alloc_t>>>("algorithm/lu/3x3.txt");
+		test_lu<join_mats_t<all_mats<double, 2, 2, alloc_t>,
+			all_mats<double, 2, 2, alloc_t>,
+			all_mats<double, 2, 2, alloc_t>>>("algorithm/lu/2x2.txt");
+		test_lu<join_mats_t<all_mats<double, 3, 3, alloc_t>,
+			all_mats<double, 3, 3, alloc_t>,
+			all_mats<double, 3, 3, alloc_t>>>("algorithm/lu/3x3.txt");
 
 		using same_mats_val_t =
 			join_mats_t<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
