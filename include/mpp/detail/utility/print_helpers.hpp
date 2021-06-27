@@ -51,7 +51,9 @@ namespace mpp::detail
 						{
 							out << '\n';
 						}
-					} else {
+					}
+					else
+					{
 						out << ' ';
 					}
 				}
