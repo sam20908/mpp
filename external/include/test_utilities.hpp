@@ -200,7 +200,7 @@ void cmp_mat_types(const Mat&, const Mat2&)
 template<typename Mat, typename Mat2>
 void cmp_mats(const Mat& mat, const Mat2& mat2)
 {
-	boost::ut::expect(mpp::elements_compare(mat, mat2) == 0);
+	boost::ut::expect(mpp::elements_compare(mat, mat2, mpp::floating_point_compare) == 0);
 }
 
 template<typename Mat, typename Rng>
@@ -589,8 +589,6 @@ inline auto parse_mat_construct_val_arg =
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-
 		const auto [rows, cols] = parse_dims(file, line);
 
 		return init_mat_extent_dependent(identity, rows, cols, args...);
