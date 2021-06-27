@@ -43,8 +43,6 @@ namespace
 		test(test_name.data()) =
 			[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
 				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>> identity) {
-				using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-
 				const auto [out, expected_rng] = parse_test(test_name, input_fn(identity, args...), parse_vec2d<T>);
 
 				cmp_mat_to_rng(out, expected_rng);
