@@ -23,17 +23,38 @@
 
 namespace mpp::detail
 {
-	void insert_expr_content_into_out_stream(auto& out, const auto& expr)
+	void insert_expr_content_into_out_stream(auto& out, const auto& expr, const char* end)
 	{
-		const auto rows    = expr.rows();
-		const auto columns = expr.columns();
+		const auto rows = expr.rows();
+		const auto cols = expr.columns();
 
-		for (auto row = std::size_t{}; row < rows; ++row)
+		if (rows == 0 && cols == 0)
 		{
-			for (auto column = std::size_t{}; column < columns; ++column)
+			out << "[empty matrix]\n";
+		}
+		else
+		{
+			for (auto row = std::size_t{}; row < rows; ++row)
 			{
-				const auto value = expr(row, column);
-				out << value << (column == columns - 1 ? '\n' : ' ');
+				for (auto col = std::size_t{}; col < cols; ++col)
+				{
+					const auto value = expr(row, col);
+					out << value;
+
+					if (col == cols - 1)
+					{
+						if (row == rows - 1)
+						{
+							out << end;
+						}
+						else
+						{
+							out << '\n';
+						}
+					} else {
+						out << ' ';
+					}
+				}
 			}
 		}
 	}

@@ -36,16 +36,16 @@ namespace mpp
 			-> void
 		{
 			auto message_stream = std::stringstream{};
-			detail::insert_expr_content_into_out_stream(message_stream, obj);
+			detail::insert_expr_content_into_out_stream(message_stream, obj, "");
 
 			std::cout << message_stream.str();
 		}
 	};
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	auto operator<<(std::ostream& os, const matrix<Value, RowsExtent, ColumnsExtent>& obj) -> std::ostream&
+	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>
+	auto operator<<(std::ostream& os, const matrix<Value, RowsExtent, ColumnsExtent, Alloc>& obj) -> std::ostream&
 	{
-		detail::insert_expr_content_into_out_stream(os, obj);
+		detail::insert_expr_content_into_out_stream(os, obj, "");
 		return os;
 	}
 
