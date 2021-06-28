@@ -38,8 +38,7 @@
 #include <variant>
 #include <vector>
 
-template<typename Mat, typename Rng>
-auto cmp_mat_to_rng_impl(const Mat& mat, const Rng& rng) -> bool
+auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 {
 	const auto expected_rows = rng.size();
 	const auto expected_cols = expected_rows == 0 ? 0 : rng[0].size();
@@ -57,6 +56,30 @@ auto cmp_mat_to_rng_impl(const Mat& mat, const Rng& rng) -> bool
 		for (auto col = std::size_t{}; col < expected_cols; ++col)
 		{
 			if (mpp::floating_point_compare(mat(row, col), rng[row][col]) != 0)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
+{
+	const auto rows_is_eq = mat.rows() == expr.rows();
+	const auto cols_is_eq = mat.columns() == expr.columns();
+
+	if (!rows_is_eq || !cols_is_eq)
+	{
+		return false;
+	}
+
+	for (auto row = std::size_t{}; row < mat.rows(); ++row)
+	{
+		for (auto col = std::size_t{}; col < mat.columns(); ++col)
+		{
+			if (mpp::floating_point_compare(mat(row, col), expr(row, col)) != 0)
 			{
 				return false;
 			}
@@ -197,17 +220,13 @@ void cmp_mat_types(const Mat&, const Mat2&)
 	boost::ut::expect(type<Mat> == type<Mat2>);
 }
 
-template<typename Mat, typename Mat2>
-void cmp_mats(const Mat& mat, const Mat2& mat2)
+void cmp_mat_to_expr_like(const auto& mat, const auto& expr)
 {
-	boost::ut::expect(mpp::elements_compare(mat, mat2, mpp::floating_point_compare) == 0);
+	boost::ut::expect(cmp_mat_to_expr_like_impl(mat, expr));
 }
 
-template<typename Mat, typename Rng>
-void cmp_mat_to_rng(const Mat& mat, const Rng& rng)
+void cmp_mat_to_rng(const auto& mat, const auto& rng)
 {
-	// Wrapping rng in a vector to nest it in another container type for boost/ut because operator<< takes the elements
-	// of a container instead of passing it as a whole
 	boost::ut::expect(cmp_mat_to_rng_impl(mat, rng));
 }
 

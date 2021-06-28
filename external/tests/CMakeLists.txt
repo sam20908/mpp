@@ -45,7 +45,7 @@ endfunction()
 _create_test("algorithms")
 _create_test("initialization")
 # _create_test("assignment")
-# _create_test("arithmetic")
+_create_test("arithmetic")
 # _create_test("members")
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)

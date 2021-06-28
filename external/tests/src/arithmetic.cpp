@@ -17,120 +17,146 @@
  * under the License.
  */
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#include <mpp/utility/comparison.hpp>
 #include <mpp/arithmetic.hpp>
 #include <mpp/matrix.hpp>
 
-#include "../../include/test_parsers.hpp"
-#include "../../include/utility.hpp"
+#include "../../include/test_utilities.hpp"
 
 using namespace boost::ut;
 using namespace boost::ut::bdd;
+using namespace mpp;
 
-template<typename Val,
-	std::size_t Rows,
-	std::size_t Columns,
-	typename Val2,
-	std::size_t Rows2,
-	std::size_t Columns2,
-	typename Val3,
-	std::size_t Rows3,
-	std::size_t Columns3>
-void test_mat_op(const std::string& filename, const auto& op)
+namespace
 {
-	const auto result =
-		parse_test<temp_types<vec2d_t, vec2d_t, vec2d_t>, types<Val, Val2, Val3>>(get_filepath(filename),
-			std::tuple{ vec2d_fn, vec2d_fn, vec2d_fn });
+	template<typename Mats, bool ConstructMat>
+	void test_op(std::string_view test_name, const auto& op)
+	{
+		test(test_name) = [&, test_name]<typename T,
+							  typename T2,
+							  typename T3,
+							  std::size_t RowsExtent,
+							  std::size_t RowsExtent2,
+							  std::size_t RowsExtent3,
+							  std::size_t ColumnsExtent,
+							  std::size_t ColumnsExtent2,
+							  std::size_t ColumnsExtent3,
+							  typename Alloc,
+							  typename Alloc2,
+							  typename Alloc3>(
+							  std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+								  std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>,
+								  std::type_identity<matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>>>) {
+			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
+			using mat3_t = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
 
-	const auto mat_tup      = create_mats<Val, Rows, Columns, all_mats_t>(args(fwd_args, std::get<0>(result)));
-	const auto mat_tup2     = create_mats<Val2, Rows2, Columns2, all_mats_t>(args(fwd_args, std::get<1>(result)));
-	const auto expected_tup = create_mats<Val3, Rows3, Columns3, all_mats_t>(args(fwd_args, std::get<2>(result)));
+			const auto [mat, mat2, expected_mat] =
+				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
 
-	test(filename) = [&]() {
-		[&]<std::size_t... Idx, std::size_t... Idx2, std::size_t... Idx3>(std::index_sequence<Idx...>,
-			std::index_sequence<Idx2...>,
-			std::index_sequence<Idx3...>)
-		{
-			when("Don't fully evaluate the result") = [&]() {
-				(cmp_mat_to_expr_like(std::get<Idx3>(expected_tup),
-					 op(std::get<Idx>(mat_tup), std::get<Idx2>(mat_tup2))),
-					...);
-			};
+			const auto out = [&]() {
+				if constexpr (ConstructMat)
+				{
+					return mat3_t{ op(mat, mat2) };
+				}
+				else
+				{
+					return op(mat, mat2);
+				}
+			}();
 
-			when("Fully evaluate the result") = [&]() {
-				(cmp_mat_to_expr_like(std::get<Idx3>(expected_tup),
-					 mpp::matrix{ op(std::get<Idx>(mat_tup), std::get<Idx2>(mat_tup2)) }),
-					...);
-			};
-		}
-		(std::make_index_sequence<4>{}, std::make_index_sequence<4>{}, std::make_index_sequence<4>{});
-	};
-}
+			if constexpr (ConstructMat)
+			{
+				cmp_mat_types(out, expected_mat);
+			}
 
-template<typename Val,
-	std::size_t Rows,
-	std::size_t Columns,
-	typename Val2,
-	typename Val3,
-	std::size_t Rows3,
-	std::size_t Columns3>
-void test_num_op(const std::string& filename, const auto& op)
-{
-	const auto result = parse_test<temp_types<vec2d_t, val_t, vec2d_t>, types<Val, Val2, Val3>>(get_filepath(filename),
-		std::tuple{ vec2d_fn, val_fn, vec2d_fn });
+			cmp_mat_to_expr_like(out, expected_mat);
+		} | Mats{};
+	}
 
-	const auto num          = std::get<1>(result);
-	const auto mat_tup      = create_mats<Val, Rows, Columns, all_mats_t>(args(fwd_args, std::get<0>(result)));
-	const auto expected_tup = create_mats<Val3, Rows3, Columns3, all_mats_t>(args(fwd_args, std::get<2>(result)));
+	template<typename Mats, bool ConstructMat>
+	void test_num_op(const std::string& test_name, const auto& op)
+	{
+		test(test_name) = [&, test_name]<typename T,
+							  typename T2,
+							  std::size_t RowsExtent,
+							  std::size_t RowsExtent2,
+							  std::size_t ColumnsExtent,
+							  std::size_t ColumnsExtent2,
+							  typename Alloc,
+							  typename Alloc2>(
+							  std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+								  std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
+			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
 
-	test(filename) = [&]() {
-		[&]<std::size_t... Idx, std::size_t... Idx2>(std::index_sequence<Idx...>, std::index_sequence<Idx2...>)
-		{
-			when("Don't fully evaluate the result") = [&]() {
-				(cmp_mat_to_expr_like(std::get<Idx2>(expected_tup), op(std::get<Idx>(mat_tup), num)), ...);
-			};
+			const auto [mat, val, expected_mat] =
+				parse_test(test_name, parse_mat<mat_t>, parse_val<T>, parse_mat<mat2_t>);
 
-			when("Fully evaluate the result") = [&]() {
-				(cmp_mat_to_expr_like(std::get<Idx2>(expected_tup), mpp::matrix{ op(std::get<Idx>(mat_tup), num) }),
-					...);
-			};
-		}
-		(std::make_index_sequence<4>{}, std::make_index_sequence<4>{});
-	};
-}
+			const auto out = [&]() {
+				if constexpr (ConstructMat)
+				{
+					return mat2_t{ op(mat, val) };
+				}
+				else
+				{
+					return op(mat, val);
+				}
+			}();
+
+			if constexpr (ConstructMat)
+			{
+				cmp_mat_types(out, expected_mat);
+			}
+
+			cmp_mat_to_expr_like(out, expected_mat);
+		} | Mats{};
+	}
+} // namespace
 
 int main()
 {
-	test_mat_op<int, 2, 3, int, 2, 3, int, 2, 3>("arithmetic/2x3_add.txt", [](const auto& a, const auto& b) {
-		return a + b;
-	});
+	feature("Addition") = []() {
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>(
+			"arithmetic/2x3_add.txt",
+			std::plus{});
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>(
+			"arithmetic/2x3_add.txt",
+			std::plus{});
+	};
 
-	test_mat_op<int, 2, 3, int, 2, 3, int, 2, 3>("arithmetic/2x3_subtract.txt", [](const auto& a, const auto& b) {
-		return a - b;
-	});
+	feature("Subtraction") = []() {
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>(
+			"arithmetic/2x3_subtract.txt",
+			std::minus{});
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>(
+			"arithmetic/2x3_subtract.txt",
+			std::minus{});
+	};
 
-	test_mat_op<int, 2, 3, int, 3, 1, int, 2, 1>("arithmetic/2x3_3x1_multiply.txt", [](const auto& a, const auto& b) {
-		return a * b;
-	});
+	feature("Multiplication (matrix multiplied with scalar)") = []() {
+		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>("arithmetic/2x3_multiply.txt",
+			std::multiplies{});
+		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>("arithmetic/2x3_multiply.txt",
+			std::multiplies{});
+	};
 
-	test_num_op<int, 2, 3, int, int, 2, 3>("arithmetic/2x3_multiply.txt", [](const auto& a, const auto& b) {
-		return a * b;
-	});
+	feature("Multiplication (matrix multiplied with matrix)") = []() {
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 3, 1>, all_mats<int, 2, 1>>, false>(
+			"arithmetic/2x3_3x1_multiply.txt",
+			std::multiplies{});
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 3, 1>, all_mats<int, 2, 1>>, true>(
+			"arithmetic/2x3_3x1_multiply.txt",
+			std::multiplies{});
+	};
 
-	test_num_op<float, 2, 3, float, float, 2, 3>("arithmetic/2x3_divide.txt", [](const auto& a, const auto& b) {
-		return a / b;
-	});
+	feature("Division (matrix divided with scalar)") = []() {
+		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, false>("arithmetic/2x3_divide.txt",
+			std::divides{});
+		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, true>("arithmetic/2x3_divide.txt",
+			std::divides{});
+	};
 
 	return 0;
 }

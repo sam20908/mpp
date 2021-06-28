@@ -90,7 +90,7 @@ namespace
 			}();
 
 			cmp_mat_types(out, expected_mat);
-			cmp_mats(out, expected_mat);
+			cmp_mat_to_expr_like(out, expected_mat);
 		} | Mats{};
 	}
 
@@ -131,7 +131,7 @@ namespace
 			}();
 
 			cmp_mat_types(out, expected_mat);
-			cmp_mats(out, expected_mat);
+			cmp_mat_to_expr_like(out, expected_mat);
 		} | Mats{};
 	}
 
@@ -172,12 +172,12 @@ namespace
 
 			scenario("Testing L matrix") = [&]() {
 				cmp_mat_types(out_l, expected_l);
-				cmp_mats(out_l, expected_l);
+				cmp_mat_to_expr_like(out_l, expected_l);
 			};
 
 			scenario("Testing U matrix") = [&]() {
 				cmp_mat_types(out_u, expected_u);
-				cmp_mats(out_u, expected_u);
+				cmp_mat_to_expr_like(out_u, expected_u);
 			};
 		} | Mats{};
 	}
