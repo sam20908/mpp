@@ -568,7 +568,7 @@ namespace mpp::detail
 			return buffer_.empty();
 		}
 
-		template<typename Range2D>
+		template<range_2d_with_value_type_convertible_to<Value> Range2D>
 		auto operator=(Range2D&& range_2d) noexcept(noexcept(
 			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d)))) -> matrix_base& // @TODO: ISSUE #20
 		{
