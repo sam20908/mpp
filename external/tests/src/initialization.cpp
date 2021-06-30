@@ -67,18 +67,17 @@ namespace
 			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
 
 			auto [mat, expected_rng] = parse_test(test_name, parse_mat<mat_t>, parse_vec2d<T>);
-			const auto out           = [&]() {
-                if constexpr (Move)
-                {
-                    return mat2_t{ std::move(mat), args... };
-                }
-                else
-                {
-                    return mat2_t{ mat, args... };
-                }
-			}();
 
-			cmp_mat_to_rng(out, expected_rng);
+			if constexpr (Move)
+			{
+				mat_t out{ std::move(mat), args... };
+				cmp_mat_to_rng(out, expected_rng);
+			}
+			else
+			{
+				mat_t out{ mat, args... };
+				cmp_mat_to_rng(out, expected_rng);
+			}
 		} | Mats{};
 	}
 } // namespace
