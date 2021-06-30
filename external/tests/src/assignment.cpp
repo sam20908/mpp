@@ -98,7 +98,7 @@ namespace
 			using mat3_t = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
 
 			auto [mat, mat2, expected_mat] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat2_t>);
+				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
 
 			if constexpr (Move)
 			{
@@ -166,9 +166,6 @@ int main()
 		test_assign_mat<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true>(
 			"assignment/2x10_2x3_shrink_dyn_cols_mat.txt");
 	};
-
-	// test_assign_mat<int>("assignment/assign_mat.txt");
-	// test_assign_mat_different<int>("assignment/assign_mat.txt");
 
 	return 0;
 }
