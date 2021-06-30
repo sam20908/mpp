@@ -109,6 +109,9 @@ int main()
 
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, false>(
 			"initialization/2x3_init_copy_and_move.txt");
+		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, false>(
+			"initialization/2x3_init_copy_and_move.txt",
+			unsafe);
 		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
 			false>("initialization/2x3_init_copy_and_move.txt", alloc_obj);
 	};
@@ -122,6 +125,9 @@ int main()
 
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
 			"initialization/2x3_init_copy_and_move.txt");
+		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
+			"initialization/2x3_init_copy_and_move.txt",
+			unsafe);
 		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
 			true>("initialization/2x3_init_copy_and_move.txt", alloc_obj);
 	};
