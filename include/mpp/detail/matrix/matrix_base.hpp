@@ -569,12 +569,23 @@ namespace mpp::detail
 		}
 
 		template<range_2d_with_value_type_convertible_to<Value> Range2D>
-		auto operator=(Range2D&& range_2d) noexcept(noexcept(
-			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d)))) -> matrix_base& // @TODO: ISSUE #20
+		auto operator=(Range2D&& rng) noexcept(noexcept(base::expr_mutable_obj().assign(std::forward<Range2D>(rng))))
+			-> matrix_base& // @TODO: ISSUE #20
 		{
-			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d));
+			base::expr_mutable_obj().assign(std::forward<Range2D>(rng));
 			return *this;
 		}
+
+		// clang-format off
+		template<matrix_with_value_convertible_to<Value> Matrix>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, ColumnsExtent, Allocator>>)
+		auto operator=(Matrix&& mat) noexcept(noexcept(base::expr_mutable_obj().assign(std::forward<Matrix>(mat))))
+			-> matrix_base& // @TODO: ISSUE #20
+		{
+			base::expr_mutable_obj().assign(std::forward<Matrix>(mat));
+			return *this;
+		}
+		// clang-format on
 
 		void swap(matrix_base& right) noexcept // @TODO: ISSUE #20
 		{

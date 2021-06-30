@@ -133,6 +133,20 @@ int main()
 		test_assign_rng<mats, true, true>("assignment/2x3_same_dims.txt");
 	};
 
+	feature("Assigning a matrix with same dimensions") = []() {
+		using mats = join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>;
+
+		test_assign_mat<mats, false>("assignment/2x3_same_dims.txt");
+		test_assign_mat<mats, true>("assignment/2x3_same_dims.txt");
+	};
+
+	feature("Assigning a matrix with same dimensions but different types") = []() {
+		using mats = join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>, all_mats<int, 2, 3>>;
+
+		test_assign_mat<mats, false>("assignment/2x3_same_dims.txt");
+		test_assign_mat<mats, true>("assignment/2x3_same_dims.txt");
+	};
+
 	feature("Expanding dynamic matrices by range (dynamic matrices only)") = []() {
 		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assignment/2x3_10x10_expand_dyn_mat.txt");
 		test_assign_rng<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true, false>(
