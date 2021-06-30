@@ -70,12 +70,12 @@ namespace
 
 			if constexpr (Move)
 			{
-				mat_t out{ std::move(mat), args... };
+				mat2_t out{ std::move(mat), args... };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 			else
 			{
-				mat_t out{ mat, args... };
+				mat2_t out{ mat, args... };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 		} | Mats{};
