@@ -569,7 +569,8 @@ namespace mpp::detail
 		}
 
 		template<typename Range2D>
-		auto operator=(Range2D&& range_2d) -> matrix_base& // @TODO: ISSUE #20
+		auto operator=(Range2D&& range_2d) noexcept(noexcept(
+			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d)))) -> matrix_base& // @TODO: ISSUE #20
 		{
 			base::expr_mutable_obj().assign(std::forward<Range2D>(range_2d));
 			return *this;

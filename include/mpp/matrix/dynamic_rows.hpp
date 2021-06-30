@@ -50,7 +50,8 @@ namespace mpp
 	public:
 		using base::operator=;
 
-		matrix() noexcept(noexcept(Allocator())) : base(0, ColumnsExtent, Allocator{}) {} // @TODO: ISSUE #20
+		matrix() noexcept(std::is_default_constructible_v<Allocator>) :
+			base(0, ColumnsExtent, Allocator{}) {} // @TODO: ISSUE #20
 
 		explicit matrix(const Allocator& allocator) noexcept : base(0, ColumnsExtent, allocator) {} // @TODO: ISSUE #20
 
@@ -67,7 +68,9 @@ namespace mpp
 		{
 		}
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, dynamic, ColumnsExtent, Allocator>>
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(0, ColumnsExtent, allocator) // @TODO: ISSUE #20
 		{
@@ -78,8 +81,11 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, dynamic, ColumnsExtent, Allocator>>
 		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
 			base(0, ColumnsExtent, allocator) // @TODO: ISSUE #20
 		{
@@ -90,6 +96,7 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 
 		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
 		explicit matrix(std::size_t rows,
@@ -243,7 +250,9 @@ namespace mpp
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::forward<Range2D>(range_2d));
 		}
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, dynamic, ColumnsExtent, Allocator>>
 		void assign(Matrix&& matrix)
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -253,8 +262,11 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, dynamic, ColumnsExtent, Allocator>>
 		void assign(Matrix&& matrix, unsafe_tag)
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -264,5 +276,6 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 	};
 } // namespace mpp
