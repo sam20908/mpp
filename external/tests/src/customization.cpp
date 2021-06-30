@@ -50,16 +50,7 @@ namespace mpp
 	};
 } // namespace mpp
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
@@ -146,8 +137,8 @@ int main()
 	using namespace boost::ut;
 
 	when("I check the new extents through the default matrix type") = []() {
-		expect(constant<mpp::matrix<int>::rows_extent() == 10_ul>);
-		expect(constant<mpp::matrix<int>::columns_extent() == 10_ul>);
+		expect(mpp::matrix<int>::rows_extent() == 10_ul);
+		expect(mpp::matrix<int>::columns_extent() == 10_ul);
 	};
 
 	when("I check the new use_unsafe") = []() {
@@ -169,15 +160,12 @@ int main()
 		expect(type<invoke_result_t<mpp::back_substitution_t>> == type<ns::dumb_class2>);
 	};
 
-	// when("I check the customized buffer types") = []() {
-	// const auto fixed_mat = mpp::matrix<int, 2, 3>{};
-
-	// typename std::remove_cvref_t<decltype(fixed_mat)>::buffer_type;
-	// expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::vector<int>>);
-	// expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::array<int, 100>>);
-	// expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::array<int, 100>>);
-	// expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::array<int, 100>>);
-	// };
+	when("I check the customized buffer types") = []() {
+		expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::vector<int>>);
+		expect(type<typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::matrix<int, mpp::dynamic, 3>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::matrix<int, 2, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
+	};
 
 	return 0;
 }
