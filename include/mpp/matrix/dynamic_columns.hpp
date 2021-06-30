@@ -70,7 +70,7 @@ namespace mpp
 
 		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>)
 		explicit matrix(Matrix&& matrix, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
@@ -85,7 +85,7 @@ namespace mpp
 
 		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>)
 		explicit matrix(Matrix&& matrix, unsafe_tag, const Allocator& allocator = Allocator{}) :
 			base(RowsExtent, 0, allocator) // @TODO: ISSUE #20
 		{
@@ -256,7 +256,7 @@ namespace mpp
 
 		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>)
 		void assign(Matrix&& matrix)
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -270,7 +270,7 @@ namespace mpp
 
 		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
-			requires !std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, dynamic, Allocator>>)
 		void assign(Matrix&& matrix, unsafe_tag)
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
