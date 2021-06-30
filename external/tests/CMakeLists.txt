@@ -44,7 +44,7 @@ endfunction()
 # _create_test("iterator")
 _create_test("algorithms")
 _create_test("initialization")
-# _create_test("assignment")
+_create_test("assignment")
 _create_test("arithmetic")
 # _create_test("members")
 

@@ -114,6 +114,15 @@ using dyn_mats_reverse = std::tuple<std::type_identity<mpp::matrix<T, Rows, mpp:
 template<typename T, std::size_t Rows, std::size_t Columns>
 using fixed_mat = std::tuple<std::type_identity<mpp::matrix<T, Rows, Columns>>>;
 
+template<typename T>
+using dyn_mat = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic>>>;
+
+template<typename T, std::size_t Columns>
+using dyn_rows_mat = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, Columns>>>;
+
+template<typename T, std::size_t Rows>
+using dyn_cols_mat = std::tuple<std::type_identity<mpp::matrix<T, Rows, mpp::dynamic>>>;
+
 template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
 using all_trps_mats = std::tuple<std::type_identity<mpp::matrix<T, Columns, Rows, Alloc...>>,
 	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
