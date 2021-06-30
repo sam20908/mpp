@@ -39,7 +39,7 @@ endfunction()
 
 # @FIXME: Revamp and uncomment rest of the tests
 
-# _create_test("customization")
+_create_test("customization")
 # _create_test("utilities")
 # _create_test("iterator")
 _create_test("algorithms")
