@@ -76,6 +76,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: UbuntuClang
     condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
@@ -107,6 +108,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: WindowsMSVC
     displayName: Windows MSVC
@@ -139,6 +141,7 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
 
   - job: WindowsClang
     condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
@@ -172,3 +175,4 @@ jobs:
           testResultsFormat: JUnit
           testResultsFiles: "**/results.xml"
         displayName: Publish Tests Results
+        condition: succeededOrFailed()
