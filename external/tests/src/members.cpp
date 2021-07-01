@@ -17,16 +17,8 @@
  * under the License.
  */
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
 
 #include <boost/ut.hpp>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #include <mpp/matrix.hpp>
 
@@ -35,232 +27,146 @@
 
 int main()
 {
-	// @NOTE: Comparisons are covered by utility_cpos.cpp
+	// @NOTE: This destructible from rule of five (1/5)
 
 	using namespace boost::ut::bdd;
 	using namespace boost::ut;
+	using namespace mpp;
 
 	feature("Destructible (part of rule of five)") = []() {
-		expect(constant<std::is_destructible_v<mpp::matrix<int, 2, 3>>>);
-		expect(constant<std::is_destructible_v<mpp::matrix<int, mpp::dynamic, mpp::dynamic>>>);
-		expect(constant<std::is_destructible_v<mpp::matrix<int, mpp::dynamic, 3>>>);
-		expect(constant<std::is_destructible_v<mpp::matrix<int, 2, mpp::dynamic>>>);
+		expect(boost::ut::constant<std::is_destructible_v<matrix<int, 2, 3>>>);
+		expect(boost::ut::constant<std::is_destructible_v<matrix<int, dynamic, dynamic>>>);
+		expect(boost::ut::constant<std::is_destructible_v<matrix<int, dynamic, 3>>>);
+		expect(boost::ut::constant<std::is_destructible_v<matrix<int, 2, dynamic>>>);
 	};
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-	const auto mat_1    = mpp::matrix<int, 2, 3>{ range_2d };
-	const auto mat_2    = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-	const auto mat_3    = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-	const auto mat_4    = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+	const auto mats     = std::tuple{ matrix<int, 2, 3>{ range_2d },
+        matrix<int, dynamic, dynamic>{ range_2d },
+        matrix<int, 2, dynamic>{ range_2d },
+        matrix<int, dynamic, 3>{ range_2d } };
+	const auto dyn_mats = std::tuple{ matrix<int, dynamic, dynamic>{ range_2d },
+		matrix<int, 2, dynamic>{ range_2d },
+		matrix<int, dynamic, 3>{ range_2d } };
 
 	feature("operator()") = [&]() {
-		given("We're only reading the data") = [&]() {
-			expect(mat_1(1, 1) == 5_i);
-			expect(mat_2(1, 1) == 5_i);
-			expect(mat_3(1, 1) == 5_i);
-			expect(mat_4(1, 1) == 5_i);
-		};
+		given("We're only reading the data") = [&](const auto& mat) {
+			expect(mat(1, 1) == 5_i);
+		} | mats;
 
-		given("We're modifying the data") = [&]() {
-			mut(mat_1)(1, 1) = 10;
-			mut(mat_2)(1, 1) = 10;
-			mut(mat_3)(1, 1) = 10;
-			mut(mat_4)(1, 1) = 10;
+		given("We're modifying the data") = [&](const auto& mat) {
+			mut(mat)(1, 1) = 10;
 
-			expect(mat_1(1, 1) == 10_i);
-			expect(mat_2(1, 1) == 10_i);
-			expect(mat_3(1, 1) == 10_i);
-			expect(mat_4(1, 1) == 10_i);
+			expect(mat(1, 1) == 10_i);
 
 			// Reset values for following tests
-			mut(mat_1)(1, 1) = 5;
-			mut(mat_2)(1, 1) = 5;
-			mut(mat_3)(1, 1) = 5;
-			mut(mat_4)(1, 1) = 5;
-		};
+			mut(mat)(1, 1) = 5;
+		} | mats;
 	};
 
 	feature("operator[]") = [&]() {
-		given("We're only reading the data") = [&]() {
-			expect(mat_1[4] == 5_i);
-			expect(mat_2[4] == 5_i);
-			expect(mat_3[4] == 5_i);
-			expect(mat_4[4] == 5_i);
-		};
+		given("We're only reading the data") = [&](const auto& mat) {
+			expect(mat[4] == 5_i);
+		} | mats;
 
-		given("We're modifying the data") = [&]() {
-			mut(mat_1)[4] = 10;
-			mut(mat_2)[4] = 10;
-			mut(mat_3)[4] = 10;
-			mut(mat_4)[4] = 10;
+		given("We're modifying the data") = [&](const auto& mat) {
+			mut(mat)[4] = 10;
 
-			expect(mat_1[4] == 10_i);
-			expect(mat_2[4] == 10_i);
-			expect(mat_3[4] == 10_i);
-			expect(mat_4[4] == 10_i);
+			expect(mat[4] == 10_i);
 
 			// Reset values for following tests
-			mut(mat_1)[4] = 5;
-			mut(mat_2)[4] = 5;
-			mut(mat_3)[4] = 5;
-			mut(mat_4)[4] = 5;
-		};
+			mut(mat)[4] = 5;
+		} | mats;
 	};
 
-	feature(".at()") = [&]() {
-		expect(mat_1.at(1, 1) == 5_i);
-		expect(mat_2.at(1, 1) == 5_i);
-		expect(mat_3.at(1, 1) == 5_i);
-		expect(mat_4.at(1, 1) == 5_i);
-	};
+	feature(".at()") = [&](const auto& mat) {
+		expect(mat.at(1, 1) == 5_i);
+	} | mats;
 
 	feature(".front()") = [&]() {
-		given("We're only reading the data") = [&]() {
-			expect(mat_1.front() == 1_i);
-			expect(mat_2.front() == 1_i);
-			expect(mat_3.front() == 1_i);
-			expect(mat_4.front() == 1_i);
-		};
+		given("We're only reading the data") = [&](const auto& mat) {
+			expect(mat.front() == 1_i);
+		} | mats;
 
-		given("We're modifying the data") = [&]() {
-			mut(mat_1).front() = 2;
-			mut(mat_2).front() = 2;
-			mut(mat_3).front() = 2;
-			mut(mat_4).front() = 2;
+		given("We're modifying the data") = [&](const auto& mat) {
+			mut(mat).front() = 2;
 
-			expect(mat_1.front() == 2_i);
-			expect(mat_2.front() == 2_i);
-			expect(mat_3.front() == 2_i);
-			expect(mat_4.front() == 2_i);
+			expect(mat.front() == 2_i);
 
 			// Reset back to previous value for other tests
-			mut(mat_1).front() = 1;
-			mut(mat_2).front() = 1;
-			mut(mat_3).front() = 1;
-			mut(mat_4).front() = 1;
-		};
+			mut(mat).front() = 1;
+		} | mats;
 	};
 
 	feature(".back()") = [&]() {
-		given("We're only reading the data") = [&]() {
-			expect(mat_1.back() == 6_i);
-			expect(mat_2.back() == 6_i);
-			expect(mat_3.back() == 6_i);
-			expect(mat_4.back() == 6_i);
-		};
+		given("We're only reading the data") = [&](const auto& mat) {
+			expect(mat.back() == 6_i);
+		} | mats;
 
-		given("We're modifying the data") = [&]() {
-			mut(mat_1).back() = 2;
-			mut(mat_2).back() = 2;
-			mut(mat_3).back() = 2;
-			mut(mat_4).back() = 2;
+		given("We're modifying the data") = [&](const auto& mat) {
+			mut(mat).back() = 2;
 
-			expect(mat_1.back() == 2_i);
-			expect(mat_2.back() == 2_i);
-			expect(mat_3.back() == 2_i);
-			expect(mat_4.back() == 2_i);
+			expect(mat.back() == 2_i);
 
 			// Reset back to previous value for other tests
-			mut(mat_1).back() = 6;
-			mut(mat_2).back() = 6;
-			mut(mat_3).back() = 6;
-			mut(mat_4).back() = 6;
-		};
+			mut(mat).back() = 6;
+		} | mats;
 	};
 
 	feature(".data()") = [&]() {
-		given("We're only reading the data") = [&]() {
-			expect(*mat_1.data() == 1_i);
-			expect(*mat_2.data() == 1_i);
-			expect(*mat_3.data() == 1_i);
-			expect(*mat_4.data() == 1_i);
-		};
+		given("We're only reading the data") = [&](const auto& mat) {
+			expect(*mat.data() == 1_i);
+		} | mats;
 
-		given("We're modifying the data") = [&]() {
-			*mut(mat_1).data() = 2;
-			*mut(mat_2).data() = 2;
-			*mut(mat_3).data() = 2;
-			*mut(mat_4).data() = 2;
+		given("We're modifying the data") = [&](const auto& mat) {
+			*mut(mat).data() = 2;
 
-			expect(*mat_1.data() == 2_i);
-			expect(*mat_2.data() == 2_i);
-			expect(*mat_3.data() == 2_i);
-			expect(*mat_4.data() == 2_i);
+			expect(*mat.data() == 2_i);
 
 			// Reset back to previous value for other tests
-			*mut(mat_1).data() = 1;
-			*mut(mat_2).data() = 1;
-			*mut(mat_3).data() = 1;
-			*mut(mat_4).data() = 1;
-		};
+			*mut(mat).data() = 1;
+		} | mats;
 	};
 
-	feature(".size()") = [&]() {
-		expect(mat_1.size() == 6_ul);
-		expect(mat_2.size() == 6_ul);
-		expect(mat_3.size() == 6_ul);
-		expect(mat_4.size() == 6_ul);
-	};
+	feature(".size()") = [&](const auto& mat) {
+		expect(mat.size() == 6_ul);
+	} | mats;
 
-	feature(".empty()") = [&]() {
-		expect(mat_1.empty() != "true"_b);
-		expect(mat_2.empty() != "true"_b);
-		expect(mat_3.empty() != "true"_b);
-		expect(mat_4.empty() != "true"_b);
-	};
+	feature(".empty()") = [&](const auto& mat) {
+		expect(mat.empty() != "true"_b);
+	} | mats;
 
 	feature(".max_size()") = [&]() {
 		// External factors can control max_size, so dynamic matrices don't have a "set" max_size
-		expect(mat_1.max_size() == 6_ul);
+		expect(std::get<0>(mats).max_size() == 6_ul);
 	};
 
-	feature(".swap()") = [&]() {
-		auto mat_1_1 = mpp::matrix<int, 2, 3>{ range_2d };
-		auto mat_2_1 = mpp::matrix<int, mpp::dynamic, mpp::dynamic>{ range_2d };
-		auto mat_3_1 = mpp::matrix<int, 2, mpp::dynamic>{ range_2d };
-		auto mat_4_1 = mpp::matrix<int, mpp::dynamic, 3>{ range_2d };
+	feature(".swap()") = [&]<typename Mat>(const Mat& mat) {
+		auto mat_1 = Mat{ range_2d };
 
 		// Too lazy to make a new 2D range
-		mat_1_1(0, 0) = 2;
-		mat_2_1(0, 0) = 2;
-		mat_3_1(0, 0) = 2;
-		mat_4_1(0, 0) = 2;
+		mat_1(0, 0) = 2;
 
-		mut(mat_1).swap(mat_1_1);
-		mut(mat_2).swap(mat_2_1);
-		mut(mat_3).swap(mat_3_1);
-		mut(mat_4).swap(mat_4_1);
+		mut(mat).swap(mat_1);
 
-		expect(mat_1(0, 0) == 2_i);
-		expect(mat_2(0, 0) == 2_i);
-		expect(mat_3(0, 0) == 2_i);
-		expect(mat_4(0, 0) == 2_i);
+		expect(mat(0, 0) == 2_i);
 
 		// Swap back for next tests
-		mut(mat_1).swap(mat_1_1);
-		mut(mat_2).swap(mat_2_1);
-		mut(mat_3).swap(mat_3_1);
-		mut(mat_4).swap(mat_4_1);
-	};
+		mut(mat).swap(mat_1);
+	} | mats;
 
-	feature(".get_allocator()") = [&]() {
-		const auto allocator = std::allocator<int>{};
+	const auto alloc = std::allocator<int>{};
 
-		expect(mat_2.get_allocator() == allocator);
-		expect(mat_3.get_allocator() == allocator);
-		expect(mat_4.get_allocator() == allocator);
-	};
+	feature(".get_allocator()") = [&](const auto& mat) {
+		expect(mat.get_allocator() == alloc);
+	} | dyn_mats;
 
 	// This should be tested last because it destroys dynamic matrices
-	feature(".clear()") = [&]() {
-		mut(mat_2).clear();
-		mut(mat_3).clear();
-		mut(mat_4).clear();
+	feature(".clear()") = [&](const auto& mat) {
+		mut(mat).clear();
 
-		expect(mat_2.empty() == "true"_b);
-		expect(mat_3.empty() == "true"_b);
-		expect(mat_4.empty() == "true"_b);
-	};
+		expect(mat.empty() == "true"_b);
+	} | dyn_mats;
 
 	return 0;
 }
