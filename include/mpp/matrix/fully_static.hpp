@@ -63,7 +63,9 @@ namespace mpp
 			fill_buffer_with_value(Value{});
 		}
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, ColumnsExtent, Allocator>>)
 		explicit matrix(Matrix&& matrix) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -73,8 +75,11 @@ namespace mpp
 				detail::configuration_use_safe,
 				false>(mat_rows, mat_columns, std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, ColumnsExtent, Allocator>>)
 		explicit matrix(Matrix&& matrix, unsafe_tag) : base(RowsExtent, ColumnsExtent) // @TODO: ISSUE #20
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -84,6 +89,7 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clant-format on
 
 		template<detail::range_1d_with_value_type_convertible_to<Value> Range>
 		explicit matrix(std::size_t rows, std::size_t columns, Range&& range) :
@@ -254,7 +260,9 @@ namespace mpp
 			base::template assign_and_insert_from_2d_range<false, false, false>(std::move(array_2d));
 		}
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, ColumnsExtent, Allocator>>)
 		void assign(Matrix&& matrix) // @TODO: ISSUE #20
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -264,8 +272,11 @@ namespace mpp
 				detail::configuration_use_safe,
 				false>(mat_rows, mat_columns, std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 
+		// clang-format off
 		template<detail::matrix_with_value_convertible_to<Value> Matrix>
+			requires (!std::same_as<std::remove_cvref_t<Matrix>, matrix<Value, RowsExtent, ColumnsExtent, Allocator>>)
 		void assign(Matrix&& matrix, unsafe_tag) // @TODO: ISSUE #20
 		{
 			const auto mat_rows    = std::forward<Matrix>(matrix).rows();
@@ -275,5 +286,6 @@ namespace mpp
 				mat_columns,
 				std::forward<Matrix>(matrix));
 		}
+		// clang-format on
 	};
 } // namespace mpp

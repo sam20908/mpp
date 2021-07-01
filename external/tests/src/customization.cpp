@@ -35,30 +35,22 @@ namespace mpp
 
 		static constexpr bool use_unsafe = true;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
-		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
+		// Only for testing purposes, don't actually do this!
 
-		template<typename Value, std::size_t, std::size_t, typename Alloc>
-		using dynamic_buffer = std::vector<Value, Alloc>;
+		template<typename Value, std::size_t, std::size_t, typename>
+		using static_buffer = std::vector<Value>;
 
-		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
-		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>;
+		template<typename Value, std::size_t, std::size_t, typename>
+		using dynamic_buffer = std::array<Value, 100>;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
-		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>;
+		template<typename Value, std::size_t, std::size_t, typename>
+		using dynamic_rows_buffer = std::array<Value, 100>;
+		template<typename Value, std::size_t, std::size_t, typename>
+		using dynamic_columns_buffer = std::array<Value, 100>;
 	};
 } // namespace mpp
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #include <mpp/algorithm.hpp>
 #include <mpp/matrix.hpp>
@@ -144,30 +136,52 @@ int main()
 	using namespace boost::ut::bdd;
 	using namespace boost::ut;
 
-	feature("Customization") = []() {
-		when("I check the new extents through the default matrix type") = []() {
-			expect(constant<mpp::matrix<int>::rows_extent() == 10_ul>);
-			expect(constant<mpp::matrix<int>::columns_extent() == 10_ul>);
-		};
+	when("I check the new extents through the default matrix type") = []() {
+		expect(mpp::matrix<int>::rows_extent() == 10_ul);
+		expect(mpp::matrix<int>::columns_extent() == 10_ul);
+	};
 
-		when("I check the new use_unsafe") = []() {
-			expect(constant<mpp::detail::configuration_use_unsafe == true>);
-		};
+	when("I check the new use_unsafe") = []() {
+		expect(constant<mpp::detail::configuration_use_unsafe == true>);
+	};
 
-		when("I check against the CPOs' return types") = []() {
-			expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::square_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::determinant_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::lu_decomposition_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::forward_substitution_t>> == type<ns::dumb_class2>);
-			expect(type<invoke_result_t<mpp::back_substitution_t>> == type<ns::dumb_class2>);
-		};
+	when("I check against the CPOs' return types") = []() {
+		expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::square_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::determinant_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::lu_decomposition_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::forward_substitution_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::back_substitution_t>> == type<ns::dumb_class2>);
+	};
+
+	when("I check the customized buffer types") = []() {
+		expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::vector<int>>);
+		expect(type<typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::matrix<int, mpp::dynamic, 3>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::matrix<int, 2, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
+	};
+
+	// Putting semiregular test here because this test does all the constants/type checking stuff
+
+	scenario("CPOs should meet std::semiregular requirements") = []() {
+		expect(boost::ut::constant<std::semiregular<mpp::type_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::singular_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::square_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::block_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::determinant_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::inverse_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::transpose_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::size_compare_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::elements_compare_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::lu_decomposition_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::forward_substitution_t>>);
+		expect(boost::ut::constant<std::semiregular<mpp::back_substitution_t>>);
 	};
 
 	return 0;

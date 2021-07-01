@@ -79,7 +79,8 @@ jobs:
         condition: succeededOrFailed()
 
   - job: UbuntuClang
-    displayName: Ubuntu Clang 11
+    condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
+    displayName: Ubuntu Clang 12
 
     pool:
       vmImage: ubuntu-latest
@@ -93,7 +94,7 @@ jobs:
         displayName: Install Python LLVM Lit
 
       - script: |
-          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-11 -DCMAKE_BUILD_TYPE=Debug -B build
+          cmake -DMPP_BUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=/usr/bin/clang++-12 -DCMAKE_BUILD_TYPE=Debug -B build
           cmake --build build --target tests --config Debug
         displayName: Configure and Build Tests
 
@@ -110,7 +111,7 @@ jobs:
         condition: succeededOrFailed()
 
   - job: WindowsMSVC
-    displayName: Windows MSVC 19.28
+    displayName: Windows MSVC
 
     pool:
       vmImage: windows-latest
@@ -143,7 +144,8 @@ jobs:
         condition: succeededOrFailed()
 
   - job: WindowsClang
-    displayName: Windows Clang 11
+    condition: false # @TODO: Enable this once Clang resolves 'reference to local binding'
+    displayName: Windows Clang 12
 
     pool:
       vmImage: windows-latest

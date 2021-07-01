@@ -27,7 +27,6 @@ function(_create_test TEST_FILENAME)
     set(TEST_SOURCE "src/${TEST_FILENAME}.cpp")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
-    # ApprovalTests includes ut.hpp by <boost/ut.hpp>
     target_include_directories(${TEST_NAME} PRIVATE "../thirdparty")
 
     _setup_target(${TEST_NAME} "${TESTS_BINARY_DIR}")
@@ -39,9 +38,9 @@ function(_create_test TEST_FILENAME)
 endfunction()
 
 _create_test("customization")
-_create_test("utility_cpos")
+_create_test("utilities")
 _create_test("iterator")
-_create_test("algorithm_cpos")
+_create_test("algorithms")
 _create_test("initialization")
 _create_test("assignment")
 _create_test("arithmetic")

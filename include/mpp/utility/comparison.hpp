@@ -49,7 +49,7 @@ namespace mpp
 			compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered }))
 			-> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
 		{
-			return std::pair{ compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
+			return { compare_rows ? left.rows() <=> right.rows() : std::partial_ordering::unordered,
 				compare_columns ? left.columns() <=> right.columns() : std::partial_ordering::unordered };
 		}
 	};
@@ -69,15 +69,11 @@ namespace mpp
 			const matrix<LeftValue, LeftRowsExtent, LeftColumnsExtent, LeftAllocator>& left,
 			const matrix<RightValue, RightRowsExtent, RightColumnsExtent, RightAllocator>& right,
 			CompareThreeway compare_three_way_fn = {}) // @TODO: ISSUE #20
-#if defined(__clang__) && __clang_major__ > 11
-			// Clang 11 and below crashes if this function had any noexcept specification
-			// @NOTE: It's fixed with Clang 12+
 			noexcept(noexcept(std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
 				right.begin(),
 				right.end(),
 				compare_three_way_fn)))
-#endif
 		{
 			return std::lexicographical_compare_three_way(left.begin(),
 				left.end(),
@@ -127,4 +123,20 @@ namespace mpp
 
 		return left_casted <=> right_casted;
 	};
+
+	// @TODO: This is an odd place, maybe look for somewhere else to put it?
+	template<typename T,
+		typename T2,
+		std::size_t RowsExtent,
+		std::size_t RowsExtent2,
+		std::size_t ColumnsExtent,
+		std::size_t ColumnsExtent2,
+		typename Alloc,
+		typename Alloc2>
+	auto operator<=>(const matrix<T, RowsExtent, ColumnsExtent, Alloc>& mat,
+		const matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>& mat2) noexcept(noexcept(elements_compare(mat, mat2)))
+		-> bool
+	{
+		return elements_compare(mat, mat2);
+	}
 } // namespace mpp

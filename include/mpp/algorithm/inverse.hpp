@@ -237,11 +237,8 @@ namespace mpp
 			const ToAllocator& to_alloc)
 			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<detail::configuration_use_safe,
-				detail::default_floating_type,
-				RowsExtent,
-				ColumnsExtent,
-				ToAllocator>(obj, to_alloc);
+			return detail::inv_impl<detail::configuration_use_safe, detail::default_floating_type, ToAllocator>(obj,
+				to_alloc);
 		}
 
 		template<typename Value,

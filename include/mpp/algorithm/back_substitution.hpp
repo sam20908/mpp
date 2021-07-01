@@ -84,7 +84,7 @@ namespace mpp
 			std::size_t ColumnsExtent,
 			typename ToAllocator,
 			typename... Args>
-		inline auto back_subst_matrix(const auto& a, const auto& b, const Args&... alloc_args)
+		inline auto back_subst_matrix(const auto& a, const auto& b, [[maybe_unused]] const Args&... alloc_args)
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			// @FIXME: Find best message to error about a.rows() != b.rows()

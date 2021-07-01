@@ -45,7 +45,7 @@ namespace mpp
 			typename Allocator,
 			typename... Args>
 		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const Args&... alloc_args) -> To // @TODO: ISSUE #20
+			[[maybe_unused]] const Args&... alloc_args) -> To // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{
@@ -69,13 +69,19 @@ namespace mpp
 			}
 			else if (rows == 2)
 			{
-				const auto ad = static_cast<To>(obj(0, 0)) * static_cast<To>(obj(1, 1));
-				const auto bc = static_cast<To>(obj(0, 1)) * static_cast<To>(obj(1, 0));
+				const auto ad =
+					static_cast<default_floating_type>(obj(0, 0)) * static_cast<default_floating_type>(obj(1, 1));
+				const auto bc =
+					static_cast<default_floating_type>(obj(0, 1)) * static_cast<default_floating_type>(obj(1, 0));
 
-				return ad - bc;
+				const auto result = ad - bc;
+
+				return static_cast<To>(result);
 			}
 
-			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, LUAllocator>;
+			using lu_alloc_rebind_t =
+				typename std::allocator_traits<LUAllocator>::template rebind_alloc<default_floating_type>;
+			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, lu_alloc_rebind_t>;
 			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
 
 			auto u_buffer = [&]() {
@@ -110,8 +116,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
@@ -123,8 +128,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			const LUAllocator& lu_alloc) -> Value // @TODO: ISSUE #20
@@ -136,8 +140,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
@@ -150,8 +153,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
@@ -165,8 +167,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
@@ -180,8 +181,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
@@ -195,8 +195,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
@@ -211,8 +210,7 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
+			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,

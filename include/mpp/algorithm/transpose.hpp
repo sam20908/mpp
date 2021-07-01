@@ -39,7 +39,7 @@ namespace mpp
 			typename Allocator,
 			typename... Args>
 		[[nodiscard]] auto trps_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const Args&... alloc_args) -> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
+			[[maybe_unused]] const Args&... alloc_args) -> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator>
 		{
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
