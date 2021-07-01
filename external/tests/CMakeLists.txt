@@ -37,11 +37,9 @@ function(_create_test TEST_FILENAME)
     target_compile_definitions(${TEST_NAME} PRIVATE -DTEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test_data")
 endfunction()
 
-# @FIXME: Revamp and uncomment rest of the tests
-
 _create_test("customization")
 _create_test("utilities")
-# _create_test("iterator")
+_create_test("iterator")
 _create_test("algorithms")
 _create_test("initialization")
 _create_test("assignment")

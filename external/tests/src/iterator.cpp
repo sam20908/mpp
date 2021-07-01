@@ -17,28 +17,19 @@
  * under the License.
  */
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4459)
-#endif
-
 #include <boost/ut.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
 #include <mpp/matrix.hpp>
+
+#include "../../include/test_utilities.hpp"
 
 using namespace boost::ut::literals;
 using namespace boost::ut::bdd;
 using namespace boost::ut;
+using namespace mpp;
 
-template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_iter_semantics(const auto& rng, auto... dimension_args)
+void test_iter_semantics(const auto& mat)
 {
-	const auto mat = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng, dimension_args... };
-
 	auto begin  = mat.begin();
 	auto cbegin = mat.cbegin();
 	auto end    = mat.end() - 1;
@@ -92,11 +83,8 @@ void test_iter_semantics(const auto& rng, auto... dimension_args)
 	expect(begin_3 == begin_2);
 }
 
-template<std::size_t RowsExtent, std::size_t ColumnsExtent>
-void test_iter_semantics_write(const auto& rng)
+void test_iter_semantics_write(auto& mat)
 {
-	auto mat = mpp::matrix<int, RowsExtent, ColumnsExtent>{ rng };
-
 	auto cbegin  = mat.cbegin();
 	auto cend    = mat.cend() - 1;
 	auto crbegin = mat.crbegin();
@@ -125,55 +113,49 @@ void test_iter_semantics_write(const auto& rng)
 
 int main()
 {
-	feature("Standard conforming iterators") = []() {
-		using static_mat      = mpp::matrix<int, 1, 1>;
-		using dyn_mat         = mpp::matrix<int>;
-		using dyn_rows_mat    = mpp::matrix<int, mpp::dynamic, 1>;
-		using dyn_columns_mat = mpp::matrix<int, 1, mpp::dynamic>;
+	const auto mats_types = all_mats<int, 0, 0>{};
 
-		using static_iterator            = typename static_mat::iterator;
-		using static_const_iterator      = typename static_mat::const_iterator;
-		using dyn_iterator               = typename dyn_mat::iterator;
-		using dyn_const_iterator         = typename dyn_mat::const_iterator;
-		using dyn_rows_iterator          = typename dyn_rows_mat::iterator;
-		using dyn_rows_const_iterator    = typename dyn_rows_mat::const_iterator;
-		using dyn_columns_iterator       = typename dyn_columns_mat::iterator;
-		using dyn_columns_const_iterator = typename dyn_columns_mat::const_iterator;
+	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+	const auto mats     = std::tuple{ matrix<int, 2, 3>{ range_2d },
+        matrix<int, dynamic, dynamic>{ range_2d },
+        matrix<int, 2, dynamic>{ range_2d },
+        matrix<int, dynamic, 3>{ range_2d } };
 
-		given("Mutable and immutable iterators should meet contiguous_iterator") = [&]() {
-			expect(constant<std::contiguous_iterator<static_iterator>>);
-			expect(constant<std::contiguous_iterator<static_const_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_const_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_rows_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_rows_const_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_columns_iterator>>);
-			expect(constant<std::contiguous_iterator<dyn_columns_const_iterator>>);
-		};
+	feature("Standard conforming iterators") =
+		[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
+			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
+			using mat_t                  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+			using mat_iter               = typename mat_t::iterator;
+			using mat_reverse_iter       = typename mat_t::iterator;
+			using mat_const_iter         = typename mat_t::const_iterator;
+			using mat_const_reverse_iter = typename mat_t::const_iterator;
 
-		given("Mutable iterators should meet output_iterator") = [&]() {
-			expect(constant<std::output_iterator<static_iterator, int>>);
-			expect(constant<std::output_iterator<dyn_iterator, int>>);
-		};
-	};
+			given("Mutable and immutable iterators should meet contiguous_iterator") = [&]() {
+				expect(boost::ut::constant<std::contiguous_iterator<mat_iter>>);
+				expect(boost::ut::constant<std::contiguous_iterator<mat_const_iter>>);
+			};
 
-	feature("Iterator semantics") = []() {
-		// @NOTE: Every test is referencing the below rng for convenience
-		const auto rng = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
+			given("Mutable and immutable reverse iterators should meet bidirectional_iterator") = [&]() {
+				expect(boost::ut::constant<std::bidirectional_iterator<mat_reverse_iter>>);
+				expect(boost::ut::constant<std::bidirectional_iterator<mat_const_reverse_iter>>);
+			};
 
-		given("Mutable and immutable iterators should have right semantics") = [&]() {
-			test_iter_semantics<2, 3>(rng);
-			test_iter_semantics<mpp::dynamic, mpp::dynamic>(rng);
-			test_iter_semantics<mpp::dynamic, 3>(rng);
-			test_iter_semantics<2, mpp::dynamic>(rng);
-		};
+			given("Mutable iterators should meet output_iterator") = [&]() {
+				expect(boost::ut::constant<std::output_iterator<mat_iter, int>>);
+			};
+		} |
+		mats_types;
 
-		given("Mutable iterators should have right mutable semantics") = [&]() {
-			test_iter_semantics_write<2, 3>(rng);
-			test_iter_semantics_write<mpp::dynamic, mpp::dynamic>(rng);
-			test_iter_semantics_write<mpp::dynamic, 3>(rng);
-			test_iter_semantics_write<2, mpp::dynamic>(rng);
-		};
+	feature("Iterator semantics") = [&]() {
+		given("Mutable and immutable iterators should have right semantics") = [](const auto& mat) {
+			test_iter_semantics(mat);
+		} | mats;
+
+		given("Mutable iterators should have right mutable semantics") = [](const auto& mat) {
+			// Explicitly allow mutating because we're not actually writing through const_* version of iterators but the
+			// test somehow always pass the matrix as a const object
+			test_iter_semantics_write(mut(mat));
+		} | mats;
 	};
 
 	return 0;
