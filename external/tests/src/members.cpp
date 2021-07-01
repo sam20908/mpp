@@ -161,7 +161,6 @@ int main()
 		expect(mat.get_allocator() == alloc);
 	} | dyn_mats;
 
-	// This should be tested last because it destroys dynamic matrices
 	feature(".clear()") = [&](const auto& mat) {
 		mut(mat).clear();
 
