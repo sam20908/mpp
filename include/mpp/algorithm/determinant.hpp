@@ -110,8 +110,6 @@ namespace mpp
 
 	struct determinant_t : public detail::cpo_base<determinant_t>
 	{
-		// @TODO: Customizing LUAllocator is confusing, find something better
-
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
@@ -119,19 +117,7 @@ namespace mpp
 			typename LUAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
-		{
-			return detail::det_impl<detail::configuration_use_safe, Value, LUAllocator>(obj);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const LUAllocator& lu_alloc) -> Value // @TODO: ISSUE #20
+			const LUAllocator& lu_alloc = LUAllocator{}) -> Value // @TODO: ISSUE #20
 		{
 			return detail::det_impl<detail::configuration_use_safe, Value, LUAllocator>(obj, lu_alloc);
 		}
@@ -144,20 +130,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
-			std::type_identity<LUAllocator> = {}) -> Value // @TODO: ISSUE #20
-		{
-			return detail::det_impl<false, Value, LUAllocator>(obj);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const LUAllocator& lu_alloc) -> Value // @TODO: ISSUE #20
+			const LUAllocator& lu_alloc = LUAllocator{}) -> Value // @TODO: ISSUE #20
 		{
 			return detail::det_impl<false, Value, LUAllocator>(obj, lu_alloc);
 		}
@@ -171,21 +144,7 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
-		{
-			return detail::det_impl<detail::configuration_use_safe, To, LUAllocator>(obj);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const LUAllocator& lu_alloc) -> To // @TODO: ISSUE #20
+			const LUAllocator& lu_alloc = LUAllocator{}) -> To // @TODO: ISSUE #20
 		{
 			return detail::det_impl<detail::configuration_use_safe, To, LUAllocator>(obj, lu_alloc);
 		}
@@ -200,22 +159,7 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
-			std::type_identity<LUAllocator> = {}) -> To // @TODO: ISSUE #20
-		{
-			return detail::det_impl<false, To, LUAllocator>(obj);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const LUAllocator& lu_alloc) -> To // @TODO: ISSUE #20
+			const LUAllocator& lu_alloc = LUAllocator{}) -> To // @TODO: ISSUE #20
 		{
 			return detail::det_impl<false, To, LUAllocator>(obj, lu_alloc);
 		}

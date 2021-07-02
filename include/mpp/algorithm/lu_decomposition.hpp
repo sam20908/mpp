@@ -125,21 +125,9 @@ namespace mpp
 			typename ToAllocator = Allocator>
 		friend inline auto tag_invoke(lu_decomposition_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::type_identity<ToAllocator> = {}) -> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-		{
-			return detail::lu_impl<detail::configuration_use_safe, Value, ToAllocator>(obj);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = Allocator>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc) -> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
+				matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
 			return detail::lu_impl<detail::configuration_use_safe, Value, ToAllocator>(obj, to_alloc);
 		}
@@ -152,23 +140,9 @@ namespace mpp
 		friend inline auto tag_invoke(lu_decomposition_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
-			std::type_identity<ToAllocator> = {}) -> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<false, Value, ToAllocator>(obj);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = Allocator>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const ToAllocator& to_alloc) -> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
+				matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
 			return detail::lu_impl<false, Value, ToAllocator>(obj, to_alloc);
@@ -183,30 +157,14 @@ namespace mpp
 		friend inline auto tag_invoke(lu_decomposition_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::type_identity<ToAllocator> = {}) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<detail::configuration_use_safe, To, ToAllocator>(obj);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
+				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
 			return detail::lu_impl<detail::configuration_use_safe, To, ToAllocator>(obj, to_alloc);
 		}
 
-
 		template<typename To,
 			typename Value,
 			std::size_t RowsExtent,
@@ -217,25 +175,9 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
-			std::type_identity<ToAllocator> = {}) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<false, To, ToAllocator>(obj);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const ToAllocator& to_alloc) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
+				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
 			return detail::lu_impl<false, To, ToAllocator>(obj, to_alloc);
