@@ -185,31 +185,22 @@ namespace
 
 int main()
 {
-	using alloc_t             = custom_allocator<double>;
-	const auto alloc_identity = std::type_identity<alloc_t>{};
-	const auto alloc_obj      = alloc_t{};
-
-	// @FIXME: Remove tests with `alloc_identity` once #323 has resolved
+	using alloc_t        = custom_allocator<double>;
+	const auto alloc_obj = alloc_t{};
 
 	feature("Determinant") = [&]() {
 		test_det<all_mats<int, 0, 0>, int>("algorithm/det/0x0.txt");
-		test_det<all_mats<int, 1, 1>, int>("algorithm/det/1x1.txt", alloc_identity);
-		test_det<all_mats<int, 1, 1>, int>("algorithm/det/1x1.txt", unsafe, alloc_identity);
-		test_det<all_mats<float, 2, 2>, float>("algorithm/det/2x2.txt", alloc_obj);
-		test_det<all_mats<float, 2, 2>, float>("algorithm/det/2x2.txt", unsafe, alloc_obj);
-		test_det<all_mats<float, 3, 3>, double>("algorithm/det/3x3.txt", alloc_identity);
-		test_det<all_mats<float, 3, 3>, double>("algorithm/det/3x3.txt", alloc_obj);
-		test_det<all_mats<float, 10, 10>, double>("algorithm/det/10x10.txt", unsafe, alloc_identity);
-		test_det<all_mats<float, 20, 20>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
+		test_det<all_mats<float, 1, 1>, double>("algorithm/det/1x1.txt", alloc_obj);
+		test_det<all_mats<float, 2, 2>, double>("algorithm/det/2x2.txt", unsafe, alloc_obj);
+		test_det<all_mats<int, 3, 3>, int>("algorithm/det/3x3.txt");
+		test_det<all_mats<double, 10, 10>, double>("algorithm/det/10x10.txt", alloc_obj);
+		test_det<all_mats<double, 20, 20>, double>("algorithm/det/20x20.txt", unsafe, alloc_obj);
 	};
 
 	feature("Transpose") = [&]() {
-		test_fn<join_mats<all_mats<double, 25, 25, alloc_t>, all_trps_mats<double, 25, 25, alloc_t>>>(
-			"algorithm/trps/25x25.txt",
+		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt",
 			transpose);
-		test_fn<join_mats<dyn_mats<double, 50, 2>, dyn_trps_mats<double, 50, 2, alloc_t>>>("algorithm/trps/50x2.txt",
-			transpose,
-			alloc_identity);
+		test_fn<join_mats<all_mats<double, 50, 2>, all_trps_mats<double, 50, 2>>>("algorithm/trps/50x2.txt", transpose);
 		test_fn<join_mats<dyn_mats<double, 50, 2>, dyn_trps_mats<double, 50, 2, alloc_t>>>("algorithm/trps/50x2.txt",
 			transpose,
 			alloc_obj);
@@ -228,15 +219,11 @@ int main()
 
 		using same_mats_val_t = join_mats<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
 
-		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, alloc_identity);
-		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, unsafe, alloc_identity);
 		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, alloc_obj);
 		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, unsafe, alloc_obj);
 
 		using diff_mats_val_t = join_mats<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>;
 
-		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, alloc_identity);
-		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, unsafe, alloc_identity);
 		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, alloc_obj);
 		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, unsafe, alloc_obj);
 	};
@@ -249,16 +236,12 @@ int main()
 		using same_mats_val_t =
 			join_mats<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>;
 
-		test_sub<same_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_identity);
-		test_sub<same_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, unsafe, alloc_identity);
 		test_sub<same_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_obj);
 		test_sub<same_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, unsafe, alloc_obj);
 
 		using diff_mats_val_t =
 			join_mats<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>;
 
-		test_sub<diff_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_identity);
-		test_sub<diff_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, unsafe, alloc_identity);
 		test_sub<diff_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_obj);
 		test_sub<diff_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, unsafe, alloc_obj);
 	};
@@ -271,16 +254,12 @@ int main()
 		using same_mats_val_t =
 			join_mats<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 3, 1, alloc_t>>;
 
-		test_sub<same_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_identity);
-		test_sub<same_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, unsafe, alloc_identity);
 		test_sub<same_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_obj);
 		test_sub<same_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, unsafe, alloc_obj);
 
 		using diff_mats_val_t =
 			join_mats<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 3, 1, alloc_t>>;
 
-		test_sub<diff_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_identity);
-		test_sub<diff_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, unsafe, alloc_identity);
 		test_sub<diff_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_obj);
 		test_sub<diff_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, unsafe, alloc_obj);
 	};
@@ -296,16 +275,12 @@ int main()
 		using same_mats_val_t =
 			join_mats<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
 
-		test_lu<same_mats_val_t>("algorithm/lu/3x3.txt", alloc_identity);
-		test_lu<same_mats_val_t>("algorithm/lu/3x3.txt", unsafe, alloc_identity);
 		test_lu<same_mats_val_t>("algorithm/lu/3x3.txt", alloc_obj);
 		test_lu<same_mats_val_t>("algorithm/lu/3x3.txt", unsafe, alloc_obj);
 
 		using diff_mats_val_t =
 			join_mats<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
 
-		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", alloc_identity);
-		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", unsafe, alloc_identity);
 		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", alloc_obj);
 		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", unsafe, alloc_obj);
 	};
@@ -324,45 +299,26 @@ int main()
 			const_0_t{},
 			const_0_t{});
 
-		using const_2_3_t_args = join_mats<dyn_mats<double, 4, 4>,
-			dyn_block_mats<double, 4, 4, const_2_t, const_2_t, const_3_t, const_3_t, alloc_t>>;
+		using const_2_3_t_args =
+			join_mats<dyn_mats<double, 4, 4>, dyn_block_mats<double, 4, 4, const_2_t, const_2_t, const_3_t, const_3_t>>;
 
 		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
 			block,
 			const_2_t{},
 			const_2_t{},
 			const_3_t{},
-			const_3_t{},
-			alloc_identity);
+			const_3_t{});
 		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
 			block,
 			const_2_t{},
 			const_2_t{},
 			const_3_t{},
 			const_3_t{},
-			unsafe,
-			alloc_identity);
-		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
-			block,
-			const_2_t{},
-			const_2_t{},
-			const_3_t{},
-			const_3_t{},
-			alloc_obj);
-		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
-			block,
-			const_2_t{},
-			const_2_t{},
-			const_3_t{},
-			const_3_t{},
-			unsafe,
-			alloc_obj);
+			unsafe);
 
 		using dyn_2_3_t_args = join_mats<dyn_mats<double, 4, 4>,
 			dyn_block_mats<double, 4, 4, std::size_t, std::size_t, std::size_t, std::size_t, alloc_t>>;
 
-		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, alloc_identity);
-		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, unsafe, alloc_identity);
 		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, alloc_obj);
 		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, unsafe, alloc_obj);
 	};

@@ -41,9 +41,9 @@ namespace mpp
 			std::size_t ColumnsExtent,
 			typename Allocator,
 			typename... Args>
-		auto lu_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj, const Args&... alloc_args)
-			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+		auto lu_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+			[[maybe_unused]] const Args&... alloc_args) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
+			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{

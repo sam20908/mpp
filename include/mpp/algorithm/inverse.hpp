@@ -46,7 +46,8 @@ namespace mpp
 			typename Allocator,
 			typename... Args>
 		[[nodiscard]] inline auto inv_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const Args&... alloc_args) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+			[[maybe_unused]] const Args&... alloc_args)
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			if constexpr (Check)
 			{
@@ -236,7 +237,8 @@ namespace mpp
 		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			return detail::inv_impl<false, To, ToAllocator>(obj, to_alloc);
 		}
@@ -251,7 +253,8 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			unsafe_tag,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+			const ToAllocator& to_alloc = ToAllocator{})
+			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
 			return detail::inv_impl<false, To, ToAllocator>(obj, to_alloc);
 		}
