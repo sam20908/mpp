@@ -93,20 +93,7 @@ namespace mpp
 			typename TransposeAllocator = Allocator>
 		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			std::type_identity<TransposeAllocator> = {})
-			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
-		{
-			return detail::trps_impl<TransposeAllocator>(obj);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename TransposeAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(transpose_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const TransposeAllocator& trps_alloc)
+			const TransposeAllocator& trps_alloc = TransposeAllocator{})
 			-> matrix<Value, ColumnsExtent, RowsExtent, TransposeAllocator> // @TODO: ISSUE #20
 		{
 			return detail::trps_impl<TransposeAllocator>(obj, trps_alloc);

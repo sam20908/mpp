@@ -147,35 +147,7 @@ namespace mpp
 			std::type_identity<To>,
 			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			std::type_identity<ToAllocator> = {}) -> matrix<To,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<detail::configuration_use_safe,
-				To,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b);
-		}
-
-		template<typename To,
-			typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			std::type_identity<To>,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			const ToAllocator& to_alloc) -> matrix<To,
+			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To,
 			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
@@ -204,36 +176,7 @@ namespace mpp
 			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
 			unsafe_tag,
-			std::type_identity<ToAllocator> = {}) -> matrix<To,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<false,
-				To,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b);
-		}
-
-		template<typename To,
-			typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			std::type_identity<To>,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			unsafe_tag,
-			const ToAllocator& to_alloc) -> matrix<To,
+			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To,
 			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
@@ -259,32 +202,7 @@ namespace mpp
 		friend inline auto tag_invoke(forward_substitution_t,
 			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			std::type_identity<ToAllocator> = {}) -> matrix<std::common_type_t<AValue, BValue>,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			return detail::forward_subst_matrix<detail::configuration_use_safe,
-				std::common_type_t<AValue, BValue>,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b);
-		}
-
-		template<typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			const ToAllocator& to_alloc) -> matrix<std::common_type_t<AValue, BValue>,
+			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<std::common_type_t<AValue, BValue>,
 			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
@@ -310,33 +228,7 @@ namespace mpp
 			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
 			unsafe_tag,
-			std::type_identity<ToAllocator> = {}) -> matrix<std::common_type_t<AValue, BValue>,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			return detail::forward_subst_matrix<false,
-				std::common_type_t<AValue, BValue>,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b);
-		}
-
-		template<typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			unsafe_tag,
-			const ToAllocator& to_alloc) -> matrix<std::common_type_t<AValue, BValue>,
+			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<std::common_type_t<AValue, BValue>,
 			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
