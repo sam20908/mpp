@@ -43,8 +43,6 @@ namespace mpp
 		static constexpr auto rows_extent    = dynamic;
 		static constexpr auto columns_extent = dynamic;
 
-		static constexpr auto use_unsafe = false;
-
 		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
 		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
 

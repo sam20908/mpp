@@ -55,7 +55,4 @@ namespace mpp::detail
 			return dynamic;
 		}
 	}
-
-	static constexpr auto configuration_use_unsafe = configuration<override>::use_unsafe;
-	static constexpr auto configuration_use_safe   = !configuration_use_unsafe;
 } // namespace mpp::detail

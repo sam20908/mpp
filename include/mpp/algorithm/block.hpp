@@ -21,55 +21,35 @@
 
 #include <mpp/detail/matrix/matrix_base.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/detail/utility/utility.hpp>
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
-#include <stdexcept>
 
 namespace mpp
 {
 	namespace detail
 	{
-		// Don't put this in validators.hpp as it's only used here
-		constexpr void validate_block_index_boundaries(std::size_t rows,
+		constexpr void assert_valid_block_dims(std::size_t rows,
 			std::size_t columns,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
 			std::size_t bottom_column_index)
 		{
-			// Out of bounds checks
+			// Out of bounds asserts
 
-			if (top_row_index >= rows)
-			{
-				throw std::invalid_argument(BLOCK_TOP_ROW_INDEX_OUT_OF_BOUNDS);
-			}
-			else if (top_column_index >= columns)
-			{
-				throw std::invalid_argument(BLOCK_TOP_COLUMN_INDEX_OUT_OF_BOUNDS);
-			}
-			else if (bottom_row_index >= rows)
-			{
-				throw std::invalid_argument(BLOCK_BOTTOM_ROW_INDEX_OUT_OF_BOUNDS);
-			}
-			else if (bottom_column_index >= columns)
-			{
-				throw std::invalid_argument(BLOCK_BOTTOM_COLUMN_INDEX_OUT_OF_BOUNDS);
-			}
+			assert(top_row_index < rows);
+			assert(top_column_index < columns);
+			assert(bottom_row_index < rows);
+			assert(bottom_column_index < columns);
 
-			// Overlapping checks
+			// Overlapping asserts
 
-			if (top_row_index > bottom_row_index)
-			{
-				throw std::invalid_argument(BLOCK_TOP_ROW_INDEX_BIGGER_THAN_BOTTOM_ROW_INDEX);
-			}
-			else if (top_column_index > bottom_column_index)
-			{
-				throw std::invalid_argument(BLOCK_TOP_COLUMN_INDEX_BIGGER_THAN_BOTTOM_COLUMN_INDEX);
-			}
+			assert(top_row_index <= bottom_row_index);
+			assert(top_column_index <= bottom_column_index);
 		}
 
 		template<typename Val,
@@ -116,7 +96,7 @@ namespace mpp
 				std::advance(buf_begin, block_columns);
 			}
 
-			return BlockMat{ block_rows, block_columns, std::move(buf), unsafe };
+			return BlockMat{ block_rows, block_columns, std::move(buf) };
 		}
 
 		template<typename BlockMat, typename... Args>
@@ -147,11 +127,10 @@ namespace mpp
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), inserter);
 			}
 
-			return BlockMat{ block_rows, block_columns, std::move(buf), unsafe, alloc_args... };
+			return BlockMat{ block_rows, block_columns, std::move(buf), alloc_args... };
 		}
 
-		template<bool Check,
-			typename BlockAllocator,
+		template<typename BlockAllocator,
 			typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
@@ -177,15 +156,12 @@ namespace mpp
 		{
 			// The static_cast are to trigger the explicit conversion operator for mpp::constant objects
 
-			if constexpr (Check)
-			{
-				validate_block_index_boundaries(obj.rows(),
-					obj.columns(),
-					static_cast<std::size_t>(top_row_index),
-					static_cast<std::size_t>(top_column_index),
-					static_cast<std::size_t>(bottom_row_index),
-					static_cast<std::size_t>(bottom_column_index));
-			}
+			assert_valid_block_dims(obj.rows(),
+				obj.columns(),
+				static_cast<std::size_t>(top_row_index),
+				static_cast<std::size_t>(top_column_index),
+				static_cast<std::size_t>(bottom_row_index),
+				static_cast<std::size_t>(bottom_column_index));
 
 			using block_mat_t = block_mat_ret_t<Value,
 				RowsExtent,
@@ -244,40 +220,7 @@ namespace mpp
 			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
 			BlockAllocator> // @TODO: ISSUE #20
 		{
-			return detail::block_impl<detail::configuration_use_safe, BlockAllocator>(obj,
-				top_row_index,
-				top_column_index,
-				bottom_row_index,
-				bottom_column_index,
-				block_alloc);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			detail::constant_or_convertible_to_size_t TopRowIndex,
-			detail::constant_or_convertible_to_size_t TopColumnIndex,
-			detail::constant_or_convertible_to_size_t BottomRowIndex,
-			detail::constant_or_convertible_to_size_t BottomColumnIndex,
-			typename Allocator,
-			typename BlockAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(block_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			TopRowIndex top_row_index,
-			TopColumnIndex top_column_index,
-			BottomRowIndex bottom_row_index,
-			BottomColumnIndex bottom_column_index,
-			unsafe_tag,
-			const BlockAllocator& block_alloc = BlockAllocator{}) -> detail::block_mat_ret_t<Value,
-			RowsExtent,
-			ColumnsExtent,
-			detail::get_constant_val_or_dynamic<TopRowIndex>(),
-			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
-			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
-			BlockAllocator> // @TODO: ISSUE #20
-		{
-			return detail::block_impl<false, BlockAllocator>(obj,
+			return detail::block_impl<BlockAllocator>(obj,
 				top_row_index,
 				top_column_index,
 				bottom_row_index,

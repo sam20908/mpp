@@ -23,10 +23,10 @@
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
+#include <cassert>
 #include <cmath>
 #include <memory>
 
@@ -36,8 +36,7 @@ namespace mpp
 	{
 		inline static constexpr auto dummy_variable = ' ';
 
-		template<bool Check,
-			typename To,
+		template<typename To,
 			typename LUAllocator,
 			typename Value,
 			std::size_t RowsExtent,
@@ -47,13 +46,7 @@ namespace mpp
 		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			[[maybe_unused]] const Args&... alloc_args) -> To // @TODO: ISSUE #20
 		{
-			if constexpr (Check)
-			{
-				if (!square(obj))
-				{
-					throw std::runtime_error(MATRIX_NOT_SQUARE);
-				}
-			}
+			assert(square(obj));
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
@@ -119,20 +112,7 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			const LUAllocator& lu_alloc = LUAllocator{}) -> Value // @TODO: ISSUE #20
 		{
-			return detail::det_impl<detail::configuration_use_safe, Value, LUAllocator>(obj, lu_alloc);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const LUAllocator& lu_alloc = LUAllocator{}) -> Value // @TODO: ISSUE #20
-		{
-			return detail::det_impl<false, Value, LUAllocator>(obj, lu_alloc);
+			return detail::det_impl<Value, LUAllocator>(obj, lu_alloc);
 		}
 
 		template<typename To,
@@ -146,22 +126,7 @@ namespace mpp
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
 			const LUAllocator& lu_alloc = LUAllocator{}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_impl<detail::configuration_use_safe, To, LUAllocator>(obj, lu_alloc);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const LUAllocator& lu_alloc = LUAllocator{}) -> To // @TODO: ISSUE #20
-		{
-			return detail::det_impl<false, To, LUAllocator>(obj, lu_alloc);
+			return detail::det_impl<To, LUAllocator>(obj, lu_alloc);
 		}
 	};
 

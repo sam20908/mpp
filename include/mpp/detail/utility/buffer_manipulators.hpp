@@ -21,7 +21,6 @@
 
 #include <mpp/detail/types/type_traits.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/detail/utility/validators.hpp>
 
 #include <cstddef>
 
@@ -52,18 +51,13 @@ namespace mpp::detail
 		}
 	}
 
-	template<bool ValidateDimensions, typename Buffer>
+	template<typename Buffer>
 	void make_identity_buffer(Buffer& buffer,
 		std::size_t rows,
 		std::size_t columns,
 		const auto& zero_value,
 		const auto& one_value) // @TODO: ISSUE #20
 	{
-		if constexpr (ValidateDimensions)
-		{
-			validate_dimensions_for_identity_matrix(rows, columns);
-		}
-
 		if constexpr (is_vector<Buffer>::value)
 		{
 			buffer.resize(rows * columns, zero_value);

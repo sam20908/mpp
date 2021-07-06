@@ -74,11 +74,11 @@ namespace mpp
 			return [&]() {
 				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
 				{
-					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe, alloc_args... };
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer), alloc_args... };
 				}
 				else
 				{
-					return trps_mat_t{ columns, rows, std::move(transposed_buffer), unsafe };
+					return trps_mat_t{ columns, rows, std::move(transposed_buffer) };
 				}
 			}();
 		}

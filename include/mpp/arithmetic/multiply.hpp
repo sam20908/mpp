@@ -22,7 +22,6 @@
 #include <mpp/detail/expr/expr_binary_constant_op.hpp>
 #include <mpp/detail/expr/expr_binary_op.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <algorithm>
@@ -98,8 +97,6 @@ namespace mpp
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
 			decltype(detail::mul_op)> // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_multipliable(left, right);
-
 		return { left, right, left.rows(), right.columns(), detail::mul_op };
 	}
 

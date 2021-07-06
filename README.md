@@ -106,41 +106,6 @@ int main()
 
 One of the main things to take away is the concept of **"extents"** for dimensions. Matrices default to "dynamic extents", which means the sizes can be provided at runtime and matrices can be (partially) flexible (e.g. you can resize rows and columns of a "fully dynamic" matrix, but a "dynamic rows" matrix can only be resized in rows).
 
-#### Unsafe Operations
-
-If you as a user can make guarantees that the library checks internally (e.g. properly initialize the matrix with valid parameters), then you can pass `mpp::unsafe` as a parameter to avoid them. **Note that only some operations allow unsafe because they are the ones that needs to validate their arguments.**
-
-```cpp
-#include <mpp/algorithm/inverse.hpp>
-#include <mpp/matrix.hpp>
-
-#include <vector>
-
-int main()
-{
-  const auto range_2d = std::vector<std::vector<int>>{ { 1, 2 }, { 3, 4 } }; // 2x2 data
-
-  /**
-   * For constructors, mpp::unsafe will allow avoid checks like these (different depending on type of matrix you are constructing):
-   * - The 2D initializer has equal columns in all rows
-   * - The 2D initializer's rows matches the RowsExtent template parameter for fully static matrices
-   * - The 2D initializer's columns matches the ColumnsExtent template parameter for fully static matrices
-   * and much more...
-   */
-  const auto matrix = mpp::matrix<int, 2, 2>{ range_2d, mpp::unsafe };
-
-  /**
-   * For mpp::inverse, mpp::unsafe allows avoid checking if the determinant of the matrix is 0, which we guaranteed with our range_2d
-   * The actual determinant of our range_2d is -2
-   */
-  const auto inv = mpp::inverse(matrix, mpp::unsafe);
-
-  return 0;
-}
-```
-
-Not all of the operations that support unsafe is shown here, but you can look for them in the (upcoming) documentation.
-
 #### Comparisons
 
 Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
