@@ -93,7 +93,6 @@ namespace mpp::detail
 
 			for (auto row = std::size_t{}; row < min_rows; ++row)
 			{
-				const auto current_columns              = std::ranges::size(*range_begin);
 				const auto rooms_available_from_current = buffer_size - row * range_columns;
 
 				if (rooms_available_from_current >= range_columns)
