@@ -29,7 +29,6 @@
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -197,8 +196,6 @@ namespace mpp::detail
 
 				for (auto row = rows_; row < range_rows; ++row)
 				{
-					const auto current_columns = std::ranges::size(*range_begin);
-
 					if constexpr (range_has_same_value_type)
 					{
 						if constexpr (range_is_moved)
@@ -236,7 +233,7 @@ namespace mpp::detail
 
 		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, auto&& range)
 		{
-			// Precondition: range.size() == rows * columns
+			// Preconditions depend on the type of matrix
 
 			const auto buffer_size = buffer_.size();
 			const auto range_size  = rows * columns;
