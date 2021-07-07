@@ -25,14 +25,12 @@
 #include <mpp/detail/types/type_traits.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/detail/utility/validators.hpp>
 #include <mpp/utility/configuration.hpp>
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <stdexcept>
 #include <type_traits>
 
 namespace mpp::detail
@@ -51,7 +49,7 @@ namespace mpp::detail
 		using base = expr_base<Derived, Value, RowsExtent, ColumnsExtent>;
 
 	protected:
-		Buffer buffer_; // Don't default initailize because value type might not be DefaultConstructible
+		Buffer buffer_;
 		std::size_t rows_{ RowsExtent == dynamic ? std::size_t{} : RowsExtent };
 		std::size_t columns_{ ColumnsExtent == dynamic ? std::size_t{} : ColumnsExtent };
 
@@ -64,20 +62,15 @@ namespace mpp::detail
 		{
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckUnequalColumns>
 		void assign_and_insert_from_2d_range(auto&& range_2d)
 		{
+			// Preconditions:
+			// range_2d is the same size as specified matrix size
+			// range_2d's rows all are equal in length
+
 			using range_2d_t = decltype(range_2d);
 
-			const auto range_rows = std::ranges::size(std::forward<range_2d_t>(range_2d));
-
-			if constexpr (CheckAgainstCurrentRows)
-			{
-				if (range_rows != rows_)
-				{
-					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-				}
-			}
+			const auto range_rows = std::ranges::size(range_2d);
 
 			auto range_begin            = std::ranges::begin(range_2d);
 			const auto range_columns    = range_rows > 0 ? std::ranges::size(*range_begin) : std::size_t{};
@@ -100,24 +93,6 @@ namespace mpp::detail
 
 			for (auto row = std::size_t{}; row < min_rows; ++row)
 			{
-				const auto current_columns = std::ranges::size(*range_begin);
-
-				if constexpr (CheckAgainstCurrentColumns)
-				{
-					if (current_columns != columns_)
-					{
-						throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-					}
-				}
-
-				if constexpr (CheckUnequalColumns)
-				{
-					if (current_columns != range_columns)
-					{
-						throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-					}
-				}
-
 				const auto rooms_available_from_current = buffer_size - row * range_columns;
 
 				if (rooms_available_from_current >= range_columns)
@@ -220,24 +195,6 @@ namespace mpp::detail
 
 				for (auto row = rows_; row < range_rows; ++row)
 				{
-					const auto current_columns = std::ranges::size(*range_begin);
-
-					if constexpr (CheckAgainstCurrentColumns)
-					{
-						if (current_columns != columns_)
-						{
-							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-						}
-					}
-
-					if constexpr (CheckUnequalColumns)
-					{
-						if (current_columns != range_columns)
-						{
-							throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-						}
-					}
-
 					if constexpr (range_has_same_value_type)
 					{
 						if constexpr (range_is_moved)
@@ -273,36 +230,12 @@ namespace mpp::detail
 			columns_ = range_columns;
 		}
 
-		template<bool CheckAgainstCurrentRows, bool CheckAgainstCurrentColumns, bool CheckRangeSize>
 		void assign_and_insert_from_1d_range(std::size_t rows, std::size_t columns, auto&& range)
 		{
-			if constexpr (CheckAgainstCurrentRows)
-			{
-				if (rows != rows_)
-				{
-					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-				}
-			}
-
-			if constexpr (CheckAgainstCurrentColumns)
-			{
-				if (columns != columns_)
-				{
-					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-				}
-			}
+			// Preconditions depend on the type of matrix
 
 			const auto buffer_size = buffer_.size();
 			const auto range_size  = rows * columns;
-
-			if constexpr (CheckRangeSize)
-			{
-				// Last resort safety check
-				if (range_size != std::ranges::size(range))
-				{
-					throw std::invalid_argument(detail::INITIALIZER_INCOMPATIBLE_DIMENSION_EXTENTS);
-				}
-			}
 
 			constexpr auto range_is_moved   = std::is_rvalue_reference_v<decltype(range)>;
 			constexpr auto buffer_is_vector = is_vector<Buffer>::value;
@@ -486,19 +419,6 @@ namespace mpp::detail
 		[[nodiscard]] auto crend() const noexcept -> const_reverse_iterator // @TODO: ISSUE #20
 		{
 			return const_reverse_iterator(buffer_.crend(), columns_);
-		}
-
-		[[nodiscard]] auto at(std::size_t row_index, std::size_t column_index) const
-			-> const_reference // @TODO: ISSUE #20
-		{
-			if (row_index >= rows_ || column_index >= columns_)
-			{
-				throw std::out_of_range("Access out of bounds!");
-			}
-
-			// Don't use internal buffer's .at because we already performed bounds checking here
-
-			return operator()(row_index, column_index);
 		}
 
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) noexcept(

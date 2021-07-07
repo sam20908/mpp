@@ -22,11 +22,11 @@
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/utility/comparison.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
+#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -34,7 +34,7 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator, typename... Args>
+		template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator, typename... Args>
 		inline auto forward_subst_on_buffer(const auto& a, const auto& b, std::size_t n) -> // @TODO: ISSUE #20
 			typename matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>::buffer_type
 		{
@@ -61,13 +61,7 @@ namespace mpp
 
 				const auto diag_elem = static_cast<default_floating_type>(a[index_2d_to_1d(n, row, row)]);
 
-				if constexpr (Check)
-				{
-					if (fp_is_zero_or_nan(diag_elem))
-					{
-						throw std::runtime_error(DIAGONAL_ELEMENT_IS_ZERO);
-					}
-				}
+				assert(!fp_is_zero_or_nan(diag_elem));
 
 				result /= diag_elem;
 
@@ -84,34 +78,17 @@ namespace mpp
 			return x_buffer;
 		}
 
-		template<bool Check,
-			typename To,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename ToAllocator,
-			typename... Args>
+		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator, typename... Args>
 		inline auto forward_subst_matrix(const auto& a, const auto& b, [[maybe_unused]] const Args&... alloc_args)
 			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
 		{
-			// @FIXME: Find best message to error about a.rows() != b.rows()
-			if constexpr (Check)
-			{
-				if (!square(a))
-				{
-					throw std::logic_error(MATRIX_NOT_SQUARE);
-				}
-
-				if (const auto b_cols = b.columns(); b_cols != 1)
-				{
-					throw std::logic_error(MATRIX_NOT_COLUMN_VECTOR);
-				}
-			}
+			assert(square(a));
+			assert(b.columns() == 1);
 
 			const auto rows = a.rows();
 
 			using x_mat_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
-			auto&& x_buf  = forward_subst_on_buffer<Check,
-                RowsExtent,
+			auto&& x_buf  = forward_subst_on_buffer<RowsExtent,
                 ColumnsExtent,
                 typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>(a.data(),
                 b.data(),
@@ -120,11 +97,11 @@ namespace mpp
 			return [&]() {
 				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
 				{
-					return x_mat_t{ rows, 1, std::move(x_buf), unsafe, alloc_args... };
+					return x_mat_t{ rows, 1, std::move(x_buf), alloc_args... };
 				}
 				else
 				{
-					return x_mat_t{ rows, 1, std::move(x_buf), unsafe };
+					return x_mat_t{ rows, 1, std::move(x_buf) };
 				}
 			}();
 		}
@@ -153,37 +130,7 @@ namespace mpp
 			ToAllocator> // @TODO: ISSUE #20
 		{
 			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<detail::configuration_use_safe,
-				To,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b, to_alloc);
-		}
-
-		template<typename To,
-			typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			std::type_identity<To>,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			unsafe_tag,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			// @TODO: Figure out the constraint on To
-			return detail::forward_subst_matrix<false,
-				To,
+			return detail::forward_subst_matrix<To,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				ToAllocator>(a, b, to_alloc);
@@ -207,34 +154,7 @@ namespace mpp
 			BColumnsExtent,
 			ToAllocator> // @TODO: ISSUE #20
 		{
-			return detail::forward_subst_matrix<detail::configuration_use_safe,
-				std::common_type_t<AValue, BValue>,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b, to_alloc);
-		}
-
-		template<typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(forward_substitution_t,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			unsafe_tag,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<std::common_type_t<AValue, BValue>,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			return detail::forward_subst_matrix<false,
-				std::common_type_t<AValue, BValue>,
+			return detail::forward_subst_matrix<std::common_type_t<AValue, BValue>,
 				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
 				BColumnsExtent,
 				ToAllocator>(a, b, to_alloc);

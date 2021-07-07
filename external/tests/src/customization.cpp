@@ -141,10 +141,6 @@ int main()
 		expect(mpp::matrix<int>::columns_extent() == 10_ul);
 	};
 
-	when("I check the new use_unsafe") = []() {
-		expect(constant<mpp::detail::configuration_use_unsafe == true>);
-	};
-
 	when("I check against the CPOs' return types") = []() {
 		expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);

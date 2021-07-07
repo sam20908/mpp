@@ -109,9 +109,6 @@ int main()
 
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, false>(
 			"initialization/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, false>(
-			"initialization/2x3_init_copy_and_move.txt",
-			unsafe);
 		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
 			false>("initialization/2x3_init_copy_and_move.txt", alloc_obj);
 	};
@@ -125,9 +122,6 @@ int main()
 
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
 			"initialization/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
-			"initialization/2x3_init_copy_and_move.txt",
-			unsafe);
 		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
 			true>("initialization/2x3_init_copy_and_move.txt", alloc_obj);
 	};
@@ -136,27 +130,16 @@ int main()
 		const auto init = std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		test_init<all_mats<int, 2, 3>>("initialization/2x3_init_list.txt", parse_mat_construct_args, init);
-		test_init<all_mats<int, 2, 3>>("initialization/2x3_init_list.txt", parse_mat_construct_args, init, unsafe);
 		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_init_list.txt",
 			parse_mat_construct_args,
 			init,
-			alloc_obj);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_init_list.txt",
-			parse_mat_construct_args,
-			init,
-			unsafe,
 			alloc_obj);
 	};
 
 	feature("2D range initialization") = [&]() {
 		test_init<all_mats<int, 2, 3>>("initialization/2x3_rng_2d.txt", parse_mat_construct_rng2d);
-		test_init<all_mats<int, 2, 3>>("initialization/2x3_rng_2d.txt", parse_mat_construct_rng2d, unsafe);
 		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_rng_2d.txt",
 			parse_mat_construct_rng2d,
-			alloc_obj);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_rng_2d.txt",
-			parse_mat_construct_rng2d,
-			unsafe,
 			alloc_obj);
 	};
 
@@ -166,13 +149,8 @@ int main()
 
 	feature("1D range initialization") = [&]() {
 		test_init<all_mats<int, 2, 3>>("initialization/2x3_rng_1d.txt", parse_mat_construct_rng1d<false>);
-		test_init<all_mats<int, 2, 3>>("initialization/2x3_rng_1d.txt", parse_mat_construct_rng1d<false>, unsafe);
 		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_rng_1d.txt",
 			parse_mat_construct_rng1d<false>,
-			alloc_obj);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("initialization/2x3_rng_1d.txt",
-			parse_mat_construct_rng1d<false>,
-			unsafe,
 			alloc_obj);
 	};
 
@@ -203,17 +181,6 @@ int main()
 		test_init<dyn_mats<double, 3, 3, alloc_t>>("initialization/3x3_identity.txt",
 			parse_mat_construct_val_arg,
 			identity,
-			0.0,
-			1.0,
-			alloc_obj);
-		test_init<all_mats<int, 3, 3>>("initialization/3x3_identity.txt",
-			parse_mat_construct_val_arg,
-			identity,
-			unsafe);
-		test_init<dyn_mats<double, 3, 3, alloc_t>>("initialization/3x3_identity.txt",
-			parse_mat_construct_val_arg,
-			identity,
-			unsafe,
 			0.0,
 			1.0,
 			alloc_obj);

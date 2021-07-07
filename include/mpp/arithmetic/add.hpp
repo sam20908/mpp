@@ -22,7 +22,6 @@
 #include <mpp/detail/expr/expr_binary_op.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/detail/utility/validators.hpp>
 #include <mpp/matrix.hpp>
 
 #include <cstddef>
@@ -56,8 +55,6 @@ namespace mpp
 			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
 			decltype(detail::add_op)> // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
-
 		return { left, right, left.rows(), left.columns(), detail::add_op };
 	}
 
@@ -70,8 +67,6 @@ namespace mpp
 		const matrix<Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
-
 		std::ranges::transform(left, right, left.begin(), std::plus{});
 
 		return left;
@@ -87,8 +82,6 @@ namespace mpp
 		const detail::expr_base<Expr, Value, RightRowsExtent, RightColumnsExtent>& right)
 		-> matrix<Value, LeftRowsExtent, LeftColumnsExtent>& // @TODO: ISSUE #20
 	{
-		detail::validate_matrices_same_size(left, right);
-
 		const auto rows    = left.rows();
 		const auto columns = left.columns();
 

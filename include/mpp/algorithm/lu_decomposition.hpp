@@ -21,10 +21,10 @@
 
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/exception_messages.hpp>
 #include <mpp/utility/square.hpp>
 #include <mpp/matrix.hpp>
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -33,8 +33,7 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<bool Check,
-			typename To,
+		template<typename To,
 			typename ToAllocator,
 			typename Value,
 			std::size_t RowsExtent,
@@ -45,13 +44,7 @@ namespace mpp
 			[[maybe_unused]] const Args&... alloc_args) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
 			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
-			if constexpr (Check)
-			{
-				if (!square(obj))
-				{
-					throw std::logic_error(MATRIX_NOT_SQUARE);
-				}
-			}
+			assert(square(obj));
 
 			using lu_matrix_t = matrix<default_floating_type,
 				RowsExtent,
@@ -89,28 +82,28 @@ namespace mpp
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buffer.begin());
 
-			make_identity_buffer<false>(l_buffer, rows, columns, default_floating_type{}, default_floating_type{ 1 });
+			make_identity_buffer(l_buffer, rows, columns, default_floating_type{}, default_floating_type{ 1 });
 
 			lu_generic<default_floating_type, true, false>(rows, columns, l_buffer, u_buffer);
 
 			return { [&]() {
 						if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
 						{
-							return result_matrix_t{ rows, columns, std::move(l_buffer), unsafe, alloc_args... };
+							return result_matrix_t{ rows, columns, std::move(l_buffer), alloc_args... };
 						}
 						else
 						{
-							return result_matrix_t{ rows, columns, std::move(l_buffer), unsafe };
+							return result_matrix_t{ rows, columns, std::move(l_buffer) };
 						}
 					}(),
 				[&]() {
 					if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
 					{
-						return result_matrix_t{ rows, columns, std::move(u_buffer), unsafe, alloc_args... };
+						return result_matrix_t{ rows, columns, std::move(u_buffer), alloc_args... };
 					}
 					else
 					{
-						return result_matrix_t{ rows, columns, std::move(u_buffer), unsafe };
+						return result_matrix_t{ rows, columns, std::move(u_buffer) };
 					}
 				}() };
 		}
@@ -129,23 +122,7 @@ namespace mpp
 			-> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
 				matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 		{
-			return detail::lu_impl<detail::configuration_use_safe, Value, ToAllocator>(obj, to_alloc);
-		}
-
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = Allocator>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<false, Value, ToAllocator>(obj, to_alloc);
+			return detail::lu_impl<Value, ToAllocator>(obj, to_alloc);
 		}
 
 		template<typename To,
@@ -162,25 +139,7 @@ namespace mpp
 				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
 
 		{
-			return detail::lu_impl<detail::configuration_use_safe, To, ToAllocator>(obj, to_alloc);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			unsafe_tag,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<false, To, ToAllocator>(obj, to_alloc);
+			return detail::lu_impl<To, ToAllocator>(obj, to_alloc);
 		}
 	};
 

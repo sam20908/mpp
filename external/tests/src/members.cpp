@@ -79,10 +79,6 @@ int main()
 		} | mats;
 	};
 
-	feature(".at()") = [&](const auto& mat) {
-		expect(mat.at(1, 1) == 5_i);
-	} | mats;
-
 	feature(".front()") = [&]() {
 		given("We're only reading the data") = [&](const auto& mat) {
 			expect(mat.front() == 1_i);

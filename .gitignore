@@ -58,3 +58,7 @@ compile_commands.json
 
 # ccls cache
 .ccls-cache/
+
+# More Neovim plugin stuff
+.cmake/
+.cache/
