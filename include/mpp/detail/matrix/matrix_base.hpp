@@ -421,19 +421,6 @@ namespace mpp::detail
 			return const_reverse_iterator(buffer_.crend(), columns_);
 		}
 
-		[[nodiscard]] auto at(std::size_t row_index, std::size_t column_index) const
-			-> const_reference // @TODO: ISSUE #20
-		{
-			if (row_index >= rows_ || column_index >= columns_)
-			{
-				throw std::out_of_range("Access out of bounds!");
-			}
-
-			// Don't use internal buffer's .at because we already performed bounds checking here
-
-			return operator()(row_index, column_index);
-		}
-
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) noexcept(
 			noexcept(buffer_[index_2d_to_1d(columns_, row_index, col_index)])) -> reference // @TODO: ISSUE #20
 		{

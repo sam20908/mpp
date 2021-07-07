@@ -64,16 +64,6 @@ namespace mpp::detail
 			return ColumnsExtent;
 		}
 
-		[[nodiscard]] auto at(std::size_t row_index, std::size_t col_index) const -> value_type // @TODO: ISSUE #20
-		{
-			if (row_index >= rows() || col_index >= columns())
-			{
-				throw std::out_of_range("Access out of range!");
-			}
-
-			return expr_obj().at(row_index, col_index);
-		}
-
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const noexcept
 			-> value_type // @TODO: ISSUE #20
 		{
