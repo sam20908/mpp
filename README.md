@@ -282,3 +282,7 @@ You can find more APIs that are not mentioned in this README in the (upcoming) d
 #### Why `tag_invoke` for customization?
 
 `tag_invoke` allows putting all the overloads into a single name, `tag_invoke` . With customization by overload resolution, name clashes are reduced down to bare minimum.
+
+#### Why assertions instead of exceptions?
+
+The operations have mathematical preconditions, which means it's safe to assume that the user knows what they're doing, but assertions can still be triggers in debug mode.
