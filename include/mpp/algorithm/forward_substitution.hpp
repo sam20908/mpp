@@ -61,6 +61,8 @@ namespace mpp
 
 				const auto diag_elem = static_cast<default_floating_type>(a[index_2d_to_1d(n, row, row)]);
 
+				assert(!fp_is_zero_or_nan(diag_elem));
+
 				result /= diag_elem;
 
 				if constexpr (x_is_vector)
