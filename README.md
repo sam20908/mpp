@@ -67,19 +67,20 @@ int main()
   // Elements are: 0, 1, 2, 3, 4, 5
 
   /**
-   * Algorithms
+   * Algorithms (note: you can change output matrix type by passing a std::type_identity with desired matrix type as the last argument)
    */
   auto det = mpp::determinant(m_fully_static);
   auto inv = mpp::inverse(m_fully_dynamic);
 
-  // mpp::block takes a mpp::constant, which allows it to produce (partial) static matrices if the following are met:
-  // - If input matrix's rows, top row index, and bottom row index are all compile time specified, then resulting rows will also be compile time specified
-  // ^ same for columns
-
-  auto block_static = mpp::block(m_fully_static, mpp::constant<0>{}, mpp::constant<0>{}, mpp::constant<1>{}, mpp::constant<1>{});
-  // matrix<int, 2, 2> 2x2
+  auto block_static = mpp::block(m_fully_static, 0, 0, 1, 1, std::type_identity<mpp::matrix<int, 2, 2>>{});
+  // mpp::matrix<int, 2, 2> 2x2
   auto block_dyn = mpp::block(m_fully_static, 0, 0, 1, 1);
-  // matrix<int, dynamic, dynamic> 2x2
+  // mpp::matrix<int, mpp::dynamic, mpp::dynamic> 2x2
+
+  // LU Decomposition algorithm has the exception where you can customize the matrix type of L and U matrix
+  auto test = mpp::matrix<int, 3, 3>{ {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
+  auto [l_matrix, u_matrix] = mpp::lu_decomposition(test, std::type_identity<mpp::matrix<int, 3, 3>>{}, std::type_identity<mpp::matrix<float>>{});
+  // l_matrix is mpp::matrix<int, 3, 3> and u_matrix is mpp::matrix<float, mpp::dynamic, mpp::dynamic>
 
   /**
    * Utilities
@@ -108,7 +109,7 @@ One of the main things to take away is the concept of **"extents"** for dimensio
 
 #### Comparisons
 
-Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. Instead, comparison CPOs were implemented to cover that gap.
+Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. In addition, comparison CPOs were implemented to cover that gap.
 
 `operator<=>` was also provided if you know you'll compare matrices with the same value type (therefore no need to use `mpp::elements_compare` ).
 
@@ -177,8 +178,6 @@ namespace mpp
     static constexpr std::size_t rows_extent    = 10;
     static constexpr std::size_t columns_extent = 10;
 
-    static constexpr bool use_unsafe = true;
-
     /**
      * These are the default buffer type aliases the library will use, but you can customize them
      */
@@ -206,7 +205,7 @@ int main()
   auto c = m.columns_extent(); // 10
 
   using alloc = typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::allocator_type;
-  // ^ my_custom_allocator<int>, note that fully static matrices don't use allocators
+  // ^ my_custom_allocator<int>
 
   return 0;
 }

@@ -38,35 +38,27 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To,
-			typename ToAllocator,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename... Args>
-		[[nodiscard]] inline auto inv_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			[[maybe_unused]] const Args&... alloc_args)
-			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+		template<typename To, typename Mat>
+		[[nodiscard]] inline auto inv_impl(const Mat& obj) -> To // @TODO: ISSUE #20
 		{
 			assert(square(obj));
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			using lu_alloc_t =
-				typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>;
-			using lu_mat_t  = matrix<default_floating_type, RowsExtent, ColumnsExtent, lu_alloc_t>;
-			using lu_buf_t  = typename lu_mat_t::buffer_type;
-			using inv_mat_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
+			using lu_buf_t = typename mat_rebind_to_t<Mat, default_floating_type>::buffer_type;
 
 			// Handle special cases - avoid LU Decomposition
 			if (rows == 0)
 			{
-				return inv_mat_t{};
+				return To{};
 			}
 
 			auto inv_buffer = lu_buf_t{};
+
+			// If the incoming matrix has an array as its buffer, we can just use the same type of buffer since it'll be
+			// less overhead and we know it's the same size
+
 			allocate_buffer_if_vector(inv_buffer, rows, columns, default_floating_type{});
 
 			if (rows == 1)
@@ -105,21 +97,20 @@ namespace mpp
 				auto l_buffer = lu_buf_t{};
 				auto u_buffer = lu_buf_t{};
 
-				// @TODO: Should do a direct copy initialization instead
+				// @TODO: Should do a direct buffer copy initialization instead
 				allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 				std::ranges::copy(obj, u_buffer.begin());
 
-				// allocate_buffer_if_vector(l_buffer, rows, columns, default_floating_type{});
-				// @TODO: Allow the user to control one_value and zero_value here?
 				make_identity_buffer(l_buffer, rows, columns, default_floating_type{}, default_floating_type{ 1 });
 
 				const auto det = lu_generic<default_floating_type, true, true>(rows, columns, l_buffer, u_buffer);
 
 				assert(!fp_is_zero_or_nan(det));
 
-				// Solve for x_buffer values with Ax=b with A=l_buffer and b=Column of identity matrix
+				// Solve for x_buffer values with Ax=b where A=l_buffer and b=Column of identity matrix
 
-				auto identity_column_buffer = typename matrix<default_floating_type, RowsExtent, 1>::buffer_type{};
+				using x_buf_t = typename matrix<default_floating_type, Mat::rows_extent(), 1>::buffer_type;
+				auto identity_column_buffer = x_buf_t{};
 
 				allocate_buffer_if_vector(identity_column_buffer, rows, 1, default_floating_type{});
 
@@ -138,14 +129,12 @@ namespace mpp
 					identity_column_buffer[last_column_index] = default_floating_type{};
 					identity_column_buffer[row]               = default_floating_type{ 1 };
 
-					auto l_x_buffer =
-						forward_subst_on_buffer<RowsExtent, 1, lu_alloc_t>(l_buffer, identity_column_buffer, rows);
+					auto l_x_buffer = forward_subst_on_buffer<x_buf_t>(l_buffer, identity_column_buffer, rows);
 
 					// Use l_x_buffer to do back substitution to solve Ax=B with A=u_buffer and b=l_x_buffer. The
 					// part_inverse_buffer now corresponds to a column of the inverse matrix
 
-					auto part_inverse_buffer =
-						back_subst_on_buffer<RowsExtent, 1, lu_alloc_t>(u_buffer, std::move(l_x_buffer), rows);
+					auto part_inverse_buffer = back_subst_on_buffer<x_buf_t>(u_buffer, std::move(l_x_buffer), rows);
 
 					for (auto column = std::size_t{}; auto&& value : part_inverse_buffer)
 					{
@@ -154,16 +143,7 @@ namespace mpp
 				}
 			}
 
-			return [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return inv_mat_t{ rows, columns, std::move(inv_buffer), alloc_args... };
-				}
-				else
-				{
-					return inv_mat_t{ rows, columns, std::move(inv_buffer) };
-				}
-			}();
+			return To{ rows, columns, std::move(inv_buffer) };
 		}
 	} // namespace detail
 
@@ -173,29 +153,12 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename ToAllocator =
-				typename std::allocator_traits<Allocator>::template rebind_alloc<detail::default_floating_type>>
-		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
+			typename To = matrix<Value, RowsExtent, ColumnsExtent, Allocator>>
+		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(inverse_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> matrix<detail::default_floating_type, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::inv_impl<detail::default_floating_type, ToAllocator>(obj, to_alloc);
-		}
-
-		template<std::floating_point To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
-		[[nodiscard]] friend inline auto tag_invoke(inverse_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
-		{
-			return detail::inv_impl<To, ToAllocator>(obj, to_alloc);
+			return detail::inv_impl<To>(obj);
 		}
 	};
 

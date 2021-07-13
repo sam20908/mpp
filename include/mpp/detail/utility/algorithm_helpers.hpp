@@ -30,6 +30,12 @@
 
 namespace mpp::detail
 {
+	template<typename Mat, typename T>
+	using mat_rebind_to_t = matrix<T,
+		Mat::rows_extent(),
+		Mat::columns_extent(),
+		typename std::allocator_traits<typename Mat::allocator_type>::template rebind_alloc<T>>;
+
 	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) noexcept
 		-> std::size_t
 	{

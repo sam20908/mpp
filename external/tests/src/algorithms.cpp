@@ -37,274 +37,153 @@ using namespace mpp;
 namespace
 {
 	template<typename Mats, typename To>
-	void test_det(std::string_view test_name, const auto&... fn_args)
+	void test_det(std::string_view test_name)
+	{
+		test(test_name.data()) = [test_name]<typename Mat>(std::type_identity<Mat>) {
+			const auto [mat, num] = parse_test(test_name, parse_mat<Mat>, parse_val<To>);
+			const auto out        = mpp::determinant(mat, std::type_identity<To>{});
+
+			cmp_nums(out, num);
+		} | Mats{};
+	}
+
+	template<typename Mats>
+	void test_fn(std::string_view test_name, const auto& fn)
+	{
+		test(test_name.data()) = [&, test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
+			const auto [mat, mat2] = parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>);
+			const auto out         = fn(mat, std::type_identity<Mat2>{});
+
+			cmp_mat_types(out, mat2);
+			cmp_mat_to_expr_like(out, mat2);
+		} | Mats{};
+	}
+
+	template<typename Mats>
+	void test_sub(std::string_view test_name, const auto& fn)
 	{
 		test(test_name.data()) =
-			[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
-				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
-				using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+			[&, test_name]<typename Mat, typename Mat2, typename Mat3>(
+				std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
+				const auto [mat, mat2, mat3] = parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
+				const auto out               = fn(mat, mat2, std::type_identity<Mat3>{});
 
-				const auto [mat, expected_num] = parse_test(test_name, parse_mat<mat_t>, parse_val<To>);
-				const auto num                 = [&]() {
-                    if constexpr (!std::is_same_v<T, To>)
-                    {
-                        return mpp::determinant(std::type_identity<To>{}, mat, fn_args...);
-                    }
-                    else
-                    {
-                        return mpp::determinant(mat, fn_args...);
-                    }
-				}();
-
-				cmp_nums(num, expected_num);
+				cmp_mat_types(out, mat3);
+				cmp_mat_to_expr_like(out, mat3);
 			} |
 			Mats{};
 	}
 
 	template<typename Mats>
-	void test_fn(std::string_view test_name, const auto& fn, const auto&... fn_args)
+	void test_lu(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 typename Alloc,
-									 typename Alloc2>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
+		test(test_name.data()) =
+			[test_name]<typename Mat, typename Mat2, typename Mat3>(
+				std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
+				const auto [mat, mat2, mat3] = parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
+				const auto [out, out2] =
+					mpp::lu_decomposition(mat, std::type_identity<Mat2>{}, std::type_identity<Mat3>{});
 
-			const auto [mat, expected_mat] = parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>);
-			const auto out                 = [&]() {
-                if constexpr (!std::is_same_v<T, T2>)
-                {
-                    return fn(std::type_identity<T2>{}, mat, fn_args...);
-                }
-                else
-                {
-                    return fn(mat, fn_args...);
-                }
-			}();
+				scenario("Testing L matrix") = [&]() {
+					cmp_mat_types(out, mat2);
+					cmp_mat_to_expr_like(out, mat2);
+				};
 
-			cmp_mat_types(out, expected_mat);
-			cmp_mat_to_expr_like(out, expected_mat);
-		} | Mats{};
+				scenario("Testing U matrix") = [&]() {
+					cmp_mat_types(out2, mat3);
+					cmp_mat_to_expr_like(out2, mat3);
+				};
+			} |
+			Mats{};
 	}
 
 	template<typename Mats>
-	void test_sub(std::string_view test_name, const auto& fn, const auto&... fn_args)
+	void test_block(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 typename T3,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t RowsExtent3,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 std::size_t ColumnsExtent3,
-									 typename Alloc,
-									 typename Alloc2,
-									 typename Alloc3>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>,
-										 std::type_identity<matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>>>) {
-			using mat_t      = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t     = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-			using mat3_t     = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
-			using from_val_t = std::common_type_t<T, T2>;
+		test(test_name.data()) = [test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
+			const auto [mat, idxs, mat2] = parse_test(test_name, parse_mat<Mat>, parse_block_idxs, parse_mat<Mat2>);
+			const auto out =
+				mpp::block(mat, idxs.row_start, idxs.col_start, idxs.row_end, idxs.col_end, std::type_identity<Mat2>{});
 
-			const auto [mat_a, mat_b, expected_mat] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
-			const auto out = [&]() {
-				if constexpr (!std::is_same_v<from_val_t, T3>)
-				{
-					return fn(std::type_identity<T3>{}, mat_a, mat_b, fn_args...);
-				}
-				else
-				{
-					return fn(mat_a, mat_b, fn_args...);
-				}
-			}();
-
-			cmp_mat_types(out, expected_mat);
-			cmp_mat_to_expr_like(out, expected_mat);
-		} | Mats{};
-	}
-
-	template<typename Mats>
-	void test_lu(std::string_view test_name, const auto&... fn_args)
-	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 typename T3,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t RowsExtent3,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 std::size_t ColumnsExtent3,
-									 typename Alloc,
-									 typename Alloc2,
-									 typename Alloc3>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>,
-										 std::type_identity<matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-			using mat3_t = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
-
-			const auto [mat, expected_l, expected_u] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
-			const auto [out_l, out_u] = [&]() {
-				if constexpr (!std::is_same_v<T, T2>)
-				{
-					return mpp::lu_decomposition(std::type_identity<T2>{}, mat, fn_args...);
-				}
-				else
-				{
-					return mpp::lu_decomposition(mat, fn_args...);
-				}
-			}();
-
-			scenario("Testing L matrix") = [&]() {
-				cmp_mat_types(out_l, expected_l);
-				cmp_mat_to_expr_like(out_l, expected_l);
-			};
-
-			scenario("Testing U matrix") = [&]() {
-				cmp_mat_types(out_u, expected_u);
-				cmp_mat_to_expr_like(out_u, expected_u);
-			};
+			cmp_mat_types(out, mat2);
+			cmp_mat_to_expr_like(out, mat2);
 		} | Mats{};
 	}
 } // namespace
 
 int main()
 {
-	using alloc_t        = custom_allocator<double>;
-	const auto alloc_obj = alloc_t{};
-
-	feature("Determinant") = [&]() {
+	feature("Determinant") = []() {
 		test_det<all_mats<int, 0, 0>, int>("algorithm/det/0x0.txt");
-		test_det<all_mats<float, 1, 1>, double>("algorithm/det/1x1.txt", alloc_obj);
-		test_det<all_mats<float, 2, 2>, double>("algorithm/det/2x2.txt", alloc_obj);
+		test_det<all_mats<float, 1, 1>, double>("algorithm/det/1x1.txt");
+		test_det<all_mats<float, 2, 2>, double>("algorithm/det/2x2.txt");
 		test_det<all_mats<int, 3, 3>, int>("algorithm/det/3x3.txt");
-		test_det<all_mats<double, 10, 10>, double>("algorithm/det/10x10.txt", alloc_obj);
-		test_det<all_mats<double, 20, 20>, double>("algorithm/det/20x20.txt", alloc_obj);
+		test_det<all_mats<double, 10, 10>, double>("algorithm/det/10x10.txt");
+		test_det<all_mats<double, 20, 20>, double>("algorithm/det/20x20.txt");
+
+		// Test different return type
+		test_det<dyn_mat<float>, int>("algorithm/det/3x3.txt");
 	};
 
-	feature("Transpose") = [&]() {
+	feature("Transpose") = []() {
 		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt",
 			transpose);
-		test_fn<join_mats<all_mats<double, 50, 2>, all_trps_mats<double, 50, 2>>>("algorithm/trps/50x2.txt", transpose);
-		test_fn<join_mats<dyn_mats<double, 50, 2>, dyn_trps_mats<double, 50, 2, alloc_t>>>("algorithm/trps/50x2.txt",
-			transpose,
-			alloc_obj);
+		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algorithm/trps/50x2.txt", transpose);
+
+		// Test different return type
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algorithm/trps/25x25.txt", transpose);
 	};
 
-	feature("Inverse") = [&]() {
-		test_fn<join_mats<all_mats<double, 0, 0, alloc_t>, all_mats<double, 0, 0, alloc_t>>>("algorithm/inv/0x0.txt",
-			inverse);
-		test_fn<join_mats<all_mats<double, 1, 1, alloc_t>, all_mats<double, 1, 1, alloc_t>>>("algorithm/inv/1x1.txt",
-			inverse);
-		test_fn<join_mats<all_mats<double, 2, 2, alloc_t>, all_mats<double, 2, 2, alloc_t>>>("algorithm/inv/2x2.txt",
-			inverse);
-		test_fn<join_mats<all_mats<double, 3, 3, alloc_t>, all_mats<double, 3, 3, alloc_t>>>(
-			"algorithm/inv/3x3_int.txt",
-			inverse);
+	feature("Inverse") = []() {
+		test_fn<join_mats<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algorithm/inv/0x0.txt", inverse);
+		test_fn<join_mats<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algorithm/inv/1x1.txt", inverse);
+		test_fn<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algorithm/inv/2x2.txt", inverse);
+		test_fn<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
+		test_fn<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algorithm/inv/3x3.txt", inverse);
+		test_fn<join_mats<all_mats<double, 10, 10>, all_mats<double, 10, 10>>>("algorithm/inv/10x10.txt", inverse);
 
-		using same_mats_val_t = join_mats<dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
-
-		test_fn<same_mats_val_t>("algorithm/inv/3x3.txt", inverse, alloc_obj);
-
-		using diff_mats_val_t = join_mats<dyn_mats<float, 10, 10>, dyn_mats<double, 10, 10, alloc_t>>;
-
-		test_fn<diff_mats_val_t>("algorithm/inv/10x10.txt", inverse, alloc_obj);
+		// Test different return type
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<int, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
 	};
 
-	feature("Forward substitution") = [&]() {
-		test_sub<join_mats<all_mats<double, 4, 4, alloc_t>,
-			all_mats<double, 4, 1, alloc_t>,
-			all_sub_mats<double, 4, 1, 1, alloc_t>>>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution);
+	feature("Forward substitution") = []() {
+		test_sub<join_mats<all_mats<double, 4, 4>, all_mats<double, 4, 1>, all_mats<double, 4, 1>>>(
+			"algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution);
 
-		using same_mats_val_t =
-			join_mats<dyn_mats<double, 4, 4>, dyn_mats<double, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>;
-
-		test_sub<same_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_obj);
-
-		using diff_mats_val_t =
-			join_mats<dyn_mats<float, 4, 4>, dyn_mats<float, 4, 1>, dyn_sub_mats<double, 4, 1, 1, alloc_t>>;
-
-		test_sub<diff_mats_val_t>("algorithm/fwd_sub/4x4_4x1.txt", forward_substitution, alloc_obj);
+		// Test different return type
+		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<int, 4, 1>>>("algorithm/fwd_sub/4x4_4x1.txt",
+			forward_substitution);
 	};
 
-	feature("Backward substitution") = [&]() {
-		test_sub<join_mats<all_mats<double, 3, 3, alloc_t>,
-			all_mats<double, 3, 1, alloc_t>,
-			all_sub_mats<double, 3, 3, 1, alloc_t>>>("algorithm/back_sub/3x3_3x1.txt", back_substitution);
+	feature("Backward substitution") = []() {
+		test_sub<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 1>, all_mats<double, 3, 1>>>(
+			"algorithm/back_sub/3x3_3x1.txt",
+			back_substitution);
 
-		using same_mats_val_t =
-			join_mats<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 1>, dyn_sub_mats<double, 3, 3, 1, alloc_t>>;
-
-		test_sub<same_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_obj);
-
-		using diff_mats_val_t =
-			join_mats<dyn_mats<float, 3, 3>, dyn_mats<float, 3, 1>, dyn_sub_mats<double, 3, 3, 1, alloc_t>>;
-
-		test_sub<diff_mats_val_t>("algorithm/back_sub/3x3_3x1.txt", back_substitution, alloc_obj);
+		// Test different return type
+		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
+			back_substitution);
 	};
 
-	feature("LU Decomposition") = [&]() {
-		test_lu<join_mats<all_mats<double, 2, 2, alloc_t>,
-			all_mats<double, 2, 2, alloc_t>,
-			all_mats<double, 2, 2, alloc_t>>>("algorithm/lu/2x2.txt");
-		test_lu<join_mats<all_mats<double, 3, 3, alloc_t>,
-			all_mats<double, 3, 3, alloc_t>,
-			all_mats<double, 3, 3, alloc_t>>>("algorithm/lu/3x3.txt");
+	feature("LU Decomposition") = []() {
+		test_lu<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>, all_mats<double, 2, 2>>>(
+			"algorithm/lu/2x2.txt");
+		test_lu<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>, all_mats<double, 3, 3>>>(
+			"algorithm/lu/3x3.txt");
 
-		using same_mats_val_t =
-			join_mats<dyn_mats<double, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
-
-		test_lu<same_mats_val_t>("algorithm/lu/3x3.txt", alloc_obj);
-
-		using diff_mats_val_t =
-			join_mats<dyn_mats<float, 3, 3>, dyn_mats<double, 3, 3, alloc_t>, dyn_mats<double, 3, 3, alloc_t>>;
-
-		test_lu<diff_mats_val_t>("algorithm/lu/3x3.txt", alloc_obj);
+		// Test different return type
+		test_lu<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 2, 2>>>("algorithm/lu/2x2.txt");
 	};
 
-	feature("Block") = [&]() {
-		using const_0_t = mpp::constant<0>;
-		using const_2_t = mpp::constant<2>;
-		using const_3_t = mpp::constant<3>;
+	feature("Block") = []() {
+		test_block<join_mats<all_mats<double, 3, 3>, all_mats<double, 1, 1>>>("algorithm/block/3x3_1x1_0_0_0_0.txt");
+		test_block<join_mats<all_mats<double, 4, 4>, all_mats<double, 2, 2>>>("algorithm/block/4x4_2x2_2_2_3_3.txt");
 
-		test_fn<join_mats<all_mats<double, 3, 3, alloc_t>,
-			all_block_mats<double, 3, 3, const_0_t, const_0_t, const_0_t, const_0_t, alloc_t>>>(
-			"algorithm/block/3x3_1x1_0_0_0_0.txt",
-			block,
-			const_0_t{},
-			const_0_t{},
-			const_0_t{},
-			const_0_t{});
-
-		using const_2_3_t_args =
-			join_mats<dyn_mats<double, 4, 4>, dyn_block_mats<double, 4, 4, const_2_t, const_2_t, const_3_t, const_3_t>>;
-
-		test_fn<const_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt",
-			block,
-			const_2_t{},
-			const_2_t{},
-			const_3_t{},
-			const_3_t{});
-
-		using dyn_2_3_t_args = join_mats<dyn_mats<double, 4, 4>,
-			dyn_block_mats<double, 4, 4, std::size_t, std::size_t, std::size_t, std::size_t, alloc_t>>;
-
-		test_fn<dyn_2_3_t_args>("algorithm/block/4x4_2x2_2_2_3_3.txt", block, 2, 2, 3, 3, alloc_obj);
+		// Test different return type
+		test_block<join_mats<dyn_mat<double>, fixed_mat<double, 1, 1>>>("algorithm/block/3x3_1x1_0_0_0_0.txt");
 	};
 
 	return 0;

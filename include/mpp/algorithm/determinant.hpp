@@ -36,15 +36,8 @@ namespace mpp
 	{
 		inline static constexpr auto dummy_variable = ' ';
 
-		template<typename To,
-			typename LUAllocator,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename... Args>
-		[[nodiscard]] inline auto det_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			[[maybe_unused]] const Args&... alloc_args) -> To // @TODO: ISSUE #20
+		template<typename To, typename Mat>
+		[[nodiscard]] inline auto det_impl(const Mat& obj) -> To // @TODO: ISSUE #20
 		{
 			assert(square(obj));
 
@@ -72,21 +65,12 @@ namespace mpp
 				return static_cast<To>(result);
 			}
 
-			using lu_alloc_rebind_t =
-				typename std::allocator_traits<LUAllocator>::template rebind_alloc<default_floating_type>;
-			using lu_decomp_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, lu_alloc_rebind_t>;
-			using lu_decomp_buffer_t = typename lu_decomp_matrix_t::buffer_type;
+			using lu_decomp_buffer_t = typename mat_rebind_to_t<Mat, default_floating_type>::buffer_type;
 
-			auto u_buffer = [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return lu_decomp_buffer_t{ alloc_args... };
-				}
-				else
-				{
-					return lu_decomp_buffer_t{};
-				}
-			}();
+			auto u_buffer = lu_decomp_buffer_t{};
+
+			// If the incoming matrix has an array as its buffer, we can just use the same type of buffer since it'll be
+			// less overhead and we know it's the same size
 
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buffer.begin());
@@ -95,8 +79,7 @@ namespace mpp
 			// creating L entirely
 			const auto det = lu_generic<default_floating_type, false, true>(rows, columns, dummy_variable, u_buffer);
 
-			// We can't directly cast because that would round down floating points
-			// @TODO: Analyze if other algorithms that uses determinant need this treatment
+			// @FIXME: Is it correct to just directly cast?
 			return static_cast<To>(det);
 		}
 	} // namespace detail
@@ -107,26 +90,12 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
+			typename To = Value>
+		requires(std::is_arithmetic_v<To>) [[nodiscard]] friend inline auto tag_invoke(determinant_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const LUAllocator& lu_alloc = LUAllocator{}) -> Value // @TODO: ISSUE #20
+			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::det_impl<Value, LUAllocator>(obj, lu_alloc);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename LUAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const LUAllocator& lu_alloc = LUAllocator{}) -> To // @TODO: ISSUE #20
-		{
-			return detail::det_impl<To, LUAllocator>(obj, lu_alloc);
+			return detail::det_impl<To>(obj);
 		}
 	};
 
