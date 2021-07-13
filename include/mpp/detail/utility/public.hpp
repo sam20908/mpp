@@ -28,26 +28,6 @@ namespace mpp
 {
 	static inline constexpr auto dynamic = static_cast<std::size_t>(-1);
 
-	template<std::size_t Val = dynamic>
-	struct constant
-	{
-		std::size_t val{ Val };
-
-		constexpr explicit operator std::size_t() const
-		{
-			return val;
-		}
-
-		[[nodiscard]] static constexpr auto tmp_val() noexcept -> std::size_t
-		{
-			return Val;
-		}
-	};
-
-	/**
-	 * Tags
-	 */
-
 	struct identity_tag
 	{
 	};

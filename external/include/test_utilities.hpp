@@ -129,58 +129,6 @@ using all_trps_mats = std::tuple<std::type_identity<mpp::matrix<T, Columns, Rows
 	std::type_identity<mpp::matrix<T, Columns, mpp::dynamic, Alloc...>>,
 	std::type_identity<mpp::matrix<T, mpp::dynamic, Rows, Alloc...>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using dyn_trps_mats = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, Columns, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Rows, Alloc...>>>;
-
-template<typename T, std::size_t ARows, std::size_t AColumns, std::size_t BColumns, typename... Alloc>
-using all_sub_mats = std::tuple<std::type_identity<mpp::matrix<T, ARows, BColumns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, ARows, BColumns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, ARows, mpp::dynamic, Alloc...>>>;
-
-template<typename T, std::size_t ARows, std::size_t AColumns, std::size_t BColumns, typename... Alloc>
-using dyn_sub_mats = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, ARows, BColumns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, ARows, mpp::dynamic, Alloc...>>>;
-
-#define IDX_VALS                                                                                                       \
-	mpp::detail::get_constant_val_or_dynamic<TopRowIndex>(),                                                           \
-		mpp::detail::get_constant_val_or_dynamic<TopColumnIndex>(),                                                    \
-		mpp::detail::get_constant_val_or_dynamic<BottomRowIndex>(),                                                    \
-		mpp::detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
-
-template<typename T,
-	std::size_t Rows,
-	std::size_t Columns,
-	typename TopRowIndex,
-	typename TopColumnIndex,
-	typename BottomRowIndex,
-	typename BottomColumnIndex,
-	typename... Alloc>
-using all_block_mats = std::tuple<std::type_identity<mpp::detail::block_mat_ret_t<T, Rows, Columns, IDX_VALS Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::detail::block_mat_ret_t<T, mpp::dynamic, Columns, IDX_VALS Alloc...>>,
-	std::type_identity<mpp::detail::block_mat_ret_t<T, Rows, mpp::dynamic, IDX_VALS Alloc...>>>;
-
-template<typename T,
-	std::size_t Rows,
-	std::size_t Columns,
-	typename TopRowIndex,
-	typename TopColumnIndex,
-	typename BottomRowIndex,
-	typename BottomColumnIndex,
-	typename... Alloc>
-using dyn_block_mats = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::detail::block_mat_ret_t<T, mpp::dynamic, Columns, IDX_VALS Alloc...>>,
-	std::type_identity<mpp::detail::block_mat_ret_t<T, Rows, mpp::dynamic, IDX_VALS Alloc...>>>;
-
-#undef IDX_VALS
-
-template<typename... Mats>
-using mats_tup = std::tuple<std::type_identity<Mats>...>;
-
 template<typename...>
 struct join_mats_impl;
 
@@ -621,6 +569,26 @@ inline auto parse_mat_construct_val_arg =
 
 		return init_mat_extent_dependent(identity, rows, cols, args...);
 	};
+};
+
+struct block_idxs_container
+{
+	std::size_t row_start;
+	std::size_t col_start;
+	std::size_t row_end;
+	std::size_t col_end;
+};
+
+inline auto parse_block_idxs = [](std::ifstream& file, std::string& line) {
+	std::getline(file, line);
+
+	auto stream = std::istringstream{ line };
+	std::size_t row_start, col_start, row_end, col_end;
+	stream >> row_start >> col_start >> row_end >> col_end;
+
+	std::getline(file, line); // to skip '='
+
+	return block_idxs_container{ row_start, col_start, row_end, col_end };
 };
 
 template<typename... Fns>

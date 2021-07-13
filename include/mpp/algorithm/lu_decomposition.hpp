@@ -33,52 +33,20 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename To,
-			typename ToAllocator,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename... Args>
-		auto lu_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			[[maybe_unused]] const Args&... alloc_args) -> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-			matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+		template<typename To, typename To2, typename Mat>
+		auto lu_impl(const Mat& obj) -> std::pair<To, To2> // @TODO: ISSUE #20
 		{
 			assert(square(obj));
 
-			using lu_matrix_t = matrix<default_floating_type,
-				RowsExtent,
-				ColumnsExtent,
-				typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>;
-			using lu_buffer_t = typename lu_matrix_t::buffer_type;
-
-			using result_matrix_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
+			using lu_buffer_t = typename mat_rebind_to_t<Mat, default_floating_type>::buffer_type;
 
 			const auto rows    = obj.rows();
 			const auto columns = obj.columns();
 
-			auto l_buffer = [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return lu_buffer_t{ alloc_args... };
-				}
-				else
-				{
-					return lu_buffer_t{};
-				}
-			}();
-			auto u_buffer = [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return lu_buffer_t{ alloc_args... };
-				}
-				else
-				{
-					return lu_buffer_t{};
-				}
-			}();
+			auto l_buffer = lu_buffer_t{};
+			auto u_buffer = lu_buffer_t{};
 
-			// @TODO: Should do a direct copy initialization instead
+			// @TODO: Should do a direct buffer copy initialization instead
 			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
 			std::ranges::copy(obj, u_buffer.begin());
 
@@ -86,26 +54,7 @@ namespace mpp
 
 			lu_generic<default_floating_type, true, false>(rows, columns, l_buffer, u_buffer);
 
-			return { [&]() {
-						if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-						{
-							return result_matrix_t{ rows, columns, std::move(l_buffer), alloc_args... };
-						}
-						else
-						{
-							return result_matrix_t{ rows, columns, std::move(l_buffer) };
-						}
-					}(),
-				[&]() {
-					if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-					{
-						return result_matrix_t{ rows, columns, std::move(u_buffer), alloc_args... };
-					}
-					else
-					{
-						return result_matrix_t{ rows, columns, std::move(u_buffer) };
-					}
-				}() };
+			return { To{ rows, columns, std::move(l_buffer) }, To2{ rows, columns, std::move(u_buffer) } };
 		}
 	} // namespace detail
 
@@ -115,31 +64,14 @@ namespace mpp
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
 			typename Allocator,
-			typename ToAllocator = Allocator>
-		friend inline auto tag_invoke(lu_decomposition_t,
+			typename To  = matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
+			typename To2 = matrix<Value, RowsExtent, ColumnsExtent, Allocator>>
+		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(lu_decomposition_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> std::pair<matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<Value, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
+			std::type_identity<To>  = {},
+			std::type_identity<To2> = {}) -> std::pair<To, To2> // @TODO: ISSUE #20
 		{
-			return detail::lu_impl<Value, ToAllocator>(obj, to_alloc);
-		}
-
-		template<typename To,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename ToAllocator = typename std::allocator_traits<Allocator>::template rebind_alloc<To>>
-		friend inline auto tag_invoke(lu_decomposition_t,
-			std::type_identity<To>,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			const ToAllocator& to_alloc = ToAllocator{})
-			-> std::pair<matrix<To, RowsExtent, ColumnsExtent, ToAllocator>,
-				matrix<To, RowsExtent, ColumnsExtent, ToAllocator>> // @TODO: ISSUE #20
-
-		{
-			return detail::lu_impl<To, ToAllocator>(obj, to_alloc);
+			return detail::lu_impl<To, To2>(obj);
 		}
 	};
 

@@ -52,30 +52,15 @@ namespace mpp
 			assert(top_column_index <= bottom_column_index);
 		}
 
-		template<typename Val,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			std::size_t TopRowIndex,
-			std::size_t TopColumnIndex,
-			std::size_t BottomRowIndex,
-			std::size_t BottomColumnIndex,
-			typename... Alloc>
-		using block_mat_ret_t = matrix<Val,
-			any_extent_is_dynamic(RowsExtent, TopRowIndex, BottomRowIndex) ? dynamic : BottomRowIndex - TopRowIndex + 1,
-			any_extent_is_dynamic(ColumnsExtent, TopColumnIndex, BottomColumnIndex)
-				? dynamic
-				: BottomColumnIndex - TopColumnIndex + 1,
-			Alloc...>;
-
-		template<typename BlockMat>
+		template<typename To>
 		auto block_impl_fixed(const auto& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
-			std::size_t bottom_column_index) -> BlockMat // @TODO: ISSUE #20
+			std::size_t bottom_column_index) -> To // @TODO: ISSUE #20
 		{
-			using diff_t = typename BlockMat::difference_type;
-			using buf_t  = typename BlockMat::buffer_type;
+			using diff_t = typename To::difference_type;
+			using buf_t  = typename To::buffer_type;
 
 			auto buf = buf_t{};
 
@@ -96,25 +81,24 @@ namespace mpp
 				std::advance(buf_begin, block_columns);
 			}
 
-			return BlockMat{ block_rows, block_columns, std::move(buf) };
+			return To{ block_rows, block_columns, std::move(buf) };
 		}
 
-		template<typename BlockMat, typename... Args>
+		template<typename To>
 		auto block_impl_dyn(const auto& obj,
 			std::size_t top_row_index,
 			std::size_t top_column_index,
 			std::size_t bottom_row_index,
-			std::size_t bottom_column_index,
-			const Args&... alloc_args) -> BlockMat // @TODO: ISSUE #20
+			std::size_t bottom_column_index) -> To // @TODO: ISSUE #20
 		{
-			using diff_t = typename BlockMat::difference_type;
-			using buf_t  = typename BlockMat::buffer_type;
+			using diff_t = typename To::difference_type;
+			using buf_t  = typename To::buffer_type;
 
 			const auto columns       = obj.columns();
 			const auto block_rows    = bottom_row_index - top_row_index + 1;
 			const auto block_columns = bottom_column_index - top_column_index + 1;
 
-			auto buf = buf_t{ alloc_args... };
+			auto buf = buf_t{};
 			buf.reserve(block_rows * block_columns);
 
 			auto inserter = std::back_inserter(buf);
@@ -127,69 +111,36 @@ namespace mpp
 				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_columns), inserter);
 			}
 
-			return BlockMat{ block_rows, block_columns, std::move(buf), alloc_args... };
+			return To{ block_rows, block_columns, std::move(buf) };
 		}
 
-		template<typename BlockAllocator,
-			typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename TopRowIndex,
-			typename TopColumnIndex,
-			typename BottomRowIndex,
-			typename BottomColumnIndex,
-			typename Allocator,
-			typename... Args>
-		[[nodiscard]] inline auto block_impl(const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			TopRowIndex top_row_index,
-			TopColumnIndex top_column_index,
-			BottomRowIndex bottom_row_index,
-			BottomColumnIndex bottom_column_index,
-			const Args&... alloc_args) -> block_mat_ret_t<Value,
-			RowsExtent,
-			ColumnsExtent,
-			get_constant_val_or_dynamic<TopRowIndex>(),
-			get_constant_val_or_dynamic<TopColumnIndex>(),
-			get_constant_val_or_dynamic<BottomRowIndex>(),
-			get_constant_val_or_dynamic<BottomColumnIndex>(),
-			BlockAllocator> // @TODO: ISSUE #20
+		template<typename To>
+		[[nodiscard]] inline auto block_impl(const auto& obj,
+			auto top_row_index,
+			auto top_column_index,
+			auto bottom_row_index,
+			auto bottom_column_index) -> To // @TODO: ISSUE #20
 		{
-			// The static_cast are to trigger the explicit conversion operator for mpp::constant objects
-
 			assert_valid_block_dims(obj.rows(),
 				obj.columns(),
-				static_cast<std::size_t>(top_row_index),
-				static_cast<std::size_t>(top_column_index),
-				static_cast<std::size_t>(bottom_row_index),
-				static_cast<std::size_t>(bottom_column_index));
+				top_row_index,
+				top_column_index,
+				bottom_row_index,
+				bottom_column_index);
 
-			using block_mat_t = block_mat_ret_t<Value,
-				RowsExtent,
-				ColumnsExtent,
-				get_constant_val_or_dynamic<TopRowIndex>(),
-				get_constant_val_or_dynamic<TopColumnIndex>(),
-				get_constant_val_or_dynamic<BottomRowIndex>(),
-				get_constant_val_or_dynamic<BottomColumnIndex>(),
-				BlockAllocator>;
-
-			constexpr auto buf_is_vec = any_extent_is_dynamic(RowsExtent, ColumnsExtent);
+			constexpr auto buf_is_vec = is_vector<typename To::buffer_type>::value;
 
 			if constexpr (buf_is_vec)
 			{
-				return block_impl_dyn<block_mat_t>(obj,
-					static_cast<std::size_t>(top_row_index),
-					static_cast<std::size_t>(top_column_index),
-					static_cast<std::size_t>(bottom_row_index),
-					static_cast<std::size_t>(bottom_column_index),
-					alloc_args...);
+				return block_impl_dyn<To>(obj, top_row_index, top_column_index, bottom_row_index, bottom_column_index);
 			}
 			else
 			{
-				return block_impl_fixed<block_mat_t>(obj,
-					static_cast<std::size_t>(top_row_index),
-					static_cast<std::size_t>(top_column_index),
-					static_cast<std::size_t>(bottom_row_index),
-					static_cast<std::size_t>(bottom_column_index));
+				return block_impl_fixed<To>(obj,
+					top_row_index,
+					top_column_index,
+					bottom_row_index,
+					bottom_column_index);
 			}
 		}
 	} // namespace detail
@@ -199,33 +150,17 @@ namespace mpp
 		template<typename Value,
 			std::size_t RowsExtent,
 			std::size_t ColumnsExtent,
-			detail::constant_or_convertible_to_size_t TopRowIndex,
-			detail::constant_or_convertible_to_size_t TopColumnIndex,
-			detail::constant_or_convertible_to_size_t BottomRowIndex,
-			detail::constant_or_convertible_to_size_t BottomColumnIndex,
 			typename Allocator,
-			typename BlockAllocator = Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(block_t,
+			typename To = matrix<Value, dynamic, dynamic, Allocator>>
+		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(block_t,
 			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
-			TopRowIndex top_row_index,
-			TopColumnIndex top_column_index,
-			BottomRowIndex bottom_row_index,
-			BottomColumnIndex bottom_column_index,
-			const BlockAllocator& block_alloc = BlockAllocator{}) -> detail::block_mat_ret_t<Value,
-			RowsExtent,
-			ColumnsExtent,
-			detail::get_constant_val_or_dynamic<TopRowIndex>(),
-			detail::get_constant_val_or_dynamic<TopColumnIndex>(),
-			detail::get_constant_val_or_dynamic<BottomRowIndex>(),
-			detail::get_constant_val_or_dynamic<BottomColumnIndex>(),
-			BlockAllocator> // @TODO: ISSUE #20
+			std::size_t top_row_index,
+			std::size_t top_column_index,
+			std::size_t bottom_row_index,
+			std::size_t bottom_column_index,
+			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::block_impl<BlockAllocator>(obj,
-				top_row_index,
-				top_column_index,
-				bottom_row_index,
-				bottom_column_index,
-				block_alloc);
+			return detail::block_impl<To>(obj, top_row_index, top_column_index, bottom_row_index, bottom_column_index);
 		}
 	};
 

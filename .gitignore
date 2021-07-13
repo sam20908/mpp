@@ -62,3 +62,4 @@ compile_commands.json
 # More Neovim plugin stuff
 .cmake/
 .cache/
+.vimspector.json

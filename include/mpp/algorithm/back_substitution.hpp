@@ -34,13 +34,10 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		inline auto back_subst_on_buffer(const auto& a, const auto& b, std::size_t n) -> // @TODO: ISSUE #20
-			typename matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>::buffer_type
+		template<typename Buf>
+		inline auto back_subst_on_buffer(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
 		{
-			using x_matrix_t = matrix<default_floating_type, RowsExtent, ColumnsExtent, Allocator>;
-			using x_buffer_t = typename x_matrix_t::buffer_type;
-			auto x_buffer    = x_buffer_t{};
+			auto x_buffer = Buf{};
 
 			// @TODO: Any way to make this utilize push_back?
 			allocate_buffer_if_vector(x_buffer, n, 1, default_floating_type{});
@@ -72,63 +69,23 @@ namespace mpp
 			return x_buffer;
 		}
 
-		template<typename To, std::size_t RowsExtent, std::size_t ColumnsExtent, typename ToAllocator, typename... Args>
-		inline auto back_subst_matrix(const auto& a, const auto& b, [[maybe_unused]] const Args&... alloc_args)
-			-> matrix<To, RowsExtent, ColumnsExtent, ToAllocator> // @TODO: ISSUE #20
+		template<typename To>
+		inline auto back_subst_matrix(const auto& a, const auto& b) -> To // @TODO: ISSUE #20
 		{
 			assert(square(a));
 			assert(b.columns() == 1);
 
 			const auto rows = a.rows();
 
-			using x_mat_t = matrix<To, RowsExtent, ColumnsExtent, ToAllocator>;
-			auto&& x_buf  = back_subst_on_buffer<RowsExtent,
-                ColumnsExtent,
-                typename std::allocator_traits<ToAllocator>::template rebind_alloc<default_floating_type>>(a.data(),
-                b.data(),
-                rows);
+			using x_mat_t = mat_rebind_to_t<To, default_floating_type>;
+			auto x_buf    = back_subst_on_buffer<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
 
-			return [&]() {
-				if constexpr (any_extent_is_dynamic(RowsExtent, ColumnsExtent))
-				{
-					return x_mat_t{ rows, 1, std::move(x_buf), alloc_args... };
-				}
-				else
-				{
-					return x_mat_t{ rows, 1, std::move(x_buf) };
-				}
-			}();
+			return To{ rows, 1, std::move(x_buf) };
 		}
 	} // namespace detail
 
 	struct back_substitution_t : public detail::cpo_base<back_substitution_t>
 	{
-		template<typename To,
-			typename AValue,
-			typename BValue,
-			std::size_t ARowsExtent,
-			std::size_t AColumnsExtent,
-			std::size_t BRowsExtent,
-			std::size_t BColumnsExtent,
-			typename AAllocator,
-			typename BAllocator,
-			typename ToAllocator = typename std::allocator_traits<AAllocator>::template rebind_alloc<To>>
-		friend inline auto tag_invoke(back_substitution_t,
-			std::type_identity<To>,
-			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
-			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<To,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
-		{
-			// @TODO: Figure out the constraint on To
-			return detail::back_subst_matrix<To,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b, to_alloc);
-		}
-
 		template<typename AValue,
 			typename BValue,
 			std::size_t ARowsExtent,
@@ -137,20 +94,15 @@ namespace mpp
 			std::size_t BColumnsExtent,
 			typename AAllocator,
 			typename BAllocator,
-			typename ToAllocator =
-				typename std::allocator_traits<AAllocator>::template rebind_alloc<std::common_type_t<AValue, BValue>>>
-		friend inline auto tag_invoke(back_substitution_t,
+			typename To = matrix<std::common_type_t<AValue, BValue>,
+				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
+				BColumnsExtent>>
+		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(back_substitution_t,
 			const matrix<AValue, ARowsExtent, AColumnsExtent, AAllocator>& a,
 			const matrix<BValue, BRowsExtent, BColumnsExtent, BAllocator>& b,
-			const ToAllocator& to_alloc = ToAllocator{}) -> matrix<std::common_type_t<AValue, BValue>,
-			detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-			BColumnsExtent,
-			ToAllocator> // @TODO: ISSUE #20
+			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::back_subst_matrix<std::common_type_t<AValue, BValue>,
-				detail::prefer_static_extent(ARowsExtent, AColumnsExtent),
-				BColumnsExtent,
-				ToAllocator>(a, b, to_alloc);
+			return detail::back_subst_matrix<To>(a, b);
 		}
 	};
 

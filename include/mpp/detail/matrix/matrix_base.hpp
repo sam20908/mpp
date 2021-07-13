@@ -321,6 +321,7 @@ namespace mpp::detail
 		using const_reverse_iterator = matrix_iterator<typename Buffer::const_reverse_iterator>;
 		using difference_type        = typename buffer_type::difference_type;
 		using size_type              = std::size_t;
+		using allocator_type         = Allocator;
 
 		matrix_base(const matrix_base&) noexcept(
 			std::is_nothrow_copy_constructible_v<Value>)                                 = default; // @TODO: ISSUE #20
@@ -577,11 +578,9 @@ namespace mpp::detail
 		}
 
 	public:
-		using allocator_type = Allocator;
-
 		using base::operator=;
 
-		[[nodiscard]] auto get_allocator() const noexcept -> allocator_type // @TODO: ISSUE #20
+		[[nodiscard]] auto get_allocator() const noexcept -> typename base::allocator_type // @TODO: ISSUE #20
 		{
 			return base::buffer_.get_allocator();
 		}
