@@ -40,42 +40,29 @@ namespace
 	template<typename Mats>
 	void test_init(std::string_view test_name, const auto& input_fn, const auto&... args)
 	{
-		test(test_name.data()) =
-			[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
-				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>> identity) {
-				const auto [out, expected_rng] = parse_test(test_name, input_fn(identity, args...), parse_vec2d<T>);
+		test(test_name.data()) = [&, test_name]<typename Mat>(std::type_identity<Mat> identity) {
+			const auto [out, expected_rng] =
+				parse_test(test_name, input_fn(identity, args...), parse_vec2d<typename Mat::value_type>);
 
-				cmp_mat_to_rng(out, expected_rng);
-			} |
-			Mats{};
+			cmp_mat_to_rng(out, expected_rng);
+		} | Mats{};
 	}
 
 	template<typename Mats, bool Move>
 	void test_init_copy_move_ctor(std::string_view test_name, const auto&... args)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 typename Alloc,
-									 typename Alloc2>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
-			auto [mat, expected_rng] = parse_test(test_name, parse_mat<mat_t>, parse_vec2d<T>);
+		test(test_name.data()) = [&, test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
+			auto [mat, expected_rng] = parse_test(test_name, parse_mat<Mat>, parse_vec2d<typename Mat::value_type>);
 
 			if constexpr (Move)
 			{
-				mat2_t out{ std::move(mat), args... };
+				Mat2 out{ std::move(mat), args... };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 			else
 			{
-				mat2_t out{ mat, args... };
+				Mat2 out{ mat, args... };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 		} | Mats{};

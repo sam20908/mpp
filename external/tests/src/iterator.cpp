@@ -121,30 +121,26 @@ int main()
         matrix<int, 2, dynamic>{ range_2d },
         matrix<int, dynamic, 3>{ range_2d } };
 
-	feature("Standard conforming iterators") =
-		[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
-			std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
-			using mat_t                  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat_iter               = typename mat_t::iterator;
-			using mat_reverse_iter       = typename mat_t::iterator;
-			using mat_const_iter         = typename mat_t::const_iterator;
-			using mat_const_reverse_iter = typename mat_t::const_iterator;
+	feature("Standard conforming iterators") = []<typename Mat>(std::type_identity<Mat>) {
+		using mat_iter               = typename Mat::iterator;
+		using mat_reverse_iter       = typename Mat::iterator;
+		using mat_const_iter         = typename Mat::const_iterator;
+		using mat_const_reverse_iter = typename Mat::const_reverse_iterator;
 
-			given("Mutable and immutable iterators should meet contiguous_iterator") = [&]() {
-				expect(boost::ut::constant<std::contiguous_iterator<mat_iter>>);
-				expect(boost::ut::constant<std::contiguous_iterator<mat_const_iter>>);
-			};
+		given("Mutable and immutable iterators should meet contiguous_iterator") = [&]() {
+			expect(constant<std::contiguous_iterator<mat_iter>>);
+			expect(constant<std::contiguous_iterator<mat_const_iter>>);
+		};
 
-			given("Mutable and immutable reverse iterators should meet bidirectional_iterator") = [&]() {
-				expect(boost::ut::constant<std::bidirectional_iterator<mat_reverse_iter>>);
-				expect(boost::ut::constant<std::bidirectional_iterator<mat_const_reverse_iter>>);
-			};
+		given("Mutable and immutable reverse iterators should meet bidirectional_iterator") = [&]() {
+			expect(constant<std::bidirectional_iterator<mat_reverse_iter>>);
+			expect(constant<std::bidirectional_iterator<mat_const_reverse_iter>>);
+		};
 
-			given("Mutable iterators should meet output_iterator") = [&]() {
-				expect(boost::ut::constant<std::output_iterator<mat_iter, int>>);
-			};
-		} |
-		mats_types;
+		given("Mutable iterators should meet output_iterator") = [&]() {
+			expect(constant<std::output_iterator<mat_iter, int>>);
+		};
+	} | mats_types;
 
 	feature("Iterator semantics") = [&]() {
 		given("Mutable and immutable iterators should have right semantics") = [](const auto& mat) {
