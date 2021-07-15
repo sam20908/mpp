@@ -38,38 +38,22 @@ namespace
 	template<typename Mats>
 	void test_fn(std::string_view test_name, const auto& fn, const auto& parse_fn)
 	{
-		test(test_name.data()) =
-			[&, test_name]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
-				std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>) {
-				using mat_t = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+		test(test_name.data()) = [&, test_name]<typename Mat>(std::type_identity<Mat>) {
+			const auto [mat, expected_val] = parse_test(test_name, parse_mat<Mat>, parse_fn);
+			const auto out                 = fn(mat);
 
-				const auto [mat, expected_val] = parse_test(test_name, parse_mat<mat_t>, parse_fn);
-				const auto out                 = fn(mat);
-
-				expect(out == expected_val);
-			} |
-			Mats{};
+			expect(out == expected_val);
+		} | Mats{};
 	}
 
 	template<typename Mats, typename Order, typename Order2>
 	void test_cmp_size(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 typename Alloc,
-									 typename Alloc2>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
+		test(test_name.data()) = [test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
 			const auto [mat, mat2, cmp_rows, cmp_cols, expected_row_cmp, expected_col_cmp] = parse_test(test_name,
-				parse_mat<mat_t>,
-				parse_mat<mat2_t>,
+				parse_mat<Mat>,
+				parse_mat<Mat2>,
 				parse_val<bool>,
 				parse_val<bool>,
 				parse_ordering<Order>,
@@ -85,21 +69,10 @@ namespace
 	template<typename Mats, typename Order>
 	void test_cmp_elems(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 typename Alloc,
-									 typename Alloc2>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
+		test(test_name.data()) = [&, test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
 			const auto [mat, mat2, expected_cmp] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_ordering<Order>);
+				parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_ordering<Order>);
 
 			const auto out = elements_compare(mat, mat2, floating_point_compare);
 

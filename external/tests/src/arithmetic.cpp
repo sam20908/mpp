@@ -33,32 +33,15 @@ namespace
 	template<typename Mats, bool ConstructMat>
 	void test_op(std::string_view test_name, const auto& op)
 	{
-		test(test_name) = [&, test_name]<typename T,
-							  typename T2,
-							  typename T3,
-							  std::size_t RowsExtent,
-							  std::size_t RowsExtent2,
-							  std::size_t RowsExtent3,
-							  std::size_t ColumnsExtent,
-							  std::size_t ColumnsExtent2,
-							  std::size_t ColumnsExtent3,
-							  typename Alloc,
-							  typename Alloc2,
-							  typename Alloc3>(
-							  std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-								  std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>,
-								  std::type_identity<matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-			using mat3_t = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
-
+		test(test_name) = [&, test_name]<typename Mat, typename Mat2, typename Mat3>(
+							  std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
 			const auto [mat, mat2, expected_mat] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
+				parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
 
 			const auto out = [&]() {
 				if constexpr (ConstructMat)
 				{
-					return mat3_t{ op(mat, mat2) };
+					return Mat3{ op(mat, mat2) };
 				}
 				else
 				{
@@ -78,26 +61,15 @@ namespace
 	template<typename Mats, bool ConstructMat>
 	void test_num_op(const std::string& test_name, const auto& op)
 	{
-		test(test_name) = [&, test_name]<typename T,
-							  typename T2,
-							  std::size_t RowsExtent,
-							  std::size_t RowsExtent2,
-							  std::size_t ColumnsExtent,
-							  std::size_t ColumnsExtent2,
-							  typename Alloc,
-							  typename Alloc2>(
-							  std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-								  std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
+		test(test_name) = [&, test_name]<typename Mat, typename Mat2>(
+							  std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
 			const auto [mat, val, expected_mat] =
-				parse_test(test_name, parse_mat<mat_t>, parse_val<T>, parse_mat<mat2_t>);
+				parse_test(test_name, parse_mat<Mat>, parse_val<typename Mat::value_type>, parse_mat<Mat2>);
 
 			const auto out = [&]() {
 				if constexpr (ConstructMat)
 				{
-					return mat2_t{ op(mat, val) };
+					return Mat2{ op(mat, val) };
 				}
 				else
 				{

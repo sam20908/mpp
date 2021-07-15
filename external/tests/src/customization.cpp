@@ -166,18 +166,18 @@ int main()
 	// Putting semiregular test here because this test does all the constants/type checking stuff
 
 	scenario("CPOs should meet std::semiregular requirements") = []() {
-		expect(boost::ut::constant<std::semiregular<mpp::type_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::singular_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::square_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::block_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::determinant_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::inverse_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::transpose_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::size_compare_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::elements_compare_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::lu_decomposition_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::forward_substitution_t>>);
-		expect(boost::ut::constant<std::semiregular<mpp::back_substitution_t>>);
+		expect(constant<std::semiregular<mpp::type_t>>);
+		expect(constant<std::semiregular<mpp::singular_t>>);
+		expect(constant<std::semiregular<mpp::square_t>>);
+		expect(constant<std::semiregular<mpp::block_t>>);
+		expect(constant<std::semiregular<mpp::determinant_t>>);
+		expect(constant<std::semiregular<mpp::inverse_t>>);
+		expect(constant<std::semiregular<mpp::transpose_t>>);
+		expect(constant<std::semiregular<mpp::size_compare_t>>);
+		expect(constant<std::semiregular<mpp::elements_compare_t>>);
+		expect(constant<std::semiregular<mpp::lu_decomposition_t>>);
+		expect(constant<std::semiregular<mpp::forward_substitution_t>>);
+		expect(constant<std::semiregular<mpp::back_substitution_t>>);
 	};
 
 	return 0;

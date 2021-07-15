@@ -35,30 +35,22 @@ namespace
 	template<typename Mats, bool Move, bool UseArr2DAsRng>
 	void test_assign_rng(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 typename Alloc,
-									 typename Alloc2>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-
+		test(test_name.data()) = [test_name]<typename Mat, typename Mat2>(
+									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
 			auto [mat, vec2d, expected_mat] = [&]() {
 				if constexpr (UseArr2DAsRng)
 				{
 					return parse_test(test_name,
-						parse_mat<mat_t>,
-						parse_arr2d<T, RowsExtent, ColumnsExtent>,
-						parse_mat<mat2_t>);
+						parse_mat<Mat>,
+						parse_arr2d<typename Mat::value_type, Mat::rows_extent(), Mat::columns_extent()>,
+						parse_mat<Mat2>);
 				}
 				else
 				{
-					return parse_test(test_name, parse_mat<mat_t>, parse_vec2d<T>, parse_mat<mat2_t>);
+					return parse_test(test_name,
+						parse_mat<Mat>,
+						parse_vec2d<typename Mat::value_type>,
+						parse_mat<Mat2>);
 				}
 			}();
 
@@ -78,39 +70,24 @@ namespace
 	template<typename Mats, bool Move>
 	void test_assign_mat(std::string_view test_name)
 	{
-		test(test_name.data()) = [&, test_name]<typename T,
-									 typename T2,
-									 typename T3,
-									 std::size_t RowsExtent,
-									 std::size_t RowsExtent2,
-									 std::size_t RowsExtent3,
-									 std::size_t ColumnsExtent,
-									 std::size_t ColumnsExtent2,
-									 std::size_t ColumnsExtent3,
-									 typename Alloc,
-									 typename Alloc2,
-									 typename Alloc3>(
-									 std::tuple<std::type_identity<matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
-										 std::type_identity<matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>>,
-										 std::type_identity<matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>>>) {
-			using mat_t  = matrix<T, RowsExtent, ColumnsExtent, Alloc>;
-			using mat2_t = matrix<T2, RowsExtent2, ColumnsExtent2, Alloc2>;
-			using mat3_t = matrix<T3, RowsExtent3, ColumnsExtent3, Alloc3>;
+		test(test_name.data()) =
+			[test_name]<typename Mat, typename Mat2, typename Mat3>(
+				std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
+				auto [mat, mat2, expected_mat] =
+					parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
 
-			auto [mat, mat2, expected_mat] =
-				parse_test(test_name, parse_mat<mat_t>, parse_mat<mat2_t>, parse_mat<mat3_t>);
+				if constexpr (Move)
+				{
+					mat = std::move(mat2);
+				}
+				else
+				{
+					mat = mat2;
+				}
 
-			if constexpr (Move)
-			{
-				mat = std::move(mat2);
-			}
-			else
-			{
-				mat = mat2;
-			}
-
-			cmp_mat_to_expr_like(mat, expected_mat);
-		} | Mats{};
+				cmp_mat_to_expr_like(mat, expected_mat);
+			} |
+			Mats{};
 	}
 } // namespace
 

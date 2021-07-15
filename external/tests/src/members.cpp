@@ -34,10 +34,10 @@ int main()
 	using namespace mpp;
 
 	feature("Destructible (part of rule of five)") = []() {
-		expect(boost::ut::constant<std::is_destructible_v<matrix<int, 2, 3>>>);
-		expect(boost::ut::constant<std::is_destructible_v<matrix<int, dynamic, dynamic>>>);
-		expect(boost::ut::constant<std::is_destructible_v<matrix<int, dynamic, 3>>>);
-		expect(boost::ut::constant<std::is_destructible_v<matrix<int, 2, dynamic>>>);
+		expect(constant<std::is_destructible_v<matrix<int, 2, 3>>>);
+		expect(constant<std::is_destructible_v<matrix<int, dynamic, dynamic>>>);
+		expect(constant<std::is_destructible_v<matrix<int, dynamic, 3>>>);
+		expect(constant<std::is_destructible_v<matrix<int, 2, dynamic>>>);
 	};
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
