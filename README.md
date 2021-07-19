@@ -109,10 +109,6 @@ One of the main things to take away is the concept of **"extents"** for dimensio
 
 #### Comparisons
 
-Normally with C++20, we could simply provide a `operator<=>` and let the compiler figure out the approriate operators, but that's not going to work when we want to compare matrices of different extents or different value types because of the different base class types. In addition, comparison CPOs were implemented to cover that gap.
-
-`operator<=>` was also provided if you know you'll compare matrices with the same value type (therefore no need to use `mpp::elements_compare` ).
-
 ```cpp
 #include <mpp/mat.hpp>
 #include <mpp/utility/cmp.hpp>
@@ -149,7 +145,7 @@ int main()
   // 41.F / 99.F is recurring 0.41
   const auto left = mpp::mat<float>{ { 41.F / 99.F } };
   const auto right = mpp::mat<float>{ { 41.F / 99.F } };
-  const auto ordering_2 = mpp::cmp(left, right, mpp::floating_point_compare);
+  const auto ordering_2 = mpp::cmp(left, right, mpp::cmp_fp);
   // mpp::floating_point_compare is exposed to the public as a comparator that handles floating points
   // ordering_2 -> std::partial_ordering::equivalent
 
@@ -159,7 +155,7 @@ int main()
 
 #### Customizations
 
-Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
+Customizations of options that affect the library globally can be changed via specializing the `mpp::cfg` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
 ```cpp
 #include <mpp/utility/cfg.hpp>
@@ -175,7 +171,7 @@ namespace mpp
     template<typename Value>
     using allocator = my_custom_allocator<Value>;
 
-    static constexpr std::size_t rows_extent    = 10;
+    static constexpr std::size_t rows_extent = 10;
     static constexpr std::size_t cols_extent = 10;
 
     /**
