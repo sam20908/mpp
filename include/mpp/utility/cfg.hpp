@@ -38,7 +38,7 @@ namespace mpp
 	struct cfg
 	{
 		template<typename Val>
-		using allocator = std::allocator<Val>;
+		using alloc = std::allocator<Val>;
 
 		static constexpr auto rows_extent = dyn;
 		static constexpr auto cols_extent = dyn;
