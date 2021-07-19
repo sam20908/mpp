@@ -98,7 +98,7 @@ int main()
   /**
    * Ways of printing matrices
    */
-  mpp::print_matrix(result);
+  mpp::print(result);
   std::cout << result; // It automatically inserts newline
 
   return 0;
@@ -162,7 +162,7 @@ int main()
 Customizations of options that affect the library globally can be changed via specializing the `mpp::configuration` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
 ```cpp
-#include <mpp/utility/configuration.hpp>
+#include <mpp/utility/cfg.hpp>
 
 #include <array>
 #include <vector>
@@ -170,7 +170,7 @@ Customizations of options that affect the library globally can be changed via sp
 namespace mpp
 {
   template<>
-  struct configuration<override>
+  struct cfg<override>
   {
     template<typename Value>
     using allocator = my_custom_allocator<Value>;
