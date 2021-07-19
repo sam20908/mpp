@@ -82,8 +82,7 @@ namespace
 			[test_name]<typename Mat, typename Mat2, typename Mat3>(
 				std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
 				const auto [mat, mat2, mat3] = parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
-				const auto [out, out2] =
-					mpp::lu(mat, std::type_identity<Mat2>{}, std::type_identity<Mat3>{});
+				const auto [out, out2]       = mpp::lu(mat, std::type_identity<Mat2>{}, std::type_identity<Mat3>{});
 
 				scenario("Testing L matrix") = [&]() {
 					cmp_mat_types(out, mat2);
@@ -128,8 +127,7 @@ int main()
 	};
 
 	feature("Transpose") = []() {
-		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt",
-			trps);
+		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt", trps);
 		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algorithm/trps/50x2.txt", trps);
 
 		// Test different return type

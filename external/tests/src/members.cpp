@@ -45,9 +45,8 @@ int main()
         mat<int, dyn, dyn>{ range_2d },
         mat<int, 2, dyn>{ range_2d },
         mat<int, dyn, 3>{ range_2d } };
-	const auto dyn_mats = std::tuple{ mat<int, dyn, dyn>{ range_2d },
-		mat<int, 2, dyn>{ range_2d },
-		mat<int, dyn, 3>{ range_2d } };
+	const auto dyn_mats =
+		std::tuple{ mat<int, dyn, dyn>{ range_2d }, mat<int, 2, dyn>{ range_2d }, mat<int, dyn, 3>{ range_2d } };
 
 	feature("operator()") = [&]() {
 		given("We're only reading the data") = [&](const auto& mat) {
