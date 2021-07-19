@@ -21,8 +21,8 @@
 
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/square.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/utility/sq.hpp>
+#include <mpp/mat.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -36,38 +36,38 @@ namespace mpp
 		template<typename To, typename To2, typename Mat>
 		auto lu_impl(const Mat& obj) -> std::pair<To, To2> // @TODO: ISSUE #20
 		{
-			assert(square(obj));
+			assert(sq(obj));
 
-			using lu_buffer_t = typename mat_rebind_to_t<Mat, default_floating_type>::buffer_type;
+			using lu_buffer_t = typename mat_rebind_to_t<Mat, fp_t>::buffer_type;
 
-			const auto rows    = obj.rows();
-			const auto columns = obj.columns();
+			const auto rows = obj.rows();
+			const auto cols = obj.cols();
 
-			auto l_buffer = lu_buffer_t{};
-			auto u_buffer = lu_buffer_t{};
+			auto l = lu_buffer_t{};
+			auto u = lu_buffer_t{};
 
 			// @TODO: Should do a direct buffer copy initialization instead
-			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
-			std::ranges::copy(obj, u_buffer.begin());
+			resize_buf_if_vec(u, rows, cols, fp_t{});
+			std::ranges::copy(obj, u.begin());
 
-			make_identity_buffer(l_buffer, rows, columns, default_floating_type{}, default_floating_type{ 1 });
+			init_identity_buf(l, rows, cols, fp_t{}, fp_t{ 1 });
 
-			lu_generic<default_floating_type, true, false>(rows, columns, l_buffer, u_buffer);
+			lu_impl<fp_t, true, false>(rows, cols, l, u);
 
-			return { To{ rows, columns, std::move(l_buffer) }, To2{ rows, columns, std::move(u_buffer) } };
+			return { To{ rows, cols, std::move(l) }, To2{ rows, cols, std::move(u) } };
 		}
 	} // namespace detail
 
-	struct lu_decomposition_t : public detail::cpo_base<lu_decomposition_t>
+	struct lu_t : public detail::cpo_base<lu_t>
 	{
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename To  = matrix<Value, RowsExtent, ColumnsExtent, Allocator>,
-			typename To2 = matrix<Value, RowsExtent, ColumnsExtent, Allocator>>
-		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(lu_decomposition_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+		template<typename Val,
+			std::size_t Rows,
+			std::size_t Cols,
+			typename Alloc,
+			typename To  = mat<Val, Rows, Cols, Alloc>,
+			typename To2 = mat<Val, Rows, Cols, Alloc>>
+		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(lu_t,
+			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To>  = {},
 			std::type_identity<To2> = {}) -> std::pair<To, To2> // @TODO: ISSUE #20
 		{
@@ -75,5 +75,5 @@ namespace mpp
 		}
 	};
 
-	inline constexpr auto lu_decomposition = lu_decomposition_t{};
+	inline constexpr auto lu = lu_t{};
 } // namespace mpp

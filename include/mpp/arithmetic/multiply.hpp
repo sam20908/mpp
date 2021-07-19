@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * regarding copyB ownership.  The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/expr/expr_binary_constant_op.hpp>
 #include <mpp/detail/expr/expr_binary_op.hpp>
+#include <mpp/detail/expr/expr_binary_val_op.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -33,78 +33,70 @@ namespace mpp
 {
 	namespace detail
 	{
-		inline constexpr auto mul_constant_op =
-			[](const auto& left,
-				const auto& right,
-				std::size_t row_index,
-				std::size_t col_index) noexcept -> decltype(left(row_index, col_index) * right) {
-			return left(row_index, col_index) * right;
+		inline constexpr auto mul_val_op =
+			[](const auto& a, const auto& b, std::size_t row, std::size_t col) noexcept -> decltype(a(row, col) * b) {
+			return a(row, col) * b;
 		};
 
-		inline constexpr auto mul_op =
-			[](const auto& left, const auto& right, std::size_t row_index, std::size_t col_index) noexcept ->
-			typename std::decay_t<decltype(left)>::value_type {
-				using value_type = typename std::decay_t<decltype(left)>::value_type;
+		inline constexpr auto mul_op = [](const auto& a, const auto& b, std::size_t row, std::size_t col) noexcept ->
+			typename std::remove_cvref_t<decltype(a)>::value_type {
+				using value_type = typename std::remove_cvref_t<decltype(a)>::value_type;
 
-				const auto left_columns = left.columns();
-				auto result             = value_type{};
+				const auto a_cols = a.cols();
+				auto res          = value_type{};
 
-				for (auto index = std::size_t{}; index < left_columns; ++index)
+				for (auto idx = std::size_t{}; idx < a_cols; ++idx)
 				{
-					result += left(row_index, index) * right(index, col_index);
+					res += a(row, idx) * b(idx, col);
 				}
 
-				return result;
+				return res;
 			};
 	} // namespace detail
 
-	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto operator*(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj,
-		Value constant) noexcept -> detail::expr_binary_constant_op<RowsExtent,
-		ColumnsExtent,
-		detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
-		Value,
-		decltype(detail::mul_constant_op)> // @TODO: ISSUE #20
+	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
+	[[nodiscard]] inline auto operator*(const detail::expr_base<Base, Val, Rows, Cols>& obj, Val val) noexcept
+		-> detail::expr_binary_val_op<Rows,
+			Cols,
+			detail::expr_base<Base, Val, Rows, Cols>,
+			Val,
+			decltype(detail::mul_val_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns(), detail::mul_constant_op };
+		return { obj, val, obj.rows(), obj.cols(), detail::mul_val_op };
 	}
 
-	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] inline auto operator*(Value constant,
-		const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj)
-		-> detail::expr_binary_constant_op<RowsExtent,
-			ColumnsExtent,
-			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
-			Value,
-			decltype(detail::mul_constant_op)> // @TODO: ISSUE #20
+	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
+	[[nodiscard]] inline auto operator*(Val val, const detail::expr_base<Base, Val, Rows, Cols>& obj)
+		-> detail::expr_binary_val_op<Rows,
+			Cols,
+			detail::expr_base<Base, Val, Rows, Cols>,
+			Val,
+			decltype(detail::mul_val_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns(), detail::mul_constant_op };
+		return { obj, val, obj.rows(), obj.cols(), detail::mul_val_op };
 	}
 
-	template<typename LeftBase,
-		typename RightBase,
-		typename Value,
-		std::size_t LeftRowsExtent,
-		std::size_t LeftColumnsExtent,
-		std::size_t RightRowsExtent,
-		std::size_t RightColumnsExtent>
-	[[nodiscard]] inline auto operator*(
-		const detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>& left,
-		const detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>& right)
-		-> detail::expr_binary_op<LeftRowsExtent,
-			RightColumnsExtent,
-			detail::expr_base<LeftBase, Value, LeftRowsExtent, LeftColumnsExtent>,
-			detail::expr_base<RightBase, Value, RightRowsExtent, RightColumnsExtent>,
-			decltype(detail::mul_op)> // @TODO: ISSUE #20
+	template<typename ABase,
+		typename BBase,
+		typename Val,
+		std::size_t ARows,
+		std::size_t ACols,
+		std::size_t BRows,
+		std::size_t BCols>
+	[[nodiscard]] inline auto operator*(const detail::expr_base<ABase, Val, ARows, ACols>& a,
+		const detail::expr_base<BBase, Val, BRows, BCols>& b) -> detail::expr_binary_op<ARows,
+		BCols,
+		detail::expr_base<ABase, Val, ARows, ACols>,
+		detail::expr_base<BBase, Val, BRows, BCols>,
+		decltype(detail::mul_op)> // @TODO: ISSUE #20
 	{
-		return { left, right, left.rows(), right.columns(), detail::mul_op };
+		return { a, b, a.rows(), b.cols(), detail::mul_op };
 	}
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	inline auto operator*=(matrix<Value, RowsExtent, ColumnsExtent>& obj, Value constant)
-		-> matrix<Value, RowsExtent, ColumnsExtent>& // @TODO: ISSUE #20
+	template<typename Val, std::size_t Rows, std::size_t Cols>
+	inline auto operator*=(mat<Val, Rows, Cols>& obj, Val val) -> mat<Val, Rows, Cols>& // @TODO: ISSUE #20
 	{
-		std::ranges::transform(obj, obj.begin(), std::bind_front(std::multiplies<>{}, constant));
+		std::ranges::transform(obj, obj.begin(), std::bind_front(std::multiplies<>{}, val));
 
 		return obj;
 	}

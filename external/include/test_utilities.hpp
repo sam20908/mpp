@@ -22,11 +22,10 @@
 #include <boost/ut.hpp>
 
 #include <mpp/algorithm/block.hpp> // @FIXME: Put necessary things for detail block helpers into a more central header
-#include <mpp/detail/matrix/matrix_def.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/public.hpp>
 #include <mpp/utility/print.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 #include <filesystem>
@@ -44,7 +43,7 @@ auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 	const auto expected_cols = expected_rows == 0 ? 0 : rng[0].size();
 
 	const auto rows_is_eq = mat.rows() == expected_rows;
-	const auto cols_is_eq = mat.columns() == expected_cols;
+	const auto cols_is_eq = mat.cols() == expected_cols;
 
 	if (!rows_is_eq || !cols_is_eq)
 	{
@@ -55,7 +54,7 @@ auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 	{
 		for (auto col = std::size_t{}; col < expected_cols; ++col)
 		{
-			if (mpp::floating_point_compare(mat(row, col), rng[row][col]) != 0)
+			if (mpp::cmp_fp(mat(row, col), rng[row][col]) != 0)
 			{
 				return false;
 			}
@@ -68,7 +67,7 @@ auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
 {
 	const auto rows_is_eq = mat.rows() == expr.rows();
-	const auto cols_is_eq = mat.columns() == expr.columns();
+	const auto cols_is_eq = mat.cols() == expr.cols();
 
 	if (!rows_is_eq || !cols_is_eq)
 	{
@@ -77,9 +76,9 @@ auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
 
 	for (auto row = std::size_t{}; row < mat.rows(); ++row)
 	{
-		for (auto col = std::size_t{}; col < mat.columns(); ++col)
+		for (auto col = std::size_t{}; col < mat.cols(); ++col)
 		{
-			if (mpp::floating_point_compare(mat(row, col), expr(row, col)) != 0)
+			if (mpp::cmp_fp(mat(row, col), expr(row, col)) != 0)
 			{
 				return false;
 			}
@@ -89,45 +88,45 @@ auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
 	return true;
 }
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using all_mats = std::tuple<std::type_identity<mpp::matrix<T, Rows, Columns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Columns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, Rows, mpp::dynamic, Alloc...>>>;
+template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
+using all_mats = std::tuple<std::type_identity<mpp::mat<T, Rows, Cols, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
+	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using dyn_mats = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Columns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, Rows, mpp::dynamic, Alloc...>>>;
+template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
+using dyn_mats = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
+	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using all_mats_reverse = std::tuple<std::type_identity<mpp::matrix<T, Rows, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Columns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, Rows, mpp::dynamic, Alloc...>>>;
+template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
+using all_mats_reverse = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using dyn_mats_reverse = std::tuple<std::type_identity<mpp::matrix<T, Rows, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Columns, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>>;
+template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
+using dyn_mats_reverse = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns>
-using fixed_mat = std::tuple<std::type_identity<mpp::matrix<T, Rows, Columns>>>;
+template<typename T, std::size_t Rows, std::size_t Cols>
+using fixed_mat = std::tuple<std::type_identity<mpp::mat<T, Rows, Cols>>>;
 
 template<typename T>
-using dyn_mat = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic>>>;
+using dyn_mat = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn>>>;
 
-template<typename T, std::size_t Columns>
-using dyn_rows_mat = std::tuple<std::type_identity<mpp::matrix<T, mpp::dynamic, Columns>>>;
+template<typename T, std::size_t Cols>
+using dyn_rows_mat = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, Cols>>>;
 
 template<typename T, std::size_t Rows>
-using dyn_cols_mat = std::tuple<std::type_identity<mpp::matrix<T, Rows, mpp::dynamic>>>;
+using dyn_cols_mat = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn>>>;
 
-template<typename T, std::size_t Rows, std::size_t Columns, typename... Alloc>
-using all_trps_mats = std::tuple<std::type_identity<mpp::matrix<T, Columns, Rows, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, Columns, mpp::dynamic, Alloc...>>,
-	std::type_identity<mpp::matrix<T, mpp::dynamic, Rows, Alloc...>>>;
+template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
+using all_trps_mats = std::tuple<std::type_identity<mpp::mat<T, Cols, Rows, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, Cols, mpp::dyn, Alloc...>>,
+	std::type_identity<mpp::mat<T, mpp::dyn, Rows, Alloc...>>>;
 
 template<typename...>
 struct join_mats_impl;
@@ -189,7 +188,7 @@ void cmp_mat_to_rng(const auto& mat, const auto& rng)
 
 namespace mpp
 {
-	enum class matrix_type;
+	enum class mat_type;
 } // namespace mpp
 
 template<typename T>
@@ -252,10 +251,10 @@ auto str_fn()
 		};
 	}
 
-	else if constexpr (std::is_same_v<T, mpp::matrix_type>)
+	else if constexpr (std::is_same_v<T, mpp::mat_type>)
 	{
 		return [](const std::string& str) {
-			return static_cast<mpp::matrix_type>(std::stoi(str));
+			return static_cast<mpp::mat_type>(std::stoi(str));
 		};
 	}
 }
@@ -345,9 +344,9 @@ inline auto parse_vec1d = [](std::ifstream& file, std::string& line) {
 	return data;
 };
 
-template<typename T, std::size_t Rows, std::size_t Columns>
+template<typename T, std::size_t Rows, std::size_t Cols>
 inline auto parse_arr2d = [](std::ifstream& file, std::string& line) {
-	auto data             = std::array<std::array<T, Columns>, Rows>{};
+	auto data             = std::array<std::array<T, Cols>, Rows>{};
 	auto row_idx          = std::size_t{};
 	const auto str_val_fn = str_fn<T>();
 
@@ -387,14 +386,14 @@ inline auto parse_dims = [](std::ifstream& file, std::string& line) {
 };
 
 inline auto parse_mat_construct_args =
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {
 		std::getline(file, line); // to skip '='
 
-		using mat_t = mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
 
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -409,28 +408,28 @@ inline auto parse_mat_construct_args =
 	};
 };
 
-template<std::size_t ArrRows, std::size_t ArrColumns>
+template<std::size_t ArrRows, std::size_t ArrCols>
 inline auto parse_mat_construct_arr2d =
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
 
-		auto rng = parse_arr2d<T, ArrRows, ArrColumns>(file, line);
+		auto rng = parse_arr2d<T, ArrRows, ArrCols>(file, line);
 
 		return mat_t{ rng, args... };
 	};
 };
 
 inline auto parse_mat_construct_rng2d =
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
 
 		auto rng = parse_vec2d<T>(file, line);
 
@@ -440,12 +439,12 @@ inline auto parse_mat_construct_rng2d =
 
 template<bool Move>
 inline auto parse_mat_construct_rng1d =
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>;
+		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
 
 		const auto [rows, cols] = parse_dims(file, line);
 		auto rng                = parse_vec1d<T>(file, line);
@@ -529,39 +528,39 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 inline auto init_mat_extent_dependent = overloaded{
 	// clang-format off
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
 		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t columns,
+		[[maybe_unused]] std::size_t cols,
 		const auto&... args) {
-		return mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>{ args... };
+		return mpp::mat<T, RowsExtent, Cols, Alloc>{ args... };
 	},
-	[]<typename T, typename Alloc>(std::type_identity<mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc>>,
+	[]<typename T, typename Alloc>(std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc>>,
 		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t columns,
+		[[maybe_unused]] std::size_t cols,
 		const auto&... args) {
-		return mpp::matrix<T, mpp::dynamic, mpp::dynamic, Alloc>{ rows, columns, args... };
+		return mpp::mat<T, mpp::dyn, mpp::dyn, Alloc>{ rows, cols, args... };
 	},
-	[]<typename T, std::size_t ColumnsExtent, typename Alloc>(
-		std::type_identity<mpp::matrix<T, mpp::dynamic, ColumnsExtent, Alloc>>,
+	[]<typename T, std::size_t Cols, typename Alloc>(
+		std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc>>,
 		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t columns,
+		[[maybe_unused]] std::size_t cols,
 		const auto&... args) {
-		return mpp::matrix<T, mpp::dynamic, ColumnsExtent, Alloc>{ rows, args... };
+		return mpp::mat<T, mpp::dyn, Cols, Alloc>{ rows, args... };
 	},
 	[]<typename T, std::size_t RowsExtent, typename Alloc>(
-		std::type_identity<mpp::matrix<T, RowsExtent, mpp::dynamic, Alloc>>,
+		std::type_identity<mpp::mat<T, RowsExtent, mpp::dyn, Alloc>>,
 		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t columns,
+		[[maybe_unused]] std::size_t cols,
 		const auto&... args) {
-		return mpp::matrix<T, RowsExtent, mpp::dynamic, Alloc>{ columns, args... };
+		return mpp::mat<T, RowsExtent, mpp::dyn, Alloc>{ cols, args... };
 	}
 	// clang-format on
 };
 
 inline auto parse_mat_construct_val_arg =
-	[]<typename T, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc, typename... Args>(
-		std::type_identity<mpp::matrix<T, RowsExtent, ColumnsExtent, Alloc>> identity,
+	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
+		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>> identity,
 		const Args&... args)
 {
 	return [&](std::ifstream& file, std::string& line) {

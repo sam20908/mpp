@@ -20,7 +20,7 @@
 #include <boost/ut.hpp>
 
 #include <mpp/arithmetic.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include "../../include/test_utilities.hpp"
 

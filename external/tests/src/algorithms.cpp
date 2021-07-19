@@ -17,10 +17,10 @@
  * under the License.
  */
 
-#include <mpp/utility/comparison.hpp>
+#include <mpp/utility/cmp.hpp>
 #include <mpp/utility/type.hpp>
 #include <mpp/algorithm.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include "../../include/custom_allocator.hpp"
 #include "../../include/test_utilities.hpp"
@@ -41,7 +41,7 @@ namespace
 	{
 		test(test_name.data()) = [test_name]<typename Mat>(std::type_identity<Mat>) {
 			const auto [mat, num] = parse_test(test_name, parse_mat<Mat>, parse_val<To>);
-			const auto out        = mpp::determinant(mat, std::type_identity<To>{});
+			const auto out        = mpp::det(mat, std::type_identity<To>{});
 
 			cmp_nums(out, num);
 		} | Mats{};
@@ -83,7 +83,7 @@ namespace
 				std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>, std::type_identity<Mat3>>) {
 				const auto [mat, mat2, mat3] = parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_mat<Mat3>);
 				const auto [out, out2] =
-					mpp::lu_decomposition(mat, std::type_identity<Mat2>{}, std::type_identity<Mat3>{});
+					mpp::lu(mat, std::type_identity<Mat2>{}, std::type_identity<Mat3>{});
 
 				scenario("Testing L matrix") = [&]() {
 					cmp_mat_types(out, mat2);
@@ -129,11 +129,11 @@ int main()
 
 	feature("Transpose") = []() {
 		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt",
-			transpose);
-		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algorithm/trps/50x2.txt", transpose);
+			trps);
+		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algorithm/trps/50x2.txt", trps);
 
 		// Test different return type
-		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algorithm/trps/25x25.txt", transpose);
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algorithm/trps/25x25.txt", trps);
 	};
 
 	feature("Inverse") = []() {
@@ -151,21 +151,21 @@ int main()
 	feature("Forward substitution") = []() {
 		test_sub<join_mats<all_mats<double, 4, 4>, all_mats<double, 4, 1>, all_mats<double, 4, 1>>>(
 			"algorithm/fwd_sub/4x4_4x1.txt",
-			forward_substitution);
+			fwd_sub);
 
 		// Test different return type
 		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<int, 4, 1>>>("algorithm/fwd_sub/4x4_4x1.txt",
-			forward_substitution);
+			fwd_sub);
 	};
 
 	feature("Backward substitution") = []() {
 		test_sub<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 1>, all_mats<double, 3, 1>>>(
 			"algorithm/back_sub/3x3_3x1.txt",
-			back_substitution);
+			back_sub);
 
 		// Test different return type
 		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
-			back_substitution);
+			back_sub);
 	};
 
 	feature("LU Decomposition") = []() {

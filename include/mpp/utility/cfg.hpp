@@ -35,24 +35,24 @@ namespace mpp
 	 * Defines the global configuration the library uses
 	 */
 	template<typename>
-	struct configuration
+	struct cfg
 	{
-		template<typename Value>
-		using allocator = std::allocator<Value>;
+		template<typename Val>
+		using allocator = std::allocator<Val>;
 
-		static constexpr auto rows_extent    = dynamic;
-		static constexpr auto columns_extent = dynamic;
+		static constexpr auto rows_extent = dyn;
+		static constexpr auto cols_extent = dyn;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename>
-		using static_buffer = std::array<Value, RowsExtent * ColumnsExtent>;
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename>
+		using fixed_buf = std::array<Val, Rows * Cols>;
 
-		template<typename Value, std::size_t, std::size_t, typename Alloc>
-		using dynamic_buffer = std::vector<Value, Alloc>;
+		template<typename Val, std::size_t, std::size_t, typename Alloc>
+		using dyn_buf = std::vector<Val, Alloc>;
 
-		template<typename Value, std::size_t, std::size_t ColumnsExtent, typename Alloc>
-		using dynamic_rows_buffer = dynamic_buffer<Value, 1, ColumnsExtent, Alloc>;
+		template<typename Val, std::size_t, std::size_t Cols, typename Alloc>
+		using dyn_rows_buf = dyn_buf<Val, 1, Cols, Alloc>;
 
-		template<typename Value, std::size_t RowsExtent, std::size_t, typename Alloc>
-		using dynamic_columns_buffer = dynamic_buffer<Value, RowsExtent, 1, Alloc>;
+		template<typename Val, std::size_t Rows, std::size_t, typename Alloc>
+		using dyn_cols_buf = dyn_buf<Val, Rows, 1, Alloc>;
 	};
 } // namespace mpp

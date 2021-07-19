@@ -19,7 +19,7 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include "../../include/test_utilities.hpp"
 
@@ -116,10 +116,10 @@ int main()
 	const auto mats_types = all_mats<int, 0, 0>{};
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-	const auto mats     = std::tuple{ matrix<int, 2, 3>{ range_2d },
-        matrix<int, dynamic, dynamic>{ range_2d },
-        matrix<int, 2, dynamic>{ range_2d },
-        matrix<int, dynamic, 3>{ range_2d } };
+	const auto mats     = std::tuple{ mat<int, 2, 3>{ range_2d },
+        mat<int, dyn, dyn>{ range_2d },
+        mat<int, 2, dyn>{ range_2d },
+        mat<int, dyn, 3>{ range_2d } };
 
 	feature("Standard conforming iterators") = []<typename Mat>(std::type_identity<Mat>) {
 		using mat_iter               = typename Mat::iterator;

@@ -19,11 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/matrix/matrix_base.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -35,44 +34,44 @@ namespace mpp
 		template<typename To>
 		[[nodiscard]] auto trps_impl(const auto& obj) -> To
 		{
-			const auto rows    = obj.rows();
-			const auto columns = obj.columns();
-			const auto data    = obj.data();
+			const auto rows = obj.rows();
+			const auto cols = obj.cols();
+			const auto data = obj.data();
 
 			using trps_buf_t = typename To::buffer_type;
 
 			auto transposed_buffer = trps_buf_t{};
-			allocate_buffer_if_vector(transposed_buffer, columns, rows, typename To::value_type{});
+			resize_buf_if_vec(transposed_buffer, cols, rows, typename To::value_type{});
 
-			for (auto column = std::size_t{}; column < columns; ++column)
+			for (auto column = std::size_t{}; column < cols; ++column)
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_index     = detail::index_2d_to_1d(columns, row, column);
-					auto transposed_index = detail::index_2d_to_1d(rows, column, row);
+					auto normal_index     = detail::idx_1d(cols, row, column);
+					auto transposed_index = detail::idx_1d(rows, column, row);
 
 					transposed_buffer[transposed_index] = data[normal_index];
 				}
 			}
 
-			return To{ columns, rows, std::move(transposed_buffer) };
+			return To{ cols, rows, std::move(transposed_buffer) };
 		}
 	} // namespace detail
 
-	struct transpose_t : public detail::cpo_base<transpose_t>
+	struct trps_t : public detail::cpo_base<trps_t>
 	{
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename To = matrix<Value, ColumnsExtent, RowsExtent, Allocator>>
-		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(transpose_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+		template<typename Val,
+			std::size_t Rows,
+			std::size_t Cols,
+			typename Alloc,
+			typename To = mat<Val, Cols, Rows, Alloc>>
+		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(trps_t,
+			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
 			return detail::trps_impl<To>(obj);
 		}
 	};
 
-	inline constexpr auto transpose = transpose_t{};
+	inline constexpr auto trps = trps_t{};
 } // namespace mpp

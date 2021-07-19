@@ -19,7 +19,7 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include "../../include/test_utilities.hpp"
 
@@ -42,7 +42,7 @@ namespace
 				{
 					return parse_test(test_name,
 						parse_mat<Mat>,
-						parse_arr2d<typename Mat::value_type, Mat::rows_extent(), Mat::columns_extent()>,
+						parse_arr2d<typename Mat::value_type, Mat::rows_extent(), Mat::cols_extent()>,
 						parse_mat<Mat2>);
 				}
 				else

@@ -21,44 +21,44 @@
 
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 
 namespace mpp
 {
-	enum class matrix_type
+	enum class mat_type
 	{
-		fully_static,
-		fully_dynamic,
+		fixed,
+		dynamic,
 		dynamic_rows,
-		dynamic_columns
+		dynamic_cols
 	};
 
 	struct type_t : public detail::cpo_base<type_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(type_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>&) noexcept -> matrix_type // @TODO: ISSUE #20
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+		[[nodiscard]] friend inline auto tag_invoke(type_t, const mat<Val, Rows, Cols, Alloc>&) noexcept
+			-> mat_type // @TODO: ISSUE #20
 		{
-			constexpr auto row_is_dynamic    = RowsExtent == dynamic;
-			constexpr auto column_is_dynamic = ColumnsExtent == dynamic;
+			constexpr auto row_is_dyn = Rows == dyn;
+			constexpr auto col_is_dyn = Cols == dyn;
 
-			if constexpr (!row_is_dynamic && !column_is_dynamic)
+			if constexpr (!row_is_dyn && !col_is_dyn)
 			{
-				return matrix_type::fully_static;
+				return mat_type::fixed;
 			}
-			else if constexpr (row_is_dynamic && column_is_dynamic)
+			else if constexpr (row_is_dyn && col_is_dyn)
 			{
-				return matrix_type::fully_dynamic;
+				return mat_type::dynamic;
 			}
-			else if constexpr (row_is_dynamic && !column_is_dynamic)
+			else if constexpr (row_is_dyn && !col_is_dyn)
 			{
-				return matrix_type::dynamic_rows;
+				return mat_type::dynamic_rows;
 			}
 			else
 			{
-				return matrix_type::dynamic_columns;
+				return mat_type::dynamic_cols;
 			}
 		}
 	};

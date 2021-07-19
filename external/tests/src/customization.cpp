@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include <mpp/utility/configuration.hpp>
+#include <mpp/utility/cfg.hpp>
 
 #include <array>
 #include <vector>
@@ -25,35 +25,35 @@
 namespace mpp
 {
 	template<>
-	struct configuration<override>
+	struct cfg<override>
 	{
-		template<typename Value>
-		using allocator = std::allocator<Value>;
+		template<typename Val>
+		using allocator = std::allocator<Val>;
 
-		static constexpr std::size_t rows_extent    = 10;
-		static constexpr std::size_t columns_extent = 10;
+		static constexpr std::size_t rows_extent = 10;
+		static constexpr std::size_t cols_extent = 10;
 
 		static constexpr bool use_unsafe = true;
 
 		// Only for testing purposes, don't actually do this!
 
-		template<typename Value, std::size_t, std::size_t, typename>
-		using static_buffer = std::vector<Value>;
+		template<typename Val, std::size_t, std::size_t, typename>
+		using fixed_buf = std::vector<Val>;
 
-		template<typename Value, std::size_t, std::size_t, typename>
-		using dynamic_buffer = std::array<Value, 100>;
+		template<typename Val, std::size_t, std::size_t, typename>
+		using dyn_buf = std::array<Val, 100>;
 
-		template<typename Value, std::size_t, std::size_t, typename>
-		using dynamic_rows_buffer = std::array<Value, 100>;
-		template<typename Value, std::size_t, std::size_t, typename>
-		using dynamic_columns_buffer = std::array<Value, 100>;
+		template<typename Val, std::size_t, std::size_t, typename>
+		using dyn_rows_buf = std::array<Val, 100>;
+		template<typename Val, std::size_t, std::size_t, typename>
+		using dyn_cols_buf = std::array<Val, 100>;
 	};
 } // namespace mpp
 
 #include <boost/ut.hpp>
 
 #include <mpp/algorithm.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 #include <mpp/utility.hpp>
 
 namespace ns
@@ -71,7 +71,7 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::square_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::sq_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -81,7 +81,7 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::determinant_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::det_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -91,12 +91,12 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::transpose_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::trps_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::singular_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::sg_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -106,22 +106,22 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::elements_compare_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::cmp_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::lu_decomposition_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::lu_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::forward_substitution_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::fwd_sub_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::back_substitution_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::back_sub_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -137,47 +137,47 @@ int main()
 	using namespace boost::ut;
 
 	when("I check the new extents through the default matrix type") = []() {
-		expect(mpp::matrix<int>::rows_extent() == 10_ul);
-		expect(mpp::matrix<int>::columns_extent() == 10_ul);
+		expect(mpp::mat<int>::rows_extent() == 10_ul);
+		expect(mpp::mat<int>::cols_extent() == 10_ul);
 	};
 
 	when("I check against the CPOs' return types") = []() {
 		expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::singular_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::square_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::sg_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::sq_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::determinant_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::det_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::transpose_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::trps_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::elements_compare_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::lu_decomposition_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::forward_substitution_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::back_substitution_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::cmp_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::lu_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::fwd_sub_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::back_sub_t>> == type<ns::dumb_class2>);
 	};
 
 	when("I check the customized buffer types") = []() {
-		expect(type<typename mpp::matrix<int, 2, 3>::buffer_type> == type<std::vector<int>>);
-		expect(type<typename mpp::matrix<int, mpp::dynamic, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
-		expect(type<typename mpp::matrix<int, mpp::dynamic, 3>::buffer_type> == type<std::array<int, 100>>);
-		expect(type<typename mpp::matrix<int, 2, mpp::dynamic>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::mat<int, 2, 3>::buffer_type> == type<std::vector<int>>);
+		expect(type<typename mpp::mat<int, mpp::dyn, mpp::dyn>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::mat<int, mpp::dyn, 3>::buffer_type> == type<std::array<int, 100>>);
+		expect(type<typename mpp::mat<int, 2, mpp::dyn>::buffer_type> == type<std::array<int, 100>>);
 	};
 
 	// Putting semiregular test here because this test does all the constants/type checking stuff
 
 	scenario("CPOs should meet std::semiregular requirements") = []() {
 		expect(constant<std::semiregular<mpp::type_t>>);
-		expect(constant<std::semiregular<mpp::singular_t>>);
-		expect(constant<std::semiregular<mpp::square_t>>);
+		expect(constant<std::semiregular<mpp::sg_t>>);
+		expect(constant<std::semiregular<mpp::sq_t>>);
 		expect(constant<std::semiregular<mpp::block_t>>);
-		expect(constant<std::semiregular<mpp::determinant_t>>);
+		expect(constant<std::semiregular<mpp::det_t>>);
 		expect(constant<std::semiregular<mpp::inverse_t>>);
-		expect(constant<std::semiregular<mpp::transpose_t>>);
+		expect(constant<std::semiregular<mpp::trps_t>>);
 		expect(constant<std::semiregular<mpp::size_compare_t>>);
-		expect(constant<std::semiregular<mpp::elements_compare_t>>);
-		expect(constant<std::semiregular<mpp::lu_decomposition_t>>);
-		expect(constant<std::semiregular<mpp::forward_substitution_t>>);
-		expect(constant<std::semiregular<mpp::back_substitution_t>>);
+		expect(constant<std::semiregular<mpp::cmp_t>>);
+		expect(constant<std::semiregular<mpp::lu_t>>);
+		expect(constant<std::semiregular<mpp::fwd_sub_t>>);
+		expect(constant<std::semiregular<mpp::back_sub_t>>);
 	};
 
 	return 0;

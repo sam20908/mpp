@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <mpp/algorithm/determinant.hpp>
+#include <mpp/algorithm/det.hpp>
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/comparison.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/utility/cmp.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -32,19 +32,19 @@
 
 namespace mpp
 {
-	struct singular_t : public detail::cpo_base<singular_t>
+	struct sg_t : public detail::cpo_base<sg_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		[[nodiscard]] friend inline auto tag_invoke(singular_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj) -> bool // @TODO: ISSUE #20
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+		[[nodiscard]] friend inline auto tag_invoke(sg_t, const mat<Val, Rows, Cols, Alloc>& obj)
+			-> bool // @TODO: ISSUE #20
 		{
-			using fp_matrix_t = matrix<detail::default_floating_type, RowsExtent, ColumnsExtent>;
-			using fp_buffer_t = typename fp_matrix_t::buffer_type;
+			using fp_mat_t = mat<detail::fp_t, Rows, Cols>;
+			using fp_buf_t = typename fp_mat_t::buffer_type;
 
-			const auto dummy_l_buffer = 1;
-			auto obj_buf_copy         = fp_buffer_t{};
+			const auto dummy_var = 1;
+			auto obj_buf_copy    = fp_buf_t{};
 
-			if constexpr (detail::is_vector<fp_buffer_t>::value)
+			if constexpr (detail::is_vec<fp_buf_t>::value)
 			{
 				obj_buf_copy.reserve(obj.size());
 				std::ranges::copy(obj, std::back_inserter(obj_buf_copy));
@@ -54,14 +54,12 @@ namespace mpp
 				std::ranges::copy(obj, obj_buf_copy.begin());
 			}
 
-			const auto det = detail::lu_generic<detail::default_floating_type, false, true>(obj.rows(),
-				obj.columns(),
-				dummy_l_buffer,
-				obj_buf_copy);
+			const auto det_ =
+				detail::lu_impl<detail::fp_t, false, true>(obj.rows(), obj.cols(), dummy_var, obj_buf_copy);
 
-			return detail::fp_is_zero_or_nan(det);
+			return detail::fp_is_zero_or_nan(det_);
 		}
 	};
 
-	inline constexpr auto singular = singular_t{};
+	inline constexpr auto sg = sg_t{};
 } // namespace mpp

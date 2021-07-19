@@ -19,7 +19,22 @@
 
 #pragma once
 
-#include <mpp/matrix/dynamic_columns.hpp>
-#include <mpp/matrix/dynamic_rows.hpp>
-#include <mpp/matrix/fully_dynamic.hpp>
-#include <mpp/matrix/fully_static.hpp>
+#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/mat.hpp>
+
+#include <cstddef>
+
+namespace mpp
+{
+	struct sq_t : public detail::cpo_base<sq_t>
+	{
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+		[[nodiscard]] friend inline auto tag_invoke(sq_t,
+			const mat<Val, Rows, Cols, Alloc>& obj) noexcept -> bool // @TODO: ISSUE #20
+		{
+			return obj.rows() == obj.cols();
+		}
+	};
+
+	inline constexpr auto sq = sq_t{};
+} // namespace mpp

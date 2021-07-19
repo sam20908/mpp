@@ -23,8 +23,8 @@
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/square.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/utility/sq.hpp>
+#include <mpp/mat.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -39,10 +39,10 @@ namespace mpp
 		template<typename To, typename Mat>
 		[[nodiscard]] inline auto det_impl(const Mat& obj) -> To // @TODO: ISSUE #20
 		{
-			assert(square(obj));
+			assert(sq(obj));
 
-			const auto rows    = obj.rows();
-			const auto columns = obj.columns();
+			const auto rows = obj.rows();
+			const auto cols = obj.cols();
 
 			// Handle special cases - avoid computing LU Decomposition
 			if (rows == 0)
@@ -55,49 +55,43 @@ namespace mpp
 			}
 			else if (rows == 2)
 			{
-				const auto ad =
-					static_cast<default_floating_type>(obj(0, 0)) * static_cast<default_floating_type>(obj(1, 1));
-				const auto bc =
-					static_cast<default_floating_type>(obj(0, 1)) * static_cast<default_floating_type>(obj(1, 0));
+				const auto ad = static_cast<fp_t>(obj(0, 0)) * static_cast<fp_t>(obj(1, 1));
+				const auto bc = static_cast<fp_t>(obj(0, 1)) * static_cast<fp_t>(obj(1, 0));
 
 				const auto result = ad - bc;
 
 				return static_cast<To>(result);
 			}
 
-			using lu_decomp_buffer_t = typename mat_rebind_to_t<Mat, default_floating_type>::buffer_type;
+			using lu_buf_t = typename mat_rebind_to_t<Mat, fp_t>::buffer_type;
 
-			auto u_buffer = lu_decomp_buffer_t{};
+			auto u = lu_buf_t{};
 
 			// If the incoming matrix has an array as its buffer, we can just use the same type of buffer since it'll be
 			// less overhead and we know it's the same size
 
-			allocate_buffer_if_vector(u_buffer, rows, columns, default_floating_type{});
-			std::ranges::copy(obj, u_buffer.begin());
+			resize_buf_if_vec(u, rows, cols, fp_t{});
+			std::ranges::copy(obj, u.begin());
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det = lu_generic<default_floating_type, false, true>(rows, columns, dummy_variable, u_buffer);
+			const auto det_ = lu_impl<fp_t, false, true>(rows, cols, dummy_variable, u);
 
 			// @FIXME: Is it correct to just directly cast?
-			return static_cast<To>(det);
+			return static_cast<To>(det_);
 		}
 	} // namespace detail
 
-	struct determinant_t : public detail::cpo_base<determinant_t>
+	struct det_t : public detail::cpo_base<det_t>
 	{
-		template<typename Value,
-			std::size_t RowsExtent,
-			std::size_t ColumnsExtent,
-			typename Allocator,
-			typename To = Value>
-		requires(std::is_arithmetic_v<To>) [[nodiscard]] friend inline auto tag_invoke(determinant_t,
-			const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj,
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc, typename To = Val>
+		requires(std::is_arithmetic_v<To>) [[nodiscard]] friend inline auto tag_invoke(det_t,
+			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
 			return detail::det_impl<To>(obj);
 		}
 	};
 
-	inline constexpr auto determinant = determinant_t{};
+	inline constexpr auto det = det_t{};
 } // namespace mpp

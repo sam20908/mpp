@@ -23,10 +23,10 @@
 
 namespace mpp::detail
 {
-	void insert_expr_content_into_out_stream(auto& out, const auto& expr, const char* end)
+	void append_expr_to_stream(auto& out, const auto& expr, const char* end)
 	{
 		const auto rows = expr.rows();
-		const auto cols = expr.columns();
+		const auto cols = expr.cols();
 
 		if (rows == 0 && cols == 0)
 		{

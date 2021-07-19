@@ -26,46 +26,42 @@
 
 namespace mpp::detail
 {
-	template<typename Buffer, typename InitializerValue>
-	void allocate_buffer_if_vector(Buffer& buffer,
+	template<typename Buf>
+	void resize_buf_if_vec(Buf& buf,
 		std::size_t rows,
-		std::size_t columns,
-		InitializerValue&& val) // @TODO: ISSUE #20
+		std::size_t cols,
+		auto val) // @TODO: ISSUE #20
 	{
-		constexpr auto is_vec = is_vector<Buffer>::value;
-
-		if constexpr (is_vec)
+		if constexpr (is_vec<Buf>::value)
 		{
-			buffer.resize(rows * columns, std::forward<InitializerValue>(val));
+			buf.resize(rows * cols, val);
 		}
 	}
 
-	template<typename Buffer>
-	void reserve_buffer_if_vector(Buffer& buffer, std::size_t rows, std::size_t columns) // @TODO: ISSUE #20
+	template<typename Buf>
+	void reserve_buf_if_vec(Buf& buffer, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
 	{
-		constexpr auto is_vec = is_vector<Buffer>::value;
-
-		if constexpr (is_vec)
+		if constexpr (is_vec<Buf>::value)
 		{
-			buffer.reserve(rows * columns);
+			buffer.reserve(rows * cols);
 		}
 	}
 
-	template<typename Buffer>
-	void make_identity_buffer(Buffer& buffer,
+	template<typename Buf>
+	void init_identity_buf(Buf& buffer,
 		std::size_t rows,
-		std::size_t columns,
-		const auto& zero_value,
-		const auto& one_value) // @TODO: ISSUE #20
+		std::size_t cols,
+		auto zero_value,
+		auto one_value) // @TODO: ISSUE #20
 	{
-		if constexpr (is_vector<Buffer>::value)
+		if constexpr (is_vec<Buf>::value)
 		{
-			buffer.resize(rows * columns, zero_value);
+			buffer.resize(rows * cols, zero_value);
 		}
 
 		for (auto index = std::size_t{}; index < rows; ++index)
 		{
-			buffer[index_2d_to_1d(columns, index, index)] = one_value;
+			buffer[idx_1d(cols, index, index)] = one_value;
 		}
 	}
 } // namespace mpp::detail

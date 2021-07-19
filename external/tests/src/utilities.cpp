@@ -19,7 +19,7 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 #include <mpp/utility.hpp>
 
 #include "../../include/test_utilities.hpp"
@@ -74,7 +74,7 @@ namespace
 			const auto [mat, mat2, expected_cmp] =
 				parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_ordering<Order>);
 
-			const auto out = elements_compare(mat, mat2, floating_point_compare);
+			const auto out = cmp(mat, mat2, cmp_fp);
 
 			expect(out == expected_cmp);
 		} | Mats{};
@@ -84,24 +84,24 @@ namespace
 int main()
 {
 	feature("Type") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utilities/type/fixed.txt", mpp::type, parse_val<matrix_type>);
-		test_fn<dyn_mat<int>>("utilities/type/dyn.txt", mpp::type, parse_val<matrix_type>);
-		test_fn<dyn_rows_mat<int, 0>>("utilities/type/dyn_rows.txt", mpp::type, parse_val<matrix_type>);
-		test_fn<dyn_cols_mat<int, 0>>("utilities/type/dyn_cols.txt", mpp::type, parse_val<matrix_type>);
+		test_fn<fixed_mat<int, 0, 0>>("utilities/type/fixed.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_mat<int>>("utilities/type/dyn.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_rows_mat<int, 0>>("utilities/type/dyn_rows.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_cols_mat<int, 0>>("utilities/type/dyn_cols.txt", mpp::type, parse_val<mat_type>);
 	};
 
 	feature("Square") = []() {
-		test_fn<all_mats<int, 1, 1>>("utilities/sq/1x1.txt", square, parse_val<bool>);
-		test_fn<all_mats<int, 1, 2>>("utilities/sq/1x2.txt", square, parse_val<bool>);
-		test_fn<all_mats<int, 3, 3>>("utilities/sq/3x3.txt", square, parse_val<bool>);
-		test_fn<all_mats<int, 3, 2>>("utilities/sq/3x2.txt", square, parse_val<bool>);
+		test_fn<all_mats<int, 1, 1>>("utilities/sq/1x1.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 1, 2>>("utilities/sq/1x2.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 3, 3>>("utilities/sq/3x3.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 3, 2>>("utilities/sq/3x2.txt", sq, parse_val<bool>);
 	};
 
 	feature("Singular") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utilities/sg/0x0.txt", singular, parse_val<bool>);
-		test_fn<dyn_mat<int>>("utilities/sg/1x1.txt", singular, parse_val<bool>);
-		test_fn<dyn_rows_mat<int, 2>>("utilities/sg/2x2.txt", singular, parse_val<bool>);
-		test_fn<dyn_cols_mat<int, 3>>("utilities/sg/3x3.txt", singular, parse_val<bool>);
+		test_fn<fixed_mat<int, 0, 0>>("utilities/sg/0x0.txt", sg, parse_val<bool>);
+		test_fn<dyn_mat<int>>("utilities/sg/1x1.txt", sg, parse_val<bool>);
+		test_fn<dyn_rows_mat<int, 2>>("utilities/sg/2x2.txt", sg, parse_val<bool>);
+		test_fn<dyn_cols_mat<int, 3>>("utilities/sg/3x3.txt", sg, parse_val<bool>);
 	};
 
 	feature("Size comparison") = []() {

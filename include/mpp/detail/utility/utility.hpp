@@ -21,19 +21,17 @@
 
 #include <mpp/detail/types/constraints.hpp>
 #include <mpp/detail/utility/public.hpp>
-#include <mpp/utility/configuration.hpp>
 
 #include <cstddef>
 
 namespace mpp::detail
 {
-	[[nodiscard]] constexpr auto
-	index_2d_to_1d(std::size_t columns, std::size_t row_index, std::size_t column_index) noexcept -> std::size_t
+	[[nodiscard]] constexpr auto idx_1d(std::size_t cols, std::size_t row, std::size_t col) noexcept -> std::size_t
 	{
 		// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a typo
 		// can cause a lot of things to fail. It's safer to wrap this calculation in a function, so the bug is easier to
 		// spot. This also assumes that the storage of row-major
 
-		return row_index * columns + column_index;
+		return row * cols + col;
 	}
 } // namespace mpp::detail
