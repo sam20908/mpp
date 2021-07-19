@@ -19,6 +19,8 @@
 
 #include <mpp/utility/cfg.hpp>
 
+#include "../../include/custom_allocator.hpp"
+
 #include <array>
 #include <vector>
 
@@ -28,7 +30,7 @@ namespace mpp
 	struct cfg<override>
 	{
 		template<typename Val>
-		using allocator = std::allocator<Val>;
+		using alloc = custom_allocator<Val>;
 
 		static constexpr std::size_t rows_extent = 10;
 		static constexpr std::size_t cols_extent = 10;
@@ -178,6 +180,13 @@ int main()
 		expect(constant<std::semiregular<mpp::lu_t>>);
 		expect(constant<std::semiregular<mpp::fwd_sub_t>>);
 		expect(constant<std::semiregular<mpp::back_sub_t>>);
+	};
+
+	when("I check the customized allocator type") = []() {
+		expect(type<typename mpp::mat<int, 2, 3>::allocator_type> == type<custom_allocator<int>>);
+		expect(type<typename mpp::mat<int, mpp::dyn, mpp::dyn>::allocator_type> == type<custom_allocator<int>>);
+		expect(type<typename mpp::mat<int, mpp::dyn, 3>::allocator_type> == type<custom_allocator<int>>);
+		expect(type<typename mpp::mat<int, 2, mpp::dyn>::allocator_type> == type<custom_allocator<int>>);
 	};
 
 	return 0;
