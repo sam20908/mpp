@@ -32,7 +32,7 @@ namespace mpp
 	template<detail::arithmetic Val,
 		std::size_t Rows = cfg<override>::rows_extent,
 		std::size_t Cols = cfg<override>::cols_extent,
-		typename Alloc   = typename cfg<override>::allocator<Val>>
+		typename Alloc   = typename cfg<override>::alloc<Val>>
 	class mat;
 
 	/**
@@ -55,7 +55,7 @@ namespace mpp
 
 	// mat3v aliases
 
-	template<typename Val, typename Alloc = std::allocator<Val>>
+	template<typename Val, typename Alloc = typename cfg<override>::alloc<Val>>
 	using mat3v = mpp::mat<Val, 3, 3, Alloc>;
 
 	template<typename Alloc = std::allocator<int>>
@@ -68,11 +68,11 @@ namespace mpp
 	using mat3d = mat3v<double, Alloc>;
 	// vector aliases
 
-	template<typename Val, std::size_t Cols, typename Alloc = std::allocator<Val>>
-	using row_vector = mpp::mat<Val, 1, Cols, Alloc>;
+	template<typename Val, std::size_t Cols, typename Alloc = typename cfg<override>::alloc<Val>>
+	using row_vec = mpp::mat<Val, 1, Cols, Alloc>;
 
-	template<typename Val, std::size_t Rows, typename Alloc = std::allocator<Val>>
-	using column_vector = mpp::mat<Val, Rows, 1, Alloc>;
+	template<typename Val, std::size_t Rows, typename Alloc = typename cfg<override>::alloc<Val>>
+	using col_vec = mpp::mat<Val, Rows, 1, Alloc>;
 
 	/**
 	 * Deduction guides
