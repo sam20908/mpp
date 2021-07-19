@@ -29,8 +29,8 @@ namespace mpp
 {
 	namespace detail
 	{
-		template<typename Value>
-		concept arithmetic = requires(Value&& value)
+		template<typename Val>
+		concept arithmetic = requires(Val&& value)
 		{
 			{ value + value };
 			{ value - value };
@@ -44,30 +44,22 @@ namespace mpp
 	} // namespace detail
 
 	template<detail::arithmetic, std::size_t, std::size_t, typename>
-	class matrix;
+	class mat;
 
 	namespace detail
 	{
-		template<typename Iterator, typename Value>
-		concept input_iterator_2d_with_value = requires(Iterator it)
-		{
-			requires std::input_iterator<Iterator>;
-			requires std::ranges::range<Iterator>;
-			requires std::same_as<std::iter_value_t<Iterator>, Value>;
-		};
+		template<typename Fn, typename Return, typename... Args>
+		concept fn_with_return_type =
+			std::invocable<Fn, Args...> && std::same_as<std::invoke_result_t<Fn, Args...>, Return>;
 
-		template<typename Callable, typename Return, typename... Args>
-		concept invocable_with_return_type =
-			std::invocable<Callable, Args...> && std::same_as<std::invoke_result_t<Callable, Args...>, Return>;
+		template<typename Rng>
+		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
 
-		template<typename Range>
-		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Range>>;
+		template<typename Rng, typename Val>
+		concept rng_2d_with_value_convertible_to = std::convertible_to<range_2d_value_t<Rng>, Val>;
 
-		template<typename Range, typename Value>
-		concept range_2d_with_value_type_convertible_to = std::convertible_to<range_2d_value_t<Range>, Value>;
-
-		template<typename Range, typename Value>
-		concept range_1d_with_value_type_convertible_to = std::convertible_to<std::ranges::range_value_t<Range>, Value>;
+		template<typename Rng, typename Val>
+		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, Val>;
 
 		// matrix_with_value_convertible_to
 
@@ -76,8 +68,8 @@ namespace mpp
 		{
 		};
 
-		template<arithmetic Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		struct is_matrix<matrix<Value, RowsExtent, ColumnsExtent, Allocator>> : std::true_type
+		template<arithmetic Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+		struct is_matrix<mat<Val, Rows, Cols, Alloc>> : std::true_type
 		{
 		};
 

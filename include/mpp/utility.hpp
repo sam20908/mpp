@@ -19,11 +19,11 @@
 
 #pragma once
 
-// Don't include configuration.hpp because that is only for user customizations
+// Don't include cfg.hpp because that is only for user customizations
 
-#include <mpp/utility/comparison.hpp>
+#include <mpp/utility/cmp.hpp>
 #include <mpp/utility/print.hpp>
-#include <mpp/utility/singular.hpp>
-#include <mpp/utility/square.hpp>
+#include <mpp/utility/sg.hpp>
+#include <mpp/utility/sq.hpp>
 #include <mpp/utility/traits.hpp>
 #include <mpp/utility/type.hpp>

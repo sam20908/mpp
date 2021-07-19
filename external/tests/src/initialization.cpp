@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include <mpp/utility/comparison.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/utility/cmp.hpp>
+#include <mpp/mat.hpp>
 
 #include "../../include/custom_allocator.hpp"
 #include "../../include/test_utilities.hpp"

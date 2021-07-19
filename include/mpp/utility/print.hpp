@@ -21,7 +21,7 @@
 
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/print_helpers.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -29,25 +29,24 @@
 
 namespace mpp
 {
-	struct print_matrix_t : public detail::cpo_base<print_matrix_t>
+	struct print_t : public detail::cpo_base<print_t>
 	{
-		template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Allocator>
-		friend inline auto tag_invoke(print_matrix_t, const matrix<Value, RowsExtent, ColumnsExtent, Allocator>& obj)
-			-> void
+		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+		friend inline auto tag_invoke(print_t, const mat<Val, Rows, Cols, Alloc>& obj) -> void
 		{
 			auto message_stream = std::stringstream{};
-			detail::insert_expr_content_into_out_stream(message_stream, obj, "");
+			detail::append_expr_to_stream(message_stream, obj, "");
 
 			std::cout << message_stream.str();
 		}
 	};
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent, typename Alloc>
-	auto operator<<(std::ostream& os, const matrix<Value, RowsExtent, ColumnsExtent, Alloc>& obj) -> std::ostream&
+	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+	auto operator<<(std::ostream& os, const mat<Val, Rows, Cols, Alloc>& obj) -> std::ostream&
 	{
-		detail::insert_expr_content_into_out_stream(os, obj, "");
+		detail::append_expr_to_stream(os, obj, "");
 		return os;
 	}
 
-	inline constexpr auto print_matrix = print_matrix_t{};
+	inline constexpr auto print = print_t{};
 } // namespace mpp

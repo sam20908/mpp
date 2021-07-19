@@ -31,36 +31,33 @@ namespace mpp::detail
 	 * Binary expression object (one of the operands is a constant, so we have to store it
 	 * differently, which differs from expr_binary_op)
 	 */
-	template<std::size_t RowsExtent, std::size_t ColumnsExtent, typename Obj, typename Value, typename Op>
-	class [[nodiscard]] expr_binary_constant_op :
-		public expr_base<expr_binary_constant_op<RowsExtent, ColumnsExtent, Obj, Value, Op>,
-			Value,
-			RowsExtent,
-			ColumnsExtent>
+	template<std::size_t Rows, std::size_t Cols, typename Obj, typename Val, typename Op>
+	class [[nodiscard]] expr_binary_val_op :
+		public expr_base<expr_binary_val_op<Rows, Cols, Obj, Val, Op>, Val, Rows, Cols>
 	{
 		const Obj& obj_;
-		Value val_; // Store the constant by copy to handle literals
+		Val val_; // Store the constant by copy to handle literals
 
 		const Op& op_;
 
 		// "Knowing" the size of the resulting matrix allows performing validation on expression objects
 		std::size_t result_rows_;
-		std::size_t result_columns_;
+		std::size_t result_cols_;
 
 	public:
-		using value_type = Value;
+		using value_type = Val;
 
-		expr_binary_constant_op(const Obj& obj,
-			Value val,
+		expr_binary_val_op(const Obj& obj,
+			Val val,
 			std::size_t result_rows,
-			std::size_t result_columns,
+			std::size_t result_cols,
 			const Op& op) noexcept // @TODO: ISSUE #20
 			:
 			obj_(obj),
 			val_(val),
 			op_(op),
 			result_rows_(result_rows),
-			result_columns_(result_columns)
+			result_cols_(result_cols)
 		{
 		}
 
@@ -69,9 +66,9 @@ namespace mpp::detail
 			return result_rows_;
 		}
 
-		[[nodiscard]] auto columns() const noexcept -> std::size_t // @TODO: ISSUE #20
+		[[nodiscard]] auto cols() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
-			return result_columns_;
+			return result_cols_;
 		}
 
 		[[nodiscard]] auto operator()(std::size_t row_index, std::size_t col_index) const noexcept

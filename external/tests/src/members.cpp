@@ -20,7 +20,7 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <memory>
 #include <vector>
@@ -34,20 +34,19 @@ int main()
 	using namespace mpp;
 
 	feature("Destructible (part of rule of five)") = []() {
-		expect(constant<std::is_destructible_v<matrix<int, 2, 3>>>);
-		expect(constant<std::is_destructible_v<matrix<int, dynamic, dynamic>>>);
-		expect(constant<std::is_destructible_v<matrix<int, dynamic, 3>>>);
-		expect(constant<std::is_destructible_v<matrix<int, 2, dynamic>>>);
+		expect(constant<std::is_destructible_v<mat<int, 2, 3>>>);
+		expect(constant<std::is_destructible_v<mat<int, dyn, dyn>>>);
+		expect(constant<std::is_destructible_v<mat<int, dyn, 3>>>);
+		expect(constant<std::is_destructible_v<mat<int, 2, dyn>>>);
 	};
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-	const auto mats     = std::tuple{ matrix<int, 2, 3>{ range_2d },
-        matrix<int, dynamic, dynamic>{ range_2d },
-        matrix<int, 2, dynamic>{ range_2d },
-        matrix<int, dynamic, 3>{ range_2d } };
-	const auto dyn_mats = std::tuple{ matrix<int, dynamic, dynamic>{ range_2d },
-		matrix<int, 2, dynamic>{ range_2d },
-		matrix<int, dynamic, 3>{ range_2d } };
+	const auto mats     = std::tuple{ mat<int, 2, 3>{ range_2d },
+        mat<int, dyn, dyn>{ range_2d },
+        mat<int, 2, dyn>{ range_2d },
+        mat<int, dyn, 3>{ range_2d } };
+	const auto dyn_mats =
+		std::tuple{ mat<int, dyn, dyn>{ range_2d }, mat<int, 2, dyn>{ range_2d }, mat<int, dyn, 3>{ range_2d } };
 
 	feature("operator()") = [&]() {
 		given("We're only reading the data") = [&](const auto& mat) {

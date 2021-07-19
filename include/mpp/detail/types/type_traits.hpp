@@ -25,12 +25,12 @@
 namespace mpp::detail
 {
 	template<typename T>
-	struct is_vector : std::false_type
+	struct is_vec : std::false_type
 	{
 	};
 
-	template<typename T, typename Allocator>
-	struct is_vector<std::vector<T, Allocator>> : std::true_type
+	template<typename T, typename Alloc>
+	struct is_vec<std::vector<T, Alloc>> : std::true_type
 	{
 	};
 } // namespace mpp::detail

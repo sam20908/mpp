@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/expr/expr_binary_constant_op.hpp>
 #include <mpp/detail/expr/expr_binary_op.hpp>
+#include <mpp/detail/expr/expr_binary_val_op.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/matrix.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -40,35 +40,34 @@ namespace mpp
 		};
 	} // namespace detail
 
-	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] auto operator/(const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj, Value constant)
-		-> detail::expr_binary_constant_op<RowsExtent,
-			ColumnsExtent,
-			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
-			Value,
+	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
+	[[nodiscard]] auto operator/(const detail::expr_base<Base, Val, Rows, Cols>& obj, Val val)
+		-> detail::expr_binary_val_op<Rows,
+			Cols,
+			detail::expr_base<Base, Val, Rows, Cols>,
+			Val,
 			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns(), detail::div_op };
+		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Base, typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	[[nodiscard]] auto operator/(Value constant, const detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>& obj)
-		-> detail::expr_binary_constant_op<RowsExtent,
-			ColumnsExtent,
-			detail::expr_base<Base, Value, RowsExtent, ColumnsExtent>,
-			Value,
+	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
+	[[nodiscard]] auto operator/(Val val, const detail::expr_base<Base, Val, Rows, Cols>& obj)
+		-> detail::expr_binary_val_op<Rows,
+			Cols,
+			detail::expr_base<Base, Val, Rows, Cols>,
+			Val,
 			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
-		return { obj, constant, obj.rows(), obj.columns(), detail::div_op };
+		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Value, std::size_t RowsExtent, std::size_t ColumnsExtent>
-	inline auto operator/=(matrix<Value, RowsExtent, ColumnsExtent>& obj, Value constant)
-		-> matrix<Value, RowsExtent, ColumnsExtent>& // @TODO: ISSUE #20
+	template<typename Val, std::size_t Rows, std::size_t Cols>
+	inline auto operator/=(mat<Val, Rows, Cols>& obj, Val val) -> mat<Val, Rows, Cols>& // @TODO: ISSUE #20
 	{
-		// Can't use bind_front here because we want elem / constant, not constant / elem
-		std::ranges::transform(obj, obj.begin(), [&constant](const auto& elem) {
-			return elem / constant;
+		// Can't use bind_front here because we want elem / val, not val / elem
+		std::ranges::transform(obj, obj.begin(), [&val](const auto& elem) {
+			return elem / val;
 		});
 
 		return obj;

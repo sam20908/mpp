@@ -21,7 +21,7 @@
 
 #include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/utility/comparison.hpp>
+#include <mpp/utility/cmp.hpp>
 
 #include <cmath>
 #include <compare>
@@ -31,87 +31,70 @@
 namespace mpp::detail
 {
 	template<typename Mat, typename T>
-	using mat_rebind_to_t = matrix<T,
+	using mat_rebind_to_t = mat<T,
 		Mat::rows_extent(),
-		Mat::columns_extent(),
+		Mat::cols_extent(),
 		typename std::allocator_traits<typename Mat::allocator_type>::template rebind_alloc<T>>;
 
-	[[nodiscard]] constexpr auto prefer_static_extent(std::size_t left_extent, std::size_t right_extent) noexcept
-		-> std::size_t
+	template<typename Val>
+	[[nodiscard]] constexpr auto fp_is_zero_or_nan(const Val& val) -> bool
 	{
-		if (left_extent != dynamic || right_extent != dynamic)
-		{
-			return left_extent != dynamic ? left_extent : right_extent;
-		}
-		else
-		{
-			return dynamic;
-		}
+		using ordering = std::compare_three_way_result_t<Val, Val>;
+
+		return cmp_fp(val, Val{}) == ordering::equivalent || std::isnan(val);
 	}
 
-	template<typename Value>
-	[[nodiscard]] constexpr auto fp_is_zero_or_nan(const Value& val) -> bool
-	{
-		using ordering = std::compare_three_way_result_t<Value, Value>;
-
-		return floating_point_compare(val, Value{}) == ordering::equivalent || std::isnan(val);
-	}
-
-	template<typename To, bool FillLBuffer, bool CalculateDeterminant>
-	inline auto lu_generic(std::size_t rows, std::size_t columns, auto& l_buffer, auto& u_buffer)
-		-> To // @TODO: ISSUE #20
+	template<typename To, bool FillL, bool GetDet>
+	inline auto lu_impl(std::size_t rows, std::size_t cols, auto& l, auto& u) -> To // @TODO: ISSUE #20
 	{
 		// Shortcut method from
 		// https://medium.com/linear-algebra-basics/lu-decomposition-c8f9b75ddeff
 
-		// Things this function expects from l_buffer and u_buffer:
-		// 1. l_buffer is already an identity buffer
-		// 2. u_buffer has the original values
+		// Things this function expects from l and u:
+		// 1. l is already an identity buffer
+		// 2. u has the original values
 
-		auto det = default_floating_type{ 1 };
+		auto det_ = fp_t{ 1 };
 
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
 			// Micro-optimization: allow other indexes to reference this instead of multi-step calculation
-			const auto diag_front_index = index_2d_to_1d(columns, row, std::size_t{});
-			const auto diag_index       = diag_front_index + row;
-			const auto diag_elem        = u_buffer[diag_index];
+			const auto diag_front_idx = idx_1d(cols, row, std::size_t{});
+			const auto diag_idx       = diag_front_idx + row;
+			const auto diag           = u[diag_idx];
 
 			for (auto inner_row = row + 1; inner_row < rows; ++inner_row)
 			{
-				const auto inner_front_index = index_2d_to_1d(columns, inner_row, row);
-				const auto inner_front_elem  = u_buffer[inner_front_index];
+				const auto inner_front_idx = idx_1d(cols, inner_row, row);
+				const auto inner_front     = u[inner_front_idx];
 
-				for (auto column = row; column < columns; ++column)
+				for (auto col = row; col < cols; ++col)
 				{
-					const auto inner_row_current_index = index_2d_to_1d(columns, inner_row, column);
+					const auto inner_row_current_index = idx_1d(cols, inner_row, col);
 
 					// row as column parameter means accessing diagnoal element
-					const auto inner_row_current_elem      = u_buffer[inner_row_current_index];
-					const auto diag_row_corresponding_elem = u_buffer[diag_front_index + column];
+					const auto inner_row_cur = u[inner_row_current_index];
+					const auto diag_row_cor  = u[diag_front_idx + col];
 
-					// inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem
+					const auto res = inner_row_cur - (inner_front * diag_row_cor) / diag;
 
-					const auto result_elem =
-						inner_row_current_elem - (inner_front_elem * diag_row_corresponding_elem) / diag_elem;
-
-					u_buffer[inner_row_current_index] = result_elem;
+					u[inner_row_current_index] = res;
 				};
 
-				if constexpr (FillLBuffer)
+				if constexpr (FillL)
 				{
-					// We don't necessarily need to fill the l_buffer if we're only getting the determinant because only
-					// u_buffer will be used
-					l_buffer[inner_front_index] = inner_front_elem / diag_elem;
+					// We don't necessarily need to fill the l if we're only getting the determinant because only
+					// u will be used
+					l[inner_front_idx] = inner_front / diag;
 				};
 			}
 
-			if constexpr (CalculateDeterminant)
+			if constexpr (GetDet)
 			{
-				det *= u_buffer[diag_index];
+				det_ *= u[diag_idx];
 			}
 		}
 
-		return static_cast<To>(det);
+		return static_cast<To>(det_);
 	}
 } // namespace mpp::detail
