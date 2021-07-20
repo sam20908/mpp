@@ -26,9 +26,7 @@ target_link_libraries(your_target mpp::mpp)
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
 ```cpp
-#include <mpp/mat.h>
-#include <mpp/algorithm.hpp>
-#include <mpp/utility.hpp>
+#include <mpp/mpp.hpp>
 
 #include <iostream>
 
@@ -110,8 +108,7 @@ One of the main things to take away is the concept of **"extents"** for dimensio
 #### Comparisons
 
 ```cpp
-#include <mpp/mat.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/mpp.hpp>
 
 int main()
 {
@@ -192,7 +189,7 @@ namespace mpp
   };
 } // namespace mpp
 
-#include <mpp/mat.hpp>
+#include <mpp/mpp.hpp>
 
 int main()
 {
@@ -240,7 +237,7 @@ Learn more about the rationale of using `tag_invoke` in FAQ.
 Custom iterators are used to make navigating matrices easier. They also meet `contiguous_iterator` requirement.
 
 ```cpp
-#include <mpp/mat.hpp>
+#include <mpp/mpp.hpp>
 
 int main()
 {
