@@ -47,9 +47,9 @@ namespace mpp::detail
 	template<typename T>
 	[[nodiscard]] constexpr auto is_zero_or_nan(T val) -> bool
 	{
-		if (std::is_floating_point_v<T>)
+		if constexpr (std::is_floating_point_v<T>)
 		{
-			return is_zero_or_nan(val);
+			return fp_is_zero_or_nan(val);
 		}
 		else
 		{
