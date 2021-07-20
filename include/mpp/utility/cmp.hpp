@@ -84,7 +84,7 @@ namespace mpp
 	inline constexpr auto cmp_fp = []<std::floating_point T>(T a,
 									   T b) noexcept -> std::compare_three_way_result_t<T, T> {
 		// @TODO: Somehow avoid branching here?
-		if (!detail::fp_is_eq(a, b))
+		if (detail::fp_is_eq(a, b))
 		{
 			return std::compare_three_way_result_t<T, T>::equivalent;
 		}
