@@ -19,11 +19,9 @@
 
 #pragma once
 
-#include <mpp/detail/types/constraints.hpp>
+#include <mpp/detail/utility/utility.hpp>
 
 #include <complex>
-#include <concepts>
-#include <cstddef>
 
 namespace mpp
 {

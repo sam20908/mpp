@@ -21,7 +21,7 @@
 
 #include <mpp/mat.hpp>
 
-#include "../../include/test_utilities.hpp"
+#include "../include/test_utilities.hpp"
 
 #include <initializer_list>
 #include <vector>

@@ -21,11 +21,10 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/algorithm/block.hpp> // @FIXME: Put necessary things for detail block helpers into a more central header
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/public.hpp>
-#include <mpp/utility/print.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/detail/utility/print_helpers.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <cstddef>
 #include <filesystem>
@@ -54,7 +53,7 @@ auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 	{
 		for (auto col = std::size_t{}; col < expected_cols; ++col)
 		{
-			if (mpp::cmp_fp(mat(row, col), rng[row][col]) != 0)
+			if (!mpp::detail::fp_is_eq(mat(row, col), rng[row][col]))
 			{
 				return false;
 			}
@@ -78,7 +77,7 @@ auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
 	{
 		for (auto col = std::size_t{}; col < mat.cols(); ++col)
 		{
-			if (mpp::cmp_fp(mat(row, col), expr(row, col)) != 0)
+			if (!mpp::detail::fp_is_eq(mat(row, col), expr(row, col)))
 			{
 				return false;
 			}

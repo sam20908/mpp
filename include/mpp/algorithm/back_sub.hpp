@@ -19,56 +19,18 @@
 
 #pragma once
 
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
 #include <cassert>
-#include <memory>
-#include <utility>
+#include <cstddef>
 
 namespace mpp
 {
 	namespace detail
 	{
-		template<typename Buf>
-		inline auto back_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
-		{
-			auto x_buf = Buf{};
-
-			// @TODO: Any way to make this utilize push_back?
-			resize_buf_if_vec(x_buf, n, 1, fp_t{});
-
-			/**
-			 * Implementation of back substitution from
-			 * https://www.gaussianwaves.com/2013/05/solving-a-triangular-matrix-using-back-backward-substitution/
-			 */
-			for (auto row = n; row > std::size_t{}; --row)
-			{
-				const auto row_idx = row - 1;
-
-				auto res = static_cast<fp_t>(b[idx_1d(1, row_idx, 0)]);
-
-				for (auto col = n - 1; col > row_idx; --col)
-				{
-					res -= a[idx_1d(n, row_idx, col)] * x_buf[col];
-				}
-
-				const auto diag = static_cast<fp_t>(a[idx_1d(n, row_idx, row_idx)]);
-
-				assert(!fp_is_zero_or_nan(diag));
-
-				res /= diag;
-
-				x_buf[row_idx] = res;
-			}
-
-			return x_buf;
-		}
-
 		template<typename To>
 		inline auto back_sub_impl(const auto& a, const auto& b) -> To // @TODO: ISSUE #20
 		{

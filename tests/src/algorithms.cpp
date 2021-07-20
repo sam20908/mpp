@@ -22,8 +22,8 @@
 #include <mpp/algorithm.hpp>
 #include <mpp/mat.hpp>
 
-#include "../../include/custom_allocator.hpp"
-#include "../../include/test_utilities.hpp"
+#include "../include/custom_allocator.hpp"
+#include "../include/test_utilities.hpp"
 
 #include <compare>
 #include <string_view>

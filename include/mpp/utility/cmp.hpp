@@ -20,7 +20,8 @@
 #pragma once
 
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -79,31 +80,11 @@ namespace mpp
 	inline constexpr auto size_compare = size_compare_t{}; // @FIXME Remove this
 	inline constexpr auto cmp          = cmp_t{};
 
-	/**
-	 * Comparators
-	 */
-
-	namespace detail
-	{
-		template<typename T>
-		constexpr auto constexpr_abs(T t) noexcept -> T
-		{
-			if (std::is_constant_evaluated())
-			{
-				return t < 0 ? -t : t;
-			}
-
-			return std::abs(t);
-		}
-	} // namespace detail
-
 	inline constexpr auto cmp_fp = []<typename T>(T a, T b) noexcept -> std::compare_three_way_result_t<T, T> {
-		using order_t = std::compare_three_way_result_t<T, T>;
-
 		// @TODO: Somehow avoid branching here?
-		if (detail::constexpr_abs(a - b) < std::numeric_limits<T>::epsilon())
+		if (!detail::fp_is_eq(a, b))
 		{
-			return order_t::equivalent;
+			return std::compare_three_way_result_t<T, T>::equivalent;
 		}
 
 		return a <=> b;

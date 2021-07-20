@@ -22,7 +22,7 @@
 #include <mpp/mat.hpp>
 #include <mpp/utility.hpp>
 
-#include "../../include/test_utilities.hpp"
+#include "../include/test_utilities.hpp"
 
 #include <compare>
 #include <concepts>

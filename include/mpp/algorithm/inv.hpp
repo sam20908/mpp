@@ -19,20 +19,14 @@
 
 #pragma once
 
-#include <mpp/algorithm/back_sub.hpp>
-#include <mpp/algorithm/fwd_sub.hpp>
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
 #include <cassert>
-#include <concepts>
-#include <memory>
-#include <type_traits>
+#include <cstddef>
 
 namespace mpp
 {

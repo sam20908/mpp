@@ -20,8 +20,8 @@
 #include <mpp/utility/cmp.hpp>
 #include <mpp/mat.hpp>
 
-#include "../../include/custom_allocator.hpp"
-#include "../../include/test_utilities.hpp"
+#include "../include/custom_allocator.hpp"
+#include "../include/test_utilities.hpp"
 
 #include <array>
 #include <compare>
