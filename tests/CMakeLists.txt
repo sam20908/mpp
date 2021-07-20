@@ -47,7 +47,7 @@ _create_test("arithmetic")
 _create_test("members")
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
-    include("../thirdparty/CodeCoverage.cmake")
+    include("thirdparty/CodeCoverage.cmake")
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
