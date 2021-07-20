@@ -59,7 +59,7 @@ namespace mpp
 			{
 				const auto elem = static_cast<fp_t>(obj(0, 0));
 
-				assert(!fp_is_zero_or_nan(elem));
+				assert(!is_zero_or_nan(elem));
 
 				inv_buf[0] = 1 / elem;
 			}
@@ -76,7 +76,7 @@ namespace mpp
 
 				const auto det_ = ad - bc;
 
-				assert(!fp_is_zero_or_nan(det_));
+				assert(!is_zero_or_nan(det_));
 
 				const auto inv_det = 1 / det_;
 
@@ -99,7 +99,7 @@ namespace mpp
 
 				const auto det_ = lu_impl<fp_t, true, true>(rows, cols, l, u);
 
-				assert(!fp_is_zero_or_nan(det_));
+				assert(!is_zero_or_nan(det_));
 
 				// Solve for x_buffer values with Ax=b where A=l and b=Column of identity matrix
 

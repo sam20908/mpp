@@ -52,7 +52,7 @@ namespace mpp
 
 			const auto det_ = det(obj);
 
-			return detail::fp_is_zero_or_nan(det_);
+			return detail::is_zero_or_nan(det_);
 		}
 	};
 

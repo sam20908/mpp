@@ -38,10 +38,23 @@ namespace mpp::detail
 		Mat::cols_extent(),
 		typename std::allocator_traits<typename Mat::allocator_type>::template rebind_alloc<T>>;
 
-	template<typename Val>
-	[[nodiscard]] constexpr auto fp_is_zero_or_nan(Val val) -> bool
+	template<typename T>
+	[[nodiscard]] constexpr auto fp_is_zero_or_nan(T val) -> bool
 	{
-		return fp_is_eq(val, Val{}) || std::isnan(val);
+		return fp_is_eq(val, T{}) || std::isnan(val);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr auto is_zero_or_nan(T val) -> bool
+	{
+		if (std::is_floating_point_v<T>)
+		{
+			return is_zero_or_nan(val);
+		}
+		else
+		{
+			return val == T{};
+		}
 	}
 
 	template<typename To, bool FillL, bool GetDet>
@@ -123,7 +136,7 @@ namespace mpp::detail
 
 			const auto diag = static_cast<fp_t>(a[idx_1d(n, row_idx, row_idx)]);
 
-			assert(!fp_is_zero_or_nan(diag));
+			assert(!is_zero_or_nan(diag));
 
 			res /= diag;
 
@@ -155,7 +168,7 @@ namespace mpp::detail
 
 			const auto diag = static_cast<fp_t>(a[idx_1d(n, row, row)]);
 
-			assert(!fp_is_zero_or_nan(diag));
+			assert(!is_zero_or_nan(diag));
 
 			res /= diag;
 
