@@ -50,7 +50,7 @@ namespace mpp
 				std::ranges::copy(obj, obj_buf_copy.begin());
 			}
 
-			const auto det_ = det(obj);
+			const auto det_ = detail::det_impl<detail::fp_t>(obj);
 
 			return detail::is_zero_or_nan(det_);
 		}
