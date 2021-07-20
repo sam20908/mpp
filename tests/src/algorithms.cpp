@@ -157,12 +157,12 @@ int main()
 	};
 
 	feature("Backward substitution") = []() {
-		test_sub<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 1>, all_mats<double, 3, 1>>>(
+		test_sub<join_mats<all_mats<float, 3, 3>, all_mats<float, 3, 1>, all_mats<float, 3, 1>>>(
 			"algorithm/back_sub/3x3_3x1.txt",
 			back_sub);
 
 		// Test different return type
-		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
+		test_sub<join_mats<dyn_mat<int>, dyn_mat<int>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
 			back_sub);
 	};
 

@@ -134,7 +134,7 @@ namespace mpp::detail
 	}
 
 	template<typename Buf>
-	inline auto forward_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
+	inline auto fwd_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
 	{
 		auto x_buf = Buf{};
 
@@ -146,20 +146,20 @@ namespace mpp::detail
 		 */
 		for (auto row = std::size_t{}; row < n; ++row)
 		{
-			auto result = static_cast<fp_t>(b[idx_1d(1, row, 0)]);
+			auto res = static_cast<fp_t>(b[idx_1d(1, row, 0)]);
 
 			for (auto col = std::size_t{}; col < row; ++col)
 			{
-				result -= a[idx_1d(n, row, col)] * x_buf[col];
+				res -= a[idx_1d(n, row, col)] * x_buf[col];
 			}
 
 			const auto diag = static_cast<fp_t>(a[idx_1d(n, row, row)]);
 
 			assert(!fp_is_zero_or_nan(diag));
 
-			result /= diag;
+			res /= diag;
 
-			x_buf[row] = result;
+			x_buf[row] = res;
 		}
 
 		return x_buf;

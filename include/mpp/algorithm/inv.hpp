@@ -123,7 +123,7 @@ namespace mpp
 					x[last_col_idx] = fp_t{};
 					x[row]          = fp_t{ 1 };
 
-					auto l_x_buffer = forward_sub_buf<x_buf_t>(l, x, rows);
+					auto l_x_buffer = fwd_sub_buf<x_buf_t>(l, x, rows);
 
 					// Use l_x_buffer to do back substitution to solve Ax=B with A=u and b=l_x_buffer. The
 					// inv_col now corresponds to a column of the inverse matrix

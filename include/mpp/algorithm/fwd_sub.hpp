@@ -21,7 +21,6 @@
 
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/utility.hpp>
 #include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
 
@@ -41,7 +40,7 @@ namespace mpp
 			const auto rows = a.rows();
 
 			using x_mat_t = mat_rebind_to_t<To, fp_t>;
-			auto x_buf    = forward_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
+			auto x_buf    = fwd_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
 
 			return To{ rows, 1, std::move(x_buf) };
 		}
