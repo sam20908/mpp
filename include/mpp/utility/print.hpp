@@ -21,7 +21,7 @@
 
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/print_helpers.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <cstddef>
 #include <iosfwd>

@@ -20,9 +20,6 @@
 #pragma once
 
 #include <cstddef>
-#include <memory>
-
-// @TODO: Export this header to the user for modules
 
 namespace mpp
 {

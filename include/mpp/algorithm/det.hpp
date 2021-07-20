@@ -19,23 +19,19 @@
 
 #pragma once
 
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
+#include <algorithm>
 #include <cassert>
-#include <cmath>
-#include <memory>
 
 namespace mpp
 {
 	namespace detail
 	{
-		inline static constexpr auto dummy_variable = ' ';
-
 		template<typename To, typename Mat>
 		[[nodiscard]] inline auto det_impl(const Mat& obj) -> To // @TODO: ISSUE #20
 		{
@@ -75,7 +71,7 @@ namespace mpp
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det_ = lu_impl<fp_t, false, true>(rows, cols, dummy_variable, u);
+			const auto det_ = lu_impl<fp_t, false, true>(rows, cols, dummy, u);
 
 			// @FIXME: Is it correct to just directly cast?
 			return static_cast<To>(det_);

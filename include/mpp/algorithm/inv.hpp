@@ -19,20 +19,14 @@
 
 #pragma once
 
-#include <mpp/algorithm/back_sub.hpp>
-#include <mpp/algorithm/fwd_sub.hpp>
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
 #include <cassert>
-#include <concepts>
-#include <memory>
-#include <type_traits>
+#include <cstddef>
 
 namespace mpp
 {
@@ -65,7 +59,7 @@ namespace mpp
 			{
 				const auto elem = static_cast<fp_t>(obj(0, 0));
 
-				assert(!fp_is_zero_or_nan(elem));
+				assert(!is_zero_or_nan(elem));
 
 				inv_buf[0] = 1 / elem;
 			}
@@ -82,7 +76,7 @@ namespace mpp
 
 				const auto det_ = ad - bc;
 
-				assert(!fp_is_zero_or_nan(det_));
+				assert(!is_zero_or_nan(det_));
 
 				const auto inv_det = 1 / det_;
 
@@ -105,7 +99,7 @@ namespace mpp
 
 				const auto det_ = lu_impl<fp_t, true, true>(rows, cols, l, u);
 
-				assert(!fp_is_zero_or_nan(det_));
+				assert(!is_zero_or_nan(det_));
 
 				// Solve for x_buffer values with Ax=b where A=l and b=Column of identity matrix
 
@@ -129,7 +123,7 @@ namespace mpp
 					x[last_col_idx] = fp_t{};
 					x[row]          = fp_t{ 1 };
 
-					auto l_x_buffer = forward_sub_buf<x_buf_t>(l, x, rows);
+					auto l_x_buffer = fwd_sub_buf<x_buf_t>(l, x, rows);
 
 					// Use l_x_buffer to do back substitution to solve Ax=B with A=u and b=l_x_buffer. The
 					// inv_col now corresponds to a column of the inverse matrix

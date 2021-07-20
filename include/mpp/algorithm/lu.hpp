@@ -21,13 +21,12 @@
 
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
 #include <cassert>
 #include <cstddef>
-#include <memory>
-#include <utility>
 
 namespace mpp
 {

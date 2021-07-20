@@ -21,11 +21,12 @@
 
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 
 namespace mpp
 {

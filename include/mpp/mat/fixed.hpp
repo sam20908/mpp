@@ -20,12 +20,10 @@
 #pragma once
 
 #include <mpp/detail/mat/mat_base.hpp>
-#include <mpp/detail/mat/mat_def.hpp>
-#include <mpp/detail/types/constraints.hpp>
-#include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
+#include <mpp/utility/cfg.hpp>
 
-#include <concepts>
 #include <initializer_list>
 #include <type_traits>
 #include <utility>

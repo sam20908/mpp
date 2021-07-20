@@ -20,11 +20,8 @@
 #pragma once
 
 #include <mpp/algorithm/det.hpp>
-#include <mpp/detail/types/algo_types.hpp>
-#include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/cmp.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/detail/utility/utility.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -41,8 +38,7 @@ namespace mpp
 			using fp_mat_t = mat<detail::fp_t, Rows, Cols>;
 			using fp_buf_t = typename fp_mat_t::buffer_type;
 
-			const auto dummy_var = 1;
-			auto obj_buf_copy    = fp_buf_t{};
+			auto obj_buf_copy = fp_buf_t{};
 
 			if constexpr (detail::is_vec<fp_buf_t>::value)
 			{
@@ -54,10 +50,9 @@ namespace mpp
 				std::ranges::copy(obj, obj_buf_copy.begin());
 			}
 
-			const auto det_ =
-				detail::lu_impl<detail::fp_t, false, true>(obj.rows(), obj.cols(), dummy_var, obj_buf_copy);
+			const auto det_ = detail::det_impl<detail::fp_t>(obj);
 
-			return detail::fp_is_zero_or_nan(det_);
+			return detail::is_zero_or_nan(det_);
 		}
 	};
 

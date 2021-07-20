@@ -19,29 +19,42 @@
 
 #pragma once
 
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/mat/matfwd.hpp>
 
+#include <cassert>
 #include <cmath>
-#include <compare>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 
 namespace mpp::detail
 {
+	inline constexpr auto dummy = 0;
+
 	template<typename Mat, typename T>
 	using mat_rebind_to_t = mat<T,
 		Mat::rows_extent(),
 		Mat::cols_extent(),
 		typename std::allocator_traits<typename Mat::allocator_type>::template rebind_alloc<T>>;
 
-	template<typename Val>
-	[[nodiscard]] constexpr auto fp_is_zero_or_nan(const Val& val) -> bool
+	template<typename T>
+	[[nodiscard]] constexpr auto fp_is_zero_or_nan(T val) -> bool
 	{
-		using ordering = std::compare_three_way_result_t<Val, Val>;
+		return fp_is_eq(val, T{}) || std::isnan(val);
+	}
 
-		return cmp_fp(val, Val{}) == ordering::equivalent || std::isnan(val);
+	template<typename T>
+	[[nodiscard]] constexpr auto is_zero_or_nan(T val) -> bool
+	{
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return fp_is_zero_or_nan(val);
+		}
+		else
+		{
+			return val == T{};
+		}
 	}
 
 	template<typename To, bool FillL, bool GetDet>
@@ -96,5 +109,72 @@ namespace mpp::detail
 		}
 
 		return static_cast<To>(det_);
+	}
+
+	template<typename Buf>
+	inline auto back_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
+	{
+		auto x_buf = Buf{};
+
+		// @TODO: Any way to make this utilize push_back?
+		resize_buf_if_vec(x_buf, n, 1, fp_t{});
+
+		/**
+		 * Implementation of back substitution from
+		 * https://www.gaussianwaves.com/2013/05/solving-a-triangular-matrix-using-back-backward-substitution/
+		 */
+		for (auto row = n; row > std::size_t{}; --row)
+		{
+			const auto row_idx = row - 1;
+
+			auto res = static_cast<fp_t>(b[idx_1d(1, row_idx, 0)]);
+
+			for (auto col = n - 1; col > row_idx; --col)
+			{
+				res -= a[idx_1d(n, row_idx, col)] * x_buf[col];
+			}
+
+			const auto diag = static_cast<fp_t>(a[idx_1d(n, row_idx, row_idx)]);
+
+			assert(!is_zero_or_nan(diag));
+
+			res /= diag;
+
+			x_buf[row_idx] = res;
+		}
+
+		return x_buf;
+	}
+
+	template<typename Buf>
+	inline auto fwd_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
+	{
+		auto x_buf = Buf{};
+
+		resize_buf_if_vec(x_buf, n, 1, fp_t{});
+
+		/**
+		 * Implementation of forward substitution from
+		 * https://www.gaussianwaves.com/2013/05/solving-a-triangular-matrix-using-forward-backward-substitution/
+		 */
+		for (auto row = std::size_t{}; row < n; ++row)
+		{
+			auto res = static_cast<fp_t>(b[idx_1d(1, row, 0)]);
+
+			for (auto col = std::size_t{}; col < row; ++col)
+			{
+				res -= a[idx_1d(n, row, col)] * x_buf[col];
+			}
+
+			const auto diag = static_cast<fp_t>(a[idx_1d(n, row, row)]);
+
+			assert(!is_zero_or_nan(diag));
+
+			res /= diag;
+
+			x_buf[row] = res;
+		}
+
+		return x_buf;
 	}
 } // namespace mpp::detail

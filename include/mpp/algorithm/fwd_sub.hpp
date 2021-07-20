@@ -19,53 +19,18 @@
 
 #pragma once
 
-#include <mpp/detail/types/algo_types.hpp>
 #include <mpp/detail/utility/algorithm_helpers.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/mat/matfwd.hpp>
 #include <mpp/utility/sq.hpp>
-#include <mpp/mat.hpp>
 
 #include <cassert>
-#include <memory>
-#include <utility>
+#include <cstddef>
 
 namespace mpp
 {
 	namespace detail
 	{
-		template<typename Buf>
-		inline auto forward_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
-		{
-			auto x_buf = Buf{};
-
-			resize_buf_if_vec(x_buf, n, 1, fp_t{});
-
-			/**
-			 * Implementation of forward substitution from
-			 * https://www.gaussianwaves.com/2013/05/solving-a-triangular-matrix-using-forward-backward-substitution/
-			 */
-			for (auto row = std::size_t{}; row < n; ++row)
-			{
-				auto result = static_cast<fp_t>(b[idx_1d(1, row, 0)]);
-
-				for (auto col = std::size_t{}; col < row; ++col)
-				{
-					result -= a[idx_1d(n, row, col)] * x_buf[col];
-				}
-
-				const auto diag = static_cast<fp_t>(a[idx_1d(n, row, row)]);
-
-				assert(!fp_is_zero_or_nan(diag));
-
-				result /= diag;
-
-				x_buf[row] = result;
-			}
-
-			return x_buf;
-		}
-
 		template<typename To>
 		inline auto fwd_sub_impl(const auto& a, const auto& b) -> To // @TODO: ISSUE #20
 		{
@@ -75,7 +40,7 @@ namespace mpp
 			const auto rows = a.rows();
 
 			using x_mat_t = mat_rebind_to_t<To, fp_t>;
-			auto x_buf    = forward_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
+			auto x_buf    = fwd_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
 
 			return To{ rows, 1, std::move(x_buf) };
 		}

@@ -19,11 +19,7 @@
 
 #pragma once
 
-#include <compare>
-
-namespace mpp::detail
-{
-	// Double was tested to be *at least* accurate enough to do calculations involve irrational fractions (e.g. 1/3) and
-	// provide accurate enough results
-	using fp_t = double;
-} // namespace mpp::detail
+#include <mpp/algorithm.hpp>
+#include <mpp/arithmetic.hpp>
+#include <mpp/mat.hpp>
+#include <mpp/utility.hpp>

@@ -27,7 +27,7 @@ function(_create_test TEST_FILENAME)
     set(TEST_SOURCE "src/${TEST_FILENAME}.cpp")
     add_executable(${TEST_NAME} "${TEST_SOURCE}")
 
-    target_include_directories(${TEST_NAME} PRIVATE "../thirdparty")
+    target_include_directories(${TEST_NAME} PRIVATE "thirdparty")
 
     _setup_target(${TEST_NAME} "${TESTS_BINARY_DIR}")
     _turn_on_warnings(${TEST_NAME})
@@ -47,11 +47,11 @@ _create_test("arithmetic")
 _create_test("members")
 
 if(${PROJECT_NAME_UPPER}_CODE_COVERAGE)
-    include("../thirdparty/CodeCoverage.cmake")
+    include("thirdparty/CodeCoverage.cmake")
     append_coverage_compiler_flags()
     setup_target_for_coverage_gcovr_xml(
         NAME ${PROJECT_NAME}_code_coverage
         EXECUTABLE lit bin/tests # @FIXME: Find a way to workaround failures of tests
-        EXCLUDE "${PROJECT_SOURCE_DIR}/external/*"
+        EXCLUDE "${PROJECT_SOURCE_DIR}/tests/*"
         DEPENDENCIES "tests")
 endif()

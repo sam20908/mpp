@@ -22,8 +22,8 @@
 #include <mpp/algorithm.hpp>
 #include <mpp/mat.hpp>
 
-#include "../../include/custom_allocator.hpp"
-#include "../../include/test_utilities.hpp"
+#include "../include/custom_allocator.hpp"
+#include "../include/test_utilities.hpp"
 
 #include <compare>
 #include <string_view>
@@ -162,7 +162,7 @@ int main()
 			back_sub);
 
 		// Test different return type
-		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
+		test_sub<join_mats<dyn_mat<int>, dyn_mat<int>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
 			back_sub);
 	};
 

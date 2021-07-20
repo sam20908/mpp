@@ -73,5 +73,5 @@ find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE Threads::Threads)
 
 if(${PROJECT_NAME_UPPER}_BUILD_TESTS)
-    add_subdirectory("external/tests")
+    add_subdirectory("tests")
 endif()

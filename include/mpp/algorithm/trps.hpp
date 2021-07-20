@@ -19,10 +19,9 @@
 
 #pragma once
 
-#include <mpp/detail/utility/buffer_manipulators.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/mat.hpp>
+#include <mpp/mat/matfwd.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -40,21 +39,21 @@ namespace mpp
 
 			using trps_buf_t = typename To::buffer_type;
 
-			auto transposed_buffer = trps_buf_t{};
-			resize_buf_if_vec(transposed_buffer, cols, rows, typename To::value_type{});
+			auto trps_buf = trps_buf_t{};
+			resize_buf_if_vec(trps_buf, cols, rows, typename To::value_type{});
 
-			for (auto column = std::size_t{}; column < cols; ++column)
+			for (auto col = std::size_t{}; col < cols; ++col)
 			{
 				for (auto row = std::size_t{}; row < rows; ++row)
 				{
-					auto normal_index     = detail::idx_1d(cols, row, column);
-					auto transposed_index = detail::idx_1d(rows, column, row);
+					auto idx      = detail::idx_1d(cols, row, col);
+					auto trps_idx = detail::idx_1d(rows, col, row);
 
-					transposed_buffer[transposed_index] = data[normal_index];
+					trps_buf[trps_idx] = data[idx];
 				}
 			}
 
-			return To{ cols, rows, std::move(transposed_buffer) };
+			return To{ cols, rows, std::move(trps_buf) };
 		}
 	} // namespace detail
 

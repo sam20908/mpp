@@ -20,7 +20,8 @@
 #pragma once
 
 #include <mpp/detail/expr/expr_base.hpp>
-#include <mpp/mat/matfwd.hpp> // @TODO: Export this header to the user for modules
+#include <mpp/detail/utility/public.hpp>
+#include <mpp/detail/utility/utility.hpp>
 #include <mpp/utility/cfg.hpp>
 
 #include <cstddef>
@@ -28,6 +29,10 @@
 
 namespace mpp
 {
+	/**
+	 * Forward declarations
+	 */
+
 	template<detail::arithmetic Val,
 		std::size_t Rows = cfg<override>::rows_extent,
 		std::size_t Cols = cfg<override>::cols_extent,

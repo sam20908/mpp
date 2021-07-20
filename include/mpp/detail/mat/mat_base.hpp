@@ -21,11 +21,8 @@
 
 #include <mpp/detail/expr/expr_base.hpp>
 #include <mpp/detail/mat/mat_iter.hpp>
-#include <mpp/detail/types/constraints.hpp>
-#include <mpp/detail/types/type_traits.hpp>
-#include <mpp/detail/utility/buffer_manipulators.hpp>
+#include <mpp/detail/utility/public.hpp>
 #include <mpp/detail/utility/utility.hpp>
-#include <mpp/utility/cfg.hpp>
 #include <mpp/utility/traits.hpp>
 
 #include <algorithm>

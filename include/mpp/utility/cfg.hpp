@@ -19,7 +19,6 @@
 
 #pragma once
 
-// @TODO: Export std::allocator for modules
 #include <mpp/detail/utility/public.hpp>
 
 #include <array>
