@@ -41,7 +41,7 @@ namespace mpp::detail
 	template<typename Val>
 	[[nodiscard]] constexpr auto fp_is_zero_or_nan(Val val) -> bool
 	{
-		return cmp_fp(val, Val{}) == 0 || std::isnan(val);
+		return fp_is_eq(val, Val{}) || std::isnan(val);
 	}
 
 	template<typename To, bool FillL, bool GetDet>

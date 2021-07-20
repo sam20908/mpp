@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cmath>
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 
@@ -66,21 +67,22 @@ namespace mpp
 			std::size_t Cols2,
 			typename Alloc,
 			typename Alloc2,
-			typename Cmp = std::compare_three_way>
+			typename Fn = std::compare_three_way>
 		[[nodiscard]] friend inline auto tag_invoke(cmp_t,
 			const mat<Val, Rows, Cols, Alloc>& a,
 			const mat<Val2, Rows2, Cols2, Alloc2>& b,
-			Cmp cmp = {}) // @TODO: ISSUE #20
-			noexcept(noexcept(std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), cmp)))
+			Fn fn = {}) // @TODO: ISSUE #20
+			noexcept(noexcept(std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), fn)))
 		{
-			return std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), cmp);
+			return std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), fn);
 		}
 	};
 
 	inline constexpr auto size_compare = size_compare_t{}; // @FIXME Remove this
 	inline constexpr auto cmp          = cmp_t{};
 
-	inline constexpr auto cmp_fp = []<typename T>(T a, T b) noexcept -> std::compare_three_way_result_t<T, T> {
+	inline constexpr auto cmp_fp = []<std::floating_point T>(T a,
+									   T b) noexcept -> std::compare_three_way_result_t<T, T> {
 		// @TODO: Somehow avoid branching here?
 		if (!detail::fp_is_eq(a, b))
 		{
@@ -88,6 +90,17 @@ namespace mpp
 		}
 
 		return a <=> b;
+	};
+
+	inline constexpr auto cmp_fn = []<typename T>(T a, T b) noexcept -> std::compare_three_way_result_t<T, T> {
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return cmp_fp(a, b);
+		}
+		else
+		{
+			return a <=> b;
+		}
 	};
 
 	// @TODO: This is an odd place, maybe look for somewhere else to put it?

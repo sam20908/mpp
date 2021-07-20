@@ -74,7 +74,7 @@ namespace
 			const auto [mat, mat2, expected_cmp] =
 				parse_test(test_name, parse_mat<Mat>, parse_mat<Mat2>, parse_ordering<Order>);
 
-			const auto out = cmp(mat, mat2, cmp_fp);
+			const auto out = cmp(mat, mat2, cmp_fn);
 
 			expect(out == expected_cmp);
 		} | Mats{};
