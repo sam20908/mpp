@@ -90,43 +90,41 @@ namespace
 int main()
 {
 	feature("Addition") = []() {
-		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>(
-			"arithmetic/2x3_add.txt",
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>("ariths/2x3_add.txt",
 			std::plus{});
-		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>(
-			"arithmetic/2x3_add.txt",
+		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>("ariths/2x3_add.txt",
 			std::plus{});
 	};
 
 	feature("Subtraction") = []() {
 		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>(
-			"arithmetic/2x3_subtract.txt",
+			"ariths/2x3_subtract.txt",
 			std::minus{});
 		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>(
-			"arithmetic/2x3_subtract.txt",
+			"ariths/2x3_subtract.txt",
 			std::minus{});
 	};
 
 	feature("Multiplication (matrix multiplied with scalar)") = []() {
-		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>("arithmetic/2x3_multiply.txt",
+		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>("ariths/2x3_multiply.txt",
 			std::multiplies{});
-		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>("arithmetic/2x3_multiply.txt",
+		test_num_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>("ariths/2x3_multiply.txt",
 			std::multiplies{});
 	};
 
 	feature("Multiplication (matrix multiplied with matrix)") = []() {
 		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 3, 1>, all_mats<int, 2, 1>>, false>(
-			"arithmetic/2x3_3x1_multiply.txt",
+			"ariths/2x3_3x1_multiply.txt",
 			std::multiplies{});
 		test_op<join_mats<all_mats<int, 2, 3>, all_mats<int, 3, 1>, all_mats<int, 2, 1>>, true>(
-			"arithmetic/2x3_3x1_multiply.txt",
+			"ariths/2x3_3x1_multiply.txt",
 			std::multiplies{});
 	};
 
 	feature("Division (matrix divided with scalar)") = []() {
-		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, false>("arithmetic/2x3_divide.txt",
+		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, false>("ariths/2x3_divide.txt",
 			std::divides{});
-		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, true>("arithmetic/2x3_divide.txt",
+		test_num_op<join_mats<all_mats<double, 2, 3>, all_mats<double, 2, 3>>, true>("ariths/2x3_divide.txt",
 			std::divides{});
 	};
 

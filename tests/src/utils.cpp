@@ -84,47 +84,47 @@ namespace
 int main()
 {
 	feature("Type") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utilities/type/fixed.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_mat<int>>("utilities/type/dyn.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_rows_mat<int, 0>>("utilities/type/dyn_rows.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_cols_mat<int, 0>>("utilities/type/dyn_cols.txt", mpp::type, parse_val<mat_type>);
+		test_fn<fixed_mat<int, 0, 0>>("utils/type/fixed.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_mat<int>>("utils/type/dyn.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_rows_mat<int, 0>>("utils/type/dyn_rows.txt", mpp::type, parse_val<mat_type>);
+		test_fn<dyn_cols_mat<int, 0>>("utils/type/dyn_cols.txt", mpp::type, parse_val<mat_type>);
 	};
 
 	feature("Square") = []() {
-		test_fn<all_mats<int, 1, 1>>("utilities/sq/1x1.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 1, 2>>("utilities/sq/1x2.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 3, 3>>("utilities/sq/3x3.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 3, 2>>("utilities/sq/3x2.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 1, 1>>("utils/sq/1x1.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 1, 2>>("utils/sq/1x2.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 3, 3>>("utils/sq/3x3.txt", sq, parse_val<bool>);
+		test_fn<all_mats<int, 3, 2>>("utils/sq/3x2.txt", sq, parse_val<bool>);
 	};
 
 	feature("Singular") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utilities/sg/0x0.txt", sg, parse_val<bool>);
-		test_fn<dyn_mat<int>>("utilities/sg/1x1.txt", sg, parse_val<bool>);
-		test_fn<dyn_rows_mat<int, 2>>("utilities/sg/2x2.txt", sg, parse_val<bool>);
-		test_fn<dyn_cols_mat<int, 3>>("utilities/sg/3x3.txt", sg, parse_val<bool>);
+		test_fn<fixed_mat<int, 0, 0>>("utils/sg/0x0.txt", sg, parse_val<bool>);
+		test_fn<dyn_mat<int>>("utils/sg/1x1.txt", sg, parse_val<bool>);
+		test_fn<dyn_rows_mat<int, 2>>("utils/sg/2x2.txt", sg, parse_val<bool>);
+		test_fn<dyn_cols_mat<int, 3>>("utils/sg/3x3.txt", sg, parse_val<bool>);
 	};
 
 	feature("Size comparison") = []() {
 		test_cmp_size<join_mats<all_mats<int, 0, 0>, all_mats<int, 0, 0>>,
 			std::partial_ordering,
-			std::partial_ordering>("utilities/cmp_size/0x0_0x0.txt");
+			std::partial_ordering>("utils/cmp_size/0x0_0x0.txt");
 		test_cmp_size<join_mats<all_mats<int, 1, 1>, all_mats<int, 1, 2>>, std::strong_ordering, std::strong_ordering>(
-			"utilities/cmp_size/1x1_1x2.txt");
+			"utils/cmp_size/1x1_1x2.txt");
 		test_cmp_size<join_mats<all_mats<int, 3, 4>, all_mats<int, 3, 3>>, std::partial_ordering, std::strong_ordering>(
-			"utilities/cmp_size/3x4_3x3.txt");
+			"utils/cmp_size/3x4_3x3.txt");
 		test_cmp_size<join_mats<all_mats<int, 4, 4>, all_mats<int, 4, 4>>, std::strong_ordering, std::strong_ordering>(
-			"utilities/cmp_size/4x4_4x4.txt");
+			"utils/cmp_size/4x4_4x4.txt");
 	};
 
 	feature("Elements comparison") = []() {
 		test_cmp_elems<join_mats<all_mats<int, 0, 0>, all_mats<int, 0, 0>>, std::strong_ordering>(
-			"utilities/cmp_elems/0x0_0x0.txt");
+			"utils/cmp_elems/0x0_0x0.txt");
 		test_cmp_elems<join_mats<all_mats<int, 1, 1>, all_mats<int, 1, 1>>, std::strong_ordering>(
-			"utilities/cmp_elems/1x1_1x1.txt");
+			"utils/cmp_elems/1x1_1x1.txt");
 		test_cmp_elems<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>, std::strong_ordering>(
-			"utilities/cmp_elems/3x3_3x3.txt");
+			"utils/cmp_elems/3x3_3x3.txt");
 		test_cmp_elems<join_mats<all_mats<float, 4, 4>, all_mats<float, 4, 4>>, std::partial_ordering>(
-			"utilities/cmp_elems/4x4_4x4.txt");
+			"utils/cmp_elems/4x4_4x4.txt");
 	};
 
 	return 0;

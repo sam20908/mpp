@@ -115,73 +115,70 @@ namespace
 int main()
 {
 	feature("Determinant") = []() {
-		test_det<all_mats<int, 0, 0>, int>("algorithm/det/0x0.txt");
-		test_det<all_mats<float, 1, 1>, double>("algorithm/det/1x1.txt");
-		test_det<all_mats<float, 2, 2>, double>("algorithm/det/2x2.txt");
-		test_det<all_mats<int, 3, 3>, int>("algorithm/det/3x3.txt");
-		test_det<all_mats<double, 10, 10>, double>("algorithm/det/10x10.txt");
-		test_det<all_mats<double, 20, 20>, double>("algorithm/det/20x20.txt");
+		test_det<all_mats<int, 0, 0>, int>("algos/det/0x0.txt");
+		test_det<all_mats<float, 1, 1>, double>("algos/det/1x1.txt");
+		test_det<all_mats<float, 2, 2>, double>("algos/det/2x2.txt");
+		test_det<all_mats<int, 3, 3>, int>("algos/det/3x3.txt");
+		test_det<all_mats<double, 10, 10>, double>("algos/det/10x10.txt");
+		test_det<all_mats<double, 20, 20>, double>("algos/det/20x20.txt");
 
 		// Test different return type
-		test_det<dyn_mat<float>, int>("algorithm/det/3x3.txt");
+		test_det<dyn_mat<float>, int>("algos/det/3x3.txt");
 	};
 
 	feature("Transpose") = []() {
-		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algorithm/trps/25x25.txt", trps);
-		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algorithm/trps/50x2.txt", trps);
+		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algos/trps/25x25.txt", trps);
+		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algos/trps/50x2.txt", trps);
 
 		// Test different return type
-		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algorithm/trps/25x25.txt", trps);
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algos/trps/25x25.txt", trps);
 	};
 
 	feature("Inverse") = []() {
-		test_fn<join_mats<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algorithm/inv/0x0.txt", inverse);
-		test_fn<join_mats<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algorithm/inv/1x1.txt", inverse);
-		test_fn<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algorithm/inv/2x2.txt", inverse);
-		test_fn<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
-		test_fn<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algorithm/inv/3x3.txt", inverse);
-		test_fn<join_mats<all_mats<double, 10, 10>, all_mats<double, 10, 10>>>("algorithm/inv/10x10.txt", inverse);
+		test_fn<join_mats<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algos/inv/0x0.txt", inverse);
+		test_fn<join_mats<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algos/inv/1x1.txt", inverse);
+		test_fn<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algos/inv/2x2.txt", inverse);
+		test_fn<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>>("algos/inv/3x3_int.txt", inverse);
+		test_fn<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algos/inv/3x3.txt", inverse);
+		test_fn<join_mats<all_mats<double, 10, 10>, all_mats<double, 10, 10>>>("algos/inv/10x10.txt", inverse);
 
 		// Test different return type
-		test_fn<join_mats<dyn_mat<float>, fixed_mat<int, 3, 3>>>("algorithm/inv/3x3_int.txt", inverse);
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<int, 3, 3>>>("algos/inv/3x3_int.txt", inverse);
 	};
 
 	feature("Forward substitution") = []() {
 		test_sub<join_mats<all_mats<double, 4, 4>, all_mats<double, 4, 1>, all_mats<double, 4, 1>>>(
-			"algorithm/fwd_sub/4x4_4x1.txt",
+			"algos/fwd_sub/4x4_4x1.txt",
 			fwd_sub);
 
 		// Test different return type
-		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<int, 4, 1>>>("algorithm/fwd_sub/4x4_4x1.txt",
+		test_sub<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<int, 4, 1>>>("algos/fwd_sub/4x4_4x1.txt",
 			fwd_sub);
 	};
 
 	feature("Backward substitution") = []() {
 		test_sub<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 1>, all_mats<double, 3, 1>>>(
-			"algorithm/back_sub/3x3_3x1.txt",
+			"algos/back_sub/3x3_3x1.txt",
 			back_sub);
 
 		// Test different return type
-		test_sub<join_mats<dyn_mat<int>, dyn_mat<int>, fixed_mat<float, 3, 1>>>("algorithm/back_sub/3x3_3x1.txt",
-			back_sub);
+		test_sub<join_mats<dyn_mat<int>, dyn_mat<int>, fixed_mat<float, 3, 1>>>("algos/back_sub/3x3_3x1.txt", back_sub);
 	};
 
 	feature("LU Decomposition") = []() {
-		test_lu<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>, all_mats<double, 2, 2>>>(
-			"algorithm/lu/2x2.txt");
-		test_lu<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>, all_mats<double, 3, 3>>>(
-			"algorithm/lu/3x3.txt");
+		test_lu<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algos/lu/2x2.txt");
+		test_lu<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algos/lu/3x3.txt");
 
 		// Test different return type
-		test_lu<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 2, 2>>>("algorithm/lu/2x2.txt");
+		test_lu<join_mats<dyn_mat<double>, dyn_mat<double>, fixed_mat<float, 2, 2>>>("algos/lu/2x2.txt");
 	};
 
 	feature("Block") = []() {
-		test_block<join_mats<all_mats<double, 3, 3>, all_mats<double, 1, 1>>>("algorithm/block/3x3_1x1_0_0_0_0.txt");
-		test_block<join_mats<all_mats<double, 4, 4>, all_mats<double, 2, 2>>>("algorithm/block/4x4_2x2_2_2_3_3.txt");
+		test_block<join_mats<all_mats<double, 3, 3>, all_mats<double, 1, 1>>>("algos/block/3x3_1x1_0_0_0_0.txt");
+		test_block<join_mats<all_mats<double, 4, 4>, all_mats<double, 2, 2>>>("algos/block/4x4_2x2_2_2_3_3.txt");
 
 		// Test different return type
-		test_block<join_mats<dyn_mat<double>, fixed_mat<double, 1, 1>>>("algorithm/block/3x3_1x1_0_0_0_0.txt");
+		test_block<join_mats<dyn_mat<double>, fixed_mat<double, 1, 1>>>("algos/block/3x3_1x1_0_0_0_0.txt");
 	};
 
 	return 0;

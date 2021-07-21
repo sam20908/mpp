@@ -99,63 +99,63 @@ int main()
 	feature("Assigning a 2D range with same dimensions") = []() {
 		using mats = join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>;
 
-		test_assign_rng<mats, false, false>("assignment/2x3_same_dims.txt");
-		test_assign_rng<mats, true, false>("assignment/2x3_same_dims.txt");
+		test_assign_rng<mats, false, false>("assign/2x3_same_dims.txt");
+		test_assign_rng<mats, true, false>("assign/2x3_same_dims.txt");
 	};
 
 	feature("Assigning a 2D array with same dimensions (fixed matrices only)") = []() {
 		using mats = join_mats<fixed_mat<int, 2, 3>, fixed_mat<int, 2, 3>>;
 
-		test_assign_rng<mats, false, true>("assignment/2x3_same_dims.txt");
-		test_assign_rng<mats, true, true>("assignment/2x3_same_dims.txt");
+		test_assign_rng<mats, false, true>("assign/2x3_same_dims.txt");
+		test_assign_rng<mats, true, true>("assign/2x3_same_dims.txt");
 	};
 
 	feature("Assigning a matrix with same dimensions") = []() {
 		using mats = join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>, all_mats<int, 2, 3>>;
 
-		test_assign_mat<mats, false>("assignment/2x3_same_dims.txt");
-		test_assign_mat<mats, true>("assignment/2x3_same_dims.txt");
+		test_assign_mat<mats, false>("assign/2x3_same_dims.txt");
+		test_assign_mat<mats, true>("assign/2x3_same_dims.txt");
 	};
 
 	feature("Assigning a matrix with same dimensions but different types") = []() {
 		using mats = join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>, all_mats<int, 2, 3>>;
 
-		test_assign_mat<mats, false>("assignment/2x3_same_dims.txt");
-		test_assign_mat<mats, true>("assignment/2x3_same_dims.txt");
+		test_assign_mat<mats, false>("assign/2x3_same_dims.txt");
+		test_assign_mat<mats, true>("assign/2x3_same_dims.txt");
 	};
 
 	feature("Expanding dynamic matrices by range (dynamic matrices only)") = []() {
-		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assignment/2x3_10x10_expand_dyn_mat.txt");
+		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assign/2x3_10x10_expand_dyn_mat.txt");
 		test_assign_rng<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true, false>(
-			"assignment/2x3_10x3_expand_dyn_rows_mat.txt");
+			"assign/2x3_10x3_expand_dyn_rows_mat.txt");
 		test_assign_rng<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true, false>(
-			"assignment/2x3_2x10_expand_dyn_cols_mat.txt");
+			"assign/2x3_2x10_expand_dyn_cols_mat.txt");
 	};
 
 	feature("Shrinking dynamic matrices by range (dynamic matrices only)") = []() {
-		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assignment/10x10_2x3_shrink_dyn_mat.txt");
+		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assign/10x10_2x3_shrink_dyn_mat.txt");
 		test_assign_rng<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true, false>(
-			"assignment/10x3_2x3_shrink_dyn_rows_mat.txt");
+			"assign/10x3_2x3_shrink_dyn_rows_mat.txt");
 		test_assign_rng<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true, false>(
-			"assignment/2x10_2x3_shrink_dyn_cols_mat.txt");
+			"assign/2x10_2x3_shrink_dyn_cols_mat.txt");
 	};
 
 	feature("Expanding dynamic matrices by matrix (dynamic matrices only)") = []() {
 		test_assign_mat<join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>, true>(
-			"assignment/2x3_10x10_expand_dyn_mat.txt");
+			"assign/2x3_10x10_expand_dyn_mat.txt");
 		test_assign_mat<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true>(
-			"assignment/2x3_10x3_expand_dyn_rows_mat.txt");
+			"assign/2x3_10x3_expand_dyn_rows_mat.txt");
 		test_assign_mat<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true>(
-			"assignment/2x3_2x10_expand_dyn_cols_mat.txt");
+			"assign/2x3_2x10_expand_dyn_cols_mat.txt");
 	};
 
 	feature("Shrinking dynamic matrices by matrix (dynamic matrices only)") = []() {
 		test_assign_mat<join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>, true>(
-			"assignment/10x10_2x3_shrink_dyn_mat.txt");
+			"assign/10x10_2x3_shrink_dyn_mat.txt");
 		test_assign_mat<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true>(
-			"assignment/10x3_2x3_shrink_dyn_rows_mat.txt");
+			"assign/10x3_2x3_shrink_dyn_rows_mat.txt");
 		test_assign_mat<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true>(
-			"assignment/2x10_2x3_shrink_dyn_cols_mat.txt");
+			"assign/2x10_2x3_shrink_dyn_cols_mat.txt");
 	};
 
 	return 0;
