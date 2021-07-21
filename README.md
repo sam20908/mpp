@@ -165,8 +165,8 @@ namespace mpp
   template<>
   struct cfg<override>
   {
-    template<typename Value>
-    using alloc = my_custom_allocator<Value>;
+    template<typename Val>
+    using alloc = my_custom_allocator<Val>;
 
     static constexpr std::size_t rows_extent = 10;
     static constexpr std::size_t cols_extent = 10;
@@ -175,17 +175,17 @@ namespace mpp
      * These are the default buffer type aliases the library will use, but you can customize them
      */
 
-    template<typename Value, std::size_t Rows, std::size_t Cols, typename>
-    using fixed_buf = std::array<Value, Rows * Cols>; // mpp::mat<int, 1, 2>
+    template<typename Val, std::size_t Rows, std::size_t Cols, typename>
+    using fixed_buf = std::array<Val, Rows * Cols>; // mpp::mat<int, 1, 2>
 
-    template<typename Value, std::size_t, std::size_t, typename Alloc>
-    using dyn_buf = std::vector<Value, Alloc>; // mpp::mat<int>
+    template<typename Val, std::size_t, std::size_t, typename Alloc>
+    using dyn_buf = std::vector<Val, Alloc>; // mpp::mat<int>
 
-    template<typename Value, std::size_t, std::size_t Cols, typename Alloc>
-    using dyn_rows_buf = dyn_buf<Value, 1, Cols, Alloc>; // mpp::mat<int, mpp::dyn, 2>
+    template<typename Val, std::size_t, std::size_t Cols, typename Alloc>
+    using dyn_rows_buf = dyn_buf<Val, 1, Cols, Alloc>; // mpp::mat<int, mpp::dyn, 2>
 
-    template<typename Value, std::size_t Rows, std::size_t, typename Alloc>
-    using dyn_cols_buf = dyn_buf<Value, Rows, 1, Alloc>; // mpp::mat<int, 1, mpp::dyn>
+    template<typename Val, std::size_t Rows, std::size_t, typename Alloc>
+    using dyn_cols_buf = dyn_buf<Val, Rows, 1, Alloc>; // mpp::mat<int, 1, mpp::dyn>
   };
 } // namespace mpp
 
