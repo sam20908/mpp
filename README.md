@@ -182,10 +182,10 @@ namespace mpp
     using dyn_buf = std::vector<Value, Alloc>; // mpp::mat<int>
 
     template<typename Value, std::size_t, std::size_t Cols, typename Alloc>
-    using dyn_rows_buf = dynamic_buffer<Value, 1, Cols, Alloc>; // mpp::mat<int, mpp::dyn, 2>
+    using dyn_rows_buf = dyn_buf<Value, 1, Cols, Alloc>; // mpp::mat<int, mpp::dyn, 2>
 
     template<typename Value, std::size_t Rows, std::size_t, typename Alloc>
-    using dyn_cols_buf = dynamic_buffer<Value, Rows, 1, Alloc>; // mpp::mat<int, 1, mpp::dyn>
+    using dyn_cols_buf = dyn_buf<Value, Rows, 1, Alloc>; // mpp::mat<int, 1, mpp::dyn>
   };
 } // namespace mpp
 
