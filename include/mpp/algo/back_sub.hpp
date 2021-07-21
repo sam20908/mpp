@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <mpp/detail/utility/algorithm_helpers.hpp>
+#include <mpp/detail/util/algo_impl.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/utility/sq.hpp>
+#include <mpp/util/sq.hpp>
 
 #include <cassert>
 #include <cstddef>

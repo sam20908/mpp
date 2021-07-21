@@ -21,9 +21,9 @@
 
 // Don't include cfg.hpp because that is only for user customizations
 
-#include <mpp/utility/cmp.hpp>
-#include <mpp/utility/print.hpp>
-#include <mpp/utility/sg.hpp>
-#include <mpp/utility/sq.hpp>
-#include <mpp/utility/traits.hpp>
-#include <mpp/utility/type.hpp>
+#include <mpp/util/cmp.hpp>
+#include <mpp/util/print.hpp>
+#include <mpp/util/sg.hpp>
+#include <mpp/util/sq.hpp>
+#include <mpp/util/traits.hpp>
+#include <mpp/util/type.hpp>

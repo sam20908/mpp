@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include <mpp/utility/cfg.hpp>
+#include <mpp/util/cfg.hpp>
 
 #include "../include/custom_allocator.hpp"
 
@@ -54,9 +54,9 @@ namespace mpp
 
 #include <boost/ut.hpp>
 
-#include <mpp/algorithm.hpp>
+#include <mpp/algo.hpp>
 #include <mpp/mat.hpp>
-#include <mpp/utility.hpp>
+#include <mpp/util.hpp>
 
 namespace ns
 {

@@ -20,8 +20,8 @@
 #pragma once
 
 #include <mpp/detail/expr/expr_binary_op.hpp>
-#include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/util/algo_impl.hpp>
+#include <mpp/detail/util/util.hpp>
 #include <mpp/mat.hpp>
 
 #include <cstddef>

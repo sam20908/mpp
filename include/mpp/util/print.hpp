@@ -20,7 +20,7 @@
 #pragma once
 
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/print_helpers.hpp>
+#include <mpp/detail/util/print_impl.hpp>
 #include <mpp/mat/matfwd.hpp>
 
 #include <cstddef>

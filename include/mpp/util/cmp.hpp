@@ -20,7 +20,7 @@
 #pragma once
 
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/util/util.hpp>
 #include <mpp/mat/matfwd.hpp>
 
 #include <algorithm>

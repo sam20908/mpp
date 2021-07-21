@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <mpp/algorithm/det.hpp>
-#include <mpp/detail/utility/utility.hpp>
+#include <mpp/algo/det.hpp>
+#include <mpp/detail/util/util.hpp>
 #include <mpp/mat/matfwd.hpp>
 
 #include <algorithm>

@@ -22,8 +22,8 @@
 #include <mpp/detail/expr/expr_base.hpp>
 #include <mpp/detail/mat/mat_iter.hpp>
 #include <mpp/detail/utility/public.hpp>
-#include <mpp/detail/utility/utility.hpp>
-#include <mpp/utility/traits.hpp>
+#include <mpp/detail/util/util.hpp>
+#include <mpp/util/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>

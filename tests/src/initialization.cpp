@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include <mpp/utility/cmp.hpp>
+#include <mpp/util/cmp.hpp>
 #include <mpp/mat.hpp>
 
 #include "../include/custom_allocator.hpp"

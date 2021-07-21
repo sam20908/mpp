@@ -21,10 +21,10 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/detail/utility/algorithm_helpers.hpp>
-#include <mpp/detail/utility/print_helpers.hpp>
+#include <mpp/detail/util/algo_impl.hpp>
+#include <mpp/detail/util/print_impl.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/utility/cmp.hpp>
+#include <mpp/util/cmp.hpp>
 
 #include <cstddef>
 #include <filesystem>

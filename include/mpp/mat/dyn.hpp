@@ -20,9 +20,9 @@
 #pragma once
 
 #include <mpp/detail/mat/mat_base.hpp>
-#include <mpp/detail/utility/utility.hpp>
+#include <mpp/detail/util/util.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/utility/cfg.hpp>
+#include <mpp/util/cfg.hpp>
 
 #include <initializer_list>
 #include <type_traits>

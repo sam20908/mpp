@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <mpp/algorithm/back_sub.hpp>
-#include <mpp/algorithm/block.hpp>
-#include <mpp/algorithm/det.hpp>
-#include <mpp/algorithm/fwd_sub.hpp>
-#include <mpp/algorithm/inv.hpp>
-#include <mpp/algorithm/lu.hpp>
-#include <mpp/algorithm/trps.hpp>
+#include <mpp/algo/back_sub.hpp>
+#include <mpp/algo/block.hpp>
+#include <mpp/algo/det.hpp>
+#include <mpp/algo/fwd_sub.hpp>
+#include <mpp/algo/inv.hpp>
+#include <mpp/algo/lu.hpp>
+#include <mpp/algo/trps.hpp>

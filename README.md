@@ -155,7 +155,7 @@ int main()
 Customizations of options that affect the library globally can be changed via specializing the `mpp::cfg` struct with `mpp::override` tag. **The only catch is that you have to do it BEFORE including other `mpp` headers.**
 
 ```cpp
-#include <mpp/utility/cfg.hpp>
+#include <mpp/util/cfg.hpp>
 
 #include <array>
 #include <vector>

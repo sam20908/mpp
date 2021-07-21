@@ -19,58 +19,52 @@
 
 #pragma once
 
+#include <mpp/detail/util/algo_impl.hpp>
 #include <mpp/detail/utility/cpo_base.hpp>
-#include <mpp/detail/utility/utility.hpp>
 #include <mpp/mat/matfwd.hpp>
+#include <mpp/util/sq.hpp>
 
+#include <cassert>
 #include <cstddef>
-#include <type_traits>
 
 namespace mpp
 {
 	namespace detail
 	{
 		template<typename To>
-		[[nodiscard]] auto trps_impl(const auto& obj) -> To
+		inline auto fwd_sub_impl(const auto& a, const auto& b) -> To // @TODO: ISSUE #20
 		{
-			const auto rows = obj.rows();
-			const auto cols = obj.cols();
-			const auto data = obj.data();
+			assert(sq(a));
+			assert(b.cols() == 1);
 
-			using trps_buf_t = typename To::buffer_type;
+			const auto rows = a.rows();
 
-			auto trps_buf = trps_buf_t{};
-			resize_buf_if_vec(trps_buf, cols, rows, typename To::value_type{});
+			using x_mat_t = mat_rebind_to_t<To, fp_t>;
+			auto x_buf    = fwd_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
 
-			for (auto col = std::size_t{}; col < cols; ++col)
-			{
-				for (auto row = std::size_t{}; row < rows; ++row)
-				{
-					auto idx      = detail::idx_1d(cols, row, col);
-					auto trps_idx = detail::idx_1d(rows, col, row);
-
-					trps_buf[trps_idx] = data[idx];
-				}
-			}
-
-			return To{ cols, rows, std::move(trps_buf) };
+			return To{ rows, 1, std::move(x_buf) };
 		}
 	} // namespace detail
 
-	struct trps_t : public detail::cpo_base<trps_t>
+	struct fwd_sub_t : public detail::cpo_base<fwd_sub_t>
 	{
-		template<typename Val,
-			std::size_t Rows,
-			std::size_t Cols,
-			typename Alloc,
-			typename To = mat<Val, Cols, Rows, Alloc>>
-		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(trps_t,
-			const mat<Val, Rows, Cols, Alloc>& obj,
+		template<typename AVal,
+			typename BVal,
+			std::size_t ARows,
+			std::size_t ACols,
+			std::size_t BRows,
+			std::size_t BCols,
+			typename AAlloc,
+			typename BAlloc,
+			typename To = mat<std::common_type_t<AVal, BVal>, dyn, BCols>>
+		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(fwd_sub_t,
+			const mat<AVal, ARows, ACols, AAlloc>& a,
+			const mat<BVal, BRows, BCols, BAlloc>& b,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
-			return detail::trps_impl<To>(obj);
+			return detail::fwd_sub_impl<To>(a, b);
 		}
 	};
 
-	inline constexpr auto trps = trps_t{};
+	inline constexpr auto fwd_sub = fwd_sub_t{};
 } // namespace mpp

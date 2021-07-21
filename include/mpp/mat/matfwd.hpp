@@ -21,8 +21,8 @@
 
 #include <mpp/detail/expr/expr_base.hpp>
 #include <mpp/detail/utility/public.hpp>
-#include <mpp/detail/utility/utility.hpp>
-#include <mpp/utility/cfg.hpp>
+#include <mpp/detail/util/util.hpp>
+#include <mpp/util/cfg.hpp>
 
 #include <cstddef>
 #include <initializer_list>
