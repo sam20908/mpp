@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/algo.hpp>
-#include <mpp/arith.hpp>
-#include <mpp/mat.hpp>
-#include <mpp/util.hpp>
+#include <mpp/arith/add.hpp>
+#include <mpp/arith/divide.hpp>
+#include <mpp/arith/multiply.hpp>
+#include <mpp/arith/subtract.hpp>

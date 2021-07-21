@@ -19,7 +19,11 @@
 
 #pragma once
 
-#include <mpp/algo.hpp>
-#include <mpp/arith.hpp>
-#include <mpp/mat.hpp>
-#include <mpp/util.hpp>
+// Don't include cfg.hpp because that is only for user customizations
+
+#include <mpp/util/cmp.hpp>
+#include <mpp/util/print.hpp>
+#include <mpp/util/sg.hpp>
+#include <mpp/util/sq.hpp>
+#include <mpp/util/traits.hpp>
+#include <mpp/util/type.hpp>

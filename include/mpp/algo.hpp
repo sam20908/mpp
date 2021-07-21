@@ -19,7 +19,10 @@
 
 #pragma once
 
-#include <mpp/algo.hpp>
-#include <mpp/arith.hpp>
-#include <mpp/mat.hpp>
-#include <mpp/util.hpp>
+#include <mpp/algo/back_sub.hpp>
+#include <mpp/algo/block.hpp>
+#include <mpp/algo/det.hpp>
+#include <mpp/algo/fwd_sub.hpp>
+#include <mpp/algo/inv.hpp>
+#include <mpp/algo/lu.hpp>
+#include <mpp/algo/trps.hpp>

@@ -19,7 +19,20 @@
 
 #pragma once
 
-#include <mpp/algo.hpp>
-#include <mpp/arith.hpp>
-#include <mpp/mat.hpp>
-#include <mpp/util.hpp>
+#include <mpp/detail/util/tag_invoke.hpp>
+
+namespace mpp::detail
+{
+	template<typename CPO>
+	struct cpo_base
+	{
+		template<typename... Args>
+		[[nodiscard]] auto operator()(Args&&... args) const
+			noexcept(noexcept(tag_invoke_cpo(CPO{}, std::forward<Args>(args)...)))
+				-> tag_invoke_result_t<CPO, Args...> // @TODO: ISSUE #20
+		{
+			// Practically empty CPO objects gets optimized out, so it's okay to create it to help overload resolution
+			return tag_invoke_cpo(CPO{}, std::forward<Args>(args)...);
+		}
+	};
+} // namespace mpp::detail

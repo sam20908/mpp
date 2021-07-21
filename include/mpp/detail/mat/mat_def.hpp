@@ -21,7 +21,7 @@
 
 #include <mpp/detail/expr/expr_base.hpp>
 #include <mpp/mat/matfwd.hpp> // @TODO: Export this header to the user for modules
-#include <mpp/utility/cfg.hpp>
+#include <mpp/util/cfg.hpp>
 
 #include <cstddef>
 #include <initializer_list>

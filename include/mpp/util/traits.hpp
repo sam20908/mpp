@@ -19,7 +19,27 @@
 
 #pragma once
 
-#include <mpp/algo.hpp>
-#include <mpp/arith.hpp>
-#include <mpp/mat.hpp>
-#include <mpp/util.hpp>
+#include <mpp/detail/util/util.hpp>
+
+#include <complex>
+
+namespace mpp
+{
+	template<detail::arithmetic Type>
+	struct traits
+	{
+		using real_type      = Type;
+		using imaginary_type = Type;
+
+		static constexpr auto is_complex = false;
+	};
+
+	template<typename Type>
+	struct traits<std::complex<Type>>
+	{
+		using real_type      = Type;
+		using imaginary_type = Type;
+
+		static constexpr auto is_complex = true;
+	};
+} // namespace mpp
