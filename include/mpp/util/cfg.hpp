@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/detail/utility/public.hpp>
+#include <mpp/detail/util/public.hpp>
 
 #include <array>
 #include <cstddef>

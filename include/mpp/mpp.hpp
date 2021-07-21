@@ -20,6 +20,6 @@
 #pragma once
 
 #include <mpp/algo.hpp>
-#include <mpp/arithmetic.hpp>
+#include <mpp/arith.hpp>
 #include <mpp/mat.hpp>
 #include <mpp/util.hpp>

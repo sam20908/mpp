@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <mpp/detail/utility/cpo_base.hpp>
+#include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/mat/matfwd.hpp>
 
 #include <cstddef>

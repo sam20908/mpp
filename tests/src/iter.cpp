@@ -21,7 +21,7 @@
 
 #include <mpp/mat.hpp>
 
-#include "../include/test_utilities.hpp"
+#include "../include/utils.hpp"
 
 using namespace boost::ut::literals;
 using namespace boost::ut::bdd;

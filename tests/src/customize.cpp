@@ -19,7 +19,7 @@
 
 #include <mpp/util/cfg.hpp>
 
-#include "../include/custom_allocator.hpp"
+#include "../include/alloc.hpp"
 
 #include <array>
 #include <vector>

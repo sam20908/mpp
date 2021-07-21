@@ -19,10 +19,10 @@
 
 #include <boost/ut.hpp>
 
-#include <mpp/arithmetic.hpp>
+#include <mpp/arith.hpp>
 #include <mpp/mat.hpp>
 
-#include "../include/test_utilities.hpp"
+#include "../include/utils.hpp"
 
 using namespace boost::ut;
 using namespace boost::ut::bdd;
