@@ -75,8 +75,7 @@ namespace mpp
 		concept matrix_with_value_convertible_to = is_matrix<std::remove_cvref_t<T>>::value &&
 			std::convertible_to<typename std::remove_cvref_t<T>::value_type, To>;
 
-		// Double was tested to be *at least* accurate enough to do calculations involve irrational fractions (e.g. 1/3)
-		// and
+		// Double was tested to be accurate *enough* to do calculations involve irrational fractions (e.g. 1/3) and
 		// provide accurate enough results
 		using fp_t = double;
 
