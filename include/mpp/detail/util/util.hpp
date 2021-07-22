@@ -22,6 +22,7 @@
 #include <compare>
 #include <cstddef>
 #include <limits>
+#include <ranges>
 #include <vector>
 
 namespace mpp
