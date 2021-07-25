@@ -141,7 +141,7 @@ namespace mpp
 			std::size_t Cols,
 			typename Alloc,
 			typename To = mat<Val, dyn, dyn, Alloc>>
-		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(block_t,
+		requires(detail::is_mat<To>::value) [[nodiscard]] friend inline auto tag_invoke(block_t,
 			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::size_t top_row_idx,
 			std::size_t top_col_idx,

@@ -88,7 +88,7 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::inverse_t, dumb_class) -> dumb_class2
+	[[nodiscard]] constexpr auto tag_invoke(mpp::inv_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -149,7 +149,7 @@ int main()
 		expect(type<invoke_result_t<mpp::sq_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::det_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::inverse_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<mpp::inv_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::trps_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::cmp_t>> == type<ns::dumb_class2>);
@@ -173,7 +173,7 @@ int main()
 		expect(constant<std::semiregular<mpp::sq_t>>);
 		expect(constant<std::semiregular<mpp::block_t>>);
 		expect(constant<std::semiregular<mpp::det_t>>);
-		expect(constant<std::semiregular<mpp::inverse_t>>);
+		expect(constant<std::semiregular<mpp::inv_t>>);
 		expect(constant<std::semiregular<mpp::trps_t>>);
 		expect(constant<std::semiregular<mpp::size_compare_t>>);
 		expect(constant<std::semiregular<mpp::cmp_t>>);

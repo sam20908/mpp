@@ -62,17 +62,17 @@ namespace mpp
 		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, Val>;
 
 		template<typename>
-		struct is_matrix : std::false_type
+		struct is_mat : std::false_type
 		{
 		};
 
 		template<arithmetic Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-		struct is_matrix<mat<Val, Rows, Cols, Alloc>> : std::true_type
+		struct is_mat<mat<Val, Rows, Cols, Alloc>> : std::true_type
 		{
 		};
 
 		template<typename T, typename To>
-		concept matrix_with_value_convertible_to = is_matrix<std::remove_cvref_t<T>>::value &&
+		concept matrix_with_value_convertible_to = is_mat<std::remove_cvref_t<T>>::value &&
 			std::convertible_to<typename std::remove_cvref_t<T>::value_type, To>;
 
 		// Double was tested to be accurate *enough* to do calculations involve irrational fractions (e.g. 1/3) and

@@ -127,23 +127,24 @@ int main()
 	};
 
 	feature("Transpose") = []() {
-		test_fn<join_mats<all_mats<float, 25, 25>, all_trps_mats<float, 25, 25>>>("algos/trps/25x25.txt", trps);
-		test_fn<join_mats<all_mats<float, 50, 2>, all_trps_mats<float, 50, 2>>>("algos/trps/50x2.txt", trps);
+		test_fn<join_mats<all_mats<float, 25, 25>, all_mats<float, 25, 25>>>("algos/trps/25x25.txt", trps);
+		test_fn<join_mats<all_mats<float, 50, 2>, all_mats<float, 2, 50>>>("algos/trps/50x2.txt", trps);
+		test_fn<join_mats<all_mats<float, 3, 2>, all_mats<float, 2, 3>>>("algos/trps/3x2.txt", trps);
 
 		// Test different return type
 		test_fn<join_mats<dyn_mat<float>, fixed_mat<double, 25, 25>>>("algos/trps/25x25.txt", trps);
 	};
 
 	feature("Inverse") = []() {
-		test_fn<join_mats<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algos/inv/0x0.txt", inverse);
-		test_fn<join_mats<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algos/inv/1x1.txt", inverse);
-		test_fn<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algos/inv/2x2.txt", inverse);
-		test_fn<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>>("algos/inv/3x3_int.txt", inverse);
-		test_fn<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algos/inv/3x3.txt", inverse);
-		test_fn<join_mats<all_mats<double, 10, 10>, all_mats<double, 10, 10>>>("algos/inv/10x10.txt", inverse);
+		test_fn<join_mats<all_mats<double, 0, 0>, all_mats<double, 0, 0>>>("algos/inv/0x0.txt", inv);
+		test_fn<join_mats<all_mats<double, 1, 1>, all_mats<double, 1, 1>>>("algos/inv/1x1.txt", inv);
+		test_fn<join_mats<all_mats<double, 2, 2>, all_mats<double, 2, 2>>>("algos/inv/2x2.txt", inv);
+		test_fn<join_mats<all_mats<int, 3, 3>, all_mats<int, 3, 3>>>("algos/inv/3x3_int.txt", inv);
+		test_fn<join_mats<all_mats<double, 3, 3>, all_mats<double, 3, 3>>>("algos/inv/3x3.txt", inv);
+		test_fn<join_mats<all_mats<double, 10, 10>, all_mats<double, 10, 10>>>("algos/inv/10x10.txt", inv);
 
 		// Test different return type
-		test_fn<join_mats<dyn_mat<float>, fixed_mat<int, 3, 3>>>("algos/inv/3x3_int.txt", inverse);
+		test_fn<join_mats<dyn_mat<float>, fixed_mat<int, 3, 3>>>("algos/inv/3x3_int.txt", inv);
 	};
 
 	feature("Forward substitution") = []() {

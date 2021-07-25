@@ -7,21 +7,18 @@ A C++20 and later matrix library
 #### Tested Compilers:
 
 * GCC 10
-* MSVC 19.28
+* VS 16.10 (works up to VS 16.11.2, see https://github.com/microsoft/STL/issues/1814#issuecomment-845572895)
 
-## How to Include:
+## Table of contents
 
-All you need to do is just add it as a subdirectory and link the target:
+#### Just getting started? Go [here](docs/super_demo.md)!
 
-```cmake
-add_subdirectory("mpp")
+##### When you know the basics of how the library works, you can move on to these:
 
-target_link_libraries(your_target mpp::mpp)
-```
-
----
-
-## Overview
+* Learn about extra iterator functionalities [here](more_iter_funcs.md)
+* Learn about algorithms [algorithms](algos.md)
+* Learn about utilities [here](utils.md)
+* Learn about customizations [here](customize.md)
 
 Here is a _super_ broken down example that showcases the API and functionality mpp offers:
 
@@ -231,39 +228,6 @@ int main()
 ```
 
 Learn more about the rationale of using `tag_invoke` in FAQ.
-
-#### Custom Iterators
-
-Custom iterators are used to make navigating matrices easier. They also meet `contiguous_iterator` requirement.
-
-```cpp
-#include <mpp/mpp.hpp>
-
-int main()
-{
-  auto matrix = mpp::mat<int>{ { 1, 2 }, { 3, 4 } };
-  auto begin = matrix.begin();
-
-  // Extra functionalities to navigate through the matrix easier
-  // 1. Nagivating by rows
-  begin.advance_fwd_rows(1);
-  auto val = *begin; // 3
-
-  begin.advance_back_rows(1);
-  ++begin;
-  val = *begin; // 2
-
-  // 2. Navigating by pair of offsets
-  auto begin_2 = matrix.begin();
-  begin_2 += { 1, 1 }; // 4
-
-  begin_2 -= { 1, 0 }; // 2
-
-  auto begin_3 = begin_2 + std::pair{ 0, 0 }; // Both point to the same location
-
-  return 0;
-}
-```
 
 You can find more APIs that are not mentioned in this README in the (upcoming) documentation.
 
