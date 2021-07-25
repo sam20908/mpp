@@ -13,94 +13,12 @@ A C++20 and later matrix library
 
 #### Just getting started? Go [here](docs/super_demo.md)!
 
-##### When you know the basics of how the library works, you can move on to these:
+When you know the basics of how the library works, you can move on to these:
 
 * Learn about extra iterator functionalities [here](more_iter_funcs.md)
 * Learn about algorithms [algorithms](algos.md)
 * Learn about utilities [here](utils.md)
 * Learn about customizations [here](customize.md)
-
-Here is a _super_ broken down example that showcases the API and functionality mpp offers:
-
-```cpp
-#include <mpp/mpp.hpp>
-
-#include <iostream>
-
-int main()
-{
-  /**
-   * Creating matrices
-   *
-   * Extents determine if a matrix is fixed or (partially) flexible
-   *
-   * The following conditions will make the matrix fixed:
-   * - Explicitly passing sizes different than mpp::dyn to the template parameters
-   * - Deduction guides with 2D std::array will deduce the extents, e.g.:
-   *
-   * - std::array<std::array<int, 3>, 2> arr_2d{ { 1, 2, 3 }, { 4, 5, 6 } }
-   * - mpp::mat{ arr_2d }; // Deduces to mpp::mat<int, 2, 3>
-   */
-  auto m_fixed = mpp::mat<int, 3, 3>{};
-  auto m_dynamic = mpp::mat<int, mpp::dyn, mpp::dyn>{};
-  auto m_dynamic_rows = mpp::mat<int, mpp::dyn, 3>{};
-  auto m_dynamic_cols = mpp::mat<int, 3, mpp::dyn>{};
-
-  // Initialize using 2D initializer list
-  auto m_init_2d_list = mpp::mat{ { 1, 2, 3 }, { 4, 5, 6 } };
-  // Note that deduction guides is used again, but it's deduced as mpp::mat<int, mpp::dyn, mpp::dyn>
-  m_init_2d_list.rows(); // 2
-  m_init_2d_list.cols(); // 3
-
-  const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-  auto m_2d_range = mpp::mat{ range_2d }; // Initialize from a 2D range
-  m_2d_range.rows(); // 2
-  m_2d_range.cols(); // 3
-
-  auto iota = [i = 0] mutable { return i++; };
-  auto m_generated = mpp::mat<int, 2, 3>{ iota }; // Generates values from callable
-  // Elements are: 0, 1, 2, 3, 4, 5
-
-  /**
-   * Algorithms (note: you can change output matrix type by passing a std::type_identity with desired matrix type as the last argument)
-   */
-  auto det = mpp::det(m_fixed);
-  auto inv = mpp::inv(m_dynamic);
-
-  auto block_fixed = mpp::block(m_fixed, 0, 0, 1, 1, std::type_identity<mpp::mat<int, 2, 2>>{});
-  // mpp::mat<int, 2, 2> 2x2
-  auto block_dyn = mpp::block(m_fixed, 0, 0, 1, 1);
-  // mpp::mat<int, mpp::dyn, mpp::dyn> 2x2
-
-  // LU Decomposition algorithm has the exception where you can customize the matrix type of L and U matrix
-  auto test = mpp::mat<int, 3, 3>{ {1, 2, 3}, {4, 5, 6}, {7, 8, 9} };
-  auto [l_matrix, u_matrix] = mpp::lu(test, std::type_identity<mpp::mat<int, 3, 3>>{}, std::type_identity<mpp::mat<float>>{});
-  // l_matrix is mpp::mat<int, 3, 3> and u_matrix is mpp::mat<float, mpp::dyn, mpp::dyn>
-
-  /**
-   * Utilities
-   */
-  auto type = mpp::type(m_fixed); // mpp::mat_type::fixed
-  auto singular = mpp::sg(m_fixed); // true (because matrices default initialize elements to 0, and matrices with 0's are singular)
-
-  /**
-   * Lazy evaluated math expressions
-   */
-  auto expr_object = m_fixed * m_fixed * 2 / 3;
-  auto result_at_top_left = expr_object(0, 0);
-  auto result = mpp::mat{ expr_object }; // Force evaluation of entire matrix
-
-  /**
-   * Ways of printing matrices
-   */
-  mpp::print(result);
-  std::cout << result; // It automatically inserts newline
-
-  return 0;
-}
-```
-
-One of the main things to take away is the concept of **"extents"** for dimensions. Matrices default to "dynamic extents", which means the sizes can be provided at runtime and matrices can be (partially) flexible (e.g. you can resize rows and cols of a "fully dynamic" matrix, but a "dynamic rows" matrix can only be resized in rows).
 
 #### Comparisons
 

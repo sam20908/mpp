@@ -111,15 +111,6 @@ namespace mpp
 		}
 
 		template<typename Buf>
-		void reserve_buf_if_vec(Buf& buffer, std::size_t rows, std::size_t cols) // @TODO: ISSUE #20
-		{
-			if constexpr (is_vec<Buf>::value)
-			{
-				buffer.reserve(rows * cols);
-			}
-		}
-
-		template<typename Buf>
 		void init_identity_buf(Buf& buffer,
 			std::size_t rows,
 			std::size_t cols,
