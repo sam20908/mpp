@@ -11,7 +11,7 @@ A C++20 and later matrix library
 
 ## Table of contents
 
-#### Just getting started? Go [here](docs/super_demo.md)!
+#### Just getting started? Go [here](docs/demo.md)!
 
 When you know the basics of how the library works, you can move on to these:
 
