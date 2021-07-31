@@ -2,9 +2,9 @@
 
 These are the algorithms currently implemented:
 
-| Algorithm  | API |
+| Algorithm | API |
 | ------------- | ------------- |
-| Block  | `mpp::block` |
+| Block | `mpp::block` |
 | Forward substitution | `mpp::fwd_sub` |
 | Backward substitution | `mpp::back_sub` |
 | LU decomposition | `mpp::lu` |
@@ -19,20 +19,19 @@ These are the algorithms currently implemented:
 #### Block/Submatrices
 
 Let's say we have this matrix:
-$$
+
+```
 A=
-\begin{bmatrix}
-1 & 2 & 3\\
-4 & 5 & 6
-\end{bmatrix}
-$$
+1 2 3
+4 5 6
+```
+
 and we want to grab this portion of the matrix (block/submatrix):
-$$
+
+```
 B=
-\begin{bmatrix}
-1 & 2
-\end{bmatrix}
-$$
+1 2
+```
 
 ```cpp
 #include <mpp/algo/block.hpp>
@@ -52,28 +51,24 @@ auto B = block(a, 0, 0, 1, 0, std::type_identity<mat<int, 1, 2>>{}); // mat<int,
 #### Forward Substitution
 
 Let's say you have the following:
-$$
+
+```
 L=
-\begin{bmatrix}
-1 & 0 & 0 & 0\\
--1 & 1 & 0 & 0\\
-0 & 0.5 & 1 & 0\\
-6 & 1 & 14 & 1
-\end{bmatrix}
+1 0 0 0
+-1 1 0 0
+0 0.5 1 0
+6 1 14 1
+```
+
+```
 B=
-\begin{bmatrix}
-1\\
--1\\
-2\\
-1\\
-\end{bmatrix}
-$$
+1
+-1
+2
+1
+```
 
-And you wanted to solve for `X` such that:
-
-$$
-LX=B
-$$
+And you wanted to solve for `X` such that `LX=B` .
 
 Note that permutation matrix is not supported yet
 
@@ -101,26 +96,22 @@ auto X = fwd_sub(L, B, std::type_identity<mat<float, 4, 1>>{}); // mat<float, 4,
 #### Backward Substitution
 
 Let's say you have the following:
-$$
+
+```
 U=
-\begin{bmatrix}
-1 & 1 & 1\\
-0 & -1 & 0\\
-0 & 0 & -5
-\end{bmatrix}
+1 1 1
+0 -1 0
+0 0 -5
+```
+
+```
 B=
-\begin{bmatrix}
-3\\
--4\\
+3
+-4
 4
-\end{bmatrix}
-$$
+```
 
-And you wanted to solve for `X` such that:
-
-$$
-UX=B
-$$
+And you wanted to solve for `X` such that `UX=B` .
 
 Note that permutation matrix is not supported yet
 
@@ -147,19 +138,14 @@ auto X = back_sub(U, B, std::type_identity<mat<float, 3, 1>>{}); // mat<float, 3
 #### LU Decomposition
 
 Let's say you have the following:
-$$
+
+```
 A=
-\begin{bmatrix}
-6 & 3\\
-6 & 3
-\end{bmatrix}
-$$
+6 3
+6 3
+```
 
-You want to find the matrices `L` and `U` such that:
-
-$$
-A=LU
-$$
+You want to find the matrices `L` and `U` such that `A=LU` .
 
 ```cpp
 mat A{
@@ -200,14 +186,12 @@ U=
 
 Let's say you want to find the transpose of this matrix:
 
-$$
+```
 A=
-\begin{bmatrix}
-1 & 2\\
-3 & 4\\
-5 & 6
-\end{bmatrix}
-$$
+1 2
+3 4
+5 6
+```
 
 ```cpp
 mat A{
@@ -232,14 +216,12 @@ auto ans = trps(A, std::type_identity<mat<float, 2, 3>>{}); // Same answer as ab
 
 Let's say you want to find the determinant of this matrix:
 
-$$
+```
 A=
-\begin{bmatrix}
-1 & 1 & 2\\
-3 & 4 & -7\\
-6 & 8 & 2
-\end{bmatrix}
-$$
+1 1 2
+3 4 -7
+6 8 2
+```
 
 ```cpp
 mat A{
@@ -258,14 +240,12 @@ auto ans = det(A, std::type_identity<float>{}); // 16.0 (more like 15.9999998)
 
 Let's say you want to find the inverse of this matrix:
 
-$$
+```
 A=
-\begin{bmatrix}
-1 & 2 & 1\\
-2 & 2 & 3\\
--1 & -3 & 0
-\end{bmatrix}
-$$
+1 2 1
+2 2 3
+-1 -3 0
+```
 
 ```cpp
 mat A{
