@@ -2,9 +2,9 @@
 
 These are the algorithms currently implemented:
 
-| Algorithm  | API |
+| Algorithm | API |
 | ------------- | ------------- |
-| Block  | `mpp::block` |
+| Block | `mpp::block` |
 | Forward substitution | `mpp::fwd_sub` |
 | Backward substitution | `mpp::back_sub` |
 | LU decomposition | `mpp::lu` |
