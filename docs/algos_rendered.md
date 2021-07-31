@@ -19,7 +19,7 @@ These are the algorithms currently implemented:
 #### Block/Submatrices
 
 Let's say we have this matrix:
-<p align="center"><img src="https://rawgit.com/sam20908/mpp/None/svgs/59d7d6518ebe8208a7258623a7bca342.svg?invert_in_darkmode" align=middle width=109.13243384999998pt height=39.452455349999994pt/></p>
+<p align="center"><img src="https://cdn.jsdelivr.net/gh/sam20908/mpp@None/svgs/59d7d6518ebe8208a7258623a7bca342.svg?invert_in_darkmode" align=middle width=109.13243384999998pt height=39.452455349999994pt/></p>
 and we want to grab this portion of the matrix (block/submatrix):
 <p align="center"><img src="https://rawgit.com/sam20908/mpp/None/svgs/93c0426b71d734bfd91f447b4211f10c.svg?invert_in_darkmode" align=middle width=81.78649709999999pt height=19.726228499999998pt/></p>
 
