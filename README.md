@@ -16,7 +16,7 @@ A C++20 and later matrix library
 When you know the basics of how the library works, you can move on to these:
 
 * Learn about extra iterator functionalities [here](docs/more_iter_funcs.md)
-* Learn about algorithms [algorithms](docs/algos.md)
+* Learn about algorithms [here](docs/algos.md)
 * Learn about utilities [here](docs/utils.md)
 * Learn about customizations [here](docs/customize.md)
 
