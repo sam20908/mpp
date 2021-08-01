@@ -64,7 +64,7 @@ namespace mpp
 			std::size_t Cols,
 			typename Alloc,
 			typename To = mat<Val, Cols, Rows, Alloc>>
-		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(trps_t,
+		requires(detail::is_mat<To>::value) [[nodiscard]] friend inline auto tag_invoke(trps_t,
 			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{

@@ -122,12 +122,6 @@ using dyn_rows_mat = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, Cols>>>
 template<typename T, std::size_t Rows>
 using dyn_cols_mat = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn>>>;
 
-template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
-using all_trps_mats = std::tuple<std::type_identity<mpp::mat<T, Cols, Rows, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, Cols, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, Rows, Alloc...>>>;
-
 template<typename...>
 struct join_mats_impl;
 

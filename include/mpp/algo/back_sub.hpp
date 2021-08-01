@@ -56,8 +56,8 @@ namespace mpp
 			std::size_t BCols,
 			typename AAlloc,
 			typename BAlloc,
-			typename To = mat<std::common_type_t<AVal, BVal>, dyn, BCols>>
-		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(back_sub_t,
+			typename To = mat<std::common_type_t<AVal, BVal>, dyn, dyn>>
+		requires(detail::is_mat<To>::value) friend inline auto tag_invoke(back_sub_t,
 			const mat<AVal, ARows, ACols, AAlloc>& a,
 			const mat<BVal, BRows, BCols, BAlloc>& b,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20

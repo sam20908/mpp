@@ -65,7 +65,7 @@ namespace mpp
 			typename Alloc,
 			typename To  = mat<Val, Rows, Cols, Alloc>,
 			typename To2 = mat<Val, Rows, Cols, Alloc>>
-		requires(detail::is_matrix<To>::value) friend inline auto tag_invoke(lu_t,
+		requires(detail::is_mat<To>::value&& detail::is_mat<To2>::value) friend inline auto tag_invoke(lu_t,
 			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To>  = {},
 			std::type_identity<To2> = {}) -> std::pair<To, To2> // @TODO: ISSUE #20

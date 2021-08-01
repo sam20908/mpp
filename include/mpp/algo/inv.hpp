@@ -141,14 +141,14 @@ namespace mpp
 		}
 	} // namespace detail
 
-	struct inverse_t : public detail::cpo_base<inverse_t>
+	struct inv_t : public detail::cpo_base<inv_t>
 	{
 		template<typename Val,
 			std::size_t Rows,
 			std::size_t Cols,
 			typename Alloc,
 			typename To = mat<Val, Rows, Cols, Alloc>>
-		requires(detail::is_matrix<To>::value) [[nodiscard]] friend inline auto tag_invoke(inverse_t,
+		requires(detail::is_mat<To>::value) [[nodiscard]] friend inline auto tag_invoke(inv_t,
 			const mat<Val, Rows, Cols, Alloc>& obj,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
@@ -156,5 +156,5 @@ namespace mpp
 		}
 	};
 
-	inline constexpr auto inverse = inverse_t{};
+	inline constexpr auto inv = inv_t{};
 } // namespace mpp
