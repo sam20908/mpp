@@ -22,7 +22,6 @@
 #include <mpp/detail/util/algo_impl.hpp>
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/util/sq.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -34,7 +33,7 @@ namespace mpp
 		template<typename To>
 		inline auto fwd_sub_impl(const auto& a, const auto& b) -> To // @TODO: ISSUE #20
 		{
-			assert(sq(a));
+			assert(a.rows() == a.cols());
 			assert(b.cols() == 1);
 
 			const auto rows = a.rows();

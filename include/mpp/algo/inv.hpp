@@ -23,7 +23,6 @@
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/util.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/util/sq.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -35,7 +34,7 @@ namespace mpp
 		template<typename To, typename Mat>
 		[[nodiscard]] inline auto inv_impl(const Mat& obj) -> To // @TODO: ISSUE #20
 		{
-			assert(sq(obj));
+			assert(obj.rows() == obj.cols());
 
 			const auto rows = obj.rows();
 			const auto cols = obj.cols();

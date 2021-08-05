@@ -23,7 +23,6 @@
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/util.hpp>
 #include <mpp/mat/matfwd.hpp>
-#include <mpp/util/sq.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -35,7 +34,7 @@ namespace mpp
 		template<typename To, typename To2, typename Mat>
 		auto lu_impl(const Mat& obj) -> std::pair<To, To2> // @TODO: ISSUE #20
 		{
-			assert(sq(obj));
+			assert(obj.rows() == obj.cols());
 
 			using lu_buffer_t = typename mat_rebind_to_t<Mat, fp_t>::buffer_type;
 

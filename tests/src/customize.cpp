@@ -73,11 +73,6 @@ namespace ns
 		return dumb_class2{};
 	}
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::sq_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
 	[[nodiscard]] constexpr auto tag_invoke(mpp::block_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
@@ -94,16 +89,6 @@ namespace ns
 	}
 
 	[[nodiscard]] constexpr auto tag_invoke(mpp::trps_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
-	[[nodiscard]] constexpr auto tag_invoke(mpp::sg_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
-	[[nodiscard]] constexpr auto tag_invoke(mpp::size_compare_t, dumb_class) -> dumb_class2
 	{
 		return dumb_class2{};
 	}
@@ -145,13 +130,10 @@ int main()
 
 	when("I check against the CPOs' return types") = []() {
 		expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::sg_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::sq_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::det_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::inv_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::trps_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::size_compare_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::cmp_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::lu_t>> == type<ns::dumb_class2>);
 		expect(type<invoke_result_t<mpp::fwd_sub_t>> == type<ns::dumb_class2>);
@@ -169,13 +151,10 @@ int main()
 
 	scenario("CPOs should meet std::semiregular requirements") = []() {
 		expect(constant<std::semiregular<mpp::type_t>>);
-		expect(constant<std::semiregular<mpp::sg_t>>);
-		expect(constant<std::semiregular<mpp::sq_t>>);
 		expect(constant<std::semiregular<mpp::block_t>>);
 		expect(constant<std::semiregular<mpp::det_t>>);
 		expect(constant<std::semiregular<mpp::inv_t>>);
 		expect(constant<std::semiregular<mpp::trps_t>>);
-		expect(constant<std::semiregular<mpp::size_compare_t>>);
 		expect(constant<std::semiregular<mpp::cmp_t>>);
 		expect(constant<std::semiregular<mpp::lu_t>>);
 		expect(constant<std::semiregular<mpp::fwd_sub_t>>);
