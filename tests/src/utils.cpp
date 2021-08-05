@@ -90,32 +90,6 @@ int main()
 		test_fn<dyn_cols_mat<int, 0>>("utils/type/dyn_cols.txt", mpp::type, parse_val<mat_type>);
 	};
 
-	feature("Square") = []() {
-		test_fn<all_mats<int, 1, 1>>("utils/sq/1x1.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 1, 2>>("utils/sq/1x2.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 3, 3>>("utils/sq/3x3.txt", sq, parse_val<bool>);
-		test_fn<all_mats<int, 3, 2>>("utils/sq/3x2.txt", sq, parse_val<bool>);
-	};
-
-	feature("Singular") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utils/sg/0x0.txt", sg, parse_val<bool>);
-		test_fn<dyn_mat<int>>("utils/sg/1x1.txt", sg, parse_val<bool>);
-		test_fn<dyn_rows_mat<int, 2>>("utils/sg/2x2.txt", sg, parse_val<bool>);
-		test_fn<dyn_cols_mat<int, 3>>("utils/sg/3x3.txt", sg, parse_val<bool>);
-	};
-
-	feature("Size comparison") = []() {
-		test_cmp_size<join_mats<all_mats<int, 0, 0>, all_mats<int, 0, 0>>,
-			std::partial_ordering,
-			std::partial_ordering>("utils/cmp_size/0x0_0x0.txt");
-		test_cmp_size<join_mats<all_mats<int, 1, 1>, all_mats<int, 1, 2>>, std::strong_ordering, std::strong_ordering>(
-			"utils/cmp_size/1x1_1x2.txt");
-		test_cmp_size<join_mats<all_mats<int, 3, 4>, all_mats<int, 3, 3>>, std::partial_ordering, std::strong_ordering>(
-			"utils/cmp_size/3x4_3x3.txt");
-		test_cmp_size<join_mats<all_mats<int, 4, 4>, all_mats<int, 4, 4>>, std::strong_ordering, std::strong_ordering>(
-			"utils/cmp_size/4x4_4x4.txt");
-	};
-
 	feature("Elements comparison") = []() {
 		test_cmp_elems<join_mats<all_mats<int, 0, 0>, all_mats<int, 0, 0>>, std::strong_ordering>(
 			"utils/cmp_elems/0x0_0x0.txt");

@@ -32,31 +32,6 @@
 
 namespace mpp
 {
-	// @FIXME Remove this
-	struct size_compare_t : public detail::cpo_base<size_compare_t>
-	{
-		template<typename LeftValue,
-			typename RightValue,
-			std::size_t LeftRowsExtent,
-			std::size_t LeftCols,
-			std::size_t RightRowsExtent,
-			std::size_t RightCols,
-			typename LeftAlloc,
-			typename RightAlloc>
-		[[nodiscard]] friend inline auto tag_invoke(size_compare_t,
-			const mat<LeftValue, LeftRowsExtent, LeftCols, LeftAlloc>& a,
-			const mat<RightValue, RightRowsExtent, RightCols, RightAlloc>& b,
-			bool compare_rows,
-			bool compare_cols) noexcept(noexcept(std::pair{ compare_rows ? a.rows() <=> b.rows()
-																		 : std::partial_ordering::unordered,
-			compare_cols ? a.cols() <=> b.cols() : std::partial_ordering::unordered }))
-			-> std::pair<std::partial_ordering, std::partial_ordering> // @TODO: ISSUE #20
-		{
-			return { compare_rows ? a.rows() <=> b.rows() : std::partial_ordering::unordered,
-				compare_cols ? a.cols() <=> b.cols() : std::partial_ordering::unordered };
-		}
-	};
-
 	struct cmp_t : public detail::cpo_base<cmp_t>
 	{
 		template<typename Val,
@@ -78,8 +53,7 @@ namespace mpp
 		}
 	};
 
-	inline constexpr auto size_compare = size_compare_t{}; // @FIXME Remove this
-	inline constexpr auto cmp          = cmp_t{};
+	inline constexpr auto cmp = cmp_t{};
 
 	inline constexpr auto cmp_fp = []<std::floating_point T>(T a,
 									   T b) noexcept -> std::compare_three_way_result_t<T, T> {
