@@ -93,8 +93,9 @@ namespace mpp
 		return { a, b, a.rows(), b.cols(), detail::mul_op };
 	}
 
-	template<typename Val, std::size_t Rows, std::size_t Cols>
-	inline auto operator*=(mat<Val, Rows, Cols>& obj, Val val) -> mat<Val, Rows, Cols>& // @TODO: ISSUE #20
+	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+	inline auto operator*=(mat<Val, Rows, Cols, Alloc>& obj, Val val)
+		-> mat<Val, Rows, Cols, Alloc>& // @TODO: ISSUE #20
 	{
 		std::ranges::transform(obj, obj.begin(), std::bind_front(std::multiplies<>{}, val));
 

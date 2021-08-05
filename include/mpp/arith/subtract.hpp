@@ -54,8 +54,14 @@ namespace mpp
 		return { a, b, a.rows(), a.cols(), detail::sub_op };
 	}
 
-	template<typename Val, std::size_t ARows, std::size_t ACols, std::size_t BRows, std::size_t BCols>
-	inline auto operator-=(mat<Val, ARows, ACols>& a, const mat<Val, BRows, BCols>& b)
+	template<typename Val,
+		std::size_t ARows,
+		std::size_t ACols,
+		std::size_t BRows,
+		std::size_t BCols,
+		typename AAlloc,
+		typename BAlloc>
+	inline auto operator-=(mat<Val, ARows, ACols, AAlloc>& a, const mat<Val, BRows, BCols, BAlloc>& b)
 		-> mat<Val, ARows, ACols>& // @TODO: ISSUE #20
 	{
 		std::ranges::transform(a, b, a.begin(), std::minus{});
@@ -63,8 +69,14 @@ namespace mpp
 		return a;
 	}
 
-	template<typename Val, typename Expr, std::size_t ARows, std::size_t ACols, std::size_t BRows, std::size_t BCols>
-	inline auto operator-=(mat<Val, ARows, ACols>& a, const detail::expr_base<Expr, Val, BRows, BCols>& b)
+	template<typename Val,
+		typename Expr,
+		std::size_t ARows,
+		std::size_t ACols,
+		std::size_t BRows,
+		std::size_t BCols,
+		typename AAlloc>
+	inline auto operator-=(mat<Val, ARows, ACols, AAlloc>& a, const detail::expr_base<Expr, Val, BRows, BCols>& b)
 		-> mat<Val, ARows, ACols>& // @TODO: ISSUE #20
 	{
 		const auto rows = a.rows();

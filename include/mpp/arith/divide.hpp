@@ -62,8 +62,9 @@ namespace mpp
 		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Val, std::size_t Rows, std::size_t Cols>
-	inline auto operator/=(mat<Val, Rows, Cols>& obj, Val val) -> mat<Val, Rows, Cols>& // @TODO: ISSUE #20
+	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+	inline auto operator/=(mat<Val, Rows, Cols, Alloc>& obj, Val val)
+		-> mat<Val, Rows, Cols, Alloc>& // @TODO: ISSUE #20
 	{
 		// Can't use bind_front here because we want elem / val, not val / elem
 		std::ranges::transform(obj, obj.begin(), [&val](const auto& elem) {
