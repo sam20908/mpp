@@ -23,7 +23,6 @@
 #include <mpp/detail/mat/mat_iter.hpp>
 #include <mpp/detail/util/public.hpp>
 #include <mpp/detail/util/util.hpp>
-#include <mpp/util/traits.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -36,7 +35,7 @@ namespace mpp::detail
 	 * Base matrix class to store internal data and define common member functions
 	 */
 	template<typename SubMat, typename Buf, typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-	class mat_base : public expr_base<SubMat, Val, Rows, Cols>, public traits<Val>
+	class mat_base : public expr_base<SubMat, Val, Rows, Cols>
 	{
 		using base = expr_base<SubMat, Val, Rows, Cols>;
 

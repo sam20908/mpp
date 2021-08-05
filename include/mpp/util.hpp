@@ -23,7 +23,4 @@
 
 #include <mpp/util/cmp.hpp>
 #include <mpp/util/print.hpp>
-#include <mpp/util/sg.hpp>
-#include <mpp/util/sq.hpp>
-#include <mpp/util/traits.hpp>
 #include <mpp/util/type.hpp>
