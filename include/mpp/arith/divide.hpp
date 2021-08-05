@@ -33,10 +33,9 @@ namespace mpp
 	{
 		inline constexpr auto div_op = [](const auto& lhs,
 										   const auto& rhs,
-										   std::size_t row_index,
-										   std::size_t column_index) noexcept -> decltype(lhs(row_index, column_index) /
-																						  rhs) {
-			return lhs(row_index, column_index) / rhs;
+										   std::size_t row,
+										   std::size_t col) noexcept -> decltype(lhs(row, col) / rhs) {
+			return lhs(row, col) / rhs;
 		};
 	} // namespace detail
 
