@@ -33,10 +33,9 @@ namespace mpp
 	{
 		inline constexpr auto div_op = [](const auto& lhs,
 										   const auto& rhs,
-										   std::size_t row_index,
-										   std::size_t column_index) noexcept -> decltype(lhs(row_index, column_index) /
-																						  rhs) {
-			return lhs(row_index, column_index) / rhs;
+										   std::size_t row,
+										   std::size_t col) noexcept -> decltype(lhs(row, col) / rhs) {
+			return lhs(row, col) / rhs;
 		};
 	} // namespace detail
 
@@ -62,8 +61,9 @@ namespace mpp
 		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Val, std::size_t Rows, std::size_t Cols>
-	inline auto operator/=(mat<Val, Rows, Cols>& obj, Val val) -> mat<Val, Rows, Cols>& // @TODO: ISSUE #20
+	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
+	inline auto operator/=(mat<Val, Rows, Cols, Alloc>& obj, Val val)
+		-> mat<Val, Rows, Cols, Alloc>& // @TODO: ISSUE #20
 	{
 		// Can't use bind_front here because we want elem / val, not val / elem
 		std::ranges::transform(obj, obj.begin(), [&val](const auto& elem) {
