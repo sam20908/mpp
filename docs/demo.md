@@ -50,30 +50,12 @@ You can do it in many ways:
 std::vector<std::vector<float>> a{
     {2, 3, 4},
     {5, 6, 7}
-};
+}; // note that it can be any valid 2D "range", meaning a range containing other ranges (see https://en.cppreference.com/w/cpp/ranges/range)
 
-// Anything with mat<int, 2, 3>, mat<int, dyn, dyn> etc are showing extents
-
-// 2D range (constructor can figure out dimensions of 2D range)
-mat<int, 2, 3> A{a};
-mat<int, dyn, dyn> A{a};
-mat<int, dyn, 3> A{a};
-mat<int, 2, dyn> A{a};
+mat<int> A{a};
 
 // 2D std::initializer_list
-mat<int, 2, 3> A{
-    {1, 2, 3},
-    {4, 5, 6}
-};
-mat<int, dyn, dyn> A{
-    {1, 2, 3},
-    {4, 5, 6}
-};
-mat<int, dyn, 3> A{
-    {1, 2, 3},
-    {4, 5, 6}
-};
-mat<int, 2, dyn> A{
+mat<int> A{
     {1, 2, 3},
     {4, 5, 6}
 };
@@ -81,23 +63,17 @@ mat<int, 2, dyn> A{
 // 1D representation
 std::array<int, 6> b{1, 2, 3, 4, 5, 6};
 
-mat<int, 2, 3> A{b};
-mat<int, dyn, dyn> A{2, 3, b};
-mat<int, dyn, 3> A{2, b};
-mat<int, 2, dyn> A{3, b};
+mat<int> A{2, 3, b}; // we have to explicitly passing the size as if it was 2D because the constructor can't deduce the size on its own
 
 // Using callable return values
 auto iota = [i = 1]() mutable {
     return i++;
 };
-// 2 means 2 rows and 3 means 3 columns
-mat<int, 2, 3> A{iota};
-mat<int, dyn, dyn> A{2, 3, iota};
-mat<int, dyn, 3> A{2, iota};
-mat<int, 2, dyn> A{3, iota};
+
+mat<int> A{2, 3, iota};
 ```
 
-Explanation for extents are [here](extents.md)
+##### If you want to learn about creating "fixed" matrices then go [here](customize.md)
 
 Now, what can I do with it?
 
@@ -106,9 +82,6 @@ Now, what can I do with it?
 ```cpp
 A.rows(); // 2
 A.cols(); // 3
-
-A.rows_extent(); // equal to Rows template parameter
-A.cols_extent(); // equal to Cols template parameter
 
 for (int val : A) { /* code */ } // Iterates as 1D range
 
