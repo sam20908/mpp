@@ -27,46 +27,36 @@ namespace mpp::detail
 	/**
 	 * Base class for expression objects
 	 */
-	template<typename Expr, typename Val, std::size_t Rows, std::size_t Cols>
+	template<typename Derived, typename T>
 	class [[nodiscard]] expr_base
 	{
 	protected:
-		[[nodiscard]] constexpr auto expr() const noexcept -> const Expr&
+		[[nodiscard]] constexpr auto derived() const noexcept -> const Derived&
 		{
-			return static_cast<const Expr&>(*this);
+			return static_cast<const Derived&>(*this);
 		}
 
-		[[nodiscard]] constexpr auto expr_mut() noexcept -> Expr&
+		[[nodiscard]] constexpr auto derived_mut() noexcept -> Derived&
 		{
-			return static_cast<Expr&>(*this);
+			return static_cast<Derived&>(*this);
 		}
 
 	public:
-		using value_type = Val;
+		using value_type = T;
 
 		[[nodiscard]] auto rows() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
-			return expr().rows();
+			return derived().rows();
 		}
 
 		[[nodiscard]] auto cols() const noexcept -> std::size_t // @TODO: ISSUE #20
 		{
-			return expr().cols();
+			return derived().cols();
 		}
 
-		[[nodiscard]] constexpr static auto rows_extent() noexcept -> std::size_t
+		[[nodiscard]] auto operator()(std::size_t row, std::size_t col) const noexcept -> T // @TODO: ISSUE #20
 		{
-			return Rows;
-		}
-
-		[[nodiscard]] constexpr static auto cols_extent() noexcept -> std::size_t
-		{
-			return Cols;
-		}
-
-		[[nodiscard]] auto operator()(std::size_t row, std::size_t col) const noexcept -> Val // @TODO: ISSUE #20
-		{
-			return expr()(row, col);
+			return derived()(row, col);
 		}
 	};
 } // namespace mpp::detail

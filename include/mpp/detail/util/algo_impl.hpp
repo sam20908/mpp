@@ -30,13 +30,7 @@
 
 namespace mpp::detail
 {
-	inline constexpr auto dummy = 0;
-
-	template<typename Mat, typename T>
-	using mat_rebind_to_t = mat<T,
-		Mat::rows_extent(),
-		Mat::cols_extent(),
-		typename std::allocator_traits<typename Mat::allocator_type>::template rebind_alloc<T>>;
+	inline constexpr auto dummy = false;
 
 	template<typename T>
 	[[nodiscard]] constexpr auto fp_is_zero_or_nan(T val) -> bool
@@ -116,7 +110,6 @@ namespace mpp::detail
 	{
 		auto x_buf = Buf{};
 
-		// @TODO: Any way to make this utilize push_back?
 		resize_buf_if_vec(x_buf, n, 1, fp_t{});
 
 		/**

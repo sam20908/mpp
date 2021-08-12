@@ -19,7 +19,10 @@
 
 #pragma once
 
-#include <mpp/mat/dyn.hpp>
-#include <mpp/mat/dyn_cols.hpp>
-#include <mpp/mat/dyn_rows.hpp>
-#include <mpp/mat/fixed.hpp>
+// This file is not strictly necessary but to be aligned with other files that includes all files from a subdirectory
+// like algo.hpp, etc.
+
+// clang-format off
+#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat/mat.hpp>
+// clang-format on

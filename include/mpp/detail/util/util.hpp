@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <compare>
 #include <cstddef>
 #include <limits>
@@ -43,7 +44,7 @@ namespace mpp
 		};
 	} // namespace detail
 
-	template<detail::arithmetic, std::size_t, std::size_t, typename>
+	template<detail::arithmetic, typename>
 	class mat;
 
 	namespace detail
@@ -55,19 +56,22 @@ namespace mpp
 		template<typename Rng>
 		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
 
-		template<typename Rng, typename Val>
-		concept rng_2d_with_value_convertible_to = std::convertible_to<range_2d_value_t<Rng>, Val>;
+		template<typename Rng, typename T>
+		concept rng_2d_with_value_convertible_to = std::convertible_to<range_2d_value_t<Rng>, T>;
 
-		template<typename Rng, typename Val>
-		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, Val>;
+		template<typename Rng, typename T>
+		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, T>;
+
+		template<typename T>
+		inline constexpr bool is_moved = !std::is_lvalue_reference_v<T>;
 
 		template<typename>
 		struct is_mat : std::false_type
 		{
 		};
 
-		template<arithmetic Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-		struct is_mat<mat<Val, Rows, Cols, Alloc>> : std::true_type
+		template<arithmetic T, typename Buf>
+		struct is_mat<mat<T, Buf>> : std::true_type
 		{
 		};
 
@@ -111,20 +115,29 @@ namespace mpp
 		}
 
 		template<typename Buf>
-		void init_identity_buf(Buf& buffer,
+		void resize_or_fill_buf(Buf& buf, std::size_t rows, std::size_t cols, auto val) // @TODO: ISSUE #20
+		{
+			if constexpr (is_vec<Buf>::value)
+			{
+				buf.resize(rows * cols, val);
+			}
+			else
+			{
+				std::ranges::fill(buf, val);
+			}
+		}
+
+		void init_identity_buf(auto& buf,
 			std::size_t rows,
 			std::size_t cols,
 			auto zero_val,
 			auto one_val) // @TODO: ISSUE #20
 		{
-			if constexpr (is_vec<Buf>::value)
-			{
-				buffer.resize(rows * cols, zero_val);
-			}
+			resize_or_fill_buf(buf, rows, cols, zero_val);
 
-			for (auto index = std::size_t{}; index < rows; ++index)
+			for (auto i = std::size_t{}; i < rows; ++i)
 			{
-				buffer[idx_1d(cols, index, index)] = one_val;
+				buf[idx_1d(cols, i, i)] = one_val;
 			}
 		}
 

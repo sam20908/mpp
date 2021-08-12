@@ -49,7 +49,7 @@ namespace
 	}
 
 	template<typename Mats, bool Move>
-	void test_init_copy_move_ctor(std::string_view test_name, const auto&... args)
+	void test_init_copy_move_ctor(std::string_view test_name)
 	{
 		test(test_name.data()) = [&, test_name]<typename Mat, typename Mat2>(
 									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
@@ -57,12 +57,12 @@ namespace
 
 			if constexpr (Move)
 			{
-				Mat2 out{ std::move(mat), args... };
+				Mat2 out{ std::move(mat) };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 			else
 			{
-				Mat2 out{ mat, args... };
+				Mat2 out{ mat };
 				cmp_mat_to_rng(out, expected_rng);
 			}
 		} | Mats{};
@@ -74,88 +74,68 @@ int main()
 	// @NOTE: Construction from expression object will be covered in lazy/eager arithmetic tests
 	// @NOTE: This covers copy and move construction from rule of five (2/5)
 
-	using alloc_t        = custom_allocator<double>;
-	const auto alloc_obj = alloc_t{};
-
-	feature("Default initialization") = [&]() {
+	feature("Default initialization") = []() {
 		test_init<all_mats<int, 0, 0>>("init/0x0_default.txt", parse_mat_construct_args);
 	};
 
-	feature("Allocator default initialization") = [&]() {
-		test_init<dyn_mats<double, 0, 0, alloc_t>>("init/0x0_default.txt", parse_mat_construct_args, alloc_obj);
-	};
-
-	feature("Copy initialization") = [&]() {
+	feature("Copy initialization") = []() {
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, false>(
 			"init/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>>, false>(
-			"init/2x3_init_copy_and_move.txt",
-			alloc_obj);
+	};
 
+	feature("Copy initialization with different matrix type") = []() {
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, false>(
 			"init/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
-			false>("init/2x3_init_copy_and_move.txt", alloc_obj);
 	};
 
-	feature("Move initialization") = [&]() {
+	feature("Move initialization") = []() {
 		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>, true>(
 			"init/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats<double, 2, 3, alloc_t>>, true>(
-			"init/2x3_init_copy_and_move.txt",
-			alloc_obj);
-
-		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
-			"init/2x3_init_copy_and_move.txt");
-		test_init_copy_move_ctor<join_mats<dyn_mats<double, 2, 3, alloc_t>, dyn_mats_reverse<double, 2, 3, alloc_t>>,
-			true>("init/2x3_init_copy_and_move.txt", alloc_obj);
 	};
 
-	feature("2D initializer list initialization") = [&]() {
+	feature("Move initialization with different matrix type") = []() {
+		test_init_copy_move_ctor<join_mats<all_mats<int, 2, 3>, all_mats_reverse<int, 2, 3>>, true>(
+			"init/2x3_init_copy_and_move.txt");
+	};
+
+	feature("2D initializer list initialization") = []() {
 		const auto init = std::initializer_list<std::initializer_list<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
 
 		test_init<all_mats<int, 2, 3>>("init/2x3_init_list.txt", parse_mat_construct_args, init);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("init/2x3_init_list.txt", parse_mat_construct_args, init, alloc_obj);
 	};
 
-	feature("2D range initialization") = [&]() {
-		test_init<all_mats<int, 2, 3>>("init/2x3_rng_2d.txt", parse_mat_construct_rng2d);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("init/2x3_rng_2d.txt", parse_mat_construct_rng2d, alloc_obj);
+	feature("2D range copy initialization") = []() {
+		test_init<all_mats<int, 2, 3>>("init/2x3_rng_2d.txt", parse_mat_construct_rng2d<false>);
 	};
 
-	feature("2D array initialization (fixed matrices only)") = [&]() {
-		test_init<fixed_mat<int, 2, 3>>("init/2x3_arr2d.txt", parse_mat_construct_arr2d<2, 3>);
+	feature("2D range move initialization") = []() {
+		test_init<all_mats<int, 2, 3>>("init/2x3_rng_2d.txt", parse_mat_construct_rng2d<true>);
 	};
 
-	feature("1D range initialization") = [&]() {
+	feature("1D range copy initialization") = []() {
 		test_init<all_mats<int, 2, 3>>("init/2x3_rng_1d.txt", parse_mat_construct_rng1d<false>);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("init/2x3_rng_1d.txt", parse_mat_construct_rng1d<false>, alloc_obj);
+	};
+
+	feature("1D range move initialization") = []() {
+		test_init<all_mats<int, 2, 3>>("init/2x3_rng_1d.txt", parse_mat_construct_rng1d<true>);
 	};
 
 	feature("Initialization via callable return values") = [&]() {
 		const auto fn = []() {
-			return 1.0;
+			return 1;
 		};
 
-		test_init<all_mats<double, 2, 3>>("init/2x3_callable.txt", parse_mat_construct_val_arg, fn);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("init/2x3_callable.txt", parse_mat_construct_val_arg, fn, alloc_obj);
+		test_init<all_mats<int, 2, 3>>("init/2x3_callable.txt", parse_mat_construct_args, 2ull, 3ull, fn);
 	};
 
-	feature("Initialization via value") = [&]() {
-		const auto val = 2.0;
+	feature("Initialization via value") = []() {
+		const auto val = 2;
 
-		test_init<all_mats<double, 2, 3>>("init/2x3_val.txt", parse_mat_construct_val_arg, val);
-		test_init<dyn_mats<double, 2, 3, alloc_t>>("init/2x3_val.txt", parse_mat_construct_val_arg, val, alloc_obj);
+		test_init<all_mats<int, 2, 3>>("init/2x3_val.txt", parse_mat_construct_args, 2ull, 3ull, val);
 	};
 
-	feature("Initialization of identity matrices") = [&]() {
-		test_init<all_mats<int, 3, 3>>("init/3x3_identity.txt", parse_mat_construct_val_arg, identity);
-		test_init<dyn_mats<double, 3, 3, alloc_t>>("init/3x3_identity.txt",
-			parse_mat_construct_val_arg,
-			identity,
-			0.0,
-			1.0,
-			alloc_obj);
+	feature("Initialization of identity matrices") = []() {
+		test_init<all_mats<int, 3, 3>>("init/3x3_identity.txt", parse_mat_construct_args, 3ull, 3ull, identity);
 	};
 
 	return 0;
