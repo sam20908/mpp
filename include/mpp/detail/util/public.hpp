@@ -23,8 +23,6 @@
 
 namespace mpp
 {
-	static inline constexpr auto dyn = static_cast<std::size_t>(-1);
-
 	struct identity_tag
 	{
 	};
