@@ -119,7 +119,7 @@ namespace mpp
 		mat(const mat&) noexcept(std::is_nothrow_copy_constructible_v<Buf>) = default;       // @TODO: ISSUE #20
 		mat(mat&&) noexcept(std::is_nothrow_move_constructible_v<Buf>)      = default;       // @TODO: ISSUE #20
 
-		template<detail::matrix_with_value_convertible_to<T> Mat>
+		template<detail::mat_with_value_convertible_to<T> Mat>
 		requires(!std::same_as<std::remove_cvref_t<Mat>, mat<T, Buf>>) explicit mat(Mat&& obj) // @TODO: ISSUE #20
 		{
 			const auto rows = std::forward<Mat>(obj).rows();
@@ -361,7 +361,7 @@ namespace mpp
 			assign_rng_2d<detail::is_moved<decltype(rng)>>(std::forward<Rng>(rng));
 		}
 
-		template<detail::matrix_with_value_convertible_to<T> Mat>
+		template<detail::mat_with_value_convertible_to<T> Mat>
 		requires(!std::same_as<std::remove_cvref_t<Mat>, mat<T, Buf>>) void assign(Mat&& obj) // @TODO: ISSUE #20
 		{
 			const auto rows = std::forward<Mat>(obj).rows();
@@ -381,7 +381,7 @@ namespace mpp
 			return *this;
 		}
 
-		template<detail::matrix_with_value_convertible_to<T> Mat>
+		template<detail::mat_with_value_convertible_to<T> Mat>
 		requires(!std::same_as<std::remove_cvref_t<Mat>, mat<T, Buf>>) auto operator=(Mat&& obj)
 			-> mat& // @TODO: ISSUE #20
 		{
