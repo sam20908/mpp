@@ -54,10 +54,10 @@ namespace mpp
 			std::invocable<Fn, Args...> && std::same_as<std::invoke_result_t<Fn, Args...>, Return>;
 
 		template<typename Rng>
-		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
+		using rng_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
 
 		template<typename Rng, typename T>
-		concept rng_2d_with_value_convertible_to = std::convertible_to<range_2d_value_t<Rng>, T>;
+		concept rng_2d_with_value_convertible_to = std::convertible_to<rng_2d_value_t<Rng>, T>;
 
 		template<typename Rng, typename T>
 		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, T>;
