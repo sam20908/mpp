@@ -23,11 +23,11 @@
 #include "../include/utils.hpp"
 
 #include <array>
-#include <compare>
 #include <cstddef>
 #include <initializer_list>
 #include <string_view>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 using namespace boost::ut;
