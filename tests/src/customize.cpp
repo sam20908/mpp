@@ -17,156 +17,134 @@
  * under the License.
  */
 
-#include <mpp/util/cfg.hpp>
-
-#include "../include/alloc.hpp"
-
-#include <array>
-#include <vector>
-
-namespace mpp
-{
-	template<>
-	struct cfg<override>
-	{
-		template<typename Val>
-		using alloc = custom_allocator<Val>;
-
-		static constexpr std::size_t rows_extent = 10;
-		static constexpr std::size_t cols_extent = 10;
-
-		static constexpr bool use_unsafe = true;
-
-		// Only for testing purposes, don't actually do this!
-
-		template<typename Val, std::size_t, std::size_t, typename>
-		using fixed_buf = std::vector<Val>;
-
-		template<typename Val, std::size_t, std::size_t, typename>
-		using dyn_buf = std::array<Val, 100>;
-
-		template<typename Val, std::size_t, std::size_t, typename>
-		using dyn_rows_buf = std::array<Val, 100>;
-		template<typename Val, std::size_t, std::size_t, typename>
-		using dyn_cols_buf = std::array<Val, 100>;
-	};
-} // namespace mpp
-
 #include <boost/ut.hpp>
 
-#include <mpp/algo.hpp>
+// #include <mpp/algo.hpp>
 #include <mpp/mat.hpp>
 #include <mpp/util.hpp>
 
+#include <cstddef>
+
+using namespace boost::ut::literals;
+using namespace boost::ut::bdd;
+using namespace boost::ut;
+using namespace mpp;
+
+template<typename T>
+struct wacky_array
+{
+	T data[4096];
+
+	using pointer                = T*;
+	using const_pointer          = const T*;
+	using iterator               = T*;
+	using const_iterator         = T*;
+	using reverse_iterator       = T*;
+	using const_reverse_iterator = T*;
+
+	using difference_type = std::size_t;
+};
+
+template<typename T>
+inline constexpr auto is_fixed_buf<wacky_array<T>> = true;
+
 namespace ns
 {
-	struct dumb_class
-	{
-	};
+	// struct dumb_class
+	// {
+	// };
 
-	struct dumb_class2
-	{
-	};
+	// struct dumb_class2
+	// {
+	// };
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::type_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(block_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::block_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(det_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::det_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(inv_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::inv_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(trps_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::trps_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(cmp_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::cmp_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(lu_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::lu_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(fwd_sub_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 
-	[[nodiscard]] constexpr auto tag_invoke(mpp::fwd_sub_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
-
-	[[nodiscard]] constexpr auto tag_invoke(mpp::back_sub_t, dumb_class) -> dumb_class2
-	{
-		return dumb_class2{};
-	}
+	// [[nodiscard]] constexpr auto tag_invoke(back_sub_t, dumb_class) -> dumb_class2
+	// {
+	// 	return dumb_class2{};
+	// }
 } // namespace ns
 
-template<typename CPO>
-using invoke_result_t = mpp::detail::tag_invoke_result_t<CPO, ns::dumb_class>;
+// template<typename CPO>
+// using invoke_result_t = detail::tag_invoke_result_t<CPO, ns::dumb_class>;
 
 int main()
 {
-	using namespace boost::ut::literals;
-	using namespace boost::ut::bdd;
-	using namespace boost::ut;
+	// when("I check against the CPOs' return types") = []() {
+	// 	expect(type<invoke_result_t<block_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<det_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<inv_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<trps_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<cmp_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<lu_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<fwd_sub_t>> == type<ns::dumb_class2>);
+	// 	expect(type<invoke_result_t<back_sub_t>> == type<ns::dumb_class2>);
+	// };
 
-	when("I check the new extents through the default matrix type") = []() {
-		expect(mpp::mat<int>::rows_extent() == 10_ul);
-		expect(mpp::mat<int>::cols_extent() == 10_ul);
+	when("I check the properties of the matrix with customized buffer") = []() {
+		using wacky_mat = mat<int, wacky_array<int>>;
+
+		expect(type<typename wacky_mat::value_type> == type<int>);
+		expect(type<typename wacky_mat::buffer_type> == type<wacky_array<int>>);
+
+		expect(type<typename wacky_mat::reference> == type<int&>);
+		expect(type<typename wacky_mat::const_reference> == type<const int&>);
+		expect(type<typename wacky_mat::pointer> == type<int*>);
+		expect(type<typename wacky_mat::const_pointer> == type<const int*>);
+
+		expect(std::contiguous_iterator<typename wacky_mat::iterator>);
+		expect(std::contiguous_iterator<typename wacky_mat::const_iterator>);
+		expect(std::bidirectional_iterator<typename wacky_mat::reverse_iterator>);
+		expect(std::bidirectional_iterator<typename wacky_mat::const_reverse_iterator>);
+
+		expect(type<typename wacky_mat::difference_type> == type<std::size_t>);
 	};
 
-	when("I check against the CPOs' return types") = []() {
-		expect(type<invoke_result_t<mpp::type_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::block_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::det_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::inv_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::trps_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::cmp_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::lu_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::fwd_sub_t>> == type<ns::dumb_class2>);
-		expect(type<invoke_result_t<mpp::back_sub_t>> == type<ns::dumb_class2>);
-	};
-
-	when("I check the customized buffer types") = []() {
-		expect(type<typename mpp::mat<int, 2, 3>::buffer_type> == type<std::vector<int>>);
-		expect(type<typename mpp::mat<int, mpp::dyn, mpp::dyn>::buffer_type> == type<std::array<int, 100>>);
-		expect(type<typename mpp::mat<int, mpp::dyn, 3>::buffer_type> == type<std::array<int, 100>>);
-		expect(type<typename mpp::mat<int, 2, mpp::dyn>::buffer_type> == type<std::array<int, 100>>);
-	};
-
-	// Putting semiregular test here because this test does all the constants/type checking stuff
-
-	scenario("CPOs should meet std::semiregular requirements") = []() {
-		expect(constant<std::semiregular<mpp::type_t>>);
-		expect(constant<std::semiregular<mpp::block_t>>);
-		expect(constant<std::semiregular<mpp::det_t>>);
-		expect(constant<std::semiregular<mpp::inv_t>>);
-		expect(constant<std::semiregular<mpp::trps_t>>);
-		expect(constant<std::semiregular<mpp::cmp_t>>);
-		expect(constant<std::semiregular<mpp::lu_t>>);
-		expect(constant<std::semiregular<mpp::fwd_sub_t>>);
-		expect(constant<std::semiregular<mpp::back_sub_t>>);
-	};
-
-	when("I check the customized allocator type") = []() {
-		expect(type<typename mpp::mat<int, 2, 3>::allocator_type> == type<custom_allocator<int>>);
-		expect(type<typename mpp::mat<int, mpp::dyn, mpp::dyn>::allocator_type> == type<custom_allocator<int>>);
-		expect(type<typename mpp::mat<int, mpp::dyn, 3>::allocator_type> == type<custom_allocator<int>>);
-		expect(type<typename mpp::mat<int, 2, mpp::dyn>::allocator_type> == type<custom_allocator<int>>);
-	};
+	// scenario("CPOs should meet std::semiregular requirements") = []() {
+	// 	expect(constant<std::semiregular<type_t>>);
+	// 	expect(constant<std::semiregular<block_t>>);
+	// 	expect(constant<std::semiregular<det_t>>);
+	// 	expect(constant<std::semiregular<inv_t>>);
+	// 	expect(constant<std::semiregular<trps_t>>);
+	// 	expect(constant<std::semiregular<cmp_t>>);
+	// 	expect(constant<std::semiregular<lu_t>>);
+	// 	expect(constant<std::semiregular<fwd_sub_t>>);
+	// 	expect(constant<std::semiregular<back_sub_t>>);
+	// };
 
 	return 0;
 }

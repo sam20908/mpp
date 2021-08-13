@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <mpp/detail/util/public.hpp>
+
 #include <algorithm>
 #include <compare>
 #include <cstddef>
@@ -83,16 +85,6 @@ namespace mpp
 		// provide accurate enough results
 		using fp_t = double;
 
-		template<typename T>
-		struct is_vec : std::false_type
-		{
-		};
-
-		template<typename T, typename Alloc>
-		struct is_vec<std::vector<T, Alloc>> : std::true_type
-		{
-		};
-
 		[[nodiscard]] constexpr auto idx_1d(std::size_t cols, std::size_t row, std::size_t col) noexcept -> std::size_t
 		{
 			// This is mainly for avoiding bug-prone code, because this calculation occurs in a lot of places, and a
@@ -103,12 +95,12 @@ namespace mpp
 		}
 
 		template<typename Buf>
-		void resize_buf_if_vec(Buf& buf,
+		void resize_buf_if_dyn(Buf& buf,
 			std::size_t rows,
 			std::size_t cols,
 			auto val) // @TODO: ISSUE #20
 		{
-			if constexpr (is_vec<Buf>::value)
+			if constexpr (is_dyn_buf<Buf>)
 			{
 				buf.resize(rows * cols, val);
 			}
@@ -117,7 +109,7 @@ namespace mpp
 		template<typename Buf>
 		void resize_or_fill_buf(Buf& buf, std::size_t rows, std::size_t cols, auto val) // @TODO: ISSUE #20
 		{
-			if constexpr (is_vec<Buf>::value)
+			if constexpr (is_dyn_buf<Buf>)
 			{
 				buf.resize(rows * cols, val);
 			}

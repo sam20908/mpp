@@ -35,6 +35,9 @@ namespace mpp
 	template<detail::arithmetic T, typename Buf = std::vector<T>>
 	class mat : public detail::expr_base<mat<T, Buf>, T>
 	{
+		static_assert(is_dyn_buf<Buf> || is_fixed_buf<Buf>, "Buffer not supported");
+		static_assert(!(is_dyn_buf<Buf> && is_fixed_buf<Buf>), "Buffer can't be both dynamic and fixed");
+
 		Buf buf_; // stores flattened data in row major
 		std::size_t rows_;
 		std::size_t cols_;
@@ -51,7 +54,7 @@ namespace mpp
 			const auto rng_rows = rng.size();
 			const auto rng_cols = rng_rows == 0 ? 0 : rng_begin->size(); // assumes all columns are same length
 
-			detail::resize_buf_if_vec(buf_, rng_rows, rng_cols, T{});
+			detail::resize_buf_if_dyn(buf_, rng_rows, rng_cols, T{});
 			auto buf_begin = buf_.begin();
 
 			using difference_type = typename Buf::difference_type;
@@ -78,7 +81,7 @@ namespace mpp
 			// Preconditions:
 			// rng is the same size as the specified matrix size (fixed matrices only)
 
-			detail::resize_buf_if_vec(buf_, rows, cols, T{});
+			detail::resize_buf_if_dyn(buf_, rows, cols, T{});
 
 			if constexpr (Moved)
 			{
@@ -149,7 +152,7 @@ namespace mpp
 
 		mat(size_type rows, size_type cols, const T& val = T{ 0 }) : rows_(rows), cols_(cols)
 		{
-			if constexpr (detail::is_vec<Buf>::value)
+			if constexpr (is_dyn_buf<Buf>)
 			{
 				buf_.resize(rows * cols, val);
 			}
@@ -170,7 +173,7 @@ namespace mpp
 		template<detail::fn_with_return_type<T> Fn>
 		mat(size_type rows, size_type cols, Fn&& fn) : rows_(rows), cols_(cols) // @TODO: ISSUE #20
 		{
-			detail::resize_buf_if_vec(buf_, rows, cols, T{});
+			detail::resize_buf_if_dyn(buf_, rows, cols, T{});
 
 			std::ranges::generate(buf_, std::forward<Fn>(fn));
 		}
