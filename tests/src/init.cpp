@@ -20,7 +20,6 @@
 #include <mpp/util/cmp.hpp>
 #include <mpp/mat.hpp>
 
-#include "../include/alloc.hpp"
 #include "../include/utils.hpp"
 
 #include <array>
