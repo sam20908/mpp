@@ -39,13 +39,16 @@
 template<typename T, typename... Bufs>
 using mats = std::tuple<std::type_identity<mpp::mat<T, Bufs>>...>;
 
+template<typename T>
+using dyn_mat = mats<T, std::vector<T>>;
+
 template<typename T, std::size_t Rows, std::size_t Cols>
 using all_mats = mats<T, std::vector<T>, std::array<T, Rows * Cols>>;
 
 template<typename T, std::size_t Rows, std::size_t Cols>
 using all_mats_reverse = mats<T, std::array<T, Rows * Cols>, std::vector<T>>;
 
-template<typename, typename>
+template<typename...>
 struct join_mats_impl;
 
 template<typename... Mats, typename... Mats2>
@@ -53,6 +56,14 @@ struct join_mats_impl<std::tuple<Mats...>, std::tuple<Mats2...>>
 {
 	using type =
 		std::tuple<std::tuple<std::type_identity<typename Mats::type>, std::type_identity<typename Mats2::type>>...>;
+};
+
+template<typename... Mats, typename... Mats2, typename... Mats3>
+struct join_mats_impl<std::tuple<Mats...>, std::tuple<Mats2...>, std::tuple<Mats3...>>
+{
+	using type = std::tuple<std::tuple<std::type_identity<typename Mats::type>,
+		std::type_identity<typename Mats2::type>,
+		std::type_identity<typename Mats3::type>>...>;
 };
 
 template<typename... Mats>
@@ -243,7 +254,7 @@ inline auto parse_mat = [](std::ifstream& file, std::string& line) {
 };
 
 template<typename T>
-inline auto parse_vec2d = [](std::ifstream& file, std::string& line) {
+inline auto parse_rng2d = [](std::ifstream& file, std::string& line) {
 	auto data             = std::vector<std::vector<T>>{};
 	const auto str_val_fn = str_fn<T>();
 
@@ -293,35 +304,6 @@ inline auto parse_vec1d = [](std::ifstream& file, std::string& line) {
 	return data;
 };
 
-template<typename T, std::size_t Rows, std::size_t Cols>
-inline auto parse_arr2d = [](std::ifstream& file, std::string& line) {
-	auto data             = std::array<std::array<T, Cols>, Rows>{};
-	auto row_idx          = std::size_t{};
-	const auto str_val_fn = str_fn<T>();
-
-	while (std::getline(file, line))
-	{
-		if (line == "=")
-		{
-			break;
-		}
-
-		auto row     = std::vector<T>{};
-		auto val_str = std::string{};
-		auto stream  = std::istringstream{ line };
-		auto col_idx = std::size_t{};
-
-		while (std::getline(stream, val_str, ' '))
-		{
-			data[row_idx][col_idx++] = str_val_fn(val_str);
-		}
-
-		++row_idx;
-	}
-
-	return data;
-};
-
 inline auto parse_dims = [](std::ifstream& file, std::string& line) {
 	std::getline(file, line);
 
@@ -353,7 +335,7 @@ inline auto parse_mat_construct_args = []<typename Mat, typename... Args>(std::t
 template<bool Move>
 inline auto parse_mat_construct_rng2d = []<typename Mat>(std::type_identity<Mat>) {
 	return [&](std::ifstream& file, std::string& line) {
-		auto rng = parse_vec2d<typename Mat::value_type>(file, line);
+		auto rng = parse_rng2d<typename Mat::value_type>(file, line);
 
 		if constexpr (Move)
 		{

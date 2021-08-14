@@ -94,6 +94,14 @@ namespace mpp
 			return row * cols + col;
 		}
 
+		[[nodiscard]] constexpr auto rng2d_dims(const auto& rng) -> std::pair<std::size_t, std::size_t>
+		{
+			// Preconditions:
+			// Assumes all columns are same length
+			return { std::ranges::size(rng),
+				std::ranges::size(rng) == 0 ? 0 : std::ranges::size(*std::ranges::begin(rng)) };
+		}
+
 		template<typename Buf>
 		void resize_buf_if_dyn(Buf& buf,
 			std::size_t rows,
