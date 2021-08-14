@@ -22,7 +22,6 @@
 #include <boost/ut.hpp>
 
 #include <mpp/detail/util/algo_impl.hpp>
-#include <mpp/detail/util/print_impl.hpp>
 #include <mpp/mat/matfwd.hpp>
 #include <mpp/util/cmp.hpp>
 
@@ -36,6 +35,28 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
+
+template<typename T, typename... Bufs>
+using mats = std::tuple<std::type_identity<mpp::mat<T, Bufs>>...>;
+
+template<typename T, std::size_t Rows, std::size_t Cols>
+using all_mats = mats<T, std::vector<T>, std::array<T, Rows * Cols>>;
+
+template<typename T, std::size_t Rows, std::size_t Cols>
+using all_mats_reverse = mats<T, std::array<T, Rows * Cols>, std::vector<T>>;
+
+template<typename, typename>
+struct join_mats_impl;
+
+template<typename... Mats, typename... Mats2>
+struct join_mats_impl<std::tuple<Mats...>, std::tuple<Mats2...>>
+{
+	using type =
+		std::tuple<std::tuple<std::type_identity<typename Mats::type>, std::type_identity<typename Mats2::type>>...>;
+};
+
+template<typename... Mats>
+using join_mats = typename join_mats_impl<Mats...>::type;
 
 auto cmp_mat_to_rng_impl(const auto& mat, const auto& rng) -> bool
 {
@@ -88,58 +109,6 @@ auto cmp_mat_to_expr_like_impl(const auto& mat, const auto& expr) -> bool
 	return true;
 }
 
-template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
-using all_mats = std::tuple<std::type_identity<mpp::mat<T, Rows, Cols, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
-	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
-
-template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
-using dyn_mats = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
-	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
-
-template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
-using all_mats_reverse = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>>;
-
-template<typename T, std::size_t Rows, std::size_t Cols, typename... Alloc>
-using dyn_mats_reverse = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc...>>,
-	std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc...>>>;
-
-template<typename T, std::size_t Rows, std::size_t Cols>
-using fixed_mat = std::tuple<std::type_identity<mpp::mat<T, Rows, Cols>>>;
-
-template<typename T>
-using dyn_mat = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn>>>;
-
-template<typename T, std::size_t Cols>
-using dyn_rows_mat = std::tuple<std::type_identity<mpp::mat<T, mpp::dyn, Cols>>>;
-
-template<typename T, std::size_t Rows>
-using dyn_cols_mat = std::tuple<std::type_identity<mpp::mat<T, Rows, mpp::dyn>>>;
-
-template<typename...>
-struct join_mats_impl;
-
-template<typename... Mats, typename... Mats2>
-struct join_mats_impl<std::tuple<Mats...>, std::tuple<Mats2...>>
-{
-	using type = std::tuple<std::tuple<Mats, Mats2>...>;
-};
-
-template<typename... Mats, typename... Mats2, typename... Mats3>
-struct join_mats_impl<std::tuple<Mats...>, std::tuple<Mats2...>, std::tuple<Mats3...>>
-{
-	using type = std::tuple<std::tuple<Mats, Mats2, Mats3>...>;
-};
-
-template<typename... Mats>
-using join_mats = typename join_mats_impl<Mats...>::type;
-
 template<typename Num, typename Num2>
 void cmp_nums(Num num, Num2 num2)
 {
@@ -180,16 +149,9 @@ void cmp_mat_to_rng(const auto& mat, const auto& rng)
 	boost::ut::expect(cmp_mat_to_rng_impl(mat, rng));
 }
 
-namespace mpp
-{
-	enum class mat_type;
-} // namespace mpp
-
 template<typename T>
 auto str_fn()
 {
-	// @NOTE: Could improve performance by using from_chars (but will need GCC 11 for FP)
-
 	if constexpr (std::is_same_v<T, double>)
 	{
 		return [](const std::string& str) {
@@ -242,13 +204,6 @@ auto str_fn()
 	{
 		return [](const std::string& str) {
 			return static_cast<bool>(std::stoi(str));
-		};
-	}
-
-	else if constexpr (std::is_same_v<T, mpp::mat_type>)
-	{
-		return [](const std::string& str) {
-			return static_cast<mpp::mat_type>(std::stoi(str));
 		};
 	}
 }
@@ -379,77 +334,51 @@ inline auto parse_dims = [](std::ifstream& file, std::string& line) {
 	return std::pair{ rows, cols };
 };
 
-inline auto parse_mat_construct_args =
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
-		const Args&... args)
+inline auto parse_mat_construct_args = []<typename Mat, typename... Args>(std::type_identity<Mat>, const Args&... args)
 {
-	return [&](std::ifstream& file, std::string& line) {
-		std::getline(file, line); // to skip '='
-
-		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
-
+	return [&](std::ifstream&, std::string&) {
 		if constexpr (sizeof...(Args) == 0)
 		{
-			mat_t mat;
+			Mat mat;
 			return mat;
 		}
 		else
 		{
-			mat_t mat{ args... };
+			Mat mat{ args... };
 			return mat;
 		}
-	};
-};
-
-template<std::size_t ArrRows, std::size_t ArrCols>
-inline auto parse_mat_construct_arr2d =
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
-		const Args&... args)
-{
-	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
-
-		auto rng = parse_arr2d<T, ArrRows, ArrCols>(file, line);
-
-		return mat_t{ rng, args... };
-	};
-};
-
-inline auto parse_mat_construct_rng2d =
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
-		const Args&... args)
-{
-	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
-
-		auto rng = parse_vec2d<T>(file, line);
-
-		return mat_t{ rng, args... };
 	};
 };
 
 template<bool Move>
-inline auto parse_mat_construct_rng1d =
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
-		const Args&... args)
-{
+inline auto parse_mat_construct_rng2d = []<typename Mat>(std::type_identity<Mat>) {
 	return [&](std::ifstream& file, std::string& line) {
-		using mat_t = mpp::mat<T, RowsExtent, Cols, Alloc>;
-
-		const auto [rows, cols] = parse_dims(file, line);
-		auto rng                = parse_vec1d<T>(file, line);
+		auto rng = parse_vec2d<typename Mat::value_type>(file, line);
 
 		if constexpr (Move)
 		{
-			return mat_t{ rows, cols, std::move(rng), args... };
+			return Mat{ std::move(rng) };
 		}
 		else
 		{
-			return mat_t{ rows, cols, rng, args... };
+			return Mat{ rng };
+		}
+	};
+};
+
+template<bool Move>
+inline auto parse_mat_construct_rng1d = []<typename Mat>(std::type_identity<Mat>) {
+	return [&](std::ifstream& file, std::string& line) {
+		const auto [rows, cols] = parse_dims(file, line);
+		auto rng                = parse_vec1d<typename Mat::value_type>(file, line);
+
+		if constexpr (Move)
+		{
+			return Mat{ rows, cols, std::move(rng) };
+		}
+		else
+		{
+			return Mat{ rows, cols, rng };
 		}
 	};
 };
@@ -466,123 +395,70 @@ inline auto parse_val = [](std::ifstream& file, std::string& line) {
 	return val;
 };
 
-struct unknown_ordering_t
-{
-};
+// struct unknown_ordering_t
+// {
+// };
 
-template<typename Ordering>
-inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
-	std::getline(file, line);
+// template<typename Ordering>
+// inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
+// 	std::getline(file, line);
 
-	auto ordering = [&]() -> std::variant<Ordering, unknown_ordering_t> {
-		if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
-		{
-			if (line == "unordered")
-			{
-				return std::partial_ordering::unordered;
-			}
-		}
+// 	auto ordering = [&]() -> std::variant<Ordering, unknown_ordering_t> {
+// 		if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
+// 		{
+// 			if (line == "unordered")
+// 			{
+// 				return std::partial_ordering::unordered;
+// 			}
+// 		}
 
-		if (line == "greater")
-		{
-			return Ordering::greater;
-		}
-		else if (line == "less")
-		{
-			return Ordering::less;
-		}
-		else if (line == "equivalent")
-		{
-			return Ordering::equivalent;
-		}
-		else
-		{
-			return unknown_ordering_t{};
-		}
-	}();
+// 		if (line == "greater")
+// 		{
+// 			return Ordering::greater;
+// 		}
+// 		else if (line == "less")
+// 		{
+// 			return Ordering::less;
+// 		}
+// 		else if (line == "equivalent")
+// 		{
+// 			return Ordering::equivalent;
+// 		}
+// 		else
+// 		{
+// 			return unknown_ordering_t{};
+// 		}
+// 	}();
 
-	std::getline(file, line); // to skip '='
+// 	std::getline(file, line); // to skip '='
 
-	if (ordering.index() == 1)
-	{
-		throw std::runtime_error("Unknown ordering for current ordering type");
-	}
+// 	if (ordering.index() == 1)
+// 	{
+// 		throw std::runtime_error("Unknown ordering for current ordering type");
+// 	}
 
-	return std::get<0>(ordering);
-};
+// 	return std::get<0>(ordering);
+// };
 
-template<typename... Ts>
-struct overloaded : Ts...
-{
-	using Ts::operator()...;
-};
+// struct block_idxs_container
+// {
+// 	std::size_t row_start;
+// 	std::size_t col_start;
+// 	std::size_t row_end;
+// 	std::size_t col_end;
+// };
 
-template<typename... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
+// inline auto parse_block_idxs = [](std::ifstream& file, std::string& line) {
+// 	std::getline(file, line);
 
-inline auto init_mat_extent_dependent = overloaded{
-	// clang-format off
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>>,
-		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t cols,
-		const auto&... args) {
-		return mpp::mat<T, RowsExtent, Cols, Alloc>{ args... };
-	},
-	[]<typename T, typename Alloc>(std::type_identity<mpp::mat<T, mpp::dyn, mpp::dyn, Alloc>>,
-		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t cols,
-		const auto&... args) {
-		return mpp::mat<T, mpp::dyn, mpp::dyn, Alloc>{ rows, cols, args... };
-	},
-	[]<typename T, std::size_t Cols, typename Alloc>(
-		std::type_identity<mpp::mat<T, mpp::dyn, Cols, Alloc>>,
-		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t cols,
-		const auto&... args) {
-		return mpp::mat<T, mpp::dyn, Cols, Alloc>{ rows, args... };
-	},
-	[]<typename T, std::size_t RowsExtent, typename Alloc>(
-		std::type_identity<mpp::mat<T, RowsExtent, mpp::dyn, Alloc>>,
-		[[maybe_unused]] std::size_t rows,
-		[[maybe_unused]] std::size_t cols,
-		const auto&... args) {
-		return mpp::mat<T, RowsExtent, mpp::dyn, Alloc>{ cols, args... };
-	}
-	// clang-format on
-};
+// 	auto stream = std::istringstream{ line };
+// 	std::size_t row_start, col_start, row_end, col_end;
+// 	stream >> row_start >> col_start >> row_end >> col_end;
 
-inline auto parse_mat_construct_val_arg =
-	[]<typename T, std::size_t RowsExtent, std::size_t Cols, typename Alloc, typename... Args>(
-		std::type_identity<mpp::mat<T, RowsExtent, Cols, Alloc>> identity,
-		const Args&... args)
-{
-	return [&](std::ifstream& file, std::string& line) {
-		const auto [rows, cols] = parse_dims(file, line);
+// 	std::getline(file, line); // to skip '='
 
-		return init_mat_extent_dependent(identity, rows, cols, args...);
-	};
-};
-
-struct block_idxs_container
-{
-	std::size_t row_start;
-	std::size_t col_start;
-	std::size_t row_end;
-	std::size_t col_end;
-};
-
-inline auto parse_block_idxs = [](std::ifstream& file, std::string& line) {
-	std::getline(file, line);
-
-	auto stream = std::istringstream{ line };
-	std::size_t row_start, col_start, row_end, col_end;
-	stream >> row_start >> col_start >> row_end >> col_end;
-
-	std::getline(file, line); // to skip '='
-
-	return block_idxs_container{ row_start, col_start, row_end, col_end };
-};
+// 	return block_idxs_container{ row_start, col_start, row_end, col_end };
+// };
 
 template<typename... Fns>
 auto parse_test(std::string_view filename, const Fns&... fns)

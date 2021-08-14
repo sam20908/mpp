@@ -4,13 +4,8 @@ These are the algorithms currently implemented:
 
 | Utility | API |
 | ------------- | ------------- |
-| Configuration | `mpp::cfg` |
 | Print | `mpp::print` |
-| Type | `mpp::type` |
-
-#### Configuration
-
-It is explained [here](customize.md)
+| Compare | `mpp::cmp` |
 
 #### Print
 
@@ -35,27 +30,35 @@ print(b);
  */
 ```
 
-#### Type
+#### Compare
 
-It returns the type of matrix via an enum class:
+This CPO was provided as a convenient helper to compare matrices. It returns a **compare-three-way** result (see https://en.cppreference.com/w/cpp/utility/compare/compare_three_way for relevant information). A helper `mpp::cmp_fp` is also provided to compare floating points.
 
 ```cpp
-// actual content of mat_type inside mpp
-enum class mat_type
-{
-    fixed,
-    dynamic,
-    dynamic_rows,
-    dynamic_cols
+mat a{
+    {1.0, 2.0},
+    {3.0, 4.0}
 };
 
-mat<int, 1, 1> a;
-mat<int, dyn, dyn> b;
-mat<int, dyn, 1> c;
-mat<int, 1, dyn> d;
+mat b{
+    {1.0, 2.0},
+    {3.0, 4.1}
+};
 
-type(a); // mat_type::fixed
-type(b); // mat_type::dynamic
-type(c); // mat_type::dynamic_rows
-type(d); // mat_type::dynamic_cols
+mat c{
+    {1, 2},
+    {3, 4}
+};
+
+mat d{
+    {1, 2},
+    {3, 4}
+};
+
+cmp(a, b, cmp_fp); // std::partial_ordering::less
+cmp(c, d); // std::strong_ordering::equal (comparator is defaulted to `std::compare_three_way`, which doesn't handling floating points)
+
+// Use `mpp::cmp_fn`to handle floating points and integral values. This comparator avoids the extra logic necessary for floating points when given integral values
+cmp(a, b, cmp_fn); // std::partial_ordering::less
+cmp(c, d, cmp_fn); // std::strong_ordering::equal
 ```

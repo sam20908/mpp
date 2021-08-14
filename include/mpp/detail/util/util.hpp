@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include <mpp/detail/util/public.hpp>
+
+#include <algorithm>
 #include <compare>
 #include <cstddef>
 #include <limits>
@@ -43,7 +46,7 @@ namespace mpp
 		};
 	} // namespace detail
 
-	template<detail::arithmetic, std::size_t, std::size_t, typename>
+	template<detail::arithmetic, typename>
 	class mat;
 
 	namespace detail
@@ -53,41 +56,34 @@ namespace mpp
 			std::invocable<Fn, Args...> && std::same_as<std::invoke_result_t<Fn, Args...>, Return>;
 
 		template<typename Rng>
-		using range_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
+		using rng_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
 
-		template<typename Rng, typename Val>
-		concept rng_2d_with_value_convertible_to = std::convertible_to<range_2d_value_t<Rng>, Val>;
+		template<typename Rng, typename T>
+		concept rng_2d_with_value_convertible_to = std::convertible_to<rng_2d_value_t<Rng>, T>;
 
-		template<typename Rng, typename Val>
-		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, Val>;
+		template<typename Rng, typename T>
+		concept rng_1d_with_value_convertible_to = std::convertible_to<std::ranges::range_value_t<Rng>, T>;
+
+		template<typename T>
+		inline constexpr bool is_moved = !std::is_lvalue_reference_v<T>;
 
 		template<typename>
 		struct is_mat : std::false_type
 		{
 		};
 
-		template<arithmetic Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-		struct is_mat<mat<Val, Rows, Cols, Alloc>> : std::true_type
+		template<arithmetic T, typename Buf>
+		struct is_mat<mat<T, Buf>> : std::true_type
 		{
 		};
 
 		template<typename T, typename To>
-		concept matrix_with_value_convertible_to = is_mat<std::remove_cvref_t<T>>::value &&
+		concept mat_with_value_convertible_to = is_mat<std::remove_cvref_t<T>>::value &&
 			std::convertible_to<typename std::remove_cvref_t<T>::value_type, To>;
 
 		// Double was tested to be accurate *enough* to do calculations involve irrational fractions (e.g. 1/3) and
 		// provide accurate enough results
 		using fp_t = double;
-
-		template<typename T>
-		struct is_vec : std::false_type
-		{
-		};
-
-		template<typename T, typename Alloc>
-		struct is_vec<std::vector<T, Alloc>> : std::true_type
-		{
-		};
 
 		[[nodiscard]] constexpr auto idx_1d(std::size_t cols, std::size_t row, std::size_t col) noexcept -> std::size_t
 		{
@@ -99,32 +95,41 @@ namespace mpp
 		}
 
 		template<typename Buf>
-		void resize_buf_if_vec(Buf& buf,
+		void resize_buf_if_dyn(Buf& buf,
 			std::size_t rows,
 			std::size_t cols,
 			auto val) // @TODO: ISSUE #20
 		{
-			if constexpr (is_vec<Buf>::value)
+			if constexpr (is_dyn_buf<Buf>)
 			{
 				buf.resize(rows * cols, val);
 			}
 		}
 
 		template<typename Buf>
-		void init_identity_buf(Buf& buffer,
+		void resize_or_fill_buf(Buf& buf, std::size_t rows, std::size_t cols, auto val) // @TODO: ISSUE #20
+		{
+			if constexpr (is_dyn_buf<Buf>)
+			{
+				buf.resize(rows * cols, val);
+			}
+			else
+			{
+				std::ranges::fill(buf, val);
+			}
+		}
+
+		void init_identity_buf(auto& buf,
 			std::size_t rows,
 			std::size_t cols,
 			auto zero_val,
 			auto one_val) // @TODO: ISSUE #20
 		{
-			if constexpr (is_vec<Buf>::value)
-			{
-				buffer.resize(rows * cols, zero_val);
-			}
+			resize_or_fill_buf(buf, rows, cols, zero_val);
 
-			for (auto index = std::size_t{}; index < rows; ++index)
+			for (auto i = std::size_t{}; i < rows; ++i)
 			{
-				buffer[idx_1d(cols, index, index)] = one_val;
+				buf[idx_1d(cols, i, i)] = one_val;
 			}
 		}
 
