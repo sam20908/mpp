@@ -20,7 +20,7 @@ Different components are split into different headers, which means we have these
 #include <mpp/arith/add.hpp> // and more arithmetic headers
 #include <mpp/arith.hpp> // includes all arithmetics
 
-#include <mpp/mat/fixed.hpp> // and more matrix headers
+#include <mpp/mat/mat.hpp> // and more matrix headers
 #include <mpp/mat.hpp> // includes all matrices
 
 #include <mpp/mpp.hpp> // includes everything
