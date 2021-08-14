@@ -41,7 +41,7 @@ namespace
 	{
 		test(test_name.data()) = [&, test_name]<typename Mat>(std::type_identity<Mat> identity) {
 			const auto [out, expected_rng] =
-				parse_test(test_name, input_fn(identity, args...), parse_vec2d<typename Mat::value_type>);
+				parse_test(test_name, input_fn(identity, args...), parse_rng2d<typename Mat::value_type>);
 
 			cmp_mat_to_rng(out, expected_rng);
 		} | Mats{};
@@ -52,7 +52,7 @@ namespace
 	{
 		test(test_name.data()) = [&, test_name]<typename Mat, typename Mat2>(
 									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
-			auto [mat, expected_rng] = parse_test(test_name, parse_mat<Mat>, parse_vec2d<typename Mat::value_type>);
+			auto [mat, expected_rng] = parse_test(test_name, parse_mat<Mat>, parse_rng2d<typename Mat::value_type>);
 
 			if constexpr (Move)
 			{

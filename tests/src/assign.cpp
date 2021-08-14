@@ -32,27 +32,13 @@ using namespace mpp;
 
 namespace
 {
-	template<typename Mats, bool Move, bool UseArr2DAsRng>
+	template<typename Mats, bool Move>
 	void test_assign_rng(std::string_view test_name)
 	{
 		test(test_name.data()) = [test_name]<typename Mat, typename Mat2>(
 									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
-			auto [mat, vec2d, expected_mat] = [&]() {
-				if constexpr (UseArr2DAsRng)
-				{
-					return parse_test(test_name,
-						parse_mat<Mat>,
-						parse_arr2d<typename Mat::value_type, Mat::rows_extent(), Mat::cols_extent()>,
-						parse_mat<Mat2>);
-				}
-				else
-				{
-					return parse_test(test_name,
-						parse_mat<Mat>,
-						parse_vec2d<typename Mat::value_type>,
-						parse_mat<Mat2>);
-				}
-			}();
+			auto [mat, vec2d, expected_mat] =
+				parse_test(test_name, parse_mat<Mat>, parse_rng2d<typename Mat::value_type>, parse_mat<Mat2>);
 
 			if constexpr (Move)
 			{
@@ -99,15 +85,8 @@ int main()
 	feature("Assigning a 2D range with same dimensions") = []() {
 		using mats = join_mats<all_mats<int, 2, 3>, all_mats<int, 2, 3>>;
 
-		test_assign_rng<mats, false, false>("assign/2x3_same_dims.txt");
-		test_assign_rng<mats, true, false>("assign/2x3_same_dims.txt");
-	};
-
-	feature("Assigning a 2D array with same dimensions (fixed matrices only)") = []() {
-		using mats = join_mats<fixed_mat<int, 2, 3>, fixed_mat<int, 2, 3>>;
-
-		test_assign_rng<mats, false, true>("assign/2x3_same_dims.txt");
-		test_assign_rng<mats, true, true>("assign/2x3_same_dims.txt");
+		test_assign_rng<mats, false>("assign/2x3_same_dims.txt");
+		test_assign_rng<mats, true>("assign/2x3_same_dims.txt");
 	};
 
 	feature("Assigning a matrix with same dimensions") = []() {
@@ -124,38 +103,48 @@ int main()
 		test_assign_mat<mats, true>("assign/2x3_same_dims.txt");
 	};
 
-	feature("Expanding dynamic matrices by range (dynamic matrices only)") = []() {
-		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assign/2x3_10x10_expand_dyn_mat.txt");
-		test_assign_rng<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true, false>(
-			"assign/2x3_10x3_expand_dyn_rows_mat.txt");
-		test_assign_rng<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true, false>(
-			"assign/2x3_2x10_expand_dyn_cols_mat.txt");
+	feature("Expanding dynamic matrices by 2D range (dynamic matrices only)") = []() {
+		using mats = join_mats<dyn_mat<int>, dyn_mat<int>>;
+
+		test_assign_rng<mats, false>("assign/2x3_10x10_expand.txt");
+		test_assign_rng<mats, true>("assign/2x3_10x10_expand.txt");
+		test_assign_rng<mats, false>("assign/2x3_10x3_expand.txt");
+		test_assign_rng<mats, true>("assign/2x3_10x3_expand.txt");
+		test_assign_rng<mats, false>("assign/2x3_2x10_expand.txt");
+		test_assign_rng<mats, true>("assign/2x3_2x10_expand.txt");
 	};
 
-	feature("Shrinking dynamic matrices by range (dynamic matrices only)") = []() {
-		test_assign_rng<join_mats<dyn_mat<int>, dyn_mat<int>>, true, false>("assign/10x10_2x3_shrink_dyn_mat.txt");
-		test_assign_rng<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true, false>(
-			"assign/10x3_2x3_shrink_dyn_rows_mat.txt");
-		test_assign_rng<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true, false>(
-			"assign/2x10_2x3_shrink_dyn_cols_mat.txt");
+	feature("Shrinking dynamic matrices by 2D range (dynamic matrices only)") = []() {
+		using mats = join_mats<dyn_mat<int>, dyn_mat<int>>;
+
+		test_assign_rng<mats, false>("assign/10x10_2x3_shrink.txt");
+		test_assign_rng<mats, true>("assign/10x10_2x3_shrink.txt");
+		test_assign_rng<mats, false>("assign/10x3_2x3_shrink.txt");
+		test_assign_rng<mats, true>("assign/10x3_2x3_shrink.txt");
+		test_assign_rng<mats, false>("assign/2x10_2x3_shrink.txt");
+		test_assign_rng<mats, true>("assign/2x10_2x3_shrink.txt");
 	};
 
-	feature("Expanding dynamic matrices by matrix (dynamic matrices only)") = []() {
-		test_assign_mat<join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>, true>(
-			"assign/2x3_10x10_expand_dyn_mat.txt");
-		test_assign_mat<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true>(
-			"assign/2x3_10x3_expand_dyn_rows_mat.txt");
-		test_assign_mat<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true>(
-			"assign/2x3_2x10_expand_dyn_cols_mat.txt");
+	feature("Expanding dynamic matrices by another matrix (dynamic matrices only)") = []() {
+		using mats = join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>;
+
+		test_assign_mat<mats, false>("assign/2x3_10x10_expand.txt");
+		test_assign_mat<mats, true>("assign/2x3_10x10_expand.txt");
+		test_assign_mat<mats, false>("assign/2x3_10x3_expand.txt");
+		test_assign_mat<mats, true>("assign/2x3_10x3_expand.txt");
+		test_assign_mat<mats, false>("assign/2x3_2x10_expand.txt");
+		test_assign_mat<mats, true>("assign/2x3_2x10_expand.txt");
 	};
 
-	feature("Shrinking dynamic matrices by matrix (dynamic matrices only)") = []() {
-		test_assign_mat<join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>, true>(
-			"assign/10x10_2x3_shrink_dyn_mat.txt");
-		test_assign_mat<join_mats<dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>, dyn_rows_mat<int, 3>>, true>(
-			"assign/10x3_2x3_shrink_dyn_rows_mat.txt");
-		test_assign_mat<join_mats<dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>, dyn_cols_mat<int, 2>>, true>(
-			"assign/2x10_2x3_shrink_dyn_cols_mat.txt");
+	feature("Shrinking dynamic matrices by another matrix (dynamic matrices only)") = []() {
+		using mats = join_mats<dyn_mat<int>, dyn_mat<int>, dyn_mat<int>>;
+
+		test_assign_mat<mats, false>("assign/10x10_2x3_shrink.txt");
+		test_assign_mat<mats, true>("assign/10x10_2x3_shrink.txt");
+		test_assign_mat<mats, false>("assign/10x3_2x3_shrink.txt");
+		test_assign_mat<mats, true>("assign/10x3_2x3_shrink.txt");
+		test_assign_mat<mats, false>("assign/2x10_2x3_shrink.txt");
+		test_assign_mat<mats, true>("assign/2x10_2x3_shrink.txt");
 	};
 
 	return 0;

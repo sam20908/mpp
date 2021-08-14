@@ -49,13 +49,12 @@ namespace mpp
 			// rng is the same size as specified matrix size (fixed matrices only)
 			// rng's rows all are equal in length
 
-			auto rng_begin      = rng.begin();
-			auto rng_end        = rng.end();
-			const auto rng_rows = rng.size();
-			const auto rng_cols = rng_rows == 0 ? 0 : rng_begin->size(); // assumes all columns are same length
+			auto rng_begin                  = std::ranges::begin(rng);
+			auto rng_end                    = std::ranges::end(rng);
+			const auto [rng_rows, rng_cols] = detail::rng2d_dims(rng);
 
 			detail::resize_buf_if_dyn(buf_, rng_rows, rng_cols, T{});
-			auto buf_begin = buf_.begin();
+			auto buf_begin = std::ranges::begin(buf_);
 
 			using difference_type = typename Buf::difference_type;
 
@@ -85,11 +84,11 @@ namespace mpp
 
 			if constexpr (Moved)
 			{
-				std::ranges::move(rng, buf_.begin());
+				std::ranges::move(rng, std::ranges::begin(buf_));
 			}
 			else
 			{
-				std::ranges::copy(rng, buf_.begin());
+				std::ranges::copy(rng, std::ranges::begin(buf_));
 			}
 
 			rows_ = rows;
@@ -358,6 +357,12 @@ namespace mpp
 			assign_rng_2d<false>(init);
 		}
 
+		template<detail::rng_1d_with_value_convertible_to<T> Rng>
+		void assign(std::size_t rows, std::size_t cols, Rng&& rng) // @TODO: ISSUE #20
+		{
+			assign_rng_1d<detail::is_moved<decltype(rng)>>(rows, cols, std::forward<Rng>(rng));
+		}
+
 		template<detail::rng_2d_with_value_convertible_to<T> Rng>
 		void assign(Rng&& rng) // @TODO: ISSUE #20
 		{
@@ -365,7 +370,7 @@ namespace mpp
 		}
 
 		template<detail::mat_with_value_convertible_to<T> Mat>
-		requires(!std::same_as<std::remove_cvref_t<Mat>, mat<T, Buf>>) void assign(Mat&& obj) // @TODO: ISSUE #20
+		void assign(Mat&& obj) // @TODO: ISSUE #20
 		{
 			const auto rows = std::forward<Mat>(obj).rows();
 			const auto cols = std::forward<Mat>(obj).cols();
@@ -377,18 +382,20 @@ namespace mpp
 			-> mat&  = default;                                                                   // @TODO: ISSUE #20
 		auto operator=(mat&&) noexcept(std::is_nothrow_move_assignable_v<Buf>) -> mat& = default; // @TODO: ISSUE #20
 
-		template<detail::rng_1d_with_value_convertible_to<T> Rng>
-		auto operator=(Rng&& rng) -> mat&
-		{
-			assign_rng_1d<detail::is_moved<decltype(rng)>>(std::forward<Rng>(rng));
-			return *this;
-		}
-
 		template<detail::mat_with_value_convertible_to<T> Mat>
 		requires(!std::same_as<std::remove_cvref_t<Mat>, mat<T, Buf>>) auto operator=(Mat&& obj)
 			-> mat& // @TODO: ISSUE #20
 		{
 			assign(std::forward<Mat>(obj));
+			return *this;
+		}
+
+		template<typename Rng>
+		requires(!detail::mat_with_value_convertible_to<Rng, T>) auto operator=(Rng&& rng) -> mat&
+		{
+			// Constraint is required to allow picking the defaulted assignment operator
+
+			assign(std::forward<Rng>(rng));
 			return *this;
 		}
 	};
