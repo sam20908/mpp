@@ -144,7 +144,7 @@ namespace mpp
 		}
 
 		template<detail::rng_2d_with_value_convertible_to<T> Rng>
-		mat(Rng&& rng) // @TODO: ISSUE #20
+		explicit mat(Rng&& rng) // @TODO: ISSUE #20
 		{
 			assign_rng_2d<detail::is_moved<decltype(rng)>>(std::forward<Rng>(rng));
 		}
@@ -175,6 +175,23 @@ namespace mpp
 			detail::resize_buf_if_dyn(buf_, rows, cols, T{});
 
 			std::ranges::generate(buf_, std::forward<Fn>(fn));
+		}
+
+		template<typename Derived, typename T2>
+		explicit mat(const detail::expr_base<Derived, T2>& expr) :
+			rows_(expr.rows()),
+			cols_(expr.cols()) // @TODO: ISSUE #20
+		{
+			detail::resize_buf_if_dyn(buf_, rows_, cols_, T{});
+
+			auto buf_begin = std::ranges::begin(buf_);
+			for (auto row = std::size_t{}; row < rows_; ++row)
+			{
+				for (auto col = std::size_t{}; col < cols_; ++col, ++buf_begin)
+				{
+					*buf_begin = expr(row, col);
+				}
+			}
 		}
 
 		[[nodiscard]] auto data() noexcept -> pointer // @TODO: ISSUE #20

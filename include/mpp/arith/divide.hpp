@@ -39,31 +39,26 @@ namespace mpp
 		};
 	} // namespace detail
 
-	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
-	[[nodiscard]] auto operator/(const detail::expr_base<Base, Val, Rows, Cols>& obj, Val val)
-		-> detail::expr_binary_val_op<Rows,
-			Cols,
-			detail::expr_base<Base, Val, Rows, Cols>,
-			Val,
+	template<typename Derived, typename T>
+	[[nodiscard]] auto operator/(const detail::expr_base<Derived, T>& obj, T val)
+		-> detail::expr_binary_val_op<detail::expr_base<Derived, T>,
+			T,
 			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
 		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
-	[[nodiscard]] auto operator/(Val val, const detail::expr_base<Base, Val, Rows, Cols>& obj)
-		-> detail::expr_binary_val_op<Rows,
-			Cols,
-			detail::expr_base<Base, Val, Rows, Cols>,
-			Val,
+	template<typename Derived, typename T>
+	[[nodiscard]] auto operator/(T val, const detail::expr_base<Derived, T>& obj)
+		-> detail::expr_binary_val_op<detail::expr_base<Derived, T>,
+			T,
 			decltype(detail::div_op)> // @TODO: ISSUE #20
 	{
 		return { obj, val, obj.rows(), obj.cols(), detail::div_op };
 	}
 
-	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-	inline auto operator/=(mat<Val, Rows, Cols, Alloc>& obj, Val val)
-		-> mat<Val, Rows, Cols, Alloc>& // @TODO: ISSUE #20
+	template<typename T, typename Buf>
+	inline auto operator/=(mat<T, Buf>& obj, T val) -> mat<T, Buf>& // @TODO: ISSUE #20
 	{
 		// Can't use bind_front here because we want elem / val, not val / elem
 		std::ranges::transform(obj, obj.begin(), [&val](const auto& elem) {

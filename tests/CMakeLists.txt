@@ -38,7 +38,7 @@ function(_create_test TEST_FILENAME)
 endfunction()
 
 # _create_test("algos")
-# _create_test("ariths")
+_create_test("ariths")
 _create_test("assign")
 _create_test("customize")
 _create_test("init")
