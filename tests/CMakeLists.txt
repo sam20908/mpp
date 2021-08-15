@@ -42,7 +42,7 @@ endfunction()
 _create_test("assign")
 _create_test("customize")
 _create_test("init")
-# _create_test("iter")
+_create_test("iter")
 # _create_test("mem_fns")
 # _create_test("utils")
 
