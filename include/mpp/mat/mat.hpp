@@ -351,6 +351,19 @@ namespace mpp
 			buf_.clear();
 		}
 
+		void swap(mat& b) noexcept // @TODO: ISSUE #20
+		{
+			// Don't swap with the same object
+			if (&b != this)
+			{
+				using std::swap;
+
+				swap(rows_, b.rows_);
+				swap(cols_, b.cols_);
+				swap(buf_, b.buf_);
+			}
+		}
+
 		template<std::convertible_to<T> T2>
 		void assign(std::initializer_list<std::initializer_list<T2>> init) // @TODO: ISSUE #20
 		{
