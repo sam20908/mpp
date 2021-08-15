@@ -380,50 +380,50 @@ inline auto parse_val = [](std::ifstream& file, std::string& line) {
 	return val;
 };
 
-// struct unknown_ordering_t
-// {
-// };
+struct unknown_ordering_t
+{
+};
 
-// template<typename Ordering>
-// inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
-// 	std::getline(file, line);
+template<typename Ordering>
+inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
+	std::getline(file, line);
 
-// 	auto ordering = [&]() -> std::variant<Ordering, unknown_ordering_t> {
-// 		if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
-// 		{
-// 			if (line == "unordered")
-// 			{
-// 				return std::partial_ordering::unordered;
-// 			}
-// 		}
+	auto ordering = [&]() -> std::variant<Ordering, unknown_ordering_t> {
+		if constexpr (std::is_same_v<Ordering, std::partial_ordering>)
+		{
+			if (line == "unordered")
+			{
+				return std::partial_ordering::unordered;
+			}
+		}
 
-// 		if (line == "greater")
-// 		{
-// 			return Ordering::greater;
-// 		}
-// 		else if (line == "less")
-// 		{
-// 			return Ordering::less;
-// 		}
-// 		else if (line == "equivalent")
-// 		{
-// 			return Ordering::equivalent;
-// 		}
-// 		else
-// 		{
-// 			return unknown_ordering_t{};
-// 		}
-// 	}();
+		if (line == "greater")
+		{
+			return Ordering::greater;
+		}
+		else if (line == "less")
+		{
+			return Ordering::less;
+		}
+		else if (line == "equivalent")
+		{
+			return Ordering::equivalent;
+		}
+		else
+		{
+			return unknown_ordering_t{};
+		}
+	}();
 
-// 	std::getline(file, line); // to skip '='
+	std::getline(file, line); // to skip '='
 
-// 	if (ordering.index() == 1)
-// 	{
-// 		throw std::runtime_error("Unknown ordering for current ordering type");
-// 	}
+	if (ordering.index() == 1)
+	{
+		throw std::runtime_error("Unknown ordering for current ordering type");
+	}
 
-// 	return std::get<0>(ordering);
-// };
+	return std::get<0>(ordering);
+};
 
 // struct block_idxs_container
 // {

@@ -35,37 +35,6 @@ using namespace mpp;
 
 namespace
 {
-	template<typename Mats>
-	void test_fn(std::string_view test_name, const auto& fn, const auto& parse_fn)
-	{
-		test(test_name.data()) = [&, test_name]<typename Mat>(std::type_identity<Mat>) {
-			const auto [mat, expected_val] = parse_test(test_name, parse_mat<Mat>, parse_fn);
-			const auto out                 = fn(mat);
-
-			expect(out == expected_val);
-		} | Mats{};
-	}
-
-	template<typename Mats, typename Order, typename Order2>
-	void test_cmp_size(std::string_view test_name)
-	{
-		test(test_name.data()) = [test_name]<typename Mat, typename Mat2>(
-									 std::tuple<std::type_identity<Mat>, std::type_identity<Mat2>>) {
-			const auto [mat, mat2, cmp_rows, cmp_cols, expected_row_cmp, expected_col_cmp] = parse_test(test_name,
-				parse_mat<Mat>,
-				parse_mat<Mat2>,
-				parse_val<bool>,
-				parse_val<bool>,
-				parse_ordering<Order>,
-				parse_ordering<Order2>);
-
-			const auto out = size_compare(mat, mat2, cmp_rows, cmp_cols);
-
-			expect(out.first == expected_row_cmp);
-			expect(out.second == expected_col_cmp);
-		} | Mats{};
-	}
-
 	template<typename Mats, typename Order>
 	void test_cmp_elems(std::string_view test_name)
 	{
@@ -83,13 +52,6 @@ namespace
 
 int main()
 {
-	feature("Type") = []() {
-		test_fn<fixed_mat<int, 0, 0>>("utils/type/fixed.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_mat<int>>("utils/type/dyn.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_rows_mat<int, 0>>("utils/type/dyn_rows.txt", mpp::type, parse_val<mat_type>);
-		test_fn<dyn_cols_mat<int, 0>>("utils/type/dyn_cols.txt", mpp::type, parse_val<mat_type>);
-	};
-
 	feature("Elements comparison") = []() {
 		test_cmp_elems<join_mats<all_mats<int, 0, 0>, all_mats<int, 0, 0>>, std::strong_ordering>(
 			"utils/cmp_elems/0x0_0x0.txt");
