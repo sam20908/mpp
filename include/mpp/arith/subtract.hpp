@@ -37,47 +37,25 @@ namespace mpp
 		};
 	} // namespace detail
 
-	template<typename ABase,
-		typename BBase,
-		typename Val,
-		std::size_t ARows,
-		std::size_t ACols,
-		std::size_t BRows,
-		std::size_t BCols>
-	[[nodiscard]] inline auto operator-(const detail::expr_base<ABase, Val, ARows, ACols>& a,
-		const detail::expr_base<BBase, Val, BRows, BCols>& b) noexcept -> detail::expr_binary_op<dyn,
-		dyn,
-		detail::expr_base<ABase, Val, ARows, ACols>,
-		detail::expr_base<BBase, Val, BRows, BCols>,
+	template<typename ADerived, typename BDerived, typename T>
+	[[nodiscard]] inline auto operator-(const detail::expr_base<ADerived, T>& a,
+		const detail::expr_base<BDerived, T>& b) noexcept -> detail::expr_binary_op<detail::expr_base<ADerived, T>,
+		detail::expr_base<BDerived, T>,
 		decltype(detail::sub_op)> // @TODO: ISSUE #20
 	{
 		return { a, b, a.rows(), a.cols(), detail::sub_op };
 	}
 
-	template<typename Val,
-		std::size_t ARows,
-		std::size_t ACols,
-		std::size_t BRows,
-		std::size_t BCols,
-		typename AAlloc,
-		typename BAlloc>
-	inline auto operator-=(mat<Val, ARows, ACols, AAlloc>& a, const mat<Val, BRows, BCols, BAlloc>& b)
-		-> mat<Val, ARows, ACols>& // @TODO: ISSUE #20
+	template<typename T, typename ABuf, typename BBuf>
+	inline auto operator-=(mat<T, ABuf>& a, const mat<T, BBuf>& b) -> mat<T>& // @TODO: ISSUE #20
 	{
 		std::ranges::transform(a, b, a.begin(), std::minus{});
 
 		return a;
 	}
 
-	template<typename Val,
-		typename Expr,
-		std::size_t ARows,
-		std::size_t ACols,
-		std::size_t BRows,
-		std::size_t BCols,
-		typename AAlloc>
-	inline auto operator-=(mat<Val, ARows, ACols, AAlloc>& a, const detail::expr_base<Expr, Val, BRows, BCols>& b)
-		-> mat<Val, ARows, ACols>& // @TODO: ISSUE #20
+	template<typename T, typename Buf, typename Expr>
+	inline auto operator-=(mat<T, Buf>& a, const detail::expr_base<Expr, T>& b) -> mat<T>& // @TODO: ISSUE #20
 	{
 		const auto rows = a.rows();
 		const auto cols = a.cols();

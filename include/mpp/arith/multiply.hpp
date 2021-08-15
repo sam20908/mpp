@@ -54,48 +54,35 @@ namespace mpp
 			};
 	} // namespace detail
 
-	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
-	[[nodiscard]] inline auto operator*(const detail::expr_base<Base, Val, Rows, Cols>& obj, Val val) noexcept
-		-> detail::expr_binary_val_op<Rows,
-			Cols,
-			detail::expr_base<Base, Val, Rows, Cols>,
-			Val,
+	template<typename Derived, typename T>
+	[[nodiscard]] inline auto operator*(const detail::expr_base<Derived, T>& obj, T val) noexcept
+		-> detail::expr_binary_val_op<detail::expr_base<Derived, T>,
+			T,
 			decltype(detail::mul_val_op)> // @TODO: ISSUE #20
 	{
 		return { obj, val, obj.rows(), obj.cols(), detail::mul_val_op };
 	}
 
-	template<typename Base, typename Val, std::size_t Rows, std::size_t Cols>
-	[[nodiscard]] inline auto operator*(Val val, const detail::expr_base<Base, Val, Rows, Cols>& obj)
-		-> detail::expr_binary_val_op<Rows,
-			Cols,
-			detail::expr_base<Base, Val, Rows, Cols>,
-			Val,
+	template<typename Derived, typename T>
+	[[nodiscard]] inline auto operator*(T val, const detail::expr_base<Derived, T>& obj)
+		-> detail::expr_binary_val_op<detail::expr_base<Derived, T>,
+			T,
 			decltype(detail::mul_val_op)> // @TODO: ISSUE #20
 	{
 		return { obj, val, obj.rows(), obj.cols(), detail::mul_val_op };
 	}
 
-	template<typename ABase,
-		typename BBase,
-		typename Val,
-		std::size_t ARows,
-		std::size_t ACols,
-		std::size_t BRows,
-		std::size_t BCols>
-	[[nodiscard]] inline auto operator*(const detail::expr_base<ABase, Val, ARows, ACols>& a,
-		const detail::expr_base<BBase, Val, BRows, BCols>& b) -> detail::expr_binary_op<ARows,
-		BCols,
-		detail::expr_base<ABase, Val, ARows, ACols>,
-		detail::expr_base<BBase, Val, BRows, BCols>,
+	template<typename ADerived, typename BDerived, typename T>
+	[[nodiscard]] inline auto operator*(const detail::expr_base<ADerived, T>& a,
+		const detail::expr_base<BDerived, T>& b) -> detail::expr_binary_op<detail::expr_base<ADerived, T>,
+		detail::expr_base<BDerived, T>,
 		decltype(detail::mul_op)> // @TODO: ISSUE #20
 	{
 		return { a, b, a.rows(), b.cols(), detail::mul_op };
 	}
 
-	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-	inline auto operator*=(mat<Val, Rows, Cols, Alloc>& obj, Val val)
-		-> mat<Val, Rows, Cols, Alloc>& // @TODO: ISSUE #20
+	template<typename T, typename Buf>
+	inline auto operator*=(mat<T, Buf>& obj, T val) -> mat<T, Buf>& // @TODO: ISSUE #20
 	{
 		std::ranges::transform(obj, obj.begin(), std::bind_front(std::multiplies<>{}, val));
 
