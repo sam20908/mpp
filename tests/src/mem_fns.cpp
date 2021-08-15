@@ -22,6 +22,8 @@
 
 #include <mpp/mat.hpp>
 
+#include "../include/utils.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -34,19 +36,13 @@ int main()
 	using namespace mpp;
 
 	feature("Destructible (part of rule of five)") = []() {
-		expect(constant<std::is_destructible_v<mat<int, 2, 3>>>);
-		expect(constant<std::is_destructible_v<mat<int, dyn, dyn>>>);
-		expect(constant<std::is_destructible_v<mat<int, dyn, 3>>>);
-		expect(constant<std::is_destructible_v<mat<int, 2, dyn>>>);
+		expect(constant<std::is_destructible_v<fixed_mat<int, 2, 3>>>);
+		expect(constant<std::is_destructible_v<dyn_mat<int>>>);
 	};
 
 	const auto range_2d = std::vector<std::vector<int>>{ { 1, 2, 3 }, { 4, 5, 6 } };
-	const auto mats     = std::tuple{ mat<int, 2, 3>{ range_2d },
-        mat<int, dyn, dyn>{ range_2d },
-        mat<int, 2, dyn>{ range_2d },
-        mat<int, dyn, 3>{ range_2d } };
-	const auto dyn_mats =
-		std::tuple{ mat<int, dyn, dyn>{ range_2d }, mat<int, 2, dyn>{ range_2d }, mat<int, dyn, 3>{ range_2d } };
+	const auto mats = std::tuple{ mat<int, std::array<int, 6>>{ range_2d }, mat<int, std::vector<int>>{ range_2d } };
+	const auto dyn_mats = std::tuple{ mat<int, std::vector<int>>{ range_2d } };
 
 	feature("operator()") = [&]() {
 		given("We're only reading the data") = [&](const auto& mat) {
@@ -151,10 +147,6 @@ int main()
 	} | mats;
 
 	const auto alloc = std::allocator<int>{};
-
-	feature(".get_allocator()") = [&](const auto& mat) {
-		expect(mat.get_allocator() == alloc);
-	} | dyn_mats;
 
 	feature(".clear()") = [&](const auto& mat) {
 		mut(mat).clear();

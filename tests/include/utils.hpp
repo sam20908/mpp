@@ -39,6 +39,9 @@
 template<typename T, typename... Bufs>
 using mats = std::tuple<std::type_identity<mpp::mat<T, Bufs>>...>;
 
+template<typename T, std::size_t Rows, std::size_t Cols>
+using fixed_mat = mats<T, std::array<T, Rows * Cols>>;
+
 template<typename T>
 using dyn_mat = mats<T, std::vector<T>>;
 
