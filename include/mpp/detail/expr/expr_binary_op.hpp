@@ -30,9 +30,8 @@ namespace mpp::detail
 	/**
 	 * Binary expression object (no operand is a constant)
 	 */
-	template<std::size_t Rows, std::size_t Cols, typename Left, typename Right, typename Op>
-	class [[nodiscard]] expr_binary_op :
-		public expr_base<expr_binary_op<Rows, Cols, Left, Right, Op>, typename Left::value_type, Rows, Cols>
+	template<typename Left, typename Right, typename Op>
+	class [[nodiscard]] expr_binary_op : public expr_base<expr_binary_op<Left, Right, Op>, typename Left::value_type>
 	{
 		// Store both operands by reference to avoid copying them
 		const Left& left_;

@@ -31,12 +31,11 @@ namespace mpp::detail
 	 * Binary expression object (one of the operands is a constant, so we have to store it
 	 * differently, which differs from expr_binary_op)
 	 */
-	template<std::size_t Rows, std::size_t Cols, typename Obj, typename Val, typename Op>
-	class [[nodiscard]] expr_binary_val_op :
-		public expr_base<expr_binary_val_op<Rows, Cols, Obj, Val, Op>, Val, Rows, Cols>
+	template<typename Obj, typename T, typename Op>
+	class [[nodiscard]] expr_binary_val_op : public expr_base<expr_binary_val_op<Obj, T, Op>, T>
 	{
 		const Obj& obj_;
-		Val val_; // Store the constant by copy to handle literals
+		T val_; // Store the constant by copy to handle literals
 
 		const Op& op_;
 
@@ -45,10 +44,10 @@ namespace mpp::detail
 		std::size_t result_cols_;
 
 	public:
-		using value_type = Val;
+		using value_type = T;
 
 		expr_binary_val_op(const Obj& obj,
-			Val val,
+			T val,
 			std::size_t result_rows,
 			std::size_t result_cols,
 			const Op& op) noexcept // @TODO: ISSUE #20

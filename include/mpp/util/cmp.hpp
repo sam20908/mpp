@@ -21,7 +21,7 @@
 
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/util.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -34,19 +34,9 @@ namespace mpp
 {
 	struct cmp_t : public detail::cpo_base<cmp_t>
 	{
-		template<typename Val,
-			typename Val2,
-			std::size_t Rows,
-			std::size_t Cols,
-			std::size_t Rows2,
-			std::size_t Cols2,
-			typename Alloc,
-			typename Alloc2,
-			typename Fn = std::compare_three_way>
-		[[nodiscard]] friend inline auto tag_invoke(cmp_t,
-			const mat<Val, Rows, Cols, Alloc>& a,
-			const mat<Val2, Rows2, Cols2, Alloc2>& b,
-			Fn fn = {}) // @TODO: ISSUE #20
+		template<typename Val, typename Val2, typename Buf, typename Buf2, typename Fn = std::compare_three_way>
+		[[nodiscard]] friend inline auto
+		tag_invoke(cmp_t, const mat<Val, Buf>& a, const mat<Val2, Buf2>& b, Fn fn = {}) // @TODO: ISSUE #20
 			noexcept(noexcept(std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), fn)))
 		{
 			return std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end(), fn);
@@ -78,16 +68,8 @@ namespace mpp
 	};
 
 	// @TODO: This is an odd place, maybe look for somewhere else to put it?
-	template<typename T,
-		typename T2,
-		std::size_t Rows,
-		std::size_t Rows2,
-		std::size_t Cols,
-		std::size_t Cols2,
-		typename Alloc,
-		typename Alloc2>
-	auto operator<=>(const mat<T, Rows, Cols, Alloc>& a, const mat<T2, Rows2, Cols2, Alloc2>& b) noexcept(
-		noexcept(cmp(a, b))) -> bool
+	template<typename T, typename T2, typename Buf, typename Buf2>
+	auto operator<=>(const mat<T, Buf>& a, const mat<T2, Buf2>& b) noexcept(noexcept(cmp(a, b))) -> bool
 	{
 		return cmp(a, b);
 	}

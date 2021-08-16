@@ -21,7 +21,7 @@
 
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/print_impl.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -31,18 +31,18 @@ namespace mpp
 {
 	struct print_t : public detail::cpo_base<print_t>
 	{
-		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-		friend inline auto tag_invoke(print_t, const mat<Val, Rows, Cols, Alloc>& obj) -> void
+		template<typename T, typename Buf>
+		friend inline auto tag_invoke(print_t, const mat<T, Buf>& obj) -> void
 		{
-			auto message_stream = std::stringstream{};
-			detail::append_expr_to_stream(message_stream, obj, "");
+			auto msg = std::stringstream{};
+			detail::append_expr_to_stream(msg, obj, "");
 
-			std::cout << message_stream.str();
+			std::cout << msg.str();
 		}
 	};
 
-	template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc>
-	auto operator<<(std::ostream& os, const mat<Val, Rows, Cols, Alloc>& obj) -> std::ostream&
+	template<typename T, typename Buf>
+	auto operator<<(std::ostream& os, const mat<T, Buf>& obj) -> std::ostream&
 	{
 		detail::append_expr_to_stream(os, obj, "");
 		return os;

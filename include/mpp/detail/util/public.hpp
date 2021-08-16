@@ -19,11 +19,23 @@
 
 #pragma once
 
+#include <array>
 #include <cstddef>
+#include <type_traits>
+#include <vector>
 
 namespace mpp
 {
-	static inline constexpr auto dyn = static_cast<std::size_t>(-1);
+	template<typename>
+	inline constexpr auto is_dyn_buf = false;
+	template<typename>
+	inline constexpr auto is_fixed_buf = false;
+
+	template<typename T, typename Alloc>
+	inline constexpr auto is_dyn_buf<std::vector<T, Alloc>> = true;
+
+	template<typename T, std::size_t N>
+	inline constexpr auto is_fixed_buf<std::array<T, N>> = true;
 
 	struct identity_tag
 	{
