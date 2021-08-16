@@ -25,11 +25,11 @@ struct my_chunk
 };
 ```
 
-You can whitelist it like this (**do this before you instantiate `mpp::mat` ):
+You can whitelist it like this (**do this before you instantiate `mat` ):
 
 ```cpp
 template<typename T>
-inline constexpr auto mpp::is_fixed_buf<my_chunk<T>> = true;
+inline constexpr auto is_fixed_buf<my_chunk<T>> = true;
 ```
 
 _This was inspired by `std::ranges::enable_borrowed_range` ._
