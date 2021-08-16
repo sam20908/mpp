@@ -19,11 +19,9 @@
 
 #include <boost/ut.hpp>
 
-// #include <mpp/algo.hpp>
+#include <mpp/algo.hpp>
 #include <mpp/mat.hpp>
 #include <mpp/util.hpp>
-
-#include <cstddef>
 
 using namespace boost::ut::literals;
 using namespace boost::ut::bdd;
@@ -50,70 +48,70 @@ inline constexpr auto is_fixed_buf<wacky_array<T>> = true;
 
 namespace ns
 {
-	// struct dumb_class
-	// {
-	// };
+	struct dumb_class
+	{
+	};
 
-	// struct dumb_class2
-	// {
-	// };
+	struct dumb_class2
+	{
+	};
 
-	// [[nodiscard]] constexpr auto tag_invoke(block_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(block_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(det_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(det_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(inv_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(inv_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(trps_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(trps_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(cmp_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(cmp_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(lu_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(lu_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(fwd_sub_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(fwd_sub_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 
-	// [[nodiscard]] constexpr auto tag_invoke(back_sub_t, dumb_class) -> dumb_class2
-	// {
-	// 	return dumb_class2{};
-	// }
+	[[nodiscard]] constexpr auto tag_invoke(back_sub_t, dumb_class) -> dumb_class2
+	{
+		return dumb_class2{};
+	}
 } // namespace ns
 
-// template<typename CPO>
-// using invoke_result_t = detail::tag_invoke_result_t<CPO, ns::dumb_class>;
+template<typename CPO>
+using invoke_result_t = mpp::detail::tag_invoke_result_t<CPO, ns::dumb_class>;
 
 int main()
 {
-	// when("I check against the CPOs' return types") = []() {
-	// 	expect(type<invoke_result_t<block_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<det_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<inv_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<trps_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<cmp_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<lu_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<fwd_sub_t>> == type<ns::dumb_class2>);
-	// 	expect(type<invoke_result_t<back_sub_t>> == type<ns::dumb_class2>);
-	// };
+	when("I check against the CPOs' return types") = []() {
+		expect(type<invoke_result_t<block_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<det_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<inv_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<trps_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<cmp_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<lu_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<fwd_sub_t>> == type<ns::dumb_class2>);
+		expect(type<invoke_result_t<back_sub_t>> == type<ns::dumb_class2>);
+	};
 
 	when("I check the properties of the matrix with customized buffer") = []() {
 		using wacky_mat = mat<int, wacky_array<int>>;
@@ -134,17 +132,16 @@ int main()
 		expect(type<typename wacky_mat::difference_type> == type<std::size_t>);
 	};
 
-	// scenario("CPOs should meet std::semiregular requirements") = []() {
-	// 	expect(constant<std::semiregular<type_t>>);
-	// 	expect(constant<std::semiregular<block_t>>);
-	// 	expect(constant<std::semiregular<det_t>>);
-	// 	expect(constant<std::semiregular<inv_t>>);
-	// 	expect(constant<std::semiregular<trps_t>>);
-	// 	expect(constant<std::semiregular<cmp_t>>);
-	// 	expect(constant<std::semiregular<lu_t>>);
-	// 	expect(constant<std::semiregular<fwd_sub_t>>);
-	// 	expect(constant<std::semiregular<back_sub_t>>);
-	// };
+	scenario("CPOs should meet std::semiregular requirements") = []() {
+		expect(constant<std::semiregular<block_t>>);
+		expect(constant<std::semiregular<det_t>>);
+		expect(constant<std::semiregular<inv_t>>);
+		expect(constant<std::semiregular<trps_t>>);
+		expect(constant<std::semiregular<cmp_t>>);
+		expect(constant<std::semiregular<lu_t>>);
+		expect(constant<std::semiregular<fwd_sub_t>>);
+		expect(constant<std::semiregular<back_sub_t>>);
+	};
 
 	return 0;
 }
