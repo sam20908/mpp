@@ -37,7 +37,7 @@ function(_create_test TEST_FILENAME)
     target_compile_definitions(${TEST_NAME} PRIVATE -DTEST_DATA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test_data")
 endfunction()
 
-# _create_test("algos")
+_create_test("algos")
 _create_test("ariths")
 _create_test("assign")
 _create_test("customize")

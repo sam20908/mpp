@@ -22,7 +22,7 @@
 #include <mpp/detail/util/algo_impl.hpp>
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/util.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -50,39 +50,28 @@ namespace mpp
 			}
 			else if (rows == 2)
 			{
-				const auto ad = static_cast<fp_t>(obj(0, 0)) * static_cast<fp_t>(obj(1, 1));
-				const auto bc = static_cast<fp_t>(obj(0, 1)) * static_cast<fp_t>(obj(1, 0));
+				const auto ad = obj(0, 0) * obj(1, 1);
+				const auto bc = obj(0, 1) * obj(1, 0);
 
-				const auto result = ad - bc;
-
-				return static_cast<To>(result);
+				return static_cast<To>(ad - bc);
 			}
 
-			using lu_buf_t = typename mat_rebind_to_t<Mat, fp_t>::buffer_type;
-
-			auto u = lu_buf_t{};
-
-			// If the incoming matrix has an array as its buffer, we can just use the same type of buffer since it'll be
-			// less overhead and we know it's the same size
-
-			resize_buf_if_vec(u, rows, cols, fp_t{});
-			std::ranges::copy(obj, u.begin());
+			auto buf = obj.buffer();
 
 			// The determinant of a LU Decomposition is det(A) = det(L) * det(U) Since det(L) is always 1, we can avoid
 			// creating L entirely
-			const auto det_ = lu_impl<fp_t, false, true>(rows, cols, dummy, u);
+			const auto det_ = lu_algo<To, false, true>(rows, cols, dummy, buf);
 
-			// @FIXME: Is it correct to just directly cast?
-			return static_cast<To>(det_);
+			return det_;
 		}
 	} // namespace detail
 
 	struct det_t : public detail::cpo_base<det_t>
 	{
-		template<typename Val, std::size_t Rows, std::size_t Cols, typename Alloc, typename To = Val>
-		requires(std::is_arithmetic_v<To>) [[nodiscard]] friend inline auto tag_invoke(det_t,
-			const mat<Val, Rows, Cols, Alloc>& obj,
-			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
+		template<typename T, typename Buf, typename To = T>
+		requires(std::is_arithmetic_v<To>)
+			[[nodiscard]] friend inline auto tag_invoke(det_t, const mat<T, Buf>& obj, std::type_identity<To> = {})
+				-> To // @TODO: ISSUE #20
 		{
 			return detail::det_impl<To>(obj);
 		}

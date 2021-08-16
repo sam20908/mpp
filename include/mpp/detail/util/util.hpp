@@ -81,6 +81,9 @@ namespace mpp
 		concept mat_with_value_convertible_to = is_mat<std::remove_cvref_t<T>>::value &&
 			std::convertible_to<typename std::remove_cvref_t<T>::value_type, To>;
 
+		template<typename, typename>
+		struct rebind_mat_to_t_impl;
+
 		// Double was tested to be accurate *enough* to do calculations involve irrational fractions (e.g. 1/3) and
 		// provide accurate enough results
 		using fp_t = double;
@@ -125,6 +128,16 @@ namespace mpp
 			{
 				std::ranges::fill(buf, val);
 			}
+		}
+
+		template<typename Buf>
+		auto copy_into_new_buf(const auto& obj, std::size_t rows, std::size_t cols) -> Buf // @TODO: ISSUE #20
+		{
+			auto buf = Buf{};
+			resize_buf_if_dyn(buf, rows, cols, typename Buf::value_type{});
+			std::ranges::copy(obj, std::ranges::begin(buf));
+
+			return buf;
 		}
 
 		void init_identity_buf(auto& buf,

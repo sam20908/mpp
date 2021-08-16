@@ -21,7 +21,7 @@
 
 #include <mpp/detail/util/algo_impl.hpp>
 #include <mpp/detail/util/cpo_base.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -37,28 +37,18 @@ namespace mpp
 			assert(b.cols() == 1);
 
 			const auto rows = a.rows();
+			auto buf        = back_sub_buf<typename To::buffer_type>(a.data(), b.data(), rows);
 
-			using x_mat_t = mat_rebind_to_t<To, fp_t>;
-			auto x_buf    = back_sub_buf<typename x_mat_t::buffer_type>(a.data(), b.data(), rows);
-
-			return To{ rows, 1, std::move(x_buf) };
+			return To{ rows, 1, std::move(buf) };
 		}
 	} // namespace detail
 
 	struct back_sub_t : public detail::cpo_base<back_sub_t>
 	{
-		template<typename AVal,
-			typename BVal,
-			std::size_t ARows,
-			std::size_t ACols,
-			std::size_t BRows,
-			std::size_t BCols,
-			typename AAlloc,
-			typename BAlloc,
-			typename To = mat<std::common_type_t<AVal, BVal>, dyn, dyn>>
+		template<typename AT, typename BT, typename ABuf, typename BBuf, typename To = mat<std::common_type_t<AT, BT>>>
 		requires(detail::is_mat<To>::value) friend inline auto tag_invoke(back_sub_t,
-			const mat<AVal, ARows, ACols, AAlloc>& a,
-			const mat<BVal, BRows, BCols, BAlloc>& b,
+			const mat<AT, ABuf>& a,
+			const mat<BT, BBuf>& b,
 			std::type_identity<To> = {}) -> To // @TODO: ISSUE #20
 		{
 			return detail::back_sub_impl<To>(a, b);

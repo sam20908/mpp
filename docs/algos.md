@@ -167,8 +167,7 @@ U=
 default to same matrix type as the input (not correct in this case)
  */
 
-using LU_t = std::type_identity<mat<float, 2, 2>>;
-auto [L, U] = lu(A, std::type_identity<LU_t>{}, std::type_identity<LU_t>{}); // specify each L and U matrix type
+auto [L, U] = lu(A, std::type_identity<mat<float, 2, 2>>{}); // specify type for L and U matrix
 /**
 L=
 1 0
