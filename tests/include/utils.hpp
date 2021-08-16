@@ -22,8 +22,8 @@
 #include <boost/ut.hpp>
 
 #include <mpp/detail/util/algo_impl.hpp>
-#include <mpp/mat/matfwd.hpp>
 #include <mpp/util/cmp.hpp>
+#include <mpp/mat.hpp>
 
 #include <cstddef>
 #include <filesystem>
@@ -425,25 +425,25 @@ inline auto parse_ordering = [](std::ifstream& file, std::string& line) {
 	return std::get<0>(ordering);
 };
 
-// struct block_idxs_container
-// {
-// 	std::size_t row_start;
-// 	std::size_t col_start;
-// 	std::size_t row_end;
-// 	std::size_t col_end;
-// };
+struct block_idxs_container
+{
+	std::size_t row_start;
+	std::size_t col_start;
+	std::size_t row_end;
+	std::size_t col_end;
+};
 
-// inline auto parse_block_idxs = [](std::ifstream& file, std::string& line) {
-// 	std::getline(file, line);
+inline auto parse_block_idxs = [](std::ifstream& file, std::string& line) {
+	std::getline(file, line);
 
-// 	auto stream = std::istringstream{ line };
-// 	std::size_t row_start, col_start, row_end, col_end;
-// 	stream >> row_start >> col_start >> row_end >> col_end;
+	auto stream = std::istringstream{ line };
+	std::size_t row_start, col_start, row_end, col_end;
+	stream >> row_start >> col_start >> row_end >> col_end;
 
-// 	std::getline(file, line); // to skip '='
+	std::getline(file, line); // to skip '='
 
-// 	return block_idxs_container{ row_start, col_start, row_end, col_end };
-// };
+	return block_idxs_container{ row_start, col_start, row_end, col_end };
+};
 
 template<typename... Fns>
 auto parse_test(std::string_view filename, const Fns&... fns)

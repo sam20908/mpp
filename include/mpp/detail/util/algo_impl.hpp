@@ -20,7 +20,7 @@
 #pragma once
 
 #include <mpp/detail/util/util.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -52,7 +52,7 @@ namespace mpp::detail
 	}
 
 	template<typename To, bool FillL, bool GetDet>
-	inline auto lu_impl(std::size_t rows, std::size_t cols, auto& l, auto& u) -> To // @TODO: ISSUE #20
+	inline auto lu_algo(std::size_t rows, std::size_t cols, auto& l, auto& u) -> To // @TODO: ISSUE #20
 	{
 		// Shortcut method from
 		// https://medium.com/linear-algebra-basics/lu-decomposition-c8f9b75ddeff
@@ -61,7 +61,7 @@ namespace mpp::detail
 		// 1. l is already an identity buffer
 		// 2. u has the original values
 
-		auto det_ = fp_t{ 1 };
+		auto det_ = To{ 1 };
 
 		for (auto row = std::size_t{}; row < rows; ++row)
 		{
@@ -102,15 +102,17 @@ namespace mpp::detail
 			}
 		}
 
-		return static_cast<To>(det_);
+		return det_;
 	}
 
 	template<typename Buf>
 	inline auto back_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
 	{
-		auto x_buf = Buf{};
+		using buf_val_t = typename Buf::value_type;
 
-		resize_buf_if_vec(x_buf, n, 1, fp_t{});
+		auto buf = Buf{};
+
+		resize_buf_if_dyn(buf, n, 1, buf_val_t{});
 
 		/**
 		 * Implementation of back substitution from
@@ -120,31 +122,33 @@ namespace mpp::detail
 		{
 			const auto row_idx = row - 1;
 
-			auto res = static_cast<fp_t>(b[idx_1d(1, row_idx, 0)]);
+			auto res = static_cast<buf_val_t>(b[idx_1d(1, row_idx, 0)]);
 
 			for (auto col = n - 1; col > row_idx; --col)
 			{
-				res -= a[idx_1d(n, row_idx, col)] * x_buf[col];
+				res -= a[idx_1d(n, row_idx, col)] * buf[col];
 			}
 
-			const auto diag = static_cast<fp_t>(a[idx_1d(n, row_idx, row_idx)]);
+			const auto diag = static_cast<buf_val_t>(a[idx_1d(n, row_idx, row_idx)]);
 
 			assert(!is_zero_or_nan(diag));
 
 			res /= diag;
 
-			x_buf[row_idx] = res;
+			buf[row_idx] = res;
 		}
 
-		return x_buf;
+		return buf;
 	}
 
 	template<typename Buf>
 	inline auto fwd_sub_buf(const auto& a, const auto& b, std::size_t n) -> Buf // @TODO: ISSUE #20
 	{
-		auto x_buf = Buf{};
+		using buf_val_t = typename Buf::value_type;
 
-		resize_buf_if_vec(x_buf, n, 1, fp_t{});
+		auto buf = Buf{};
+
+		resize_buf_if_dyn(buf, n, 1, buf_val_t{});
 
 		/**
 		 * Implementation of forward substitution from
@@ -152,22 +156,22 @@ namespace mpp::detail
 		 */
 		for (auto row = std::size_t{}; row < n; ++row)
 		{
-			auto res = static_cast<fp_t>(b[idx_1d(1, row, 0)]);
+			auto res = static_cast<buf_val_t>(b[idx_1d(1, row, 0)]);
 
 			for (auto col = std::size_t{}; col < row; ++col)
 			{
-				res -= a[idx_1d(n, row, col)] * x_buf[col];
+				res -= a[idx_1d(n, row, col)] * buf[col];
 			}
 
-			const auto diag = static_cast<fp_t>(a[idx_1d(n, row, row)]);
+			const auto diag = static_cast<buf_val_t>(a[idx_1d(n, row, row)]);
 
 			assert(!is_zero_or_nan(diag));
 
 			res /= diag;
 
-			x_buf[row] = res;
+			buf[row] = res;
 		}
 
-		return x_buf;
+		return buf;
 	}
 } // namespace mpp::detail

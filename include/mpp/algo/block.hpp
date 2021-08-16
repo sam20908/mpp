@@ -21,12 +21,13 @@
 
 #include <mpp/detail/util/cpo_base.hpp>
 #include <mpp/detail/util/util.hpp>
-#include <mpp/mat/matfwd.hpp>
+#include <mpp/mat.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 
 namespace mpp
 {
@@ -53,96 +54,46 @@ namespace mpp
 		}
 
 		template<typename To>
-		auto block_impl_fixed(const auto& obj,
-			std::size_t top_row_idx,
-			std::size_t top_col_idx,
-			std::size_t bottom_row_idx,
-			std::size_t bottom_col_idx) -> To // @TODO: ISSUE #20
-		{
-			using diff_t = typename To::difference_type;
-			using buf_t  = typename To::buffer_type;
-
-			auto buf = buf_t{};
-
-			auto buf_begin = buf.begin();
-			auto obj_begin = obj.begin();
-
-			const auto cols       = obj.cols();
-			const auto block_rows = bottom_row_idx - top_row_idx + 1;
-			const auto block_cols = bottom_col_idx - top_col_idx + 1;
-
-			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
-			{
-				auto row_begin_index = static_cast<diff_t>(idx_1d(cols, row, top_col_idx));
-				auto row_begin       = std::next(obj_begin, row_begin_index);
-
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), buf_begin);
-
-				std::advance(buf_begin, block_cols);
-			}
-
-			return To{ block_rows, block_cols, std::move(buf) };
-		}
-
-		template<typename To>
-		auto block_impl_dyn(const auto& obj,
-			std::size_t top_row_idx,
-			std::size_t top_col_idx,
-			std::size_t bottom_row_idx,
-			std::size_t bottom_col_idx) -> To // @TODO: ISSUE #20
-		{
-			using diff_t = typename To::difference_type;
-			using buf_t  = typename To::buffer_type;
-
-			const auto cols       = obj.cols();
-			const auto block_rows = bottom_row_idx - top_row_idx + 1;
-			const auto block_cols = bottom_col_idx - top_col_idx + 1;
-
-			auto buf = buf_t{};
-			buf.reserve(block_rows * block_cols);
-
-			auto inserter = std::back_inserter(buf);
-
-			for (auto row = top_row_idx; row <= bottom_row_idx; ++row)
-			{
-				auto row_begin_index = static_cast<diff_t>(idx_1d(cols, row, top_col_idx));
-				auto row_begin       = std::next(obj.begin(), row_begin_index);
-
-				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), inserter);
-			}
-
-			return To{ block_rows, block_cols, std::move(buf) };
-		}
-
-		template<typename To>
 		[[nodiscard]] inline auto block_impl(const auto& obj,
 			auto top_row_idx,
 			auto top_col_idx,
 			auto bottom_row_idx,
 			auto bottom_col_idx) -> To // @TODO: ISSUE #20
 		{
-			assert_valid_block_dims(obj.rows(), obj.cols(), top_row_idx, top_col_idx, bottom_row_idx, bottom_col_idx);
+			const auto rows = obj.rows();
+			const auto cols = obj.cols();
+			assert_valid_block_dims(rows, cols, top_row_idx, top_col_idx, bottom_row_idx, bottom_col_idx);
 
-			if constexpr (is_vec<typename To::buffer_type>::value)
+			using buf_t  = typename To::buffer_type;
+			using val_t  = typename To::value_type;
+			using diff_t = typename To::difference_type;
+
+			const auto block_rows = bottom_row_idx - top_row_idx + 1;
+			const auto block_cols = bottom_col_idx - top_col_idx + 1;
+
+			auto buf = buf_t{};
+			resize_buf_if_dyn(buf, block_rows, block_cols, val_t{});
+
+			auto buf_begin = std::ranges::begin(buf);
+			auto obj_begin = std::ranges::begin(obj);
+
+			for (auto row = top_row_idx; row <= bottom_row_idx; ++row, buf_begin += static_cast<diff_t>(block_cols))
 			{
-				return block_impl_dyn<To>(obj, top_row_idx, top_col_idx, bottom_row_idx, bottom_col_idx);
+				auto row_begin_index = static_cast<diff_t>(idx_1d(cols, row, top_col_idx));
+				auto row_begin       = std::next(obj_begin, row_begin_index);
+
+				std::ranges::copy_n(row_begin, static_cast<diff_t>(block_cols), buf_begin);
 			}
-			else
-			{
-				return block_impl_fixed<To>(obj, top_row_idx, top_col_idx, bottom_row_idx, bottom_col_idx);
-			}
+
+			return To{ block_rows, block_cols, std::move(buf) };
 		}
 	} // namespace detail
 
 	struct block_t : public detail::cpo_base<block_t>
 	{
-		template<typename Val,
-			std::size_t Rows,
-			std::size_t Cols,
-			typename Alloc,
-			typename To = mat<Val, dyn, dyn, Alloc>>
+		template<typename T, typename Buf, typename To = mat<T, Buf>>
 		requires(detail::is_mat<To>::value) [[nodiscard]] friend inline auto tag_invoke(block_t,
-			const mat<Val, Rows, Cols, Alloc>& obj,
+			const mat<T, Buf>& obj,
 			std::size_t top_row_idx,
 			std::size_t top_col_idx,
 			std::size_t bottom_row_idx,
