@@ -1,6 +1,6 @@
 # mpp
 
-A C++20 and later matrix library
+A modern C++ matrix library
 
 [![Build Status](https://dev.azure.com/samestimable2016/mpp/_apis/build/status/sam20908.mpp?branchName=main)](https://dev.azure.com/samestimable2016/mpp/_build/latest?definitionId=3&branchName=main)
 
