@@ -24,7 +24,7 @@
 #include <mpp/mat.hpp>
 
 #include <cstddef>
-#include <iosfwd>
+#include <iostream>
 #include <sstream>
 
 namespace mpp
