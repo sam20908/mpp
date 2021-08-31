@@ -177,7 +177,7 @@ namespace mpp
 			std::ranges::generate(buf_, std::forward<Fn>(fn));
 		}
 
-		template<typename Derived, typename T2>
+		template<typename Derived, std::convertible_to<T> T2>
 		explicit mat(const detail::expr_base<Derived, T2>& expr) :
 			rows_(expr.rows()),
 			cols_(expr.cols()) // @TODO: ISSUE #20
