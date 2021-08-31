@@ -168,8 +168,7 @@ namespace mpp
 			detail::init_identity_buf(buf_, rows, cols, zero_val, one_val);
 		}
 
-		// @FIXME: Allow fn's value return be convertible to value type
-		template<detail::fn_with_return_type<T> Fn>
+		template<detail::fn_with_return_type_convertible_to<T> Fn>
 		mat(size_type rows, size_type cols, Fn&& fn) : rows_(rows), cols_(cols) // @TODO: ISSUE #20
 		{
 			detail::resize_buf_if_dyn(buf_, rows, cols, T{});

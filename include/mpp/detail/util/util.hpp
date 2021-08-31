@@ -52,8 +52,8 @@ namespace mpp
 	namespace detail
 	{
 		template<typename Fn, typename Return, typename... Args>
-		concept fn_with_return_type =
-			std::invocable<Fn, Args...> && std::same_as<std::invoke_result_t<Fn, Args...>, Return>;
+		concept fn_with_return_type_convertible_to =
+			std::invocable<Fn, Args...> && std::convertible_to<std::invoke_result_t<Fn, Args...>, Return>;
 
 		template<typename Rng>
 		using rng_2d_value_t = std::ranges::range_value_t<std::ranges::range_value_t<Rng>>;
